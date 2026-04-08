@@ -9,10 +9,8 @@
   "citizen": "مواطن",
   "employee": "موظف",
   "emailLabel": "البريد الإلكتروني",
-  "phoneLabel": "رقم الهاتف",
   "passwordLabel": "كلمة المرور",
-  "emailHint": "user@example.com",
-  "phoneHint": "+961 xx xxx xxx",
+ "emailHint": "user@example.com",
   "loginButton": "تسجيل الدخول",
   "sendCodeButton": "إرسال الرمز",
   "noAccount": "ليس لديك حساب؟",
@@ -27,7 +25,6 @@
   "fieldRequired": "هذا الحقل مطلوب",
   "invalidEmail": "الرجاء إدخال بريد إلكتروني صحيح",
   "passwordTooShort": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
-  "invalidPhone": "الرجاء إدخال رقم هاتف صحيح",
   "copyright": "© ٢٠٢٦ بلديتي - جميع الحقوق محفوظة",
   "errorGeneric": "حدث خطأ ما. الرجاء المحاولة مرة أخرى.",
   "errorInvalidCredentials": "البريد الإلكتروني أو كلمة المرور غير صحيحة",
@@ -37,7 +34,6 @@
   "successLogin": "تم تسجيل الدخول بنجاح!",
   "successRegister": "تم إنشاء الحساب بنجاح!",
   "emailMethod": "بريد إلكتروني",
-  "phoneMethod": "هاتف",
   "selectMunicipality": "اختر البلدية",
   "municipalityLabel": "البلدية"
 }

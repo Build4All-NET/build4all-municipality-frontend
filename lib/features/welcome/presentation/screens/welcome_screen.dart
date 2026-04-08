@@ -24,7 +24,7 @@ class WelcomeScreen extends StatelessWidget {
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              AppColors.lightBlue,
+              Color.fromARGB(255, 8, 46, 123),
               AppColors.primary,
               Color(0xFF1020A0),
             ],

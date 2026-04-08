@@ -7,7 +7,7 @@
 import '../entities/user_entity.dart';
 
 abstract class AuthRepository {
-  Future<String> login({
+  Future<String>login({
     required String email,
     required String password,
   });
@@ -16,7 +16,7 @@ abstract class AuthRepository {
     required String email,
     required String password,
     required String fullName,
-    required String phone,
+   // required String phone,
     required String role,
     required int municipalityId,
   });

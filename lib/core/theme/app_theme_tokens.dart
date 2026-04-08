@@ -42,7 +42,7 @@ class AppThemeTokens {
   factory AppThemeTokens.dark() {
     return AppThemeTokens(
       colors: AppColorTokens(
-        primary: AppColors.lightBlue,
+        primary: const Color.fromARGB(255, 0, 49, 226),
         onPrimary: Colors.white,
         background: const Color(0xFF0D1117),
         surface: const Color(0xFF161B22),

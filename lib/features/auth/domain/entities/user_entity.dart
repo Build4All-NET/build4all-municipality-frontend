@@ -4,7 +4,7 @@ class UserEntity {
   final String? username;
   final String? fullName;
   final String? email;
-  final String? phone;
+  //final String? phone;
   final String? address;
   final String? avatarUrl;
   final String? role;
@@ -18,7 +18,7 @@ class UserEntity {
     this.username,
     this.fullName,
     this.email,
-    this.phone,
+   // this.phone,
     this.address,
     this.avatarUrl,
     this.role,
@@ -34,7 +34,7 @@ class UserEntity {
       username: json['username'],
       fullName: json['fullName'],
       email: json['email'],
-      phone: json['phone'],
+      //phone: json['phone'],
       address: json['address'],
       avatarUrl: json['avatarUrl'],
       role: json['role'],
@@ -49,7 +49,7 @@ class UserEntity {
     String? username,
     String? fullName,
     String? email,
-    String? phone,
+  //  String? phone,
     String? address,
     String? avatarUrl,
     String? role,
@@ -62,7 +62,7 @@ class UserEntity {
       username: username ?? this.username,
       fullName: fullName ?? this.fullName,
       email: email ?? this.email,
-      phone: phone ?? this.phone,
+      //phone: phone ?? this.phone,
       address: address ?? this.address,
       avatarUrl: avatarUrl ?? this.avatarUrl,
       role: role ?? this.role,

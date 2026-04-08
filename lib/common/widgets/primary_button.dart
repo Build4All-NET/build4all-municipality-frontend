@@ -23,6 +23,7 @@ class PrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+
     return SizedBox(
       width: width ?? double.infinity,
       height: AppSizes.buttonHeight,
@@ -35,6 +36,13 @@ class PrimaryButton extends StatelessWidget {
             borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
           ),
           elevation: 0,
+        ).copyWith(
+          backgroundColor: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.pressed)) {
+              return const Color(0xFF0D47A1); // dark blue عند الضغط
+            }
+            return backgroundColor ?? theme.colorScheme.primary;
+          }),
         ),
         child: isLoading
             ? SizedBox(
@@ -47,7 +55,10 @@ class PrimaryButton extends StatelessWidget {
               )
             : Text(
                 label,
-                style: const TextStyle(fontSize: 17, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  fontSize: 17,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
       ),
     );

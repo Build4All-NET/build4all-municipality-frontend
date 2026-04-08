@@ -9,10 +9,8 @@
   "citizen": "Citizen",
   "employee": "Employee",
   "emailLabel": "Email Address",
-  "phoneLabel": "Phone Number",
   "passwordLabel": "Password",
   "emailHint": "user@example.com",
-  "phoneHint": "+961 xx xxx xxx",
   "loginButton": "Login",
   "sendCodeButton": "Send Code",
   "noAccount": "Don't have an account?",
@@ -27,7 +25,6 @@
   "fieldRequired": "This field is required",
   "invalidEmail": "Please enter a valid email",
   "passwordTooShort": "Password must be at least 6 characters",
-  "invalidPhone": "Please enter a valid phone number",
   "copyright": "© 2026 Baladiyati - All rights reserved",
   "errorGeneric": "Something went wrong. Please try again.",
   "errorInvalidCredentials": "Invalid email or password",
@@ -37,7 +34,6 @@
   "successLogin": "Login successful!",
   "successRegister": "Account created successfully!",
   "emailMethod": "Email",
-  "phoneMethod": "Phone",
   "selectMunicipality": "Select Municipality",
   "municipalityLabel": "Municipality"
 }

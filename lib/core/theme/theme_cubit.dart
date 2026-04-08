@@ -3,7 +3,7 @@
 // Manages light/dark theme switching
 // Saves preference to SharedPreferences
 // ─────────────────────────────────────────
-
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'app_theme_tokens.dart';
@@ -14,7 +14,13 @@ class ThemeState {
 
   const ThemeState({required this.tokens, required this.isDark});
 }
+class ColorCubit extends Cubit<Color> {
+  ColorCubit() : super(const Color.fromRGBO(33, 54, 243, 0.884)); // couleur par défaut
 
+  void changeColor(Color color) {
+    emit(color);
+  }
+}
 class ThemeCubit extends Cubit<ThemeState> {
   static const _key = 'app_theme';
 

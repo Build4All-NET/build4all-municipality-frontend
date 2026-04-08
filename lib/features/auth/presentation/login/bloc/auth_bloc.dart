@@ -1,4 +1,5 @@
 // lib/features/auth/presentation/login/bloc/auth_bloc.dart
+
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../data/services/auth_api_service.dart';
 import '../../../data/services/session_role_store.dart';
@@ -17,23 +18,28 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<AuthUserPatched>(_onUserPatched);
   }
 
+  /// 🔹 LOGIN (CITIZEN / EMPLOYEE)
   Future<void> _onLoginSubmitted(
     AuthLoginSubmitted event,
     Emitter<AuthState> emit,
   ) async {
     emit(state.copyWith(isLoading: true));
+
     try {
       final response = await authApi.login(
         email: event.email.trim(),
         password: event.password,
+        role: event.role,
       );
 
-      // Save role
-      await _roleStore.saveRole('CITIZEN');
+      // Sauvegarde rôle
+      await _roleStore.saveRole(event.role);
 
+      // Création user temporaire (pas de userId dans AuthResponseModel)
       final user = UserEntity(
-        id: 0,
+        id: 0, // valeur temporaire
         email: event.email.trim(),
+        role: event.role,
       );
 
       emit(state.copyWith(
@@ -50,22 +56,26 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     }
   }
 
+  /// 🔹 LOGOUT
   Future<void> _onLoggedOut(
     AuthLoggedOut event,
     Emitter<AuthState> emit,
   ) async {
     try {
-      await authApi.logout();
+      await authApi.logout(); // ← plus de paramètres inutiles
     } catch (_) {}
+
     emit(AuthState.initial());
   }
 
+  /// 🔹 UPDATE USER
   void _onUserPatched(
     AuthUserPatched event,
     Emitter<AuthState> emit,
   ) {
     final current = state.user;
     if (!state.isLoggedIn || current == null) return;
+
     emit(state.copyWith(
       user: current.copyWith(
         fullName: event.fullName,

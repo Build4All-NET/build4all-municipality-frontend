@@ -9,10 +9,8 @@
   "citizen": "Citoyen",
   "employee": "Employé",
   "emailLabel": "Adresse Email",
-  "phoneLabel": "Numéro de Téléphone",
   "passwordLabel": "Mot de Passe",
   "emailHint": "user@example.com",
-  "phoneHint": "+961 xx xxx xxx",
   "loginButton": "Se Connecter",
   "sendCodeButton": "Envoyer le Code",
   "noAccount": "Pas encore de compte?",
@@ -27,7 +25,6 @@
   "fieldRequired": "Ce champ est obligatoire",
   "invalidEmail": "Veuillez entrer un email valide",
   "passwordTooShort": "Le mot de passe doit contenir au moins 6 caractères",
-  "invalidPhone": "Veuillez entrer un numéro de téléphone valide",
   "copyright": "© 2026 Baladiyati - Tous droits réservés",
   "errorGeneric": "Une erreur s'est produite. Veuillez réessayer.",
   "errorInvalidCredentials": "Email ou mot de passe invalide",
@@ -37,7 +34,6 @@
   "successLogin": "Connexion réussie!",
   "successRegister": "Compte créé avec succès!",
   "emailMethod": "Email",
-  "phoneMethod": "Téléphone",
   "selectMunicipality": "Sélectionner la Municipalité",
   "municipalityLabel": "Municipalité"
 }

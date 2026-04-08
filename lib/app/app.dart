@@ -19,7 +19,8 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => LocaleCubit()),
         BlocProvider(create: (_) => ThemeCubit()),
         BlocProvider(create: (_) => AuthBloc(authApi: AuthApiService())),
-    
+               BlocProvider(create: (_) => ColorCubit()), // ✅ NEW
+
       ],
       child: BlocBuilder<ThemeCubit, ThemeState>(
         builder: (context, themeState) {

@@ -17,4 +17,7 @@ class AuthResponseModel {
       message: json['message'] ?? '',
     );
   }
+
+  int? get userid => null;
+
 }

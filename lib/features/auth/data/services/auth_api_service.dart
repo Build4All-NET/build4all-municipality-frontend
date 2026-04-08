@@ -1,8 +1,4 @@
 // lib/features/auth/data/services/auth_api_service.dart
-// ─────────────────────────────────────────
-// All HTTP calls to Spring Boot backend
-// Endpoints: login, register, verify, logout
-// ─────────────────────────────────────────
 
 import '../../../../core/network/api_client.dart';
 import '../../../../core/exceptions/app_exception.dart';
@@ -23,18 +19,18 @@ class AuthApiService {
         _tokenStore = tokenStore ?? AuthTokenStore(),
         _roleStore = roleStore ?? SessionRoleStore();
 
-  // ─────────────────────────────────────────
-  // LOGIN — POST /auth/users/login
-  // ─────────────────────────────────────────
+  /// LOGIN
   Future<AuthResponseModel> login({
     required String email,
     required String password,
+    required String role,
   }) async {
     final data = await _client.post(
       '/auth/users/login',
       body: {
         'email': email,
         'passwordHash': password,
+        'role': role,
       },
     );
 
@@ -43,56 +39,7 @@ class AuthApiService {
     return response;
   }
 
-  // ─────────────────────────────────────────
-  // REGISTER — POST /auth/users/register
-  // ─────────────────────────────────────────
-  Future<AuthResponseModel> register({
-    required String email,
-    required String password,
-    required String fullName,
-    required String phone,
-    required String role,
-    required int municipalityId,
-  }) async {
-    final data = await _client.post(
-      '/auth/users/register',
-      body: {
-        'email': email,
-        'passwordHash': password,
-        'fullName': fullName,
-        'phone': phone,
-        'role': role,
-        'municipality': {'id': municipalityId},
-      },
-    );
-
-    return AuthResponseModel.fromJson(data);
-  }
-
-  // ─────────────────────────────────────────
-  // SEND VERIFICATION EMAIL
-  // POST /auth/send-verification-email
-  // ─────────────────────────────────────────
-  Future<void> sendVerificationEmail({required String email}) async {
-    await _client.post(
-      '/auth/send-verification-email',
-      body: {'email': email},
-    );
-  }
-
-  // ─────────────────────────────────────────
-  // VERIFY EMAIL CODE — POST /auth/verify
-  // ─────────────────────────────────────────
-  Future<void> verifyEmailCode({required String code}) async {
-    await _client.post(
-      '/auth/verify',
-      body: {'code': code},
-    );
-  }
-
-  // ─────────────────────────────────────────
-  // LOGOUT — POST /auth/logout
-  // ─────────────────────────────────────────
+  /// LOGOUT
   Future<void> logout() async {
     try {
       await _client.post('/auth/logout', requiresAuth: true);
@@ -101,10 +48,7 @@ class AuthApiService {
     await _roleStore.clearRole();
   }
 
-  // ─────────────────────────────────────────
-  // COMPLETE PROFILE
-  // POST /auth/complete-profile
-  // ─────────────────────────────────────────
+  /// COMPLETE PROFILE
   Future<void> completeProfile({
     required String address,
     required String username,
@@ -118,8 +62,16 @@ class AuthApiService {
       requiresAuth: true,
     );
   }
-
-  // Token helpers
+  
+  /// TOKEN HELPERS
   Future<String?> getSavedToken() => _tokenStore.getToken();
   Future<bool> hasToken() => _tokenStore.hasToken();
+    
+  Future<void> sendVerificationEmail({required String email}) async {}
+
+  Future<void> verifyEmailCode({required String code}) async {}
+  
+  Future<Object?> register({required String email, required String password, required String fullName, /*required String phone*/ required String role, required int municipalityId}) async {}
+  
+   
 }

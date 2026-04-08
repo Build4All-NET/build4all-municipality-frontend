@@ -5,7 +5,7 @@ class MunicipalityEntity {
   final String? nameEn;
   final String? nameFr;
   final String? logoUrl;
-  final String? phone;
+ // final String? phone;
   final String? email;
   final String? addressText;
   final double? geoLat;
@@ -19,7 +19,7 @@ class MunicipalityEntity {
     this.nameEn,
     this.nameFr,
     this.logoUrl,
-    this.phone,
+   // this.phone,
     this.email,
     this.addressText,
     this.geoLat,
@@ -35,7 +35,7 @@ class MunicipalityEntity {
       nameEn: json['nameEn'],
       nameFr: json['nameFr'],
       logoUrl: json['logoUrl'],
-      phone: json['phone'],
+      //phone: json['phone'],
       email: json['email'],
       addressText: json['addressText'],
       geoLat: json['geoLat']?.toDouble(),
