@@ -36,4 +36,13 @@
   "emailMethod": "Email",
   "selectMunicipality": "Select Municipality",
   "municipalityLabel": "Municipality"
+  "signup": "Sign Up",
+  "email": "Email",
+  "email_hint": "you@example.com",
+  "password": "Password",
+  "password_hint": "Password",
+  "password_info": "Password must be at least 6 characters",
+  "send_code": "Send Code",
+  "info": "We will send a 6-digit code to your email."
 }
+

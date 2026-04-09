@@ -1,13 +1,14 @@
+// lib/features/auth/presentation/login/screens/login_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 // Screens
 import 'package:baladiyati/features/auth/presentation/login/screens/reset_password_page.dart';
-
+import 'package:baladiyati/features/auth/presentation/register/screens/user_register_screen.dart';
 // Bloc
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
-import '../bloc/auth_state.dart';
 
 // Core
 import '../../../../../core/config/app_sizes.dart';
@@ -46,8 +47,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
     context.read<AuthBloc>().add(
           AuthLoginSubmitted(
-            email: _emailCtrl.text,
-            password: _passwordCtrl.text,
+            email: _emailCtrl.text.trim(),
+            password: _passwordCtrl.text.trim(),
             role: role,
           ),
         );
@@ -70,6 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           children: [
             const SizedBox(height: 20),
+
             Expanded(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.symmetric(
@@ -86,6 +88,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
+                        /// 🔹 TITLE
                         Center(
                           child: Text(
                             ar
@@ -100,9 +103,26 @@ class _LoginScreenState extends State<LoginScreen> {
                           ),
                         ),
 
+                        const SizedBox(height: 8),
+
+                        /// 🔹 SUBTITLE
+                        Center(
+                          child: Text(
+                            ar
+                                ? 'الوصول إلى حسابك في البلدية'
+                                : fr
+                                    ? 'Accédez à votre compte municipal'
+                                    : 'Access your municipal account',
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.grey,
+                            ),
+                          ),
+                        ),
+
                         const SizedBox(height: 24),
 
-                        // ROLE TOGGLE
+                        /// 🔹 ROLE TOGGLE
                         Container(
                           height: 50,
                           decoration: BoxDecoration(
@@ -119,7 +139,7 @@ class _LoginScreenState extends State<LoginScreen> {
                                         ? 'Employé'
                                         : 'Employee',
                                 Icons.badge_outlined,
-                                isCitizen == false,
+                                !isCitizen,
                                 () => setState(() => isCitizen = false),
                               ),
                               _roleTab(
@@ -139,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         const SizedBox(height: 20),
 
-                        // EMAIL
+                        /// 🔹 EMAIL
                         Text(ar
                             ? 'البريد الإلكتروني'
                             : fr
@@ -166,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         const SizedBox(height: 16),
 
-                        // PASSWORD
+                        /// 🔹 PASSWORD
                         Text(ar
                             ? 'كلمة المرور'
                             : fr
@@ -202,7 +222,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         const SizedBox(height: 10),
 
-                        // FORGOT PASSWORD
+                        /// 🔹 FORGOT PASSWORD
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
@@ -232,7 +252,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
                         const SizedBox(height: 10),
 
-                        // LOGIN BUTTON
+                        /// 🔹 LOGIN BUTTON
                         PrimaryButton(
                           label: ar
                               ? 'تسجيل الدخول'
@@ -241,6 +261,44 @@ class _LoginScreenState extends State<LoginScreen> {
                                   : 'Login',
                           isLoading: false,
                           onPressed: () => _onLoginPressed(context),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        /// 🔹 REGISTER LINK
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              ar
+                                  ? 'ليس لديك حساب؟ '
+                                  : fr
+                                      ? "Vous n'avez pas de compte ? "
+                                      : "Don't have an account? ",
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => const UserRegisterScreen(),
+                                  ),
+                                );
+                              },
+                              child: Text(
+                                ar
+                                    ? 'سجل الآن'
+                                    : fr
+                                        ? "S'inscrire"
+                                        : 'Sign up',
+                                style: TextStyle(
+                                  color: colors.primary,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -254,6 +312,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  /// 🔹 ROLE TAB WIDGET
   Widget _roleTab(
     BuildContext context,
     String label,

@@ -1,36 +1,54 @@
 // lib/features/auth/domain/repository/auth_repository.dart
-// ─────────────────────────────────────────
-// Abstract interface — defines what auth can do
-// The implementation is in data/repository/
-// ─────────────────────────────────────────
+
+import 'package:dartz/dartz.dart';
 
 import '../entities/user_entity.dart';
 
+class AuthFailure {
+  final String message;
+  final String? code;
+  final int? pendingId;
+
+  const AuthFailure(
+    this.message, {
+    this.code,
+    this.pendingId,
+  });
+}
+//👉 abstract = on définit seulement les fonctions (pas de code dedans)
 abstract class AuthRepository {
-  Future<String>login({
-    required String email,
+  Future<Either<AuthFailure, void>> sendVerificationCode({
+    String? email,
+    String? phoneNumber,
     required String password,
+    required int ownerProjectLinkId,
+  });//erreur → AuthFailure succès → void (rien)
+
+  Future<Either<AuthFailure, int>> verifyEmailCode({
+    required String email,
+    required String code,
   });
 
-  Future<String> register({
-    required String email,
-    required String password,
-    required String fullName,
-   // required String phone,
-    required String role,
-    required int municipalityId,
+  Future<Either<AuthFailure, int>> verifyPhoneCode({
+    required String phoneNumber,
+    required String code,
   });
 
-  Future<void> sendVerificationEmail({required String email});
+  /// LOGIN
+  Future<UserEntity> loginWithEmail({
+    required String email,
+    required String password,
+    required int ownerProjectLinkId,
+  });
 
-  Future<void> verifyEmailCode({required String code});
-
-  Future<void> logout();
-
-  Future<void> completeProfile({
-    required String address,
+  /// COMPLETE PROFILE
+  Future<UserEntity> completeProfile({
+    required int pendingId,
     required String username,
+    required String firstName,
+    required String lastName,
+    required bool isPublicProfile,
+    required int ownerProjectLinkId,
+    String? profileImagePath,
   });
-
-  Future<String?> getSavedToken();
 }

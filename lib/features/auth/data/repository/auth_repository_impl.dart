@@ -1,79 +1,68 @@
 // lib/features/auth/data/repository/auth_repository_impl.dart
-import '../../domain/repository/auth_repository.dart';
-import '../services/auth_api_service.dart';
-import '../models/auth_response_model.dart';
+import 'package:baladiyati/features/auth/domain/repository/auth_repository.dart';
+
+import 'package:baladiyati/features/auth/domain/entities/user_entity.dart';
+import 'package:dartz/dartz.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
-  final AuthApiService api;
-
-  AuthRepositoryImpl({required this.api});
+  @override
+  Future<Either<AuthFailure, void>> sendVerificationCode({
+    String? email,
+    String? phoneNumber,
+    required String password,
+    required int ownerProjectLinkId,
+  }) async {
+    // TODO: implémentation API réelle
+    return const Right(null);
+  }
 
   @override
-  Future<String> login({
+  Future<Either<AuthFailure, void>> sendVerificationEmail({
+    String? email,
+    String? phoneNumber,
+    required String password,
+    required int ownerProjectLinkId,
+  }) async {
+    // TODO: implémentation API réelle
+    return const Right(null);
+  }
+
+  @override
+  Future<Either<AuthFailure, int>> verifyEmailCode({
+    required String email,
+    required String code,
+  }) async {
+    // TODO: implémentation API réelle
+    return const Right(1);
+  }
+
+  @override
+  Future<Either<AuthFailure, int>> verifyPhoneCode({
+    required String phoneNumber,
+    required String code,
+  }) async {
+    return const Right(1);
+  }
+
+  @override
+  Future<UserEntity> loginWithEmail({
     required String email,
     required String password,
+    required int ownerProjectLinkId,
   }) async {
-    // rôle fixé ici
-    const role = "CITIZEN";
-
-    final AuthResponseModel response =
-        await api.login(email: email, password: password, role: role);
-
-    if (response.token == null || response.token!.isEmpty) {
-      throw Exception("Login failed: token missing");
-    }
-    return response.token;
+    return UserEntity(id: 1, username: 'demo', email: email);
   }
 
   @override
-  @override
-Future<String> register({
-  required String email,
-  required String password,
-  required String fullName,
-  //required String phone,
-  required String role,
-  required int municipalityId,
-}) async {
-  final  response = await api.register(
-    email: email,
-    password: password,
-    fullName: fullName,
-    //phone: phone,
-    role: role,
-    municipalityId: municipalityId,
-  );
-
-  // ✅ Vérifier que token n'est pas null avant de retourner
-  if (response.token == null || response.token!.isEmpty) {
-    throw Exception("Register failed: token is missing");
-  }
-
-  return response.token!; // <-- Le ! est safe car on a vérifié
-}
-
-  @override
-  Future<void> logout() => api.logout();
-
-  @override
-  Future<void> sendVerificationEmail({required String email}) =>
-      api.sendVerificationEmail(email: email);
-
-  @override
-  Future<void> verifyEmailCode({required String code}) =>
-      api.verifyEmailCode(code: code);
-
-  @override
-  Future<void> completeProfile({
-    required String address,
+  Future<UserEntity> completeProfile({
+    required int pendingId,
     required String username,
-  }) =>
-      api.completeProfile(address: address, username: username);
-
-  @override
-  Future<String?> getSavedToken() => api.getSavedToken();
-}
-
-extension on Object? {
-  get token => null;
+    required String firstName,
+    required String lastName,
+    required bool isPublicProfile,
+    required int ownerProjectLinkId,
+    String? profileImagePath,
+  }) async {
+    return UserEntity(id: pendingId, username: username, email: '$username@email.com');
+  }
 }

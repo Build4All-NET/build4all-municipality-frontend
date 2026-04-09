@@ -3,7 +3,12 @@
 // UseCase: Login with email and password
 // Calls the repository
 // ─────────────────────────────────────────
+import 'package:baladiyati/features/auth/domain/entities/user_entity.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+// Screens
+import 'package:baladiyati/features/auth/presentation/login/screens/reset_password_page.dart';
 import '../repository/auth_repository.dart';
 
 class LoginWithEmail {
@@ -11,13 +16,14 @@ class LoginWithEmail {
 
   LoginWithEmail(this.repository);
 
-  Future<String> call({
+  Future<UserEntity> call({
     required String email,
     required String password,
+    required String ownerProjectLinkId,
   }) {
-    return repository.login(
-      email: email,
-      password: password,
+    var ownerProjectLinkId = null;
+    return repository.loginWithEmail(email: email, password: password, ownerProjectLinkId: ownerProjectLinkId, 
+    
     );
-  }
+}
 }

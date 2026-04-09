@@ -36,4 +36,13 @@
   "emailMethod": "بريد إلكتروني",
   "selectMunicipality": "اختر البلدية",
   "municipalityLabel": "البلدية"
+  "signup": "التسجيل",
+  "email": "البريد الإلكتروني",
+  "email_hint": "you@example.com",
+  "password": "كلمة المرور",
+  "password_hint": "كلمة المرور",
+  "password_info": "كلمة المرور يجب أن تكون 6 أحرف على الأقل",
+  "send_code": "إرسال الرمز",
+  "info": "سنرسل رمز مكوّن من 6 أرقام إلى بريدك الإلكتروني."
 }
+
