@@ -4,7 +4,7 @@ import 'package:baladiyati/features/auth/presentation/register/bloc/register_Eve
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:dartz/dartz.dart';
 import 'package:baladiyati/features/auth/domain/usecases/send_verification_code.dart';
-import 'register_event.dart' hide RegisterEvent, RegisterSendCodeSubmitted;
+//import 'register_event.dart' hide RegisterEvent, RegisterSendCodeSubmitted;
 import 'register_state.dart';
 
 

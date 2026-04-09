@@ -1,21 +1,12 @@
-// lib/features/auth/presentation/login/screens/login_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-
-// Screens
+import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:baladiyati/features/auth/presentation/login/screens/reset_password_page.dart';
 import 'package:baladiyati/features/auth/presentation/register/screens/user_register_screen.dart';
-// Bloc
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
-
-// Core
 import '../../../../../core/config/app_sizes.dart';
-import '../../../../../core/l10n/locale_cubit.dart';
 import '../../../../../core/theme/theme_cubit.dart';
-
-// Widgets
 import '../../../../../common/widgets/primary_button.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -29,7 +20,6 @@ class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _emailCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
-
   bool _obscurePassword = true;
   bool isCitizen = true;
 
@@ -42,28 +32,19 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _onLoginPressed(BuildContext context) {
     if (!_formKey.currentState!.validate()) return;
-
-    final role = isCitizen ? 'CITIZEN' : 'EMPLOYEE';
-
-    context.read<AuthBloc>().add(
-          AuthLoginSubmitted(
-            email: _emailCtrl.text.trim(),
-            password: _passwordCtrl.text.trim(),
-            role: role,
-          ),
-        );
+    context.read<AuthBloc>().add(AuthLoginSubmitted(
+      email: _emailCtrl.text.trim(),
+      password: _passwordCtrl.text.trim(),
+      role: isCitizen ? 'CITIZEN' : 'EMPLOYEE',
+    ));
   }
 
   @override
   Widget build(BuildContext context) {
-    final localeCubit = context.read<LocaleCubit>();
+    final l10n = AppLocalizations.of(context)!;
     final themeState = context.watch<ThemeCubit>().state;
-
     final colors = themeState.tokens.colors;
     final card = themeState.tokens.card;
-
-    final ar = localeCubit.isArabic;
-    final fr = localeCubit.isFrench;
 
     return Scaffold(
       backgroundColor: colors.background,
@@ -71,12 +52,9 @@ class _LoginScreenState extends State<LoginScreen> {
         child: Column(
           children: [
             const SizedBox(height: 20),
-
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSizes.paddingLarge,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: AppSizes.paddingLarge),
                 child: Container(
                   padding: EdgeInsets.all(card.padding),
                   decoration: BoxDecoration(
@@ -88,215 +66,107 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        /// 🔹 TITLE
-                        Center(
-                          child: Text(
-                            ar
-                                ? 'تسجيل الدخول'
-                                : fr
-                                    ? 'Connexion'
-                                    : 'Login',
-                            style: const TextStyle(
-                              fontSize: 22,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
 
+                        // TITLE
+                        Center(
+                          child: Text(l10n.loginTitle,
+                              style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+                        ),
                         const SizedBox(height: 8),
 
-                        /// 🔹 SUBTITLE
+                        // SUBTITLE
                         Center(
-                          child: Text(
-                            ar
-                                ? 'الوصول إلى حسابك في البلدية'
-                                : fr
-                                    ? 'Accédez à votre compte municipal'
-                                    : 'Access your municipal account',
-                            style: const TextStyle(
-                              fontSize: 14,
-                              color: Colors.grey,
-                            ),
-                          ),
+                          child: Text(l10n.loginSubtitle,
+                              style: const TextStyle(fontSize: 14, color: Colors.grey)),
                         ),
-
                         const SizedBox(height: 24),
 
-                        /// 🔹 ROLE TOGGLE
+                        // ROLE TOGGLE
                         Container(
                           height: 50,
                           decoration: BoxDecoration(
                             color: Colors.grey.shade100,
                             borderRadius: BorderRadius.circular(14),
                           ),
-                          child: Row(
-                            children: [
-                              _roleTab(
-                                context,
-                                ar
-                                    ? 'موظف'
-                                    : fr
-                                        ? 'Employé'
-                                        : 'Employee',
-                                Icons.badge_outlined,
-                                !isCitizen,
-                                () => setState(() => isCitizen = false),
-                              ),
-                              _roleTab(
-                                context,
-                                ar
-                                    ? 'مواطن'
-                                    : fr
-                                        ? 'Citoyen'
-                                        : 'Citizen',
-                                Icons.person_outline,
-                                isCitizen,
-                                () => setState(() => isCitizen = true),
-                              ),
-                            ],
-                          ),
+                          child: Row(children: [
+                            _roleTab(context, l10n.employee, Icons.badge_outlined,
+                                !isCitizen, () => setState(() => isCitizen = false)),
+                            _roleTab(context, l10n.citizen, Icons.person_outline,
+                                isCitizen, () => setState(() => isCitizen = true)),
+                          ]),
                         ),
-
                         const SizedBox(height: 20),
 
-                        /// 🔹 EMAIL
-                        Text(ar
-                            ? 'البريد الإلكتروني'
-                            : fr
-                                ? 'Email'
-                                : 'Email'),
+                        // EMAIL
+                        Text(l10n.emailLabel),
                         const SizedBox(height: 8),
-
                         TextFormField(
                           controller: _emailCtrl,
-                          decoration: const InputDecoration(
-                            hintText: 'user@example.com',
-                          ),
+                          decoration: InputDecoration(hintText: l10n.emailHint),
                           validator: (v) {
-                            if (v == null || v.isEmpty) {
-                              return ar
-                                  ? 'البريد الإلكتروني مطلوب'
-                                  : fr
-                                      ? 'Email requis'
-                                      : 'Email is required';
-                            }
+                            if (v == null || v.isEmpty) return l10n.fieldRequired;
                             return null;
                           },
                         ),
-
                         const SizedBox(height: 16),
 
-                        /// 🔹 PASSWORD
-                        Text(ar
-                            ? 'كلمة المرور'
-                            : fr
-                                ? 'Mot de passe'
-                                : 'Password'),
+                        // PASSWORD
+                        Text(l10n.passwordLabel),
                         const SizedBox(height: 8),
-
                         TextFormField(
                           controller: _passwordCtrl,
                           obscureText: _obscurePassword,
                           decoration: InputDecoration(
+                            hintText: l10n.passwordHint,
                             suffixIcon: IconButton(
-                              onPressed: () => setState(() =>
-                                  _obscurePassword = !_obscurePassword),
-                              icon: Icon(
-                                _obscurePassword
-                                    ? Icons.lock_outline
-                                    : Icons.lock_open_outlined,
-                              ),
+                              onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                              icon: Icon(_obscurePassword ? Icons.lock_outline : Icons.lock_open_outlined),
                             ),
                           ),
                           validator: (v) {
-                            if (v == null || v.isEmpty) {
-                              return ar
-                                  ? 'كلمة المرور مطلوبة'
-                                  : fr
-                                      ? 'Mot de passe requis'
-                                      : 'Password is required';
-                            }
+                            if (v == null || v.isEmpty) return l10n.fieldRequired;
                             return null;
                           },
                         ),
-
                         const SizedBox(height: 10),
 
-                        /// 🔹 FORGOT PASSWORD
+                        // FORGOT PASSWORD
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
-                            onPressed: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const ResetPasswordPage(),
-                                ),
-                              );
-                            },
-                            child: Text(
-                              ar
-                                  ? 'هل نسيت كلمة المرور؟'
-                                  : fr
-                                      ? 'Mot de passe oublié ?'
-                                      : 'Forgot password?',
-                              style: TextStyle(
-                                color: colors.primary,
-                                fontWeight: FontWeight.w600,
-                                decoration: TextDecoration.underline,
-                              ),
-                            ),
+                            onPressed: () => Navigator.push(context,
+                                MaterialPageRoute(builder: (_) => const ResetPasswordPage())),
+                            child: Text(l10n.forgotPassword,
+                                style: TextStyle(
+                                    color: colors.primary,
+                                    fontWeight: FontWeight.w600,
+                                    decoration: TextDecoration.underline)),
                           ),
                         ),
-
                         const SizedBox(height: 10),
 
-                        /// 🔹 LOGIN BUTTON
+                        // LOGIN BUTTON
                         PrimaryButton(
-                          label: ar
-                              ? 'تسجيل الدخول'
-                              : fr
-                                  ? 'Se connecter'
-                                  : 'Login',
+                          label: l10n.loginButton,
                           isLoading: false,
                           onPressed: () => _onLoginPressed(context),
                         ),
-
                         const SizedBox(height: 20),
 
-                        /// 🔹 REGISTER LINK
+                        // REGISTER LINK
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
-                              ar
-                                  ? 'ليس لديك حساب؟ '
-                                  : fr
-                                      ? "Vous n'avez pas de compte ? "
-                                      : "Don't have an account? ",
-                            ),
+                            Text(l10n.noAccount),
+                            const SizedBox(width: 4),
                             GestureDetector(
-                              onTap: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const UserRegisterScreen(),
-                                  ),
-                                );
-                              },
-                              child: Text(
-                                ar
-                                    ? 'سجل الآن'
-                                    : fr
-                                        ? "S'inscrire"
-                                        : 'Sign up',
-                                style: TextStyle(
-                                  color: colors.primary,
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
+                              onTap: () => Navigator.push(context,
+                                  MaterialPageRoute(builder: (_) => const UserRegisterScreen())),
+                              child: Text(l10n.registerNow,
+                                  style: TextStyle(
+                                      color: colors.primary,
+                                      fontWeight: FontWeight.bold,
+                                      decoration: TextDecoration.underline)),
                             ),
                           ],
                         ),
@@ -312,14 +182,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  /// 🔹 ROLE TAB WIDGET
-  Widget _roleTab(
-    BuildContext context,
-    String label,
-    IconData icon,
-    bool selected,
-    VoidCallback onTap,
-  ) {
+  Widget _roleTab(BuildContext context, String label, IconData icon, bool selected, VoidCallback onTap) {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -328,26 +191,18 @@ class _LoginScreenState extends State<LoginScreen> {
           margin: const EdgeInsets.all(4),
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: selected
-                ? Theme.of(context).primaryColor
-                : Colors.grey.shade200,
+            color: selected ? Theme.of(context).primaryColor : Colors.grey.shade200,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                icon,
-                color: selected ? Colors.white : Colors.black87,
-              ),
+              Icon(icon, color: selected ? Colors.white : Colors.black87),
               const SizedBox(width: 6),
-              Text(
-                label,
-                style: TextStyle(
-                  color: selected ? Colors.white : Colors.black87,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              Text(label,
+                  style: TextStyle(
+                      color: selected ? Colors.white : Colors.black87,
+                      fontWeight: FontWeight.bold)),
             ],
           ),
         ),

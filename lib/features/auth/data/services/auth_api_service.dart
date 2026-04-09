@@ -1,7 +1,7 @@
 // lib/features/auth/data/services/auth_api_service.dart
 
 import '../../../../core/network/api_client.dart';
-import '../../../../core/exceptions/app_exception.dart';
+//import '../../../../core/exceptions/app_exception.dart';
 import '../models/auth_response_model.dart';
 import 'auth_token_store.dart';
 import 'session_role_store.dart';

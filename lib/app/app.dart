@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:baladiyati/l10n/app_localizations.dart';
 import '../core/l10n/locale_cubit.dart';
 import '../core/theme/theme_cubit.dart';
 import '../core/theme/app_theme_builder.dart';
@@ -19,8 +20,6 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => LocaleCubit()),
         BlocProvider(create: (_) => ThemeCubit()),
         BlocProvider(create: (_) => AuthBloc(authApi: AuthApiService())),
-               BlocProvider(create: (_) => ColorCubit()), // ✅ NEW
-
       ],
       child: BlocBuilder<ThemeCubit, ThemeState>(
         builder: (context, themeState) {
@@ -36,7 +35,8 @@ class MyApp extends StatelessWidget {
                   Locale('en'),
                   Locale('fr'),
                 ],
-                localizationsDelegates: const [
+                localizationsDelegates: [
+                  AppLocalizations.delegate, 
                   GlobalMaterialLocalizations.delegate,
                   GlobalWidgetsLocalizations.delegate,
                   GlobalCupertinoLocalizations.delegate,

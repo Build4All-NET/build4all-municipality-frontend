@@ -12,7 +12,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
     required int ownerProjectLinkId,
   }) async {
-    // TODO: implémentation API réelle
+    //  implémentation API réelle
     return const Right(null);
   }
 
@@ -23,7 +23,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
     required int ownerProjectLinkId,
   }) async {
-    // TODO: implémentation API réelle
+    //  implémentation API réelle
     return const Right(null);
   }
 
@@ -32,7 +32,7 @@ class AuthRepositoryImpl implements AuthRepository {
     required String email,
     required String code,
   }) async {
-    // TODO: implémentation API réelle
+    //  implémentation API réelle
     return const Right(1);
   }
 

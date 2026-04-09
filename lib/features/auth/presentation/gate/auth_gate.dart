@@ -32,7 +32,7 @@ class _AuthGateState extends State<AuthGate> {
     if (!hasToken && mounted) {
       // No token → stay on welcome
     }
-    // TODO: if has token → navigate to Home
+    // if has token → navigate to Home
   }
 
   @override
@@ -40,7 +40,7 @@ class _AuthGateState extends State<AuthGate> {
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state.isLoggedIn) {
-          // TODO: Navigate to Home screen
+          //  Navigate to Home screen
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Login successful! Home screen coming soon.'),

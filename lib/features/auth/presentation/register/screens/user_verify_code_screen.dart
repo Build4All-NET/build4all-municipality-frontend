@@ -1,74 +1,55 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
 import '../../../../../core/l10n/locale_cubit.dart';
 
 class UserVerifyCodeScreen extends StatefulWidget {
   final String email;
   final String sharedReference;
 
-  const UserVerifyCodeScreen
-  ({
+  const UserVerifyCodeScreen({
     super.key,
     required this.email,
     required this.sharedReference,
   });
 
   @override
-  State<UserVerifyCodeScreen>createState() => _OtpScreenState();
+  State<UserVerifyCodeScreen> createState() => _OtpScreenState();
 }
 
-class _OtpScreenState extends State<UserVerifyCodeScreen>{
+class _OtpScreenState extends State<UserVerifyCodeScreen> {
   final List<TextEditingController> _controllers =
       List.generate(6, (_) => TextEditingController());
-
-  final List<FocusNode> _focusNodes =
-      List.generate(6, (_) => FocusNode());
+  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
 
   @override
   void dispose() {
-    for (var c in _controllers) {
-      c.dispose();
-    }
-    for (var f in _focusNodes) {
-      f.dispose();
-    }
+    for (var c in _controllers) c.dispose();
+    for (var f in _focusNodes) f.dispose();
     super.dispose();
   }
 
-  // 🔥 قراءة البيانات من SharedPreferences
   Future<void> _readStoredData() async {
     final prefs = await SharedPreferences.getInstance();
     final data = prefs.getString('register_body');
-
     if (data != null) {
       final body = jsonDecode(data);
       print("Saved Body: $body");
     }
   }
 
-  void _verify(bool ar, bool fr) async {
+  void _verify(AppLocalizations l10n) async {
     String code = _controllers.map((c) => c.text).join();
 
     if (code.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            ar
-                ? 'أدخل الرمز كاملاً'
-                : fr
-                    ? 'Entrez le code complet'
-                    : 'Enter full code',
-          ),
-        ),
+        SnackBar(content: Text(l10n.enterFullCode)),
       );
       return;
     }
 
-    // 🔥 API READY
     final body = {
       "email": widget.email,
       "code": code,
@@ -76,18 +57,11 @@ class _OtpScreenState extends State<UserVerifyCodeScreen>{
     };
 
     print("VERIFY BODY: $body");
-
     await _readStoredData();
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(
-          ar
-              ? 'تم التحقق بنجاح'
-              : fr
-                  ? 'Vérifié avec succès'
-                  : 'Verified successfully',
-        ),
+        content: Text(l10n.verifySuccess),
         backgroundColor: Colors.green,
       ),
     );
@@ -95,10 +69,7 @@ class _OtpScreenState extends State<UserVerifyCodeScreen>{
 
   @override
   Widget build(BuildContext context) {
-    final localeCubit = context.watch<LocaleCubit>();
-    final ar = localeCubit.isArabic;
-    final fr = localeCubit.isFrench;
-
+    final l10n = AppLocalizations.of(context)!;
     final primary = Colors.blue.shade900;
 
     return Scaffold(
@@ -120,42 +91,20 @@ class _OtpScreenState extends State<UserVerifyCodeScreen>{
                   backgroundColor: primary.withOpacity(0.1),
                   child: Icon(Icons.lock, color: primary),
                 ),
-
                 const SizedBox(height: 20),
 
-                Text(
-                  ar
-                      ? "أدخل رمز التحقق"
-                      : fr
-                          ? "Entrez le code"
-                          : "Enter verification code",
-                  style: const TextStyle(
-                      fontSize: 20, fontWeight: FontWeight.bold),
-                ),
-
+                Text(l10n.verifyTitle,
+                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 10),
 
-                Text(
-                  ar
-                      ? "لقد أرسلنا رمزًا إلى بريدك"
-                      : fr
-                          ? "Code envoyé à votre email"
-                          : "Code sent to your email",
-                ),
-
+                Text(l10n.verifySubtitle),
                 const SizedBox(height: 8),
 
-                Text(
-                  widget.email,
-                  style: TextStyle(
-                    color: primary,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-
+                Text(widget.email,
+                    style: TextStyle(color: primary, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 20),
 
-                // 🔢 OTP
+                // OTP fields
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: List.generate(6, (index) {
@@ -180,15 +129,13 @@ class _OtpScreenState extends State<UserVerifyCodeScreen>{
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide:
-                                BorderSide(color: primary, width: 2),
+                            borderSide: BorderSide(color: primary, width: 2),
                           ),
                         ),
                       ),
                     );
                   }),
                 ),
-
                 const SizedBox(height: 25),
 
                 SizedBox(
@@ -197,19 +144,11 @@ class _OtpScreenState extends State<UserVerifyCodeScreen>{
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primary,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
-                      ),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     ),
-                    onPressed: () => _verify(ar, fr),
-                    child: Text(
-                      ar
-                          ? "تحقق"
-                          : fr
-                              ? "Vérifier"
-                              : "Verify",
-                      style: const TextStyle(fontSize: 16),
-                    ),
+                    onPressed: () => _verify(l10n),
+                    child: Text(l10n.verifyButton,
+                        style: const TextStyle(fontSize: 16, color: Colors.white)),
                   ),
                 ),
               ],
