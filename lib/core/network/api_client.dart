@@ -77,12 +77,12 @@ class ApiClient {
 
       final trimmed = response.body.trim();
 
-      // ✅ If it starts with { or [ → it's JSON
+      // If it starts with { or [ → it's JSON
       if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
         return jsonDecode(trimmed);
       }
 
-      // ✅ If it's a plain String (like "Verification email sent successfully")
+      //  If it's a plain String (like "Verification email sent successfully")
       return {'message': trimmed};
     }
 

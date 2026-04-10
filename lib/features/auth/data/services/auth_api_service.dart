@@ -20,8 +20,6 @@ class AuthApiService {
 
   // ─────────────────────────────────────────────────
   // STEP 1 — Send verification email
-  // POST /auth/send-verification-email
-  // Body: { "email": "..." }
   // ─────────────────────────────────────────────────
   Future<void> sendVerificationEmail({required String email}) async {
     await _client.post(
@@ -32,8 +30,6 @@ class AuthApiService {
 
   // ─────────────────────────────────────────────────
   // STEP 2 — Verify OTP code
-  // POST /auth/verify
-  // Body: { "code": "123456" }
   // ─────────────────────────────────────────────────
   Future<void> verifyEmailCode({required String code}) async {
     await _client.post(
@@ -44,8 +40,6 @@ class AuthApiService {
 
   // ─────────────────────────────────────────────────
   // STEP 3 — Register
-  // POST /auth/users/register
-  // Body: { email, passwordHash, fullName, phone, role, municipality:{id} }
   // ─────────────────────────────────────────────────
   Future<AuthResponseModel> register({
     required String email,
@@ -56,25 +50,30 @@ class AuthApiService {
     required int municipalityId,
   }) async {
     final data = await _client.post(
-      '/auth/users/register',  // ✅ correct URL with /
+      '/auth/users/register',
       body: {
         'email': email,
         'passwordHash': password,
-        'fullName': fullName,       // ✅ correct field name
+        'fullName': fullName,
         'phone': phone,
         'role': role,
-        'municipality': {'id': municipalityId}, // ✅ correct format
+        'municipality': {'id': municipalityId},
       },
     );
 
     final response = AuthResponseModel.fromJson(data);
-    await _tokenStore.saveToken(response.token);
+
+    // Save token to BOTH storages so complete profile can use it
+    if (response.token.isNotEmpty) {
+      await _tokenStore.saveToken(response.token);
+      await _client.saveToken(response.token);
+    }
+
     return response;
   }
 
   // ─────────────────────────────────────────────────
   // LOGIN
-  // POST /auth/users/login
   // ─────────────────────────────────────────────────
   Future<AuthResponseModel> login({
     required String email,
@@ -91,44 +90,55 @@ class AuthApiService {
     );
 
     final response = AuthResponseModel.fromJson(data);
-    await _tokenStore.saveToken(response.token);
+
+    // Save token to BOTH storages
+    if (response.token.isNotEmpty) {
+      await _tokenStore.saveToken(response.token);
+      await _client.saveToken(response.token);
+    }
+
     return response;
   }
 
   // ─────────────────────────────────────────────────
   // LOGOUT
-  // POST /auth/logout
   // ─────────────────────────────────────────────────
   Future<void> logout() async {
     try {
       await _client.post('/auth/logout', requiresAuth: true);
     } catch (_) {}
     await _tokenStore.clearToken();
+    await _client.clearToken();
     await _roleStore.clearRole();
   }
 
   // ─────────────────────────────────────────────────
   // COMPLETE PROFILE
-  // POST /auth/complete-profile
   // ─────────────────────────────────────────────────
-Future<String> completeProfile({
-  required String address,
-  required String username,
-}) async {
-  final response = await _client.post(
-    '/auth/complete-profile',
-    body: {
-      'address': address,
-      'username': username,
-    },
-    requiresAuth: true,
-  );
+  Future<String> completeProfile({
+    required String address,
+    required String username,
+  }) async {
+    // Get token from store and make sure ApiClient has it
+    final token = await _tokenStore.getToken();
+    if (token != null && token.isNotEmpty) {
+      await _client.saveToken(token);
+    }
 
-  return response['message']; // ✅ extract correctly
-}
+    final response = await _client.post(
+      '/auth/complete-profile',
+      body: {
+        'address': address,
+        'username': username,
+      },
+      requiresAuth: true,
+    );
+
+    return response['message'] ?? 'Success';
+  }
+
   // ─────────────────────────────────────────────────
   // FORGOT PASSWORD
-  // POST /auth/forgot-password
   // ─────────────────────────────────────────────────
   Future<String> forgetPassword({required String email}) async {
     final response = await _client.post(
@@ -140,7 +150,6 @@ Future<String> completeProfile({
 
   // ─────────────────────────────────────────────────
   // VERIFY RESET CODE
-  // POST /auth/verify-code
   // ─────────────────────────────────────────────────
   Future<void> verifyPasswordReset({
     required String email,
@@ -154,7 +163,6 @@ Future<String> completeProfile({
 
   // ─────────────────────────────────────────────────
   // RESET PASSWORD
-  // POST /auth/reset-password
   // ─────────────────────────────────────────────────
   Future<String> resetPassword({
     required String email,
