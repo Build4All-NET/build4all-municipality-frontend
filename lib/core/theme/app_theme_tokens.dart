@@ -1,7 +1,6 @@
 // lib/core/theme/app_theme_tokens.dart
 // ─────────────────────────────────────────
 // Design tokens — all visual values in one place
-// Like the doctor's app_theme_tokens.dart
 // ─────────────────────────────────────────
 
 import 'package:flutter/material.dart';
@@ -16,7 +15,7 @@ class AppThemeTokens {
     required this.card,
   });
 
-  // Light theme tokens
+  // 🌞 LIGHT THEME
   factory AppThemeTokens.light() {
     return AppThemeTokens(
       colors: AppColorTokens(
@@ -27,6 +26,9 @@ class AppThemeTokens {
         label: AppColors.darkBlue,
         body: Colors.grey,
         border: Colors.grey,
+
+        // ✅ FIXED
+        textSecondary: Colors.grey.shade600,
       ),
       card: const AppCardTokens(
         padding: 24,
@@ -38,17 +40,20 @@ class AppThemeTokens {
     );
   }
 
-  // Dark theme tokens
+  // 🌚 DARK THEME
   factory AppThemeTokens.dark() {
     return AppThemeTokens(
       colors: AppColorTokens(
-        primary: const Color.fromARGB(255, 0, 49, 226),
+        primary: const Color.fromARGB(255, 31, 41, 161),
         onPrimary: Colors.white,
         background: const Color(0xFF0D1117),
         surface: const Color(0xFF161B22),
         label: Colors.white,
         body: Colors.grey,
         border: Colors.grey,
+
+        // ✅ FIXED
+        textSecondary: Colors.grey.shade400,
       ),
       card: const AppCardTokens(
         padding: 24,
@@ -69,6 +74,7 @@ class AppColorTokens {
   final Color label;
   final Color body;
   final Color border;
+  final Color textSecondary; // ✅ FIXED (non-nullable)
 
   const AppColorTokens({
     required this.primary,
@@ -78,6 +84,7 @@ class AppColorTokens {
     required this.label,
     required this.body,
     required this.border,
+    required this.textSecondary,
   });
 }
 

@@ -465,6 +465,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Must be 8 digits'**
   String get eightDigits;
+
+  /// No description provided for @resetPasswordTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Set New Password'**
+  String get resetPasswordTitle;
+
+  /// No description provided for @resetPasswordSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Make it strong — your future self will thank you.'**
+  String get resetPasswordSubtitle;
+
+  /// No description provided for @newPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'New Password'**
+  String get newPasswordLabel;
+
+  /// No description provided for @confirmPasswordLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Password'**
+  String get confirmPasswordLabel;
+
+  /// No description provided for @confirmPasswordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Re-enter password'**
+  String get confirmPasswordHint;
+
+  /// No description provided for @savePasswordButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Password'**
+  String get savePasswordButton;
+
+  /// No description provided for @passwordsNotMatch.
+  ///
+  /// In en, this message translates to:
+  /// **'Passwords do not match'**
+  String get passwordsNotMatch;
 }
 
 class _AppLocalizationsDelegate

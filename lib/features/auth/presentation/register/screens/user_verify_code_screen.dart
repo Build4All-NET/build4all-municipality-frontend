@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../../core/l10n/locale_cubit.dart';
+import 'package:baladiyati/l10n/app_localizations.dart';
+
+// ✅ تأكدي من اسم الملف الصحيح
+import 'package:baladiyati/features/auth/presentation/register/screens/reset_pass_screen.dart';
 
 class UserVerifyCodeScreen extends StatefulWidget {
   final String email;
@@ -22,18 +23,25 @@ class UserVerifyCodeScreen extends StatefulWidget {
 class _OtpScreenState extends State<UserVerifyCodeScreen> {
   final List<TextEditingController> _controllers =
       List.generate(6, (_) => TextEditingController());
-  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
+
+  final List<FocusNode> _focusNodes =
+      List.generate(6, (_) => FocusNode());
 
   @override
   void dispose() {
-    for (var c in _controllers) c.dispose();
-    for (var f in _focusNodes) f.dispose();
+    for (var c in _controllers) {
+      c.dispose();
+    }
+    for (var f in _focusNodes) {
+      f.dispose();
+    }
     super.dispose();
   }
 
   Future<void> _readStoredData() async {
     final prefs = await SharedPreferences.getInstance();
     final data = prefs.getString('register_body');
+
     if (data != null) {
       final body = jsonDecode(data);
       print("Saved Body: $body");
@@ -57,13 +65,17 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
     };
 
     print("VERIFY BODY: $body");
+
     await _readStoredData();
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.verifySuccess),
-        backgroundColor: Colors.green,
-      ),
+    if (!mounted) return;
+
+    //  الانتقال للشاشة التالية
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) =>  ResetPasswordScreen(email: widget.email,),
+    )   
     );
   }
 
@@ -91,20 +103,29 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
                   backgroundColor: primary.withOpacity(0.1),
                   child: Icon(Icons.lock, color: primary),
                 ),
+
                 const SizedBox(height: 20),
 
-                Text(l10n.verifyTitle,
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                Text(
+                  l10n.verifyTitle,
+                  style: const TextStyle(
+                      fontSize: 20, fontWeight: FontWeight.bold),
+                ),
+
                 const SizedBox(height: 10),
 
                 Text(l10n.verifySubtitle),
+
                 const SizedBox(height: 8),
 
-                Text(widget.email,
-                    style: TextStyle(color: primary, fontWeight: FontWeight.bold)),
+                Text(
+                  widget.email,
+                  style: TextStyle(
+                      color: primary, fontWeight: FontWeight.bold),
+                ),
+
                 const SizedBox(height: 20),
 
-                // OTP fields
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: List.generate(6, (index) {
@@ -120,6 +141,9 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
                           if (value.isNotEmpty && index < 5) {
                             _focusNodes[index + 1].requestFocus();
                           }
+                          if (value.isEmpty && index > 0) {
+                            _focusNodes[index - 1].requestFocus();
+                          }
                         },
                         decoration: InputDecoration(
                           counterText: "",
@@ -129,13 +153,15 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
                           ),
                           focusedBorder: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
-                            borderSide: BorderSide(color: primary, width: 2),
+                            borderSide:
+                                BorderSide(color: primary, width: 2),
                           ),
                         ),
                       ),
                     );
                   }),
                 ),
+
                 const SizedBox(height: 25),
 
                 SizedBox(
@@ -144,11 +170,19 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
                     ),
-                    onPressed: () => _verify(l10n),
-                    child: Text(l10n.verifyButton,
-                        style: const TextStyle(fontSize: 16, color: Colors.white)),
+                    onPressed: () {
+                      print("BUTTON CLICKED");
+                      _verify(l10n);
+                    },
+                    child: Text(
+                      l10n.verifyButton,
+                      style: const TextStyle(
+                          fontSize: 16, color: Colors.white),
+                    ),
                   ),
                 ),
               ],

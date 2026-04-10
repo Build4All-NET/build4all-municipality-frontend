@@ -60,5 +60,13 @@
   "forgotPassword": "هل نسيت كلمة المرور؟",
   "selectLanguage": "اختر اللغة",
   "gmailOnly": "فقط Gmail مسموح",
-  "eightDigits": "يجب 8 أرقام"
+  "eightDigits": "يجب 8 أرقام",
+  "resetPasswordTitle": "تعيين كلمة مرور جديدة",
+  "resetPasswordSubtitle": "اجعلها قوية — نفسك المستقبلية ستشكرك.",
+  "newPasswordLabel": "كلمة المرور الجديدة",
+  "confirmPasswordLabel": "تأكيد كلمة المرور",
+  "confirmPasswordHint": "أعد إدخال كلمة المرور",
+  "savePasswordButton": "حفظ كلمة المرور",
+  "passwordsNotMatch": "كلمتا المرور غير متطابقتين"
 }
+

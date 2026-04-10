@@ -60,5 +60,13 @@
   "forgotPassword": "Mot de passe oublié?",
   "selectLanguage": "Choisir la langue",
   "gmailOnly": "Gmail seulement",
-  "eightDigits": "8 chiffres requis"
+  "eightDigits": "8 chiffres requis",
+  "resetPasswordTitle": "Définir un nouveau mot de passe",
+  "resetPasswordSubtitle": "Choisissez-en un robuste — votre futur vous remerciera.",
+  "newPasswordLabel": "Nouveau mot de passe",
+  "confirmPasswordLabel": "Confirmer le mot de passe",
+  "confirmPasswordHint": "Ressaisir le mot de passe",
+  "savePasswordButton": "Enregistrer le mot de passe",
+  "passwordsNotMatch": "Les mots de passe ne correspondent pas"
 }
+

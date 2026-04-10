@@ -192,4 +192,26 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get eightDigits => 'Must be 8 digits';
+
+  @override
+  String get resetPasswordTitle => 'Set New Password';
+
+  @override
+  String get resetPasswordSubtitle =>
+      'Make it strong — your future self will thank you.';
+
+  @override
+  String get newPasswordLabel => 'New Password';
+
+  @override
+  String get confirmPasswordLabel => 'Confirm Password';
+
+  @override
+  String get confirmPasswordHint => 'Re-enter password';
+
+  @override
+  String get savePasswordButton => 'Save Password';
+
+  @override
+  String get passwordsNotMatch => 'Passwords do not match';
 }
