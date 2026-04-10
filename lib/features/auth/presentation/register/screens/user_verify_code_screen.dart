@@ -1,9 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../../../../../core/l10n/locale_cubit.dart';
+import '../../../../../features/auth/data/services/auth_api_service.dart';
+import 'package:baladiyati/app/app_router.dart';
 
 class UserVerifyCodeScreen extends StatefulWidget {
   final String email;
@@ -23,6 +23,8 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
   final List<TextEditingController> _controllers =
       List.generate(6, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
+  final _authApi = AuthApiService();
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -31,17 +33,17 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
     super.dispose();
   }
 
-  Future<void> _readStoredData() async {
+  Future<Map<String, dynamic>?> _readStoredData() async {
     final prefs = await SharedPreferences.getInstance();
     final data = prefs.getString('register_body');
     if (data != null) {
-      final body = jsonDecode(data);
-      print("Saved Body: $body");
+      return jsonDecode(data) as Map<String, dynamic>;
     }
+    return null;
   }
 
   void _verify(AppLocalizations l10n) async {
-    String code = _controllers.map((c) => c.text).join();
+    final code = _controllers.map((c) => c.text).join();
 
     if (code.length < 6) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -50,21 +52,54 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
       return;
     }
 
-    final body = {
-      "email": widget.email,
-      "code": code,
-      "sharedReference": widget.sharedReference,
-    };
+    setState(() => _isLoading = true);
 
-    print("VERIFY BODY: $body");
-    await _readStoredData();
+    try {
+      // ✅ STEP 1 — Verify OTP code with backend
+      await _authApi.verifyEmailCode(code: code);
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.verifySuccess),
-        backgroundColor: Colors.green,
-      ),
-    );
+      // ✅ STEP 2 — Read saved register data
+      final savedData = await _readStoredData();
+      if (savedData == null) throw Exception('Register data not found');
+
+      // ✅ STEP 3 — Register the user
+      await _authApi.register(
+        email: savedData['email'] ?? widget.email,
+        password: savedData['password'] ?? '',
+        fullName: savedData['fullName'] ?? '',
+        phone: savedData['phone'] ?? '',
+        role: 'CITIZEN',
+        municipalityId: 1,
+      );
+
+      setState(() => _isLoading = false);
+
+      if (!mounted) return;
+
+      // ✅ Show success
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.successRegister),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      // ✅ STEP 4 — Navigate to Complete Profile
+      AppRouter.gotoCompleteProfile(context);
+
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (!mounted) return;
+
+      // Show exact error message from server
+      final errorMsg = e.toString().replaceAll('Exception:', '').trim();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('خطأ: $errorMsg'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   @override
@@ -94,14 +129,16 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
                 const SizedBox(height: 20),
 
                 Text(l10n.verifyTitle,
-                    style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                    style: const TextStyle(
+                        fontSize: 20, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 10),
 
                 Text(l10n.verifySubtitle),
                 const SizedBox(height: 8),
 
                 Text(widget.email,
-                    style: TextStyle(color: primary, fontWeight: FontWeight.bold)),
+                    style: TextStyle(
+                        color: primary, fontWeight: FontWeight.bold)),
                 const SizedBox(height: 20),
 
                 // OTP fields
@@ -119,6 +156,8 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
                         onChanged: (value) {
                           if (value.isNotEmpty && index < 5) {
                             _focusNodes[index + 1].requestFocus();
+                          } else if (value.isEmpty && index > 0) {
+                            _focusNodes[index - 1].requestFocus();
                           }
                         },
                         decoration: InputDecoration(
@@ -138,17 +177,22 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
                 ),
                 const SizedBox(height: 25),
 
+                // VERIFY BUTTON
                 SizedBox(
                   width: double.infinity,
                   height: 50,
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: primary,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
-                    onPressed: () => _verify(l10n),
-                    child: Text(l10n.verifyButton,
-                        style: const TextStyle(fontSize: 16, color: Colors.white)),
+                    onPressed: _isLoading ? null : () => _verify(l10n),
+                    child: _isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : Text(l10n.verifyButton,
+                            style: const TextStyle(
+                                fontSize: 16, color: Colors.white)),
                   ),
                 ),
               ],

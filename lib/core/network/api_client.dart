@@ -20,7 +20,7 @@ class ApiClient {
   // ─────────────────────────────────────────
   // GET request
   // ─────────────────────────────────────────
-  Future<Map<String, dynamic>> get(String endpoint) async {
+  Future<dynamic> get(String endpoint) async {
     final response = await http.get(
       Uri.parse('$baseUrl$endpoint'),
       headers: await _headers(),
@@ -32,7 +32,7 @@ class ApiClient {
   // ─────────────────────────────────────────
   // POST request
   // ─────────────────────────────────────────
-  Future<Map<String, dynamic>> post(
+  Future<dynamic> post(
     String endpoint, {
     Map<String, dynamic>? body,
     bool requiresAuth = false,
@@ -52,6 +52,7 @@ class ApiClient {
   Future<Map<String, String>> _headers({bool requiresAuth = false}) async {
     final headers = <String, String>{
       'Content-Type': 'application/json',
+      'Accept': 'application/json',
     };
 
     if (requiresAuth) {
@@ -65,19 +66,40 @@ class ApiClient {
   }
 
   // ─────────────────────────────────────────
-  // Handle response
+  // Handle response — supports BOTH:
+  //   - Plain String: "Verification email sent"
+  //   - JSON Object:  { "token": "...", "message": "..." }
   // ─────────────────────────────────────────
-  Map<String, dynamic> _handleResponse(http.Response response) {
+  dynamic _handleResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
+      // Empty body
       if (response.body.isEmpty) return {};
-      return jsonDecode(response.body);
+
+      final trimmed = response.body.trim();
+
+      // ✅ If it starts with { or [ → it's JSON
+      if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
+        return jsonDecode(trimmed);
+      }
+
+      // ✅ If it's a plain String (like "Verification email sent successfully")
+      return {'message': trimmed};
     }
 
+    // ─── Error handling ───────────────────
     try {
-      final error = jsonDecode(response.body);
-      final code = error['code'] ?? error['error'] ?? 'UNKNOWN';
-      final message = error['message'] ?? 'Something went wrong';
-      throw AppException(message, code: code);
+      final trimmed = response.body.trim();
+
+      // Try to parse as JSON error
+      if (trimmed.startsWith('{')) {
+        final error = jsonDecode(trimmed);
+        final code = error['code'] ?? error['error'] ?? 'UNKNOWN';
+        final message = error['message'] ?? 'Something went wrong';
+        throw AppException(message, code: code);
+      }
+
+      // Plain string error
+      throw AppException(trimmed.isNotEmpty ? trimmed : 'Error ${response.statusCode}');
     } catch (e) {
       if (e is AppException) rethrow;
       throw NetworkException.serverError();

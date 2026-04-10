@@ -1,11 +1,12 @@
+// lib/features/welcome/presentation/screens/welcome_screen.dart
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:baladiyati/app/app_router.dart';
 import '../../../../core/l10n/locale_cubit.dart';
 import '../../../../core/theme/theme_cubit.dart';
 import '../../../../core/config/app_colors.dart';
 import '../../../../common/widgets/primary_button.dart';
-import '../../../auth/presentation/login/screens/login_screen.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -38,6 +39,7 @@ class WelcomeScreen extends StatelessWidget {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      // Icon
                       Container(
                         width: 150,
                         height: 150,
@@ -45,34 +47,53 @@ class WelcomeScreen extends StatelessWidget {
                           color: Colors.white.withOpacity(0.18),
                           borderRadius: BorderRadius.circular(32),
                         ),
-                        child: const Icon(Icons.apartment, size: 85, color: Colors.white),
+                        child: const Icon(Icons.apartment,
+                            size: 85, color: Colors.white),
                       ),
                       const SizedBox(height: 36),
+
+                      // Title
                       Text(l10n.appTitle,
-                          style: const TextStyle(fontSize: 42, fontWeight: FontWeight.bold, color: Colors.white)),
+                          style: const TextStyle(
+                              fontSize: 42,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white)),
                       const SizedBox(height: 10),
+
+                      // Subtitle
                       Text(l10n.appSubtitle,
-                          style: const TextStyle(fontSize: 20, color: Colors.white)),
+                          style: const TextStyle(
+                              fontSize: 20, color: Colors.white)),
                       const SizedBox(height: 14),
+
+                      // Description
                       Text(l10n.appDescription,
                           textAlign: TextAlign.center,
-                          style: const TextStyle(fontSize: 14, color: Colors.white70)),
+                          style: const TextStyle(
+                              fontSize: 14, color: Colors.white70)),
                       const SizedBox(height: 48),
+
+                      // ✅ Uses AppRouter.goToLogin — provides AuthBloc!
                       PrimaryButton(
                         label: l10n.getStarted,
                         width: 220,
                         backgroundColor: Colors.white,
                         textColor: AppColors.primary,
-                        onPressed: () => Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (_) => const LoginScreen()),
-                        ),
+                        onPressed: () => AppRouter.goToLogin(context),
                       ),
                     ],
                   ),
                 ),
               ),
-              Positioned(top: 16, right: 16, child: _LanguageSelector()),
+
+              // Language selector (top right)
+              Positioned(
+                top: 16,
+                right: 16,
+                child: _LanguageSelector(),
+              ),
+
+              // Theme toggle (top left)
               Positioned(
                 top: 16,
                 left: 16,
@@ -85,13 +106,16 @@ class WelcomeScreen extends StatelessWidget {
                   ),
                 ),
               ),
+
+              // Footer
               Positioned(
                 bottom: 16,
                 left: 0,
                 right: 0,
                 child: Text(l10n.copyright,
                     textAlign: TextAlign.center,
-                    style: const TextStyle(color: Colors.white54, fontSize: 12)),
+                    style: const TextStyle(
+                        color: Colors.white54, fontSize: 12)),
               ),
             ],
           ),
@@ -106,36 +130,51 @@ class _LanguageSelector extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final localeCubit = context.watch<LocaleCubit>();
+
     return GestureDetector(
       onTap: () => showModalBottomSheet(
         context: context,
         shape: const RoundedRectangleBorder(
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+            borderRadius:
+                BorderRadius.vertical(top: Radius.circular(20))),
         builder: (_) => Padding(
           padding: const EdgeInsets.all(24),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(l10n.selectLanguage,
-                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                  style: const TextStyle(
+                      fontSize: 18, fontWeight: FontWeight.bold)),
               const SizedBox(height: 16),
               ListTile(
-                leading: const Text('🇱🇧', style: TextStyle(fontSize: 24)),
+                leading:
+                    const Text('🇱🇧', style: TextStyle(fontSize: 24)),
                 title: const Text('العربية'),
                 selected: localeCubit.isArabic,
-                onTap: () { localeCubit.setArabic(); Navigator.pop(context); },
+                onTap: () {
+                  localeCubit.setArabic();
+                  Navigator.pop(context);
+                },
               ),
               ListTile(
-                leading: const Text('🇬🇧', style: TextStyle(fontSize: 24)),
+                leading:
+                    const Text('🇬🇧', style: TextStyle(fontSize: 24)),
                 title: const Text('English'),
                 selected: localeCubit.isEnglish,
-                onTap: () { localeCubit.setEnglish(); Navigator.pop(context); },
+                onTap: () {
+                  localeCubit.setEnglish();
+                  Navigator.pop(context);
+                },
               ),
               ListTile(
-                leading: const Text('🇫🇷', style: TextStyle(fontSize: 24)),
+                leading:
+                    const Text('🇫🇷', style: TextStyle(fontSize: 24)),
                 title: const Text('Français'),
                 selected: localeCubit.isFrench,
-                onTap: () { localeCubit.setFrench(); Navigator.pop(context); },
+                onTap: () {
+                  localeCubit.setFrench();
+                  Navigator.pop(context);
+                },
               ),
             ],
           ),
@@ -149,7 +188,11 @@ class _LanguageSelector extends StatelessWidget {
         ),
         child: Row(children: [
           Text(
-            localeCubit.isArabic ? 'العربية' : localeCubit.isFrench ? 'Français' : 'English',
+            localeCubit.isArabic
+                ? 'العربية'
+                : localeCubit.isFrench
+                    ? 'Français'
+                    : 'English',
             style: const TextStyle(color: Colors.white, fontSize: 13),
           ),
           const SizedBox(width: 4),
