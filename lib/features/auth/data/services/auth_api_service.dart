@@ -111,20 +111,21 @@ class AuthApiService {
   // COMPLETE PROFILE
   // POST /auth/complete-profile
   // ─────────────────────────────────────────────────
-  Future<void> completeProfile({
-    required String address,
-    required String username,
-  }) async {
-    await _client.post(
-      '/auth/complete-profile',
-      body: {
-        'address': address,
-        'userName': username,
-      },
-      requiresAuth: true,
-    );
-  }
+Future<String> completeProfile({
+  required String address,
+  required String username,
+}) async {
+  final response = await _client.post(
+    '/auth/complete-profile',
+    body: {
+      'address': address,
+      'username': username,
+    },
+    requiresAuth: true,
+  );
 
+  return response['message']; // ✅ extract correctly
+}
   // ─────────────────────────────────────────────────
   // FORGOT PASSWORD
   // POST /auth/forgot-password

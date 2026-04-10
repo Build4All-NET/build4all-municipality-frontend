@@ -61,7 +61,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     context.read<CompleteProfileBloc>().add(CompleteProfileSubmitted(
       username: _usernameCtrl.text.trim(),
       address: _addressCtrl.text.trim(),
-      municipalityId: _selectedMunicipality!.id,
     ));
   }
 
