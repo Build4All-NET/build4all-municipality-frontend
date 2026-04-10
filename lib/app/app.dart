@@ -6,8 +6,6 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import '../core/l10n/locale_cubit.dart';
 import '../core/theme/theme_cubit.dart';
 import '../core/theme/app_theme_builder.dart';
-import '../features/auth/data/services/auth_api_service.dart';
-import '../features/auth/presentation/login/bloc/auth_bloc.dart';
 import '../features/welcome/presentation/screens/welcome_screen.dart';
 
 class MyApp extends StatelessWidget {
@@ -19,7 +17,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => LocaleCubit()),
         BlocProvider(create: (_) => ThemeCubit()),
-        BlocProvider(create: (_) => AuthBloc(authApi: AuthApiService())),
+        // ✅ AuthBloc removed from here — LoginScreen has its own via AppRouter
       ],
       child: BlocBuilder<ThemeCubit, ThemeState>(
         builder: (context, themeState) {
@@ -36,7 +34,7 @@ class MyApp extends StatelessWidget {
                   Locale('fr'),
                 ],
                 localizationsDelegates: [
-                  AppLocalizations.delegate, 
+                  AppLocalizations.delegate,
                   GlobalMaterialLocalizations.delegate,
                   GlobalWidgetsLocalizations.delegate,
                   GlobalCupertinoLocalizations.delegate,

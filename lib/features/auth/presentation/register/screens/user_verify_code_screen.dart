@@ -3,8 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../features/auth/data/services/auth_api_service.dart';
-import '../../../../../core/l10n/locale_cubit.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/app/app_router.dart';
 
 class UserVerifyCodeScreen extends StatefulWidget {
   final String email;
@@ -25,7 +24,6 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
       List.generate(6, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
   final _authApi = AuthApiService();
-
   bool _isLoading = false;
 
   @override
@@ -35,7 +33,6 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
     super.dispose();
   }
 
-  // Read saved register data from SharedPreferences
   Future<Map<String, dynamic>?> _readStoredData() async {
     final prefs = await SharedPreferences.getInstance();
     final data = prefs.getString('register_body');
@@ -46,7 +43,6 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
   }
 
   void _verify(AppLocalizations l10n) async {
-    // Get the 6-digit code
     final code = _controllers.map((c) => c.text).join();
 
     if (code.length < 6) {
@@ -59,24 +55,21 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
     setState(() => _isLoading = true);
 
     try {
-      // ✅ STEP 1 — Call /auth/verify with the code
+      // ✅ STEP 1 — Verify OTP code with backend
       await _authApi.verifyEmailCode(code: code);
 
-      // ✅ STEP 2 — Read saved register data from SharedPreferences
+      // ✅ STEP 2 — Read saved register data
       final savedData = await _readStoredData();
+      if (savedData == null) throw Exception('Register data not found');
 
-      if (savedData == null) {
-        throw Exception('Register data not found');
-      }
-
-      // ✅ STEP 3 — Call /auth/users/register with all the data
+      // ✅ STEP 3 — Register the user
       await _authApi.register(
         email: savedData['email'] ?? widget.email,
         password: savedData['password'] ?? '',
         fullName: savedData['fullName'] ?? '',
         phone: savedData['phone'] ?? '',
         role: 'CITIZEN',
-        municipalityId: 1, // default — change when municipality screen is ready
+        municipalityId: 1,
       );
 
       setState(() => _isLoading = false);
@@ -86,21 +79,23 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
       // ✅ Show success
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(l10n.verifySuccess),
+          content: Text(l10n.successRegister),
           backgroundColor: Colors.green,
         ),
       );
 
-      // TODO: Navigate to CompleteProfileScreen
-      // AppRouter.gotoCompleteProfile(context);
+      // ✅ STEP 4 — Navigate to Complete Profile
+      AppRouter.gotoCompleteProfile(context);
 
     } catch (e) {
       setState(() => _isLoading = false);
-
       if (!mounted) return;
+
+      // Show exact error message from server
+      final errorMsg = e.toString().replaceAll('Exception:', '').trim();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('خطأ: ${e.toString().replaceAll('Exception:', '').trim()}'),
+          content: Text('خطأ: $errorMsg'),
           backgroundColor: Colors.red,
         ),
       );
