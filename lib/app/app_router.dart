@@ -1,4 +1,5 @@
 // lib/app/app_router.dart
+import 'package:baladiyati/features/auth/presentation/complete_profile/screens/HomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../features/welcome/presentation/screens/welcome_screen.dart';
@@ -64,6 +65,13 @@ class AppRouter {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const CompleteProfileScreen()),
+      (_) => false,
+    );
+  }
+   static void gotoHomePage(BuildContext context) {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
       (_) => false,
     );
   }

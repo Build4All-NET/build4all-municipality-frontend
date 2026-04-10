@@ -1,10 +1,17 @@
 // lib/features/auth/data/repository/auth_repository_impl.dart
 import 'package:baladiyati/features/auth/domain/repository/auth_repository.dart';
-
 import 'package:baladiyati/features/auth/domain/entities/user_entity.dart';
+import 'package:baladiyati/features/auth/data/services/auth_api_service.dart';
 import 'package:dartz/dartz.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
+
+  final AuthApiService _api = AuthApiService();
+
+  // ─────────────────────────────────────────────────
+  // STEP 1 — Send verification code
+  // ✅ Actually calls POST /auth/send-verification-email
+  // ─────────────────────────────────────────────────
   @override
   Future<Either<AuthFailure, void>> sendVerificationCode({
     String? email,
@@ -12,30 +19,43 @@ class AuthRepositoryImpl implements AuthRepository {
     required String password,
     required int ownerProjectLinkId,
   }) async {
-    //  implémentation API réelle
-    return const Right(null);
+    try {
+      if (email != null && email.isNotEmpty) {
+        await _api.sendVerificationEmail(email: email);
+      }
+      return const Right(null);
+    } catch (e) {
+      // ✅ Correct constructor: positional message, named code
+      return Left(AuthFailure(
+        e.toString(),
+        code: 'SEND_CODE_FAILED',
+      ));
+    }
   }
 
-  @override
-  Future<Either<AuthFailure, void>> sendVerificationEmail({
-    String? email,
-    String? phoneNumber,
-    required String password,
-    required int ownerProjectLinkId,
-  }) async {
-    //  implémentation API réelle
-    return const Right(null);
-  }
-
+  // ─────────────────────────────────────────────────
+  // STEP 2 — Verify OTP code
+  // ✅ Actually calls POST /auth/verify
+  // ─────────────────────────────────────────────────
   @override
   Future<Either<AuthFailure, int>> verifyEmailCode({
     required String email,
     required String code,
   }) async {
-    //  implémentation API réelle
-    return const Right(1);
+    try {
+      await _api.verifyEmailCode(code: code);
+      return const Right(1);
+    } catch (e) {
+      return Left(AuthFailure(
+        e.toString(),
+        code: 'VERIFY_FAILED',
+      ));
+    }
   }
 
+  // ─────────────────────────────────────────────────
+  // Verify phone code (not implemented yet)
+  // ─────────────────────────────────────────────────
   @override
   Future<Either<AuthFailure, int>> verifyPhoneCode({
     required String phoneNumber,
@@ -44,15 +64,26 @@ class AuthRepositoryImpl implements AuthRepository {
     return const Right(1);
   }
 
+  // ─────────────────────────────────────────────────
+  // Login with email
+  // ─────────────────────────────────────────────────
   @override
   Future<UserEntity> loginWithEmail({
     required String email,
     required String password,
     required int ownerProjectLinkId,
   }) async {
-    return UserEntity(id: 1, username: 'demo', email: email);
+    final response = await _api.login(
+      email: email,
+      password: password,
+      role: 'CITIZEN',
+    );
+    return UserEntity(id: 0, username: email, email: email);
   }
 
+  // ─────────────────────────────────────────────────
+  // Complete profile
+  // ─────────────────────────────────────────────────
   @override
   Future<UserEntity> completeProfile({
     required int pendingId,
@@ -63,6 +94,14 @@ class AuthRepositoryImpl implements AuthRepository {
     required int ownerProjectLinkId,
     String? profileImagePath,
   }) async {
-    return UserEntity(id: pendingId, username: username, email: '$username@email.com');
+    await _api.completeProfile(
+      address: '',
+      username: username,
+    );
+    return UserEntity(
+      id: pendingId,
+      username: username,
+      email: '$username@email.com',
+    );
   }
 }

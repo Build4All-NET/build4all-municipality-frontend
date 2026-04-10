@@ -9,14 +9,12 @@ abstract class CompleteProfileEvent extends Equatable {
 class CompleteProfileSubmitted extends CompleteProfileEvent {
   final String username;
   final String address;
-  final int municipalityId;
 
   const CompleteProfileSubmitted({
     required this.username,
     required this.address,
-    required this.municipalityId,
   });
 
   @override
-  List<Object?> get props => [username, address, municipalityId];
+  List<Object?> get props => [username, address];
 }

@@ -3,7 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:baladiyati/features/auth/presentation/login/screens/reset_password_page.dart';
 import 'package:baladiyati/features/auth/presentation/register/screens/user_register_screen.dart';
-import 'package:baladiyati/features/auth/presentation/complete_profile/screens/complete_profile_screen.dart';
+import 'package:baladiyati/features/auth/presentation/complete_profile/screens/HomePage.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -53,7 +53,6 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: BlocConsumer<AuthBloc, AuthState>(
           listener: (context, state) {
-            // ✅ Show error message
             if (state.errorMessage != null) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -64,7 +63,6 @@ class _LoginScreenState extends State<LoginScreen> {
               );
             }
 
-            // ✅ Navigate to CompleteProfile after login success
             if (state.isLoggedIn) {
               ScaffoldMessenger.of(context).showSnackBar(
                 SnackBar(
@@ -74,13 +72,13 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               );
 
-              // Navigate to CompleteProfile screen
+              // Navigate to HomePage after login
               Future.delayed(const Duration(milliseconds: 500), () {
                 if (!mounted) return;
                 Navigator.pushAndRemoveUntil(
                   context,
                   MaterialPageRoute(
-                    builder: (_) => const CompleteProfileScreen(),
+                    builder: (_) => const HomeScreen(),
                   ),
                   (_) => false,
                 );
@@ -106,8 +104,6 @@ class _LoginScreenState extends State<LoginScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-
-                            // TITLE
                             Center(
                               child: Text(l10n.loginTitle,
                                   style: const TextStyle(
@@ -115,16 +111,12 @@ class _LoginScreenState extends State<LoginScreen> {
                                       fontWeight: FontWeight.bold)),
                             ),
                             const SizedBox(height: 8),
-
-                            // SUBTITLE
                             Center(
                               child: Text(l10n.loginSubtitle,
                                   style: const TextStyle(
                                       fontSize: 14, color: Colors.grey)),
                             ),
                             const SizedBox(height: 24),
-
-                            // ROLE TOGGLE
                             Container(
                               height: 50,
                               decoration: BoxDecoration(
@@ -147,8 +139,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               ]),
                             ),
                             const SizedBox(height: 20),
-
-                            // EMAIL
                             Text(l10n.emailLabel),
                             const SizedBox(height: 8),
                             TextFormField(
@@ -163,8 +153,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                             ),
                             const SizedBox(height: 16),
-
-                            // PASSWORD
                             Text(l10n.passwordLabel),
                             const SizedBox(height: 8),
                             TextFormField(
@@ -187,8 +175,6 @@ class _LoginScreenState extends State<LoginScreen> {
                               },
                             ),
                             const SizedBox(height: 10),
-
-                            // FORGOT PASSWORD
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
@@ -205,18 +191,14 @@ class _LoginScreenState extends State<LoginScreen> {
                               ),
                             ),
                             const SizedBox(height: 10),
-
-                            // ✅ LOGIN BUTTON — now uses state.isLoading
                             PrimaryButton(
                               label: l10n.loginButton,
-                              isLoading: state.isLoading, // ✅ FIXED
+                              isLoading: state.isLoading,
                               onPressed: state.isLoading
-                                  ? () {} // disabled while loading
+                                  ? () {}
                                   : () => _onLoginPressed(context),
                             ),
                             const SizedBox(height: 20),
-
-                            // REGISTER LINK
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
