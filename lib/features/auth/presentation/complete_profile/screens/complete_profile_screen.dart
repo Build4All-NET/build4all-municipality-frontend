@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:baladiyati/features/auth/presentation/login/screens/login_screen.dart';
 import '../bloc/complete_profile_bloc.dart';
 import '../bloc/complete_profile_event.dart';
 import '../bloc/complete_profile_state.dart';
@@ -14,7 +15,13 @@ class _Municipality {
   final String nameAr;
   final String nameEn;
   final String nameFr;
-  const _Municipality({required this.id, required this.nameAr, required this.nameEn, required this.nameFr});
+
+  const _Municipality({
+    required this.id,
+    required this.nameAr,
+    required this.nameEn,
+    required this.nameFr,
+  });
 }
 
 class CompleteProfileScreen extends StatefulWidget {
@@ -65,7 +72,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   }
 
   String _getMunicipalityName(_Municipality m, AppLocalizations l10n) {
-    // Detect locale from l10n
     if (l10n.localeName == 'ar') return m.nameAr;
     if (l10n.localeName == 'fr') return m.nameFr;
     return m.nameEn;
@@ -79,13 +85,25 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         return BlocConsumer<CompleteProfileBloc, CompleteProfileState>(
           listener: (context, state) {
             final l10n = AppLocalizations.of(context)!;
+
             if (state.isSuccess) {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(l10n.completeProfileSuccess),
                 backgroundColor: Colors.green,
               ));
-              // TODO: Navigate to Home screen
+              // Navigate to LoginScreen after profile completion
+              Future.delayed(const Duration(milliseconds: 500), () {
+                if (!mounted) return;
+                Navigator.pushAndRemoveUntil(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const LoginScreen(),
+                  ),
+                  (_) => false,
+                );
+              });
             }
+
             if (state.errorMessage != null) {
               ScaffoldMessenger.of(context).showSnackBar(SnackBar(
                 content: Text(state.errorMessage!),
@@ -103,27 +121,40 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                     _buildHeader(context),
                     Expanded(
                       child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(AppSizes.paddingLarge),
+                        padding:
+                            const EdgeInsets.all(AppSizes.paddingLarge),
                         child: Container(
-                          padding: const EdgeInsets.all(AppSizes.paddingLarge),
+                          padding:
+                              const EdgeInsets.all(AppSizes.paddingLarge),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(AppSizes.radiusLarge),
-                            boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.07), blurRadius: 20, offset: const Offset(0, 4))],
+                            borderRadius:
+                                BorderRadius.circular(AppSizes.radiusLarge),
+                            boxShadow: [
+                              BoxShadow(
+                                  color: Colors.black.withOpacity(0.07),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 4))
+                            ],
                           ),
                           child: Form(
                             key: _formKey,
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.end,
                               children: [
-                                Center(child: Text(l10n.completeProfileTitle,
-                                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: AppColors.darkBlue))),
+                                Center(
+                                    child: Text(l10n.completeProfileTitle,
+                                        style: const TextStyle(
+                                            fontSize: 24,
+                                            fontWeight: FontWeight.bold,
+                                            color: AppColors.darkBlue))),
                                 const SizedBox(height: 6),
-                                Center(child: Text(l10n.completeProfileSubtitle,
-                                    style: const TextStyle(fontSize: 14, color: Colors.grey))),
+                                Center(
+                                    child: Text(l10n.completeProfileSubtitle,
+                                        style: const TextStyle(
+                                            fontSize: 14,
+                                            color: Colors.grey))),
                                 const SizedBox(height: 28),
-
-                                // USERNAME
                                 _label(l10n.usernameLabel),
                                 const SizedBox(height: 8),
                                 _textField(
@@ -131,30 +162,30 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                                   hint: l10n.usernameHint,
                                   icon: Icons.person_outline,
                                   validator: (v) {
-                                    if (v == null || v.trim().isEmpty) return l10n.fieldRequired;
-                                    if (v.trim().length < 3) return l10n.usernameTooShort;
+                                    if (v == null || v.trim().isEmpty)
+                                      return l10n.fieldRequired;
+                                    if (v.trim().length < 3)
+                                      return l10n.usernameTooShort;
                                     return null;
                                   },
                                 ),
                                 const SizedBox(height: 16),
-
-                                // ADDRESS
                                 _label(l10n.addressLabel),
                                 const SizedBox(height: 8),
                                 _textField(
                                   controller: _addressCtrl,
                                   hint: l10n.addressHint,
                                   icon: Icons.location_on_outlined,
-                                  validator: (v) => (v == null || v.trim().isEmpty) ? l10n.fieldRequired : null,
+                                  validator: (v) =>
+                                      (v == null || v.trim().isEmpty)
+                                          ? l10n.fieldRequired
+                                          : null,
                                 ),
                                 const SizedBox(height: 16),
-
-                                // MUNICIPALITY
                                 _label(l10n.municipalityLabel),
                                 const SizedBox(height: 8),
                                 _municipalityDropdown(l10n),
                                 const SizedBox(height: 28),
-
                                 PrimaryButton(
                                   label: l10n.completeProfileButton,
                                   isLoading: state.isLoading,
@@ -179,7 +210,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   Widget _buildHeader(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: AppSizes.paddingLarge, vertical: AppSizes.paddingMedium),
+      padding: const EdgeInsets.symmetric(
+          horizontal: AppSizes.paddingLarge,
+          vertical: AppSizes.paddingMedium),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -192,19 +225,32 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                 borderRadius: BorderRadius.circular(10),
                 color: Colors.white,
               ),
-              child: const Icon(Icons.arrow_back_ios_new, size: 18, color: AppColors.primary),
+              child: const Icon(Icons.arrow_back_ios_new,
+                  size: 18, color: AppColors.primary),
             ),
           ),
           Row(children: [
-            Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-              Text(l10n.appTitle, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: AppColors.primary)),
-              Text(l10n.appSubtitle, style: const TextStyle(fontSize: 11, color: Colors.grey)),
-            ]),
+            Column(
+                crossAxisAlignment: CrossAxisAlignment.end,
+                children: [
+                  Text(l10n.appTitle,
+                      style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: AppColors.primary)),
+                  Text(l10n.appSubtitle,
+                      style: const TextStyle(
+                          fontSize: 11, color: Colors.grey)),
+                ]),
             const SizedBox(width: 10),
             Container(
-              width: 46, height: 46,
-              decoration: BoxDecoration(color: AppColors.primary, borderRadius: BorderRadius.circular(13)),
-              child: const Icon(Icons.apartment, color: Colors.white, size: 24),
+              width: 46,
+              height: 46,
+              decoration: BoxDecoration(
+                  color: AppColors.primary,
+                  borderRadius: BorderRadius.circular(13)),
+              child: const Icon(Icons.apartment,
+                  color: Colors.white, size: 24),
             ),
           ]),
         ],
@@ -213,9 +259,17 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   }
 
   Widget _label(String text) => Text(text,
-      style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: AppColors.darkBlue));
+      style: const TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w600,
+          color: AppColors.darkBlue));
 
-  Widget _textField({required TextEditingController controller, required String hint, required IconData icon, required String? Function(String?) validator}) {
+  Widget _textField({
+    required TextEditingController controller,
+    required String hint,
+    required IconData icon,
+    required String? Function(String?) validator,
+  }) {
     return TextFormField(
       controller: controller,
       textDirection: TextDirection.rtl,
@@ -224,11 +278,21 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         hintText: hint,
         hintStyle: const TextStyle(color: Colors.grey, fontSize: 13),
         prefixIcon: Icon(icon, color: Colors.grey, size: 20),
-        filled: true, fillColor: const Color(0xFFF5F6FA),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
-        enabledBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide(color: Colors.grey.shade200)),
-        focusedBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: AppColors.primary, width: 1.5)),
-        errorBorder: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: const BorderSide(color: Colors.red)),
+        filled: true,
+        fillColor: const Color(0xFFF5F6FA),
+        border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey.shade200)),
+        enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: BorderSide(color: Colors.grey.shade200)),
+        focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide:
+                const BorderSide(color: AppColors.primary, width: 1.5)),
+        errorBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(12),
+            borderSide: const BorderSide(color: Colors.red)),
       ),
       validator: validator,
     );
@@ -241,7 +305,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         color: const Color(0xFFF5F6FA),
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: _selectedMunicipality != null ? AppColors.primary : Colors.grey.shade200,
+          color: _selectedMunicipality != null
+              ? AppColors.primary
+              : Colors.grey.shade200,
           width: _selectedMunicipality != null ? 1.5 : 1,
         ),
       ),
@@ -249,22 +315,29 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         child: DropdownButton<_Municipality>(
           value: _selectedMunicipality,
           isExpanded: true,
-          icon: const Icon(Icons.keyboard_arrow_down, color: AppColors.primary),
+          icon: const Icon(Icons.keyboard_arrow_down,
+              color: AppColors.primary),
           hint: Align(
             alignment: Alignment.centerRight,
-            child: Text(l10n.selectMunicipality, style: const TextStyle(color: Colors.grey, fontSize: 14)),
+            child: Text(l10n.selectMunicipality,
+                style:
+                    const TextStyle(color: Colors.grey, fontSize: 14)),
           ),
           dropdownColor: Colors.white,
           borderRadius: BorderRadius.circular(12),
-          items: _municipalities.map((m) => DropdownMenuItem<_Municipality>(
-            value: m,
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: Text(_getMunicipalityName(m, l10n),
-                  style: const TextStyle(fontSize: 14, color: AppColors.darkBlue)),
-            ),
-          )).toList(),
-          onChanged: (val) => setState(() => _selectedMunicipality = val),
+          items: _municipalities
+              .map((m) => DropdownMenuItem<_Municipality>(
+                    value: m,
+                    child: Align(
+                      alignment: Alignment.centerRight,
+                      child: Text(_getMunicipalityName(m, l10n),
+                          style: const TextStyle(
+                              fontSize: 14, color: AppColors.darkBlue)),
+                    ),
+                  ))
+              .toList(),
+          onChanged: (val) =>
+              setState(() => _selectedMunicipality = val),
         ),
       ),
     );
