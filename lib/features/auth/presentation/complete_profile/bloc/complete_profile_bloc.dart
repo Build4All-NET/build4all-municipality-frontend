@@ -22,6 +22,7 @@ class CompleteProfileBloc
       await authApi.completeProfile(
         address: event.address,
         username: event.username,
+        municipalityId: 1
       );
 
       emit(state.copyWith(isLoading: false, isSuccess: true));
