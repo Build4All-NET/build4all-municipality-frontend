@@ -1,21 +1,26 @@
+// lib/features/auth/presentation/register/screens/user_verify_code_screen.dart
+
 import 'dart:convert';
+
 import 'package:baladiyati/common/registration_step_cubit.dart';
 import 'package:baladiyati/common/registration_step_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
-import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../../../../../features/auth/data/services/auth_api_service.dart';
 import 'package:baladiyati/app/app_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 class UserVerifyCodeScreen extends StatefulWidget {
   final String email;
   final String sharedReference;
+  final String password; // received from RegisterScreen, never stored on disk
 
   const UserVerifyCodeScreen({
     super.key,
     required this.email,
     required this.sharedReference,
+    required this.password,
   });
 
   @override
@@ -36,6 +41,7 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
     super.dispose();
   }
 
+  //  only reads non-sensitive data (fullName, email, phone) from prefs
   Future<Map<String, dynamic>?> _readStoredData() async {
     final prefs = await SharedPreferences.getInstance();
     final data = prefs.getString('register_body');
@@ -44,178 +50,168 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
     }
     return null;
   }
-void _verify(AppLocalizations l10n) async {
-  final code = _controllers.map((c) => c.text).join();
 
-  if (code.length < 6) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(l10n.enterFullCode)),
-    );
-    return;
+  void _verify(AppLocalizations l10n) async {
+    final code = _controllers.map((c) => c.text).join();
+    if (code.length < 6) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(l10n.enterFullCode)),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+
+    try {
+      //  STEP 1 --- Verify OTP
+      await _authApi.verifyEmailCode(
+        email: widget.email,
+        code: code,
+      );
+
+      //  STEP 2 --- Read saved register data (no password inside)
+      final savedData = await _readStoredData();
+      if (savedData == null) throw Exception('Register data not found');
+
+      // STEP 3 --- Call register using widget.password (in-memory, never stored)
+      await _authApi.register(
+        email: savedData['email'],
+        password: widget.password, //  from memory, not from disk
+        fullName: savedData['fullName'],
+        phone: savedData['phone'],
+        role: 'CITIZEN',
+        municipalityId: 1, // TEMP (will update later)
+      );
+
+      if (!mounted) return;
+      setState(() => _isLoading = false);
+      context.read<RegistrationStepCubit>().nextStep();
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(l10n.successRegister),
+          backgroundColor: Colors.green,
+        ),
+      );
+
+      //  STEP 4 --- Go to Complete Profile
+      AppRouter.gotoCompleteProfile(context);
+    } catch (e) {
+      setState(() => _isLoading = false);
+      if (!mounted) return;
+      final errorMsg = e.toString().replaceAll('Exception:', '').trim();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('خطأ: $errorMsg'),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
-
-  setState(() => _isLoading = true);
-
-  try {
-    // ✅ STEP 1 — Verify OTP
-    await _authApi.verifyEmailCode(
-      email: widget.email,
-      code: code,
-    );
-
-    // ✅ STEP 2 — Read saved register data
-    final savedData = await _readStoredData();
-    if (savedData == null) throw Exception('Register data not found');
-
-    // ✅ STEP 3 — CALL REGISTER HERE
-    await _authApi.register(
-      email: savedData['email'],
-      password: savedData['password'],
-      fullName: savedData['fullName'],
-      phone: savedData['phone'],
-      role: 'CITIZEN',
-      municipalityId: 1, // TEMP (will update later)
-    );
-
-    if (!mounted) return;
-
-    setState(() => _isLoading = false);
-context.read<RegistrationStepCubit>().nextStep();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(l10n.successRegister),
-        backgroundColor: Colors.green,
-      ),
-    );
-    // ✅ STEP 4 — GO TO COMPLETE PROFILE
-    AppRouter.gotoCompleteProfile(context);
-
-  } catch (e) {
-    setState(() => _isLoading = false);
-    if (!mounted) return;
-
-    final errorMsg = e.toString().replaceAll('Exception:', '').trim();
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('خطأ: $errorMsg'),
-        backgroundColor: Colors.red,
-      ),
-    );
-  }
-}
 
   @override
-Widget build(BuildContext context) {
-  final l10n = AppLocalizations.of(context)!;
-  final primary = Colors.blue.shade900;
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final primary = Colors.blue.shade900;
 
-  return Scaffold(
-    backgroundColor: Colors.grey.shade100,
-    body: SafeArea(
-      child: Column(
-        children: [
-          // ✅ STEP INDICATOR (same as register page)
-          const RegistrationStepIndicator(),
+    return Scaffold(
+      backgroundColor: Colors.grey.shade100,
+      body: SafeArea(
+        child: Column(
+          children: [
+            // Step indicator (same as register page)
+            const RegistrationStepIndicator(),
+            Expanded(
+              child: Center(
+                child: Container(
+                  margin: const EdgeInsets.all(20),
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircleAvatar(
+                        radius: 30,
+                        backgroundColor: primary.withOpacity(0.1),
+                        child: Icon(Icons.lock, color: primary),
+                      ),
+                      const SizedBox(height: 20),
+                      Text(l10n.verifyTitle,
+                          style: const TextStyle(
+                              fontSize: 20, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 10),
+                      Text(l10n.verifySubtitle),
+                      const SizedBox(height: 8),
+                      Text(widget.email,
+                          style: TextStyle(
+                              color: primary, fontWeight: FontWeight.bold)),
+                      const SizedBox(height: 20),
 
-          Expanded(
-            child: Center(
-              child: Container(
-                margin: const EdgeInsets.all(20),
-                padding: const EdgeInsets.all(20),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundColor: primary.withOpacity(0.1),
-                      child: Icon(Icons.lock, color: primary),
-                    ),
-                    const SizedBox(height: 20),
-
-                    Text(l10n.verifyTitle,
-                        style: const TextStyle(
-                            fontSize: 20, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 10),
-
-                    Text(l10n.verifySubtitle),
-                    const SizedBox(height: 8),
-
-                    Text(widget.email,
-                        style: TextStyle(
-                            color: primary, fontWeight: FontWeight.bold)),
-                    const SizedBox(height: 20),
-
-                    // OTP fields
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: List.generate(6, (index) {
-                        return SizedBox(
-                          width: 45,
-                          child: TextField(
-                            controller: _controllers[index],
-                            focusNode: _focusNodes[index],
-                            textAlign: TextAlign.center,
-                            keyboardType: TextInputType.number,
-                            maxLength: 1,
-                            onChanged: (value) {
-                              if (value.isNotEmpty && index < 5) {
-                                _focusNodes[index + 1].requestFocus();
-                              } else if (value.isEmpty && index > 0) {
-                                _focusNodes[index - 1].requestFocus();
-                              }
-                            },
-                            decoration: InputDecoration(
-                              counterText: "",
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide: BorderSide(color: primary),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(10),
-                                borderSide:
-                                    BorderSide(color: primary, width: 2),
+                      // OTP fields
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: List.generate(6, (index) {
+                          return SizedBox(
+                            width: 45,
+                            child: TextField(
+                              controller: _controllers[index],
+                              focusNode: _focusNodes[index],
+                              textAlign: TextAlign.center,
+                              keyboardType: TextInputType.number,
+                              maxLength: 1,
+                              onChanged: (value) {
+                                if (value.isNotEmpty && index < 5) {
+                                  _focusNodes[index + 1].requestFocus();
+                                } else if (value.isEmpty && index > 0) {
+                                  _focusNodes[index - 1].requestFocus();
+                                }
+                              },
+                              decoration: InputDecoration(
+                                counterText: "",
+                                enabledBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: primary),
+                                ),
+                                focusedBorder: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                  borderSide: BorderSide(color: primary, width: 2),
+                                ),
                               ),
                             ),
-                          ),
-                        );
-                      }),
-                    ),
-                    const SizedBox(height: 25),
-
-                    // VERIFY BUTTON
-                    SizedBox(
-                      width: double.infinity,
-                      height: 50,
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: primary,
-                          shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12)),
-                        ),
-                        onPressed:
-                            _isLoading ? null : () => _verify(l10n),
-                        child: _isLoading
-                            ? const CircularProgressIndicator(
-                                color: Colors.white)
-                            : Text(l10n.verifyButton,
-                                style: const TextStyle(
-                                    fontSize: 16, color: Colors.white)),
+                          );
+                        }),
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 25),
+
+                      // VERIFY BUTTON
+                      SizedBox(
+                        width: double.infinity,
+                        height: 50,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: primary,
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                          ),
+                          onPressed: _isLoading ? null : () => _verify(l10n),
+                          child: _isLoading
+                              ? const CircularProgressIndicator(color: Colors.white)
+                              : Text(l10n.verifyButton,
+                                  style: const TextStyle(
+                                      fontSize: 16, color: Colors.white)),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
-    ),
-  );
-}
+    );
+  }
 }

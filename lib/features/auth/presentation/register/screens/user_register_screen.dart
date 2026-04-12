@@ -1,4 +1,7 @@
+// lib/features/auth/presentation/register/screens/user_register_screen.dart
+
 import 'dart:convert';
+
 import 'package:baladiyati/common/registration_step_cubit.dart';
 import 'package:baladiyati/common/registration_step_indicator.dart';
 import 'package:flutter/material.dart';
@@ -6,7 +9,6 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:baladiyati/features/auth/presentation/register/screens/user_verify_code_screen.dart';
-
 import '../../../../../core/theme/theme_cubit.dart';
 import '../../../../../common/widgets/primary_button.dart';
 import '../../../../../features/auth/data/services/auth_api_service.dart';
@@ -25,7 +27,6 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
   final _phoneCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
   final _authApi = AuthApiService();
-
   bool _obscurePassword = true;
   bool _isLoading = false;
 
@@ -38,6 +39,7 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
     super.dispose();
   }
 
+  // ✅ FIXED: password is NOT saved here — only non-sensitive data
   Future<void> _saveToPrefs(Map<String, dynamic> body) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('register_body', jsonEncode(body));
@@ -49,26 +51,27 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
     setState(() => _isLoading = true);
 
     final email = _emailCtrl.text.trim();
+    final password = _passwordCtrl.text.trim(); // kept in memory only
     final sharedReference = DateTime.now().millisecondsSinceEpoch.toString();
 
-    // Save all form data to SharedPreferences
+    // ✅ FIXED: password is excluded from SharedPreferences
     final body = {
       "fullName": _nameCtrl.text.trim(),
       "email": email,
       "phone": _phoneCtrl.text.trim(),
-      "password": _passwordCtrl.text.trim(),
       "sharedReference": sharedReference,
     };
 
     await _saveToPrefs(body);
 
     try {
-      // ✅ STEP 1 — Send verification email to backend
+      // ✅ STEP 1 --- Send verification email to backend
       await _authApi.sendVerificationEmail(email: email);
 
       setState(() => _isLoading = false);
-context.read<RegistrationStepCubit>().nextStep();
-      // ✅ STEP 2 — Navigate to OTP screen
+      context.read<RegistrationStepCubit>().nextStep();
+
+      // ✅ STEP 2 --- Navigate to OTP screen, passing password in memory
       if (!mounted) return;
       Navigator.push(
         context,
@@ -76,12 +79,12 @@ context.read<RegistrationStepCubit>().nextStep();
           builder: (_) => UserVerifyCodeScreen(
             email: email,
             sharedReference: sharedReference,
+            password: password, // ✅ FIXED: passed directly, never stored on disk
           ),
         ),
       );
     } catch (e) {
       setState(() => _isLoading = false);
-
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -105,7 +108,7 @@ context.read<RegistrationStepCubit>().nextStep();
       body: SafeArea(
         child: Column(
           children: [
-const RegistrationStepIndicator(),
+            const RegistrationStepIndicator(),
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(card.padding),
@@ -115,7 +118,6 @@ const RegistrationStepIndicator(),
                     crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
                       const SizedBox(height: 20),
-
                       Center(
                         child: Text(l10n.registerTitle,
                             style: TextStyle(
@@ -203,8 +205,8 @@ const RegistrationStepIndicator(),
                           border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(card.radius)),
                           suffixIcon: IconButton(
-                            onPressed: () => setState(
-                                () => _obscurePassword = !_obscurePassword),
+                            onPressed: () =>
+                                setState(() => _obscurePassword = !_obscurePassword),
                             icon: Icon(_obscurePassword
                                 ? Icons.lock_outline
                                 : Icons.lock_open_outlined),
