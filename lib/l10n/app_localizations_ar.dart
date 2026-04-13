@@ -193,4 +193,28 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get eightDigits => 'يجب 8 أرقام';
+
+  @override
+  String get resetPasswordTitle => 'إعادة تعيين كلمة المرور';
+
+  @override
+  String get resetPasswordSubtitle => 'أدخل كلمة المرور الجديدة وتأكيدها';
+
+  @override
+  String get newPassword => 'كلمة المرور الجديدة';
+
+  @override
+  String get confirmPassword => 'تأكيد كلمة المرور';
+
+  @override
+  String get savePassword => 'حفظ كلمة المرور';
+
+  @override
+  String get passwordUpdated => 'تم تحديث كلمة المرور بنجاح';
+
+  @override
+  String get passwordNotMatch => 'كلمتا المرور غير متطابقتين';
+
+  @override
+  String get passwordRequired => 'كلمة المرور مطلوبة';
 }

@@ -1,6 +1,9 @@
+// lib/features/auth/presentation/login/screens/login_screen.dart
+
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
+//import 'package:baladiyati/app/app_router.dart';
 import 'package:baladiyati/features/auth/presentation/login/screens/reset_password_page.dart';
 import 'package:baladiyati/features/auth/presentation/register/screens/user_register_screen.dart';
 import 'package:baladiyati/features/auth/presentation/complete_profile/screens/HomePage.dart';
@@ -72,7 +75,6 @@ class _LoginScreenState extends State<LoginScreen> {
                 ),
               );
 
-              // Navigate to HomePage after login
               Future.delayed(const Duration(milliseconds: 500), () {
                 if (!mounted) return;
                 Navigator.pushAndRemoveUntil(
@@ -178,11 +180,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
+                                // ✅ Login → ResetPasswordPage (email) → ForgotPasswordScreen (new password)
                                 onPressed: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (_) =>
-                                            const ResetPasswordPage())),
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (_) => const ResetPasswordPage(),
+                                  ),
+                                ),
                                 child: Text(l10n.forgotPassword,
                                     style: TextStyle(
                                         color: colors.primary,

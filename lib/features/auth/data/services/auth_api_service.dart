@@ -31,18 +31,15 @@ class AuthApiService {
   // ─────────────────────────────────────────────────
   // STEP 2 — Verify OTP code
   // ─────────────────────────────────────────────────
- Future<void> verifyEmailCode({
-  required String email,
-  required String code,
-}) async {
-  await _client.post(
-    '/auth/verify',
-    body: {
-      'email': email,
-      'code': code,
-    },
-  );
-}
+  Future<void> verifyEmailCode({
+    required String email,
+    required String code,
+  }) async {
+    await _client.post(
+      '/auth/verify',
+      body: {'email': email, 'code': code},
+    );
+  }
 
   // ─────────────────────────────────────────────────
   // STEP 3 — Register
@@ -66,15 +63,11 @@ class AuthApiService {
         'municipality': {'id': municipalityId},
       },
     );
-
     final response = AuthResponseModel.fromJson(data);
-
-    // Save token to BOTH storages so complete profile can use it
     if (response.token.isNotEmpty) {
       await _tokenStore.saveToken(response.token);
       await _client.saveToken(response.token);
     }
-
     return response;
   }
 
@@ -94,15 +87,11 @@ class AuthApiService {
         'role': role,
       },
     );
-
     final response = AuthResponseModel.fromJson(data);
-
-    // Save token to BOTH storages
     if (response.token.isNotEmpty) {
       await _tokenStore.saveToken(response.token);
       await _client.saveToken(response.token);
     }
-
     return response;
   }
 
@@ -122,30 +111,28 @@ class AuthApiService {
   // COMPLETE PROFILE
   // ─────────────────────────────────────────────────
   Future<String> completeProfile({
-  required String address,
-  required String username,
-  required int municipalityId,
-}) async {
-  final token = await _tokenStore.getToken();
-  if (token != null && token.isNotEmpty) {
-    await _client.saveToken(token);
+    required String address,
+    required String username,
+    required int municipalityId,
+  }) async {
+    final token = await _tokenStore.getToken();
+    if (token != null && token.isNotEmpty) {
+      await _client.saveToken(token);
+    }
+    final response = await _client.post(
+      '/auth/complete-profile',
+      body: {
+        'address': address,
+        'username': username,
+        'municipality': {'id': municipalityId},
+      },
+      requiresAuth: true,
+    );
+    return response['message'] ?? 'Success';
   }
 
-  final response = await _client.post(
-    '/auth/complete-profile',
-    body: {
-      'address': address,
-      'username': username,
-      'municipality': {'id': municipalityId},
-    },
-    requiresAuth: true,
-  );
-
-  return response['message'] ?? 'Success';
-}
-
   // ─────────────────────────────────────────────────
-  // FORGOT PASSWORD
+  // FORGOT PASSWORD — Step 1: send OTP to email
   // ─────────────────────────────────────────────────
   Future<String> forgetPassword({required String email}) async {
     final response = await _client.post(
@@ -156,7 +143,7 @@ class AuthApiService {
   }
 
   // ─────────────────────────────────────────────────
-  // VERIFY RESET CODE
+  // VERIFY RESET CODE — Step 2: verify OTP
   // ─────────────────────────────────────────────────
   Future<void> verifyPasswordReset({
     required String email,
@@ -169,7 +156,8 @@ class AuthApiService {
   }
 
   // ─────────────────────────────────────────────────
-  // RESET PASSWORD
+  // RESET PASSWORD — Step 3: set new password
+  // ✅ FIXED: 'newPassword' and 'confirmPassword' match SetNewPasswordRequest.java
   // ─────────────────────────────────────────────────
   Future<String> resetPassword({
     required String email,
@@ -180,7 +168,7 @@ class AuthApiService {
       '/auth/reset-password',
       body: {
         'email': email,
-        'password': newPassword,
+        'newPassword': newPassword,       // ✅ was 'password' — now matches backend
         'confirmPassword': confirmPassword,
       },
     );

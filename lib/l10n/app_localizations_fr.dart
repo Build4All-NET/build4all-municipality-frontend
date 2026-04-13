@@ -196,4 +196,29 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get eightDigits => '8 chiffres requis';
+
+  @override
+  String get resetPasswordTitle => 'Réinitialiser le mot de passe';
+
+  @override
+  String get resetPasswordSubtitle =>
+      'Entrez votre nouveau mot de passe et confirmez-le';
+
+  @override
+  String get newPassword => 'Nouveau mot de passe';
+
+  @override
+  String get confirmPassword => 'Confirmer le mot de passe';
+
+  @override
+  String get savePassword => 'Enregistrer le mot de passe';
+
+  @override
+  String get passwordUpdated => 'Mot de passe mis à jour avec succès';
+
+  @override
+  String get passwordNotMatch => 'Les mots de passe ne correspondent pas';
+
+  @override
+  String get passwordRequired => 'Le mot de passe est requis';
 }
