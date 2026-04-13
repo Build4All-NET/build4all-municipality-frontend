@@ -31,12 +31,18 @@ class AuthApiService {
   // ─────────────────────────────────────────────────
   // STEP 2 — Verify OTP code
   // ─────────────────────────────────────────────────
-  Future<void> verifyEmailCode({required String code}) async {
-    await _client.post(
-      '/auth/verify',
-      body: {'code': code},
-    );
-  }
+ Future<void> verifyEmailCode({
+  required String email,
+  required String code,
+}) async {
+  await _client.post(
+    '/auth/verify',
+    body: {
+      'email': email,
+      'code': code,
+    },
+  );
+}
 
   // ─────────────────────────────────────────────────
   // STEP 3 — Register
@@ -116,26 +122,27 @@ class AuthApiService {
   // COMPLETE PROFILE
   // ─────────────────────────────────────────────────
   Future<String> completeProfile({
-    required String address,
-    required String username,
-  }) async {
-    // Get token from store and make sure ApiClient has it
-    final token = await _tokenStore.getToken();
-    if (token != null && token.isNotEmpty) {
-      await _client.saveToken(token);
-    }
-
-    final response = await _client.post(
-      '/auth/complete-profile',
-      body: {
-        'address': address,
-        'username': username,
-      },
-      requiresAuth: true,
-    );
-
-    return response['message'] ?? 'Success';
+  required String address,
+  required String username,
+  required int municipalityId,
+}) async {
+  final token = await _tokenStore.getToken();
+  if (token != null && token.isNotEmpty) {
+    await _client.saveToken(token);
   }
+
+  final response = await _client.post(
+    '/auth/complete-profile',
+    body: {
+      'address': address,
+      'username': username,
+      'municipality': {'id': municipalityId},
+    },
+    requiresAuth: true,
+  );
+
+  return response['message'] ?? 'Success';
+}
 
   // ─────────────────────────────────────────────────
   // FORGOT PASSWORD

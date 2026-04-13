@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:baladiyati/common/registration_step_cubit.dart';
 import 'package:baladiyati/common/registration_step_indicator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -66,7 +67,7 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
       await _authApi.sendVerificationEmail(email: email);
 
       setState(() => _isLoading = false);
-
+context.read<RegistrationStepCubit>().nextStep();
       // ✅ STEP 2 — Navigate to OTP screen
       if (!mounted) return;
       Navigator.push(
@@ -104,9 +105,7 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            RegistrationStepIndicator(
-              currentStep: RegistrationStep.register,
-            ),
+const RegistrationStepIndicator(),
             Expanded(
               child: SingleChildScrollView(
                 padding: EdgeInsets.all(card.padding),

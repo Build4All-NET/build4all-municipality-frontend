@@ -37,21 +37,24 @@ class AuthRepositoryImpl implements AuthRepository {
   // STEP 2 — Verify OTP code
   // ✅ Actually calls POST /auth/verify
   // ─────────────────────────────────────────────────
-  @override
-  Future<Either<AuthFailure, int>> verifyEmailCode({
-    required String email,
-    required String code,
-  }) async {
-    try {
-      await _api.verifyEmailCode(code: code);
-      return const Right(1);
-    } catch (e) {
-      return Left(AuthFailure(
-        e.toString(),
-        code: 'VERIFY_FAILED',
-      ));
-    }
+ @override
+Future<Either<AuthFailure, int>> verifyEmailCode({
+  required String email,
+  required String code,
+}) async {
+  try {
+    await _api.verifyEmailCode(
+      email: email,   // ✅ ADD THIS
+      code: code,
+    );
+    return const Right(1);
+  } catch (e) {
+    return Left(AuthFailure(
+      e.toString(),
+      code: 'VERIFY_FAILED',
+    ));
   }
+}
 
   // ─────────────────────────────────────────────────
   // Verify phone code (not implemented yet)
@@ -97,6 +100,7 @@ class AuthRepositoryImpl implements AuthRepository {
     await _api.completeProfile(
       address: '',
       username: username,
+      municipalityId: 1
     );
     return UserEntity(
       id: pendingId,

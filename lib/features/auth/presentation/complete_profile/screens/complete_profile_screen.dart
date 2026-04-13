@@ -1,3 +1,5 @@
+import 'package:baladiyati/app/app_router.dart';
+import 'package:baladiyati/common/registration_step_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
@@ -77,6 +79,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
             //municipalityId: _selectedMunicipality!.id, // 
           ),
         );
+        context.read<RegistrationStepCubit>().nextStep();
+        AppRouter.goToWelcome(context);
   }
 
   String _getMunicipalityName(_Municipality m, AppLocalizations l10n) {

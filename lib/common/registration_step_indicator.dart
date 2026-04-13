@@ -1,3 +1,4 @@
+import 'package:baladiyati/common/registration_step_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/core/theme/theme_cubit.dart';
@@ -13,67 +14,59 @@ enum RegistrationStep {
 }
 
 class RegistrationStepIndicator extends StatelessWidget {
-  final RegistrationStep currentStep;
 
   const RegistrationStepIndicator({
     super.key,
-    required this.currentStep,
   });
 
   @override
-  Widget build(BuildContext context) {
-    final themeState = context.watch<ThemeCubit>().state;
-    final colors = themeState.tokens.colors;
-    final isDark = themeState.isDark;
+Widget build(BuildContext context) {
+  final stepIndex = context.watch<RegistrationStepCubit>().state;
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.5),
-            blurRadius: 4,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          _buildStep(
-            context,
-            index: 0,
-            title: _getStepTitle(context, 0),
-            isActive: currentStep.index >= 0,
-            isCompleted: currentStep.index > 0,
-          ),
-          _buildDivider(
-            context,
-            isActive: currentStep.index >= 1,
-          ),
-          _buildStep(
-            context,
-            index: 1,
-            title: _getStepTitle(context, 1),
-            isActive: currentStep.index >= 1,
-            isCompleted: currentStep.index > 1,
-          ),
-          _buildDivider(
-            context,
-            isActive: currentStep.index >= 2,
-          ),
-          _buildStep(
-            context,
-            index: 2,
-            title: _getStepTitle(context, 2),
-            isActive: currentStep.index >= 2,
-            isCompleted: currentStep.index > 2,
-          ),
-        ],
-      ),
-    );
-  }
+  final themeState = context.watch<ThemeCubit>().state;
+  final colors = themeState.tokens.colors;
 
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+    decoration: BoxDecoration(
+      color: colors.surface,
+      boxShadow: [
+        BoxShadow(
+          color: Colors.black.withValues(alpha: 0.5),
+          blurRadius: 4,
+          offset: const Offset(0, 2),
+        ),
+      ],
+    ),
+    child: Row(
+      children: [
+        _buildStep(
+          context,
+          index: 0,
+          title: _getStepTitle(context, 0),
+          isActive: stepIndex >= 0,
+          isCompleted: stepIndex > 0,
+        ),
+        _buildDivider(context, isActive: stepIndex >= 1),
+        _buildStep(
+          context,
+          index: 1,
+          title: _getStepTitle(context, 1),
+          isActive: stepIndex >= 1,
+          isCompleted: stepIndex > 1,
+        ),
+        _buildDivider(context, isActive: stepIndex >= 2),
+        _buildStep(
+          context,
+          index: 2,
+          title: _getStepTitle(context, 2),
+          isActive: stepIndex >= 2,
+          isCompleted: stepIndex > 2,
+        ),
+      ],
+    ),
+  );
+}
   String _getStepTitle(BuildContext context, int step) {
     // You can add localization keys for these
     switch (step) {

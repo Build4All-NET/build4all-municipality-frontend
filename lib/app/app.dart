@@ -1,4 +1,5 @@
 // lib/app/app.dart
+import 'package:baladiyati/common/registration_step_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -17,6 +18,7 @@ class MyApp extends StatelessWidget {
       providers: [
         BlocProvider(create: (_) => LocaleCubit()),
         BlocProvider(create: (_) => ThemeCubit()),
+        BlocProvider(create: (_) => RegistrationStepCubit()),
         // ✅ AuthBloc removed from here — LoginScreen has its own via AppRouter
       ],
       child: BlocBuilder<ThemeCubit, ThemeState>(
