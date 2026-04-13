@@ -1,0 +1,311 @@
+name: Owner App Build (APK + AAB)
+
+on:
+  repository_dispatch:
+    types: [owner_app_build]
+
+permissions:
+  contents: write
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+
+    env:
+      CI_CALLBACK_TOKEN: ${{ secrets.CI_CALLBACK_TOKEN }}
+      CI_RUNTIME_TOKEN: ${{ secrets.CI_RUNTIME_TOKEN }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+       # ════════════════════════════════════════════════════════════════════
+      # EXTRACT BUILD_ID & LINK_ID (needed for status callbacks)
+      # ════════════════════════════════════════════════════════════════════
+      - name: Extract BUILD_ID and LINK_ID
+        run: |
+          set -e
+          python3 - <<'PY'
+          import json, os
+          payload = json.loads(r'''${{ toJson(github.event.client_payload) }}''') or {}
+          cfg = payload.get("CONFIG") or {}
+          
+          build_id = (
+              (payload.get("BUILD_ID") or "")
+              or (payload.get("buildId") or "")
+              or ""
+          ).strip()
+          link_id = str(
+              cfg.get("OWNER_PROJECT_LINK_ID")
+              or payload.get("OWNER_PROJECT_LINK_ID")
+              or payload.get("ownerProjectLinkId")
+              or cfg.get("ownerProjectLinkId")
+              or ""
+          ).strip()
+          
+          api_base = ((cfg.get("API_BASE_URL") or payload.get("API_BASE_URL") or "").rstrip("/")).strip()
+          
+          open("ci_build_id.txt","w",encoding="utf-8").write(build_id)
+          open("ci_link_id.txt","w",encoding="utf-8").write(link_id)
+          open("ci_api_base.txt","w",encoding="utf-8").write(api_base)
+          print("BUILD_ID =", build_id if build_id else "(empty)")
+          print("LINK_ID =", link_id if link_id else "(empty)")
+          print("API_BASE =", api_base if api_base else "(empty)")
+          
+          # Export to GITHUB_ENV for all steps
+          with open(os.environ["GITHUB_ENV"], "a") as f:
+              f.write(f"BUILD_ID={build_id}\n")
+              f.write(f"LINK_ID={link_id}\n")
+              f.write(f"API_BASE={api_base}\n")
+          PY
+     # ════════════════════════════════════════════════════════════════════
+      # MARK BUILD AS RUNNING (at start)
+      # ════════════════════════════════════════════════════════════════════
+      - name: 📡 Mark build RUNNING
+        if: always()
+        run: |
+          set +e
+          
+          if [ -z "${API_BASE:-}" ] || [ -z "${CI_CALLBACK_TOKEN:-}" ]; then
+            echo "⚠️ API_BASE or CI_CALLBACK_TOKEN missing, skipping status update"
+            exit 0
+          fi
+          curl -sS -X PUT "${API_BASE}/api/ci/build-jobs/running" \
+            -H "Content-Type: application/json" \
+            -H "X-Auth-Token: ${CI_CALLBACK_TOKEN}" \
+            -d "{\"buildId\":\"${BUILD_ID}\",\"linkId\":\"${LINK_ID}\",\"platform\":\"ANDROID\"}" || true
+          
+          echo "✅ Build marked as RUNNING"
+
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.32.0"
+          channel: stable
+          cache: true
+
+      - name: Show Flutter/Dart versions
+        run: |
+          flutter --version
+          dart --version
+
+      - name: Show payload (debug)
+        run: |
+          cat > payload.json <<'JSON'
+          ${{ toJson(github.event.client_payload) }}
+          JSON
+      
+          echo "----- payload.json -----"
+          cat payload.json
+          echo ""
+          echo "----- pretty -----"
+          python3 -m json.tool payload.json || true
+
+
+      - name: Force Android NDK 27
+        run: |
+          set -e
+          FILE="android/app/build.gradle.kts"
+          if [ -f "$FILE" ]; then
+            if grep -q "ndkVersion" "$FILE"; then
+              sed -i 's/^[[:space:]]*ndkVersion *=.*/    ndkVersion = "27.0.12077973"/' "$FILE"
+            else
+              perl -0777 -i -pe 's/android\s*\{\s*/android {\n    ndkVersion = "27.0.12077973"\n/s' "$FILE"
+            fi
+
+            echo "---- ndkVersion ----"
+            grep -n "ndkVersion" "$FILE" || true
+          else
+            echo "android/app/build.gradle.kts not found"
+            exit 1
+          fi
+      - name: Force compileSdk 36 (plugin requirement)
+        run: |
+          set -e
+          FILE="android/app/build.gradle.kts"
+
+          if grep -qE 'compileSdk\s*=\s*flutter\.compileSdkVersion' "$FILE"; then
+            sed -i 's/compileSdk\s*=\s*flutter\.compileSdkVersion/compileSdk = 36/g' "$FILE"
+          elif grep -qE 'compileSdk\s*=\s*[0-9]+' "$FILE"; then
+            sed -i 's/compileSdk\s*=\s*[0-9]\+/compileSdk = 36/g' "$FILE"
+          else
+            perl -0777 -i -pe 's/android\s*\{\s*/android {\n    compileSdk = 36\n/s' "$FILE"
+          fi
+
+          echo "---- compileSdk now ----"
+          grep -n "compileSdk" "$FILE" || true
+
+
+      - name: Build ci_env.json (BY_LINK runtime-config + fallback)
+        run: |
+          set -e
+          mkdir -p lib/env
+
+          python3 - <<'PY'
+          import json, re, os, urllib.request, urllib.error, socket
+
+          payload = json.loads(r'''${{ toJson(github.event.client_payload) }}''') or {}
+          cfg = payload.get("CONFIG") or {}
+
+          api_base = (cfg.get("API_BASE_URL") or payload.get("API_BASE_URL") or "").strip().rstrip("/")
+          link_id  = str(
+              cfg.get("OWNER_PROJECT_LINK_ID")
+              or payload.get("OWNER_PROJECT_LINK_ID")
+              or payload.get("ownerProjectLinkId")
+              or cfg.get("ownerProjectLinkId")
+              or ""
+          ).strip()
+
+          if not api_base:
+              raise SystemExit("Missing API_BASE_URL")
+          if not link_id:
+              raise SystemExit("Missing OWNER_PROJECT_LINK_ID")
+
+          url = f"{api_base}/api/public/runtime-config/by-link?linkId={link_id}"
+          runtime = {}
+          source = "FALLBACK (payload/defaults)"
+
+          token = (os.getenv("CI_RUNTIME_TOKEN") or "").strip()
+          headers = {"Accept": "application/json"}
+          if token:
+              headers["X-Auth-Token"] = token
+
+          try:
+              print("Fetching runtime config:", url)
+              print("Auth header present =", "YES" if token else "NO")
+              req = urllib.request.Request(url, headers=headers)
+              with urllib.request.urlopen(req, timeout=12) as r:
+                  raw = r.read().decode("utf-8")
+                  runtime = json.loads(raw)
+              source = "BY_LINK"
+          except (urllib.error.HTTPError, urllib.error.URLError, socket.timeout, json.JSONDecodeError) as e:
+              print("⚠️ runtime-config fetch failed, using fallback:", repr(e))
+
+          print("CONFIG SOURCE =", source)
+          def pick(key, default=None):
+              v = runtime.get(key)
+              if v not in (None, "", []):
+                  return v
+              v = cfg.get(key)
+              if v not in (None, "", []):
+                  return v
+              v = payload.get(key)
+              if v not in (None, "", []):
+                  return v
+              return default
+
+          app_name   = pick("APP_NAME", "My App")
+          app_type   = pick("APP_TYPE", "municipality")
+          project_id = str(pick("PROJECT_ID", "")).strip()
+          pkg_raw = (pick("PACKAGE_NAME") or pick("APPLICATION_ID") or "").strip()
+          if not pkg_raw:
+              pkg_raw = f"com.build4all.app{link_id}"
+
+          pkg = pkg_raw.lower()
+          pkg = re.sub(r"[^a-z0-9._]", "", pkg)
+          pkg = re.sub(r"\.+", ".", pkg).strip(".")
+
+          if not pkg or pkg.count(".") < 1:
+              pkg = f"com.build4all.app{link_id}"
+
+          vc = pick("ANDROID_VERSION_CODE")
+          vn = pick("ANDROID_VERSION_NAME")
+
+          try:
+              vc_int = int(vc) if vc not in (None,"",[]) else None
+          except Exception:
+              vc_int = None
+
+          vn_str = (str(vn).strip() if vn not in (None,"",[]) else "")
+
+          env = {
+              "API_BASE_URL": api_base,
+              "APP_NAME": app_name,
+              "APP_TYPE": app_type,
+              "OWNER_PROJECT_LINK_ID": link_id,
+              "PROJECT_ID": project_id,
+              "PACKAGE_NAME": pkg,
+              "ANDROID_VERSION_CODE": vc_int if vc_int is not None else 1,
+              "ANDROID_VERSION_NAME": vn_str if vn_str else "1.0.0",
+              "CONFIG_SOURCE": source,
+          }
+          currency_id = pick("CURRENCY_ID")
+          if currency_id in (None, "", []):
+              currency_id = (
+                  runtime.get("currencyId")
+                  or cfg.get("currencyId")
+                  or payload.get("currencyId")
+                  or payload.get("CURRENCY_ID")
+              )
+          if currency_id not in (None, "", []):
+              env["CURRENCY_ID"] = str(currency_id).strip()
+
+          import re
+          
+          def pick_any(*keys, default=None):
+              for k in keys:
+                  v = runtime.get(k)
+                  if v not in (None, "", []):
+                      return v
+                  v = cfg.get(k)
+                  if v not in (None, "", []):
+                      return v
+                  v = payload.get(k)
+                  if v not in (None, "", []):
+                      return v
+              return default
+          
+          def clean_b64(v):
+              if not v:
+                  return None
+              return re.sub(r"\s+", "", str(v))  # removes spaces/newlines that break base64
+          
+          # ✅ only set the key if it exists (no nulls)
+          for env_key, alt_key in [
+              ("THEME_JSON_B64", "themeJsonB64"),
+              ("NAV_JSON_B64", "navJsonB64"),
+              ("HOME_JSON_B64", "homeJsonB64"),
+              ("ENABLED_FEATURES_JSON_B64", "enabledFeaturesJsonB64"),
+              ("BRANDING_JSON_B64", "brandingJsonB64"),
+          ]:
+              v = clean_b64(pick_any(env_key, alt_key))
+              if v:
+                  env[env_key] = v
+          logo_url = (pick("LOGO_URL") or pick("LOGO_PATH") or "").strip()
+          if not logo_url:
+              logo_url = (runtime.get("logoUrl") or cfg.get("logoUrl") or payload.get("logoUrl") or "").strip()
+          if logo_url:
+              env["LOGO_URL"] = logo_url
+
+          open("ci_package_name.txt", "w", encoding="utf-8").write(pkg)
+          open("ci_android_version_code.txt", "w", encoding="utf-8").write(str(env["ANDROID_VERSION_CODE"]))
+          open("ci_android_version_name.txt", "w", encoding="utf-8").write(env["ANDROID_VERSION_NAME"])
+
+          os.makedirs("lib/env", exist_ok=True)
+          with open("lib/env/ci_env.json", "w", encoding="utf-8") as f:
+              json.dump(env, f, ensure_ascii=False, indent=2)
+
+          print("ci_env.json written")
+          print("API_BASE_URL =", api_base)
+          print("OWNER_PROJECT_LINK_ID =", link_id)
+          print("PROJECT_ID =", project_id)
+          print("PACKAGE_NAME =", pkg)
+          print("ANDROID_VERSION_CODE =", env["ANDROID_VERSION_CODE"])
+          print("ANDROID_VERSION_NAME =", env["ANDROID_VERSION_NAME"])
+          print("CURRENCY_ID =", env.get("CURRENCY_ID"))
+          print("CONFIG_SOURCE =", source)
+
+          for k in ["THEME_JSON_B64","NAV_JSON_B64","HOME_JSON_B64","ENABLED_FEATURES_JSON_B64","BRANDING_JSON_B64"]:
+              print(k, "=", "YES" if env.get(k) else "NO")
+          PY
+
+          
+          
+          
+          
+          
