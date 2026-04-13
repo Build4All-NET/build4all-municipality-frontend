@@ -60,5 +60,13 @@
   "forgotPassword": "Forgot password?",
   "selectLanguage": "Select Language",
   "gmailOnly": "Gmail only allowed",
-  "eightDigits": "Must be 8 digits"
+  "eightDigits": "Must be 8 digits",
+  "resetPasswordTitle": "Reset Password",
+  "resetPasswordSubtitle": "Enter your new password and confirm it",
+  "newPassword": "New Password",
+  "confirmPassword": "Confirm Password",
+  "savePassword": "Save Password",
+  "passwordUpdated": "Password updated successfully",
+  "passwordNotMatch": "Passwords do not match",
+  "passwordRequired": "Password is required"
 }

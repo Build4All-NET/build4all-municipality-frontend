@@ -1,4 +1,5 @@
 // lib/app/app_router.dart
+
 import 'package:baladiyati/features/auth/presentation/complete_profile/screens/HomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -9,6 +10,9 @@ import '../features/auth/presentation/register/screens/user_register_screen.dart
 import '../features/auth/presentation/register/screens/user_verify_code_screen.dart';
 import '../features/auth/presentation/complete_profile/screens/complete_profile_screen.dart';
 import '../features/auth/data/services/auth_api_service.dart';
+import '../features/auth/presentation/login/screens/reset_password_page.dart';
+import '../features/auth/presentation/login/screens/verify_reset_code_screen.dart';
+import '../features/auth/presentation/login/screens/forgot_password_screen.dart';
 
 class AppRouter {
 
@@ -22,9 +26,8 @@ class AppRouter {
   }
 
   // ── Login ─────────────────────────────────────────
-  // ✅ Provides its OWN AuthBloc — fixes "nothing happens on login"
   static void goToLogin(BuildContext context) {
-    Navigator.push(
+    Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(
         builder: (_) => BlocProvider(
@@ -32,6 +35,7 @@ class AppRouter {
           child: const LoginScreen(),
         ),
       ),
+      (_) => false,
     );
   }
 
@@ -43,11 +47,12 @@ class AppRouter {
     );
   }
 
-  // ── Verify Code ───────────────────────────────────
+  // ── Verify Code (Registration) ────────────────────
   static void gotoUserVerifyCodeScreen(
     BuildContext context, {
     required String email,
     required String sharedReference,
+    required String password,
   }) {
     Navigator.push(
       context,
@@ -55,6 +60,7 @@ class AppRouter {
         builder: (_) => UserVerifyCodeScreen(
           email: email,
           sharedReference: sharedReference,
+          password: password,
         ),
       ),
     );
@@ -68,7 +74,42 @@ class AppRouter {
       (_) => false,
     );
   }
-   static void gotoHomePage(BuildContext context) {
+
+  // ── STEP 1: Reset Password (enter email) ──────────
+  static void gotoResetPasswordPage(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ResetPasswordPage()),
+    );
+  }
+
+  // ── STEP 2: Verify OTP code ───────────────────────
+  static void gotoVerifyResetCodeScreen(BuildContext context, String email) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => VerifyResetCodeScreen(email: email),
+      ),
+    );
+  }
+
+  // ── STEP 3: Enter new password ────────────────────
+  // ✅ Now accepts code parameter passed from VerifyResetCodeScreen
+  static void gotoForgotPasswordScreen(
+    BuildContext context,
+    String email, {
+    String code = '',
+  }) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => ForgotPasswordScreen(email: email, code: code),
+      ),
+    );
+  }
+
+  // ── Home ──────────────────────────────────────────
+  static void gotoHomePage(BuildContext context) {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (_) => const HomeScreen()),
