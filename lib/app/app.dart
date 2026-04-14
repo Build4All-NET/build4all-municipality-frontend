@@ -1,4 +1,5 @@
 // lib/app/app.dart
+
 import 'package:baladiyati/common/registration_step_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -19,31 +20,31 @@ class MyApp extends StatelessWidget {
         BlocProvider(create: (_) => LocaleCubit()),
         BlocProvider(create: (_) => ThemeCubit()),
         BlocProvider(create: (_) => RegistrationStepCubit()),
-        // ✅ AuthBloc removed from here — LoginScreen has its own via AppRouter
       ],
-      child: BlocBuilder<ThemeCubit, ThemeState>(
-        builder: (context, themeState) {
-          return BlocBuilder<LocaleCubit, Locale?>(
-            builder: (context, locale) {
-              return MaterialApp(
-                title: 'بلديتي',
-                debugShowCheckedModeBanner: false,
-                theme: AppThemeBuilder.build(themeState.tokens),
-                locale: locale ?? const Locale('ar'),
-                supportedLocales: const [
-                  Locale('ar'),
-                  Locale('en'),
-                  Locale('fr'),
-                ],
-                localizationsDelegates: [
-                  AppLocalizations.delegate,
-                  GlobalMaterialLocalizations.delegate,
-                  GlobalWidgetsLocalizations.delegate,
-                  GlobalCupertinoLocalizations.delegate,
-                ],
-                home: const WelcomeScreen(),
-              );
-            },
+      //  Use a single BlocBuilder that listens to both cubits
+      // instead of two nested BlocBuilders — reduces unnecessary rebuilds
+      child: Builder(
+        builder: (context) {
+          final themeState = context.watch<ThemeCubit>().state;
+          final locale = context.watch<LocaleCubit>().state;
+
+          return MaterialApp(
+            title: 'بلديتي',
+            debugShowCheckedModeBanner: false,
+            theme: AppThemeBuilder.build(themeState.tokens),
+            locale: locale ?? const Locale('ar'),
+            supportedLocales: const [
+              Locale('ar'),
+              Locale('en'),
+              Locale('fr'),
+            ],
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            home: const WelcomeScreen(),
           );
         },
       ),
