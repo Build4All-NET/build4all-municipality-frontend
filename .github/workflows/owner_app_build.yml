@@ -1,4 +1,4 @@
-name: Municipality App Build Basic
+name: Owner App Build (APK + AAB)
 
 on:
   repository_dispatch:
@@ -13,50 +13,73 @@ jobs:
 
     env:
       CI_CALLBACK_TOKEN: ${{ secrets.CI_CALLBACK_TOKEN }}
+      CI_RUNTIME_TOKEN: ${{ secrets.CI_RUNTIME_TOKEN }}
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Extract payload
+      # ════════════════════════════════════════════════════════════════════
+      # EXTRACT BUILD_ID & LINK_ID (needed for status callbacks)
+      # ════════════════════════════════════════════════════════════════════
+      - name: Extract BUILD_ID and LINK_ID
         run: |
+          set -e
           python3 - <<'PY'
           import json, os
           payload = json.loads(r'''${{ toJson(github.event.client_payload) }}''') or {}
           cfg = payload.get("CONFIG") or {}
-
-          build_id = str(payload.get("BUILD_ID") or payload.get("buildId") or "").strip()
+          
+          build_id = (
+              (payload.get("BUILD_ID") or "")
+              or (payload.get("buildId") or "")
+              or ""
+          ).strip()
+          
           link_id = str(
               cfg.get("OWNER_PROJECT_LINK_ID")
               or payload.get("OWNER_PROJECT_LINK_ID")
               or payload.get("ownerProjectLinkId")
+              or cfg.get("ownerProjectLinkId")
               or ""
           ).strip()
-          api_base = str(cfg.get("API_BASE_URL") or payload.get("API_BASE_URL") or "").strip().rstrip("/")
-
-          if not link_id:
-              raise SystemExit("Missing OWNER_PROJECT_LINK_ID")
-          if not api_base:
-              raise SystemExit("Missing API_BASE_URL")
-
-          env = {
-              "BUILD_ID": build_id,
-              "LINK_ID": link_id,
-              "API_BASE": api_base,
-          }
-
+          
+          api_base = ((cfg.get("API_BASE_URL") or payload.get("API_BASE_URL") or "").rstrip("/")).strip()
+          
+          open("ci_build_id.txt","w",encoding="utf-8").write(build_id)
+          open("ci_link_id.txt","w",encoding="utf-8").write(link_id)
+          open("ci_api_base.txt","w",encoding="utf-8").write(api_base)
+          
+          print("BUILD_ID =", build_id if build_id else "(empty)")
+          print("LINK_ID =", link_id if link_id else "(empty)")
+          print("API_BASE =", api_base if api_base else "(empty)")
+          
+          # Export to GITHUB_ENV for all steps
           with open(os.environ["GITHUB_ENV"], "a") as f:
-              for k, v in env.items():
-                  f.write(f"{k}={v}\n")
+              f.write(f"BUILD_ID={build_id}\n")
+              f.write(f"LINK_ID={link_id}\n")
+              f.write(f"API_BASE={api_base}\n")
           PY
 
-      - name: Mark build RUNNING
+      # ════════════════════════════════════════════════════════════════════
+      # MARK BUILD AS RUNNING (at start)
+      # ════════════════════════════════════════════════════════════════════
+      - name: 📡 Mark build RUNNING
         if: always()
         run: |
+          set +e
+          
+          if [ -z "${API_BASE:-}" ] || [ -z "${CI_CALLBACK_TOKEN:-}" ]; then
+            echo "⚠️ API_BASE or CI_CALLBACK_TOKEN missing, skipping status update"
+            exit 0
+          fi
+          
           curl -sS -X PUT "${API_BASE}/api/ci/build-jobs/running" \
             -H "Content-Type: application/json" \
             -H "X-Auth-Token: ${CI_CALLBACK_TOKEN}" \
             -d "{\"buildId\":\"${BUILD_ID}\",\"linkId\":\"${LINK_ID}\",\"platform\":\"ANDROID\"}" || true
+          
+          echo "✅ Build marked as RUNNING"
 
       - name: Setup Java
         uses: actions/setup-java@v4
@@ -67,59 +90,763 @@ jobs:
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.41.6"
+          flutter-version: "3.32.0"
           channel: stable
+          cache: true
 
-      - name: Create ci_env.json
+      - name: Show Flutter/Dart versions
         run: |
+          flutter --version
+          dart --version
+
+      - name: Show payload (debug)
+        run: |
+          cat > payload.json <<'JSON'
+          ${{ toJson(github.event.client_payload) }}
+          JSON
+      
+          echo "----- payload.json -----"
+          cat payload.json
+          echo ""
+          echo "----- pretty -----"
+          python3 -m json.tool payload.json || true
+
+
+      - name: Force Android NDK 27
+        run: |
+          set -e
+          FILE="android/app/build.gradle.kts"
+
+          if [ -f "$FILE" ]; then
+            if grep -q "ndkVersion" "$FILE"; then
+              sed -i 's/^[[:space:]]*ndkVersion *=.*/    ndkVersion = "27.0.12077973"/' "$FILE"
+            else
+              perl -0777 -i -pe 's/android\s*\{\s*/android {\n    ndkVersion = "27.0.12077973"\n/s' "$FILE"
+            fi
+
+            echo "---- ndkVersion ----"
+            grep -n "ndkVersion" "$FILE" || true
+          else
+            echo "android/app/build.gradle.kts not found"
+            exit 1
+          fi
+
+      - name: Force compileSdk 36 (plugin requirement)
+        run: |
+          set -e
+          FILE="android/app/build.gradle.kts"
+
+          if grep -qE 'compileSdk\s*=\s*flutter\.compileSdkVersion' "$FILE"; then
+            sed -i 's/compileSdk\s*=\s*flutter\.compileSdkVersion/compileSdk = 36/g' "$FILE"
+          elif grep -qE 'compileSdk\s*=\s*[0-9]+' "$FILE"; then
+            sed -i 's/compileSdk\s*=\s*[0-9]\+/compileSdk = 36/g' "$FILE"
+          else
+            perl -0777 -i -pe 's/android\s*\{\s*/android {\n    compileSdk = 36\n/s' "$FILE"
+          fi
+
+          echo "---- compileSdk now ----"
+          grep -n "compileSdk" "$FILE" || true
+
+
+      - name: Build ci_env.json (BY_LINK runtime-config + fallback)
+        run: |
+          set -e
           mkdir -p lib/env
-          cat > lib/env/ci_env.json <<EOF
-          {
-            "API_BASE_URL": "${API_BASE}",
-            "OWNER_PROJECT_LINK_ID": "${LINK_ID}",
-            "APP_TYPE": "MUNICIPALITY"
+
+          python3 - <<'PY'
+          import json, re, os, urllib.request, urllib.error, socket
+
+          payload = json.loads(r'''${{ toJson(github.event.client_payload) }}''') or {}
+          cfg = payload.get("CONFIG") or {}
+
+          api_base = (cfg.get("API_BASE_URL") or payload.get("API_BASE_URL") or "").strip().rstrip("/")
+          link_id  = str(
+              cfg.get("OWNER_PROJECT_LINK_ID")
+              or payload.get("OWNER_PROJECT_LINK_ID")
+              or payload.get("ownerProjectLinkId")
+              or cfg.get("ownerProjectLinkId")
+              or ""
+          ).strip()
+
+          if not api_base:
+              raise SystemExit("Missing API_BASE_URL")
+          if not link_id:
+              raise SystemExit("Missing OWNER_PROJECT_LINK_ID")
+
+          url = f"{api_base}/api/public/runtime-config/by-link?linkId={link_id}"
+          runtime = {}
+          source = "FALLBACK (payload/defaults)"
+
+          token = (os.getenv("CI_RUNTIME_TOKEN") or "").strip()
+          headers = {"Accept": "application/json"}
+          if token:
+              headers["X-Auth-Token"] = token
+
+          try:
+              print("Fetching runtime config:", url)
+              print("Auth header present =", "YES" if token else "NO")
+              req = urllib.request.Request(url, headers=headers)
+              with urllib.request.urlopen(req, timeout=12) as r:
+                  raw = r.read().decode("utf-8")
+                  runtime = json.loads(raw)
+              source = "BY_LINK"
+          except (urllib.error.HTTPError, urllib.error.URLError, socket.timeout, json.JSONDecodeError) as e:
+              print("⚠️ runtime-config fetch failed, using fallback:", repr(e))
+
+          print("CONFIG SOURCE =", source)
+
+          def pick(key, default=None):
+              v = runtime.get(key)
+              if v not in (None, "", []):
+                  return v
+              v = cfg.get(key)
+              if v not in (None, "", []):
+                  return v
+              v = payload.get(key)
+              if v not in (None, "", []):
+                  return v
+              return default
+
+          app_name   = pick("APP_NAME", "My App")
+          app_type   = pick("APP_TYPE", "MUNICIPALITY")
+          project_id = str(pick("PROJECT_ID", "")).strip()
+
+          pkg_raw = (pick("PACKAGE_NAME") or pick("APPLICATION_ID") or "").strip()
+          if not pkg_raw:
+              pkg_raw = f"com.build4all.app{link_id}"
+
+          pkg = pkg_raw.lower()
+          pkg = re.sub(r"[^a-z0-9._]", "", pkg)
+          pkg = re.sub(r"\.+", ".", pkg).strip(".")
+
+          if not pkg or pkg.count(".") < 1:
+              pkg = f"com.build4all.app{link_id}"
+
+          vc = pick("ANDROID_VERSION_CODE")
+          vn = pick("ANDROID_VERSION_NAME")
+
+          try:
+              vc_int = int(vc) if vc not in (None,"",[]) else None
+          except Exception:
+              vc_int = None
+
+          vn_str = (str(vn).strip() if vn not in (None,"",[]) else "")
+
+          env = {
+              "API_BASE_URL": api_base,
+              "APP_NAME": app_name,
+              "APP_TYPE": app_type,
+              "OWNER_PROJECT_LINK_ID": link_id,
+              "PROJECT_ID": project_id,
+              "PACKAGE_NAME": pkg,
+              "ANDROID_VERSION_CODE": vc_int if vc_int is not None else 1,
+              "ANDROID_VERSION_NAME": vn_str if vn_str else "1.0.0",
+              "CONFIG_SOURCE": source,
           }
-          EOF
+
+          currency_id = pick("CURRENCY_ID")
+          if currency_id in (None, "", []):
+              currency_id = (
+                  runtime.get("currencyId")
+                  or cfg.get("currencyId")
+                  or payload.get("currencyId")
+                  or payload.get("CURRENCY_ID")
+              )
+          if currency_id not in (None, "", []):
+              env["CURRENCY_ID"] = str(currency_id).strip()
+
+          import re
+          
+          def pick_any(*keys, default=None):
+              for k in keys:
+                  v = runtime.get(k)
+                  if v not in (None, "", []):
+                      return v
+                  v = cfg.get(k)
+                  if v not in (None, "", []):
+                      return v
+                  v = payload.get(k)
+                  if v not in (None, "", []):
+                      return v
+              return default
+          
+          def clean_b64(v):
+              if not v:
+                  return None
+              return re.sub(r"\s+", "", str(v))  # removes spaces/newlines that break base64
+          
+          # ✅ only set the key if it exists (no nulls)
+          for env_key, alt_key in [
+              ("THEME_JSON_B64", "themeJsonB64"),
+              ("NAV_JSON_B64", "navJsonB64"),
+              ("HOME_JSON_B64", "homeJsonB64"),
+              ("ENABLED_FEATURES_JSON_B64", "enabledFeaturesJsonB64"),
+              ("BRANDING_JSON_B64", "brandingJsonB64"),
+          ]:
+              v = clean_b64(pick_any(env_key, alt_key))
+              if v:
+                  env[env_key] = v
+          logo_url = (pick("LOGO_URL") or pick("LOGO_PATH") or "").strip()
+          if not logo_url:
+              logo_url = (runtime.get("logoUrl") or cfg.get("logoUrl") or payload.get("logoUrl") or "").strip()
+          if logo_url:
+              env["LOGO_URL"] = logo_url
+
+          open("ci_package_name.txt", "w", encoding="utf-8").write(pkg)
+          open("ci_android_version_code.txt", "w", encoding="utf-8").write(str(env["ANDROID_VERSION_CODE"]))
+          open("ci_android_version_name.txt", "w", encoding="utf-8").write(env["ANDROID_VERSION_NAME"])
+
+          os.makedirs("lib/env", exist_ok=True)
+          with open("lib/env/ci_env.json", "w", encoding="utf-8") as f:
+              json.dump(env, f, ensure_ascii=False, indent=2)
+
+          print("ci_env.json written")
+          print("API_BASE_URL =", api_base)
+          print("OWNER_PROJECT_LINK_ID =", link_id)
+          print("PROJECT_ID =", project_id)
+          print("PACKAGE_NAME =", pkg)
+          print("ANDROID_VERSION_CODE =", env["ANDROID_VERSION_CODE"])
+          print("ANDROID_VERSION_NAME =", env["ANDROID_VERSION_NAME"])
+          print("CURRENCY_ID =", env.get("CURRENCY_ID"))
+          print("CONFIG_SOURCE =", source)
+
+          for k in ["THEME_JSON_B64","NAV_JSON_B64","HOME_JSON_B64","ENABLED_FEATURES_JSON_B64","BRANDING_JSON_B64"]:
+              print(k, "=", "YES" if env.get(k) else "NO")
+          PY
+
+      # ════════════════════════════════════════════════════════════════════
+      # 🔧 FIX: Sync menuType (BRANDING -> THEME) so hamburger stays hamburger
+      # ════════════════════════════════════════════════════════════════════
+      - name: 🔧 Sync menuType (BRANDING -> THEME) so drawer doesn't flip to bottom
+        run: |
+          python3 - <<'PY'
+          import json, base64, pathlib
+
+          p = pathlib.Path("lib/env/ci_env.json")
+          env = json.loads(p.read_text(encoding="utf-8"))
+
+          def b64decode(s: str) -> str:
+              s = (s or "").strip()
+              if not s:
+                  return ""
+              return base64.b64decode(s + "==="[: (4 - len(s) % 4) % 4]).decode("utf-8", "replace")
+
+          def b64encode(s: str) -> str:
+              return base64.b64encode(s.encode("utf-8")).decode("utf-8")
+
+          branding = {}
+          theme = {}
+
+          # read BRANDING
+          if env.get("BRANDING_JSON_B64"):
+              branding = json.loads(b64decode(env["BRANDING_JSON_B64"]) or "{}")
+          elif env.get("BRANDING_JSON"):
+              branding = json.loads(env["BRANDING_JSON"] or "{}")
+
+          # read THEME
+          if env.get("THEME_JSON_B64"):
+              theme = json.loads(b64decode(env["THEME_JSON_B64"]) or "{}")
+          elif env.get("THEME_JSON"):
+              theme = json.loads(env["THEME_JSON"] or "{}")
+
+          menu = (branding.get("menuType") or "").strip().lower()
+
+          # normalize drawer -> hamburger
+          if menu == "drawer":
+              menu = "hamburger"
+
+          if menu in ("hamburger", "bottom"):
+              theme["menuType"] = menu
+              theme_json = json.dumps(theme, separators=(",", ":"))
+              env["THEME_JSON"] = theme_json
+              env["THEME_JSON_B64"] = b64encode(theme_json)
+              print("✅ Forced THEME menuType =", menu)
+          else:
+              print("ℹ️ No valid branding menuType found, left THEME as-is. branding.menuType =", menu)
+
+          p.write_text(json.dumps(env, ensure_ascii=False, indent=2), encoding="utf-8")
+          PY
+
+          echo "----- ci_env.json AFTER sync -----"
           cat lib/env/ci_env.json
 
-      - name: Flutter pub get
-        run: flutter pub get
+      - name: Debug env (check currency + version)
+        run: |
+          echo "----- ci_env.json -----"
+          cat lib/env/ci_env.json
+          echo ""
+          python3 - <<'PY'
+          import json
+          cfg=json.load(open("lib/env/ci_env.json"))
+          print("OWNER_PROJECT_LINK_ID =", cfg.get("OWNER_PROJECT_LINK_ID"))
+          print("PROJECT_ID =", cfg.get("PROJECT_ID"))
+          print("PACKAGE_NAME =", cfg.get("PACKAGE_NAME"))
+          print("ANDROID_VERSION_CODE =", cfg.get("ANDROID_VERSION_CODE"))
+          print("ANDROID_VERSION_NAME =", cfg.get("ANDROID_VERSION_NAME"))
+          print("CURRENCY_ID =", cfg.get("CURRENCY_ID"))
+          print("CONFIG_SOURCE =", cfg.get("CONFIG_SOURCE"))
+          PY
+
+      - name: Set unique applicationId (PACKAGE_NAME)
+        run: |
+          set -e
+          FILE="android/app/build.gradle.kts"
+          PKG="$(cat ci_package_name.txt | tr -d '\r\n')"
+
+          echo "Setting applicationId to: $PKG"
+
+          if grep -qE 'applicationId\s*=\s*"' "$FILE"; then
+            sed -i "s/applicationId\s*=\s*\"[^\"]*\"/applicationId = \"$PKG\"/g" "$FILE"
+          elif grep -qE 'applicationId\s*"' "$FILE"; then
+            sed -i "s/applicationId\s*\"[^\"]*\"/applicationId \"$PKG\"/g" "$FILE"
+          else
+            echo "ERROR: Could not find applicationId in $FILE"
+            grep -n "applicationId" "$FILE" || true
+            exit 1
+          fi
+
+          echo "---- applicationId now ----"
+          grep -n "applicationId" "$FILE" || true
+
+      - name: Apply PACKAGE_NAME + VERSION (namespace + MainActivity + folders)
+        run: |
+          set -e
+
+          PKG="$(cat ci_package_name.txt | tr -d '\r\n')"
+          VC="$(cat ci_android_version_code.txt | tr -d '\r\n')"
+          VN="$(cat ci_android_version_name.txt | tr -d '\r\n')"
+
+          FILE="android/app/build.gradle.kts"
+
+          echo "PKG=$PKG"
+          echo "VERSION_CODE=$VC"
+          echo "VERSION_NAME=$VN"
+
+          # 1) namespace
+          if grep -qE 'namespace\s*=\s*"' "$FILE"; then
+            sed -i "s/namespace\s*=\s*\"[^\"]*\"/namespace = \"$PKG\"/g" "$FILE"
+          else
+            perl -0777 -i -pe "s/android\\s*\\{\\s*/android {\\n    namespace = \\\"$PKG\\\"\\n/s" "$FILE"
+          fi
+
+          # 2) versionCode / versionName
+          if grep -qE 'versionCode\s*=\s*[0-9]+' "$FILE"; then
+            sed -i "s/versionCode\s*=\s*[0-9]\+/versionCode = $VC/g" "$FILE"
+          else
+            perl -0777 -i -pe "s/defaultConfig\\s*\\{\\s*/defaultConfig {\\n        versionCode = $VC\\n/s" "$FILE"
+          fi
+
+          if grep -qE 'versionName\s*=\s*"' "$FILE"; then
+            sed -i "s/versionName\s*=\s*\"[^\"]*\"/versionName = \"$VN\"/g" "$FILE"
+          else
+            perl -0777 -i -pe "s/defaultConfig\\s*\\{\\s*/defaultConfig {\\n        versionName = \\\"$VN\\\"\\n/s" "$FILE"
+          fi
+
+          echo "---- build.gradle.kts (key lines) ----"
+          grep -n "namespace\|applicationId\|versionCode\|versionName" "$FILE" || true
+
+          # 3) Update MainActivity package + move file to new folder
+          ROOT_KT="android/app/src/main/kotlin"
+          ROOT_JAVA="android/app/src/main/java"
+          NEW_PATH_REL="$(echo "$PKG" | tr '.' '/')"
+
+          fix_activity_in_root () {
+            local ROOT="$1"
+            if [ ! -d "$ROOT" ]; then
+              return 0
+            fi
+
+            local ACT
+            ACT="$(find "$ROOT" -type f \( -name "MainActivity.kt" -o -name "MainActivity.java" \) | head -n 1 || true)"
+            if [ -z "$ACT" ]; then
+              echo "No MainActivity found under $ROOT (ok if your project differs)."
+              return 0
+            fi
+
+            echo "Found MainActivity: $ACT"
+
+            local OLD_PKG
+            OLD_PKG="$(grep -m1 '^package ' "$ACT" | awk '{print $2}' | tr -d '\r\n' || true)"
+            if [ -z "$OLD_PKG" ]; then
+              echo "Could not detect old package line in MainActivity. Will still try to move."
+            else
+              echo "Old package: $OLD_PKG"
+              sed -i "s/^package .*/package $PKG/" "$ACT"
+            fi
+
+            local DEST_DIR="$ROOT/$NEW_PATH_REL"
+            mkdir -p "$DEST_DIR"
+
+            local BASENAME
+            BASENAME="$(basename "$ACT")"
+            mv "$ACT" "$DEST_DIR/$BASENAME"
+
+            echo "Moved MainActivity to: $DEST_DIR/$BASENAME"
+          }
+
+          fix_activity_in_root "$ROOT_KT"
+          fix_activity_in_root "$ROOT_JAVA"
+
+          # 4) AndroidManifest.xml package attr (only if exists)
+          MAN="android/app/src/main/AndroidManifest.xml"
+          if [ -f "$MAN" ]; then
+            if grep -q 'package="' "$MAN"; then
+              sed -i "s/package=\"[^\"]*\"/package=\"$PKG\"/g" "$MAN"
+              echo "Updated AndroidManifest package."
+            fi
+          fi
+
+      - name: Download Android Firebase config
+        shell: bash
+        run: |
+          set -e
+
+          if [ -z "${API_BASE:-}" ]; then
+            echo "❌ API_BASE is missing"
+            exit 1
+          fi
+
+          if [ -z "${LINK_ID:-}" ]; then
+            echo "❌ LINK_ID is missing"
+            exit 1
+          fi
+
+          if [ -z "${CI_RUNTIME_TOKEN:-}" ]; then
+            echo "❌ CI_RUNTIME_TOKEN is missing"
+            exit 1
+          fi
+
+          echo "Downloading Android Firebase config for LINK_ID=$LINK_ID"
+
+          RESPONSE=$(curl -sS \
+            -H "X-Auth-Token: ${CI_RUNTIME_TOKEN}" \
+            "${API_BASE}/api/ci/firebase-config/android?linkId=${LINK_ID}")
+
+          echo "$RESPONSE" > android_firebase_response.json
+
+          python3 - <<'PY'
+          import json
+          import base64
+          from pathlib import Path
+
+          with open("android_firebase_response.json", "r", encoding="utf-8") as f:
+              data = json.load(f)
+
+          if "error" in data:
+              raise SystemExit(f"Backend returned error: {data['error']}")
+
+          content = base64.b64decode(data["contentBase64"])
+          target = Path("android/app/google-services.json")
+          target.parent.mkdir(parents=True, exist_ok=True)
+          target.write_bytes(content)
+
+          print(f"✅ Wrote {target}")
+          PY
+
+          echo "----- google-services.json exists? -----"
+          ls -la android/app/google-services.json
+          
+      - name: Apply branding
+        run: |
+          set -e
+
+          python3 - <<'PY'
+          import json, re, pathlib, shutil, urllib.request
+          from xml.sax.saxutils import escape
+
+          cfg = json.load(open("lib/env/ci_env.json","r",encoding="utf-8"))
+
+          def decode_js_unicode(s: str) -> str:
+              # Convert JS-style \u{XXXX} into real characters
+              def repl(m):
+                  try:
+                      return chr(int(m.group(1), 16))
+                  except Exception:
+                      return m.group(0)
+              s = re.sub(r'\\u\{([0-9a-fA-F]+)\}', repl, s)
+
+              # If anything weird is still there, neutralize it
+              s = re.sub(r'\\u\{[^}]*\}', '', s)
+              return s
+
+          app_name_raw = str(cfg.get("APP_NAME") or "My App")
+
+          # Convert JS-style \u{XXXX} (hex only)
+          def repl(m):
+              try:
+                  return chr(int(m.group(1), 16))
+              except Exception:
+                  return ""
+          app_name_clean = re.sub(r'\\u\{([0-9a-fA-F]+)\}', repl, app_name_raw)
+          
+          # remove any leftover \u{...} that isn't valid hex
+          app_name_clean = re.sub(r'\\u\{[^}]*\}', '', app_name_clean)
+          
+          # 🔥 nuke backslashes completely (Android treats them as escapes)
+          app_name_clean = app_name_clean.replace("\\", "")
+          
+          # remove literal patterns like u{...} if they appear without backslash
+          app_name_clean = re.sub(r'u\{[^}]*\}', '', app_name_clean)
+          
+          # remove control chars (newlines/tabs/etc)
+          app_name_clean = re.sub(r'[\x00-\x1F\x7F]', ' ', app_name_clean).strip()
+          
+          # optional: escape single quote
+          app_name_clean = app_name_clean.replace("'", "\\'")
+          
+          app_name_xml = escape(app_name_clean)
+
+          api_base = (cfg.get("API_BASE_URL") or payload.get("API_BASE_URL") or "").strip().rstrip("/")
+          logo_url = (cfg.get("LOGO_URL") or "").strip()
+
+          print("APP_NAME (raw):", app_name_raw)
+          print("APP_NAME (clean):", app_name_clean)
+          print("LOGO_URL (raw):", logo_url)
+          print("API_BASE_URL:", api_base)
+
+          pathlib.Path("assets/branding").mkdir(parents=True, exist_ok=True)
+
+          if logo_url and logo_url.startswith("/") and api_base:
+              logo_url = api_base + logo_url
+              print("Resolved absolute LOGO_URL:", logo_url)
+
+          if logo_url:
+              try:
+                  print("Downloading logo from:", logo_url)
+                  urllib.request.urlretrieve(logo_url, "assets/branding/logo.png")
+                  shutil.copyfile("assets/branding/logo.png","assets/branding/launcher.png")
+                  shutil.copyfile("assets/branding/logo.png","assets/branding/splash.png")
+              except Exception as e:
+                  print("⚠️ Failed to download logo:", e)
+
+          values_dir = pathlib.Path("android/app/src/main/res/values")
+          values_dir.mkdir(parents=True, exist_ok=True)
+
+          strings_xml = (
+            '<?xml version="1.0" encoding="utf-8"?>\n'
+            '<resources>\n'
+            f'  <string name="app_name">{app_name_xml}</string>\n'
+            '</resources>\n'
+          )
+          (values_dir/"strings.xml").write_text(strings_xml, encoding="utf-8")
+
+          print("✅ strings.xml written")
+          PY
+
+          echo "----- strings.xml (final) -----"
+          cat android/app/src/main/res/values/strings.xml
+
+          flutter pub get
+          flutter pub run flutter_launcher_icons
+          flutter pub run flutter_native_splash:create
+
+      - name: 🔎 Validate app_name resource before build
+        run: |
+          echo "----- strings.xml -----"
+          cat android/app/src/main/res/values/strings.xml || true
+          echo ""
+          echo "----- search for \\u{ in android res -----"
+          grep -RIn "\\\\u{" android/app/src/main/res || true
+          echo ""
+          echo "----- search for app_name occurrences -----"
+          grep -RIn "name=\"app_name\"" android/app/src/main/res || true
+
+          # fail fast if still present
+          if grep -RIn "\\\\u{" android/app/src/main/res >/dev/null 2>&1; then
+            echo "❌ Found invalid \\u{...} sequence in Android resources. Failing early."
+            exit 1
+          fi
+
+      - name: Disable R8
+        run: |
+          set -e
+          FILE="android/app/build.gradle.kts"
+
+          if grep -q "isMinifyEnabled" "$FILE"; then
+            sed -i 's/^[[:space:]]*isMinifyEnabled *=.*/            isMinifyEnabled = false/' "$FILE"
+          fi
+
+          if grep -q "isShrinkResources" "$FILE"; then
+            sed -i 's/^[[:space:]]*isShrinkResources *=.*/            isShrinkResources = false/' "$FILE"
+          fi
+
+          if ! grep -q "isMinifyEnabled" "$FILE"; then
+            perl -0777 -i -pe 's/release\s*\{\s*/release {\n            isMinifyEnabled = false\n            isShrinkResources = false\n/s' "$FILE"
+          fi
+
+          echo "---- R8 flags ----"
+          grep -n "isMinifyEnabled\|isShrinkResources" "$FILE" || true
+
+      - name: Setup Android signing
+        run: |
+          set -e
+          mkdir -p android/app
+
+          echo "${{ secrets.ANDROID_KEYSTORE_B64 }}" | base64 --decode > android/app/build4all-release.p12
+
+          cat > android/key.properties <<'EOF'
+          storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}
+          keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}
+          storeFile=build4all-release.p12
+          EOF
+
+          echo "✅ signing files:"
+          ls -la android/app
+          echo "✅ key.properties:"
+          cat android/key.properties | sed 's/storePassword=.*/storePassword=***/; s/keyPassword=.*/keyPassword=***/'
 
       - name: Build APK
         run: flutter build apk --release --dart-define-from-file=lib/env/ci_env.json
 
-      - name: Save APK URL
-        if: success()
+      - name: Build AAB
+        run: flutter build appbundle --release --dart-define-from-file=lib/env/ci_env.json
+
+      - name: Rename artifacts (copy) + export names
         run: |
-          APK_NAME="municipality-app-${LINK_ID}.apk"
+          set -e
+
+          LINK_ID=$(cat ci_link_id.txt | tr -d '\r\n')
+
+          APP_NAME=$(python3 - <<'PY'
+          import json, re
+          cfg=json.load(open("lib/env/ci_env.json","r",encoding="utf-8"))
+          s=(cfg.get("APP_NAME") or "app").strip().lower()
+          s=re.sub(r"[^a-z0-9]+","-",s).strip("-")
+          print(s or "app")
+          PY
+          )
+
+          VN=$(cat ci_android_version_name.txt | tr -d '\r\n')
+          VN_SAFE=$(echo "$VN" | tr ' ' '-' | tr -cd '0-9A-Za-z._-')
+          if [ -z "$VN_SAFE" ]; then VN_SAFE="1.0.0"; fi
+
+          APK_NAME="${APP_NAME}-${LINK_ID}-v${VN_SAFE}.apk"
+          AAB_NAME="${APP_NAME}-${LINK_ID}-v${VN_SAFE}.aab"
+
           cp build/app/outputs/flutter-apk/app-release.apk "build/app/outputs/flutter-apk/${APK_NAME}"
+          cp build/app/outputs/bundle/release/app-release.aab "build/app/outputs/bundle/release/${AAB_NAME}"
 
-          TAG="municipality-build-${LINK_ID}-${{ github.run_number }}"
-          gh release view "$TAG" >/dev/null 2>&1 || \
-            gh release create "$TAG" --title "$TAG" --notes "Municipality CI build"
+          echo "✅ APK_NAME=$APK_NAME"
+          echo "✅ AAB_NAME=$AAB_NAME"
 
-          gh release upload "$TAG" "build/app/outputs/flutter-apk/${APK_NAME}" --clobber
+          echo "APK_NAME=$APK_NAME" >> $GITHUB_ENV
+          echo "AAB_NAME=$AAB_NAME" >> $GITHUB_ENV
 
-          APK_URL="https://github.com/${{ github.repository_owner }}/${{ github.event.repository.name }}/releases/download/${TAG}/${APK_NAME}"
-
-          curl -sS -X PUT "${API_BASE}/api/ci/owner-project-links/${LINK_ID}/apk-url" \
-            -H "Content-Type: application/json" \
-            -H "X-Auth-Token: ${CI_CALLBACK_TOKEN}" \
-            -d "{\"apkUrl\":\"${APK_URL}\",\"buildId\":\"${BUILD_ID}\"}" || true
+      - name: Create GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
+        run: |
+          set -e
+          LINK_ID=$(cat ci_link_id.txt | tr -d '\r\n')
+          TAG="build-${LINK_ID}-${{ github.run_number }}"
 
-      - name: Report final status
+          gh release view "$TAG" >/dev/null 2>&1 || \
+            gh release create "$TAG" --title "$TAG" --notes "CI build"
+
+          gh release upload "$TAG" \
+            "build/app/outputs/flutter-apk/${APK_NAME}" \
+            "build/app/outputs/bundle/release/${AAB_NAME}" \
+            --clobber
+
+          echo "RELEASE_TAG=$TAG" >> $GITHUB_ENV
+
+      - name: Callback backend (SAVE URLs)
+        run: |
+          set -e
+
+          TAG="${RELEASE_TAG}"
+          OWNER="${{ github.repository_owner }}"
+          REPO="${{ github.event.repository.name }}"
+
+          APK_URL="https://github.com/${OWNER}/${REPO}/releases/download/${TAG}/${APK_NAME}"
+          AAB_URL="https://github.com/${OWNER}/${REPO}/releases/download/${TAG}/${AAB_NAME}"
+
+          echo ""
+          echo "========================================"
+          echo "✅ BUILD OUTPUT LINKS"
+          echo "TAG:      $TAG"
+          echo "APK URL:  $APK_URL"
+          echo "AAB URL:  $AAB_URL"
+          echo "LINK_ID:  ${LINK_ID}"
+          echo "BUILD_ID: ${BUILD_ID:-"(empty)"}"
+          echo "API:      ${API_BASE}"
+          echo "========================================"
+          echo ""
+
+          # Build JSON payloads (include buildId only if present)
+          APK_JSON="{\"apkUrl\":\"${APK_URL}\""
+          if [ -n "$BUILD_ID" ]; then
+            APK_JSON="${APK_JSON},\"buildId\":\"${BUILD_ID}\""
+          fi
+          APK_JSON="${APK_JSON}}"
+
+          AAB_JSON="{\"aabUrl\":\"${AAB_URL}\""
+          if [ -n "$BUILD_ID" ]; then
+            AAB_JSON="${AAB_JSON},\"buildId\":\"${BUILD_ID}\""
+          fi
+          AAB_JSON="${AAB_JSON}}"
+
+          echo "---- Callback: save APK URL ----"
+          APK_HTTP=$(curl -sS -o apk_resp.txt -w "%{http_code}" -X PUT \
+            "${API_BASE}/api/ci/owner-project-links/${LINK_ID}/apk-url" \
+            -H "Content-Type: application/json" \
+            -H "X-Auth-Token: ${CI_CALLBACK_TOKEN}" \
+            -d "${APK_JSON}" || true)
+
+          echo "HTTP_STATUS=$APK_HTTP"
+          echo "RESPONSE:"
+          cat apk_resp.txt || true
+          echo ""
+
+          echo "---- Callback: save AAB URL ----"
+          AAB_HTTP=$(curl -sS -o aab_resp.txt -w "%{http_code}" -X PUT \
+            "${API_BASE}/api/ci/owner-project-links/${LINK_ID}/aab-url" \
+            -H "Content-Type: application/json" \
+            -H "X-Auth-Token: ${CI_CALLBACK_TOKEN}" \
+            -d "${AAB_JSON}" || true)
+
+          echo "HTTP_STATUS=$AAB_HTTP"
+          echo "RESPONSE:"
+          cat aab_resp.txt || true
+          echo ""
+
+          if [ "$APK_HTTP" -ge 400 ] || [ "$AAB_HTTP" -ge 400 ]; then
+            echo "⚠️ Callback failed (backend did not save URLs)."
+            echo "✅ BUT build/release links above are still valid, so we won't fail the job."
+            exit 0
+          fi
+
+          echo "✅ Callback succeeded. Backend saved URLs."
+
+      # ════════════════════════════════════════════════════════════════════
+      # FINAL STATUS UPDATE (runs always, reports SUCCESS or FAILED)
+      # ════════════════════════════════════════════════════════════════════
+      - name: 📡 Report final status to backend
         if: always()
         run: |
-          if [ "${{ job.status }}" = "success" ]; then
+          set +e
+          
+          if [ -z "${API_BASE:-}" ] || [ -z "${CI_CALLBACK_TOKEN:-}" ]; then
+            echo "⚠️ API_BASE or CI_CALLBACK_TOKEN missing, skipping final status"
+            exit 0
+          fi
+          
+          JOB_STATUS="${{ job.status }}"
+          
+          if [ "$JOB_STATUS" = "success" ]; then
+            echo "✅ Job succeeded → marking SUCCEEDED"
             curl -sS -X PUT "${API_BASE}/api/ci/build-jobs/succeeded" \
               -H "Content-Type: application/json" \
               -H "X-Auth-Token: ${CI_CALLBACK_TOKEN}" \
               -d "{\"buildId\":\"${BUILD_ID}\",\"linkId\":\"${LINK_ID}\",\"platform\":\"ANDROID\"}" || true
           else
+            echo "❌ Job failed/cancelled → marking FAILED"
+            ERROR_MSG="Android build ${JOB_STATUS} (see GitHub Actions logs for details)"
             curl -sS -X PUT "${API_BASE}/api/ci/build-jobs/failed" \
               -H "Content-Type: application/json" \
               -H "X-Auth-Token: ${CI_CALLBACK_TOKEN}" \
-              -d "{\"buildId\":\"${BUILD_ID}\",\"linkId\":\"${LINK_ID}\",\"platform\":\"ANDROID\",\"error\":\"Municipality build failed\"}" || true
+              -d "{\"buildId\":\"${BUILD_ID}\",\"linkId\":\"${LINK_ID}\",\"platform\":\"ANDROID\",\"error\":\"${ERROR_MSG}\"}" || true
           fi
+          
+          echo "✅ Final status reported"
