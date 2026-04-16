@@ -14,7 +14,7 @@ class ApiClient {
   // Web (Chrome):      http://localhost:8091
   // Android Emulator:  http://10.0.2.2:8091
   // Real Phone (WiFi): http://192.168.0.101:8091
-  static const String baseUrl = 'https://static-sneeze-unfrozen.ngrok-free.dev';
+  static const String baseUrl = 'http://localhost:8094';
   static const String _tokenKey = 'auth_token';
 
   // ─────────────────────────────────────────

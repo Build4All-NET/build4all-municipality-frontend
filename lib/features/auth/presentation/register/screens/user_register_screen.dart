@@ -67,6 +67,8 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
     try {
       // ✅ STEP 1 --- Send verification email to backend
       await _authApi.sendVerificationEmail(email: email);
+      
+      
 
       setState(() => _isLoading = false);
       context.read<RegistrationStepCubit>().nextStep();
