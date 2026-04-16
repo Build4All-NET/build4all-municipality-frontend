@@ -63,8 +63,7 @@ import 'app_localizations_fr.dart';
 /// be consistent with the languages listed in the AppLocalizations.supportedLocales
 /// property.
 abstract class AppLocalizations {
-  AppLocalizations(String locale)
-      : localeName = intl.Intl.canonicalizedLocale(locale.toString());
+  AppLocalizations(String locale) : localeName = intl.Intl.canonicalizedLocale(locale.toString());
 
   final String localeName;
 
@@ -72,8 +71,7 @@ abstract class AppLocalizations {
     return Localizations.of<AppLocalizations>(context, AppLocalizations);
   }
 
-  static const LocalizationsDelegate<AppLocalizations> delegate =
-      _AppLocalizationsDelegate();
+  static const LocalizationsDelegate<AppLocalizations> delegate = _AppLocalizationsDelegate();
 
   /// A list of this localizations delegate along with the default localizations
   /// delegates.
@@ -85,8 +83,7 @@ abstract class AppLocalizations {
   /// Additional delegates can be added by appending to this list in
   /// MaterialApp. This list does not have to be used at all if a custom list
   /// of delegates is preferred or required.
-  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates =
-      <LocalizationsDelegate<dynamic>>[
+  static const List<LocalizationsDelegate<dynamic>> localizationsDelegates = <LocalizationsDelegate<dynamic>>[
     delegate,
     GlobalMaterialLocalizations.delegate,
     GlobalCupertinoLocalizations.delegate,
@@ -513,10 +510,465 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password is required'**
   String get passwordRequired;
+
+  /// No description provided for @navHome.
+  ///
+  /// In en, this message translates to:
+  /// **'Home'**
+  String get navHome;
+
+  /// No description provided for @navServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Services'**
+  String get navServices;
+
+  /// No description provided for @navRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Requests'**
+  String get navRequests;
+
+  /// No description provided for @navPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'Payments'**
+  String get navPayments;
+
+  /// No description provided for @navAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Account'**
+  String get navAccount;
+
+  /// No description provided for @welcomeMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'Welcome,'**
+  String get welcomeMessage;
+
+  /// No description provided for @activeRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Active Requests'**
+  String get activeRequests;
+
+  /// No description provided for @awaitingPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting Payment'**
+  String get awaitingPayment;
+
+  /// No description provided for @completed.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get completed;
+
+  /// No description provided for @quickActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Quick Actions'**
+  String get quickActions;
+
+  /// No description provided for @newRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'New Request'**
+  String get newRequest;
+
+  /// No description provided for @serviceCategories.
+  ///
+  /// In en, this message translates to:
+  /// **'Service Categories'**
+  String get serviceCategories;
+
+  /// No description provided for @viewAll.
+  ///
+  /// In en, this message translates to:
+  /// **'View All'**
+  String get viewAll;
+
+  /// No description provided for @recentRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Requests'**
+  String get recentRequests;
+
+  /// No description provided for @municipalAnnouncements.
+  ///
+  /// In en, this message translates to:
+  /// **'Municipal Announcements'**
+  String get municipalAnnouncements;
+
+  /// No description provided for @latestNews.
+  ///
+  /// In en, this message translates to:
+  /// **'Latest news and updates'**
+  String get latestNews;
+
+  /// No description provided for @workingHours.
+  ///
+  /// In en, this message translates to:
+  /// **'New working hours: Monday to Friday, 8 AM - 2 PM'**
+  String get workingHours;
+
+  /// No description provided for @notifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Notifications'**
+  String get notifications;
+
+  /// No description provided for @municipalServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Municipal Services'**
+  String get municipalServices;
+
+  /// No description provided for @searchService.
+  ///
+  /// In en, this message translates to:
+  /// **'Search for a service...'**
+  String get searchService;
+
+  /// No description provided for @selectCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'Select a category to view available services'**
+  String get selectCategory;
+
+  /// No description provided for @serviceCount.
+  ///
+  /// In en, this message translates to:
+  /// **'services'**
+  String get serviceCount;
+
+  /// No description provided for @myAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'My Account'**
+  String get myAccount;
+
+  /// No description provided for @editProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Profile'**
+  String get editProfile;
+
+  /// No description provided for @editInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Information'**
+  String get editInfo;
+
+  /// No description provided for @changesSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Changes saved'**
+  String get changesSaved;
+
+  /// No description provided for @save.
+  ///
+  /// In en, this message translates to:
+  /// **'Save'**
+  String get save;
+
+  /// No description provided for @cancel.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancel'**
+  String get cancel;
+
+  /// No description provided for @logout.
+  ///
+  /// In en, this message translates to:
+  /// **'Logout'**
+  String get logout;
+
+  /// No description provided for @pending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get pending;
+
+  /// No description provided for @paid.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get paid;
+
+  /// No description provided for @paidLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid'**
+  String get paidLabel;
+
+  /// No description provided for @due.
+  ///
+  /// In en, this message translates to:
+  /// **'Due'**
+  String get due;
+
+  /// No description provided for @dueDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Due:'**
+  String get dueDate;
+
+  /// No description provided for @paidDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Paid:'**
+  String get paidDate;
+
+  /// No description provided for @receiptNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Receipt:'**
+  String get receiptNumber;
+
+  /// No description provided for @downloadReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Download Receipt'**
+  String get downloadReceipt;
+
+  /// No description provided for @payNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay Now'**
+  String get payNow;
+
+  /// No description provided for @paymentSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment successful'**
+  String get paymentSuccess;
+
+  /// No description provided for @lbp.
+  ///
+  /// In en, this message translates to:
+  /// **'LBP'**
+  String get lbp;
+
+  /// No description provided for @noPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'No payments'**
+  String get noPayments;
+
+  /// No description provided for @myRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'My Requests'**
+  String get myRequests;
+
+  /// No description provided for @searchRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by number or name...'**
+  String get searchRequest;
+
+  /// No description provided for @filterAll.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get filterAll;
+
+  /// No description provided for @statusSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Submitted'**
+  String get statusSubmitted;
+
+  /// No description provided for @statusUnderReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Under Review'**
+  String get statusUnderReview;
+
+  /// No description provided for @statusWaitingPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'Awaiting Payment'**
+  String get statusWaitingPayment;
+
+  /// No description provided for @statusApproved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get statusApproved;
+
+  /// No description provided for @statusDelivered.
+  ///
+  /// In en, this message translates to:
+  /// **'Delivered'**
+  String get statusDelivered;
+
+  /// No description provided for @noRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'No requests found'**
+  String get noRequests;
+
+  /// No description provided for @progress.
+  ///
+  /// In en, this message translates to:
+  /// **'Progress'**
+  String get progress;
+
+  /// No description provided for @timeline.
+  ///
+  /// In en, this message translates to:
+  /// **'Timeline'**
+  String get timeline;
+
+  /// No description provided for @details.
+  ///
+  /// In en, this message translates to:
+  /// **'Details'**
+  String get details;
+
+  /// No description provided for @descriptionLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get descriptionLabel;
+
+  /// No description provided for @submissionDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Submission Date'**
+  String get submissionDate;
+
+  /// No description provided for @amountDue.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount Due'**
+  String get amountDue;
+
+  /// No description provided for @searchInServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Search services...'**
+  String get searchInServices;
+
+  /// No description provided for @noServices.
+  ///
+  /// In en, this message translates to:
+  /// **'No services available'**
+  String get noServices;
+
+  /// No description provided for @requiresInspection.
+  ///
+  /// In en, this message translates to:
+  /// **'Inspection Required'**
+  String get requiresInspection;
+
+  /// No description provided for @days.
+  ///
+  /// In en, this message translates to:
+  /// **'days'**
+  String get days;
+
+  /// No description provided for @free.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get free;
+
+  /// No description provided for @serviceInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Service Information'**
+  String get serviceInfo;
+
+  /// No description provided for @feeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fee:'**
+  String get feeLabel;
+
+  /// No description provided for @processingTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing Time:'**
+  String get processingTime;
+
+  /// No description provided for @requestDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Request Details'**
+  String get requestDetails;
+
+  /// No description provided for @titleLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Title'**
+  String get titleLabel;
+
+  /// No description provided for @titleHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter request title'**
+  String get titleHint;
+
+  /// No description provided for @descriptionHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Detailed description...'**
+  String get descriptionHint;
+
+  /// No description provided for @locationLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get locationLabel;
+
+  /// No description provided for @locationHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Address or GPS location'**
+  String get locationHint;
+
+  /// No description provided for @requiredAttachments.
+  ///
+  /// In en, this message translates to:
+  /// **'Required Attachments'**
+  String get requiredAttachments;
+
+  /// No description provided for @tapToUpload.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap to upload attachments'**
+  String get tapToUpload;
+
+  /// No description provided for @pdfOrImages.
+  ///
+  /// In en, this message translates to:
+  /// **'Photos or PDF files'**
+  String get pdfOrImages;
+
+  /// No description provided for @filesSelected.
+  ///
+  /// In en, this message translates to:
+  /// **'file(s) selected'**
+  String get filesSelected;
+
+  /// No description provided for @submitRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Request'**
+  String get submitRequest;
+
+  /// No description provided for @requestSubmitted.
+  ///
+  /// In en, this message translates to:
+  /// **'Request submitted successfully'**
+  String get requestSubmitted;
 }
 
-class _AppLocalizationsDelegate
-    extends LocalizationsDelegate<AppLocalizations> {
+class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 
   @override
@@ -525,27 +977,26 @@ class _AppLocalizationsDelegate
   }
 
   @override
-  bool isSupported(Locale locale) =>
-      <String>['ar', 'en', 'fr'].contains(locale.languageCode);
+  bool isSupported(Locale locale) => <String>['ar', 'en', 'fr'].contains(locale.languageCode);
 
   @override
   bool shouldReload(_AppLocalizationsDelegate old) => false;
 }
 
 AppLocalizations lookupAppLocalizations(Locale locale) {
+
+
   // Lookup logic when only language code is specified.
   switch (locale.languageCode) {
-    case 'ar':
-      return AppLocalizationsAr();
-    case 'en':
-      return AppLocalizationsEn();
-    case 'fr':
-      return AppLocalizationsFr();
+    case 'ar': return AppLocalizationsAr();
+    case 'en': return AppLocalizationsEn();
+    case 'fr': return AppLocalizationsFr();
   }
 
   throw FlutterError(
-      'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
-      'an issue with the localizations generation tool. Please file an issue '
-      'on GitHub with a reproducible sample app and the gen-l10n configuration '
-      'that was used.');
+    'AppLocalizations.delegate failed to load unsupported locale "$locale". This is likely '
+    'an issue with the localizations generation tool. Please file an issue '
+    'on GitHub with a reproducible sample app and the gen-l10n configuration '
+    'that was used.'
+  );
 }

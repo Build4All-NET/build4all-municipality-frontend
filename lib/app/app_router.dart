@@ -1,6 +1,5 @@
 // lib/app/app_router.dart
 
-import 'package:baladiyati/features/auth/presentation/complete_profile/screens/HomePage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import '../features/welcome/presentation/screens/welcome_screen.dart';
@@ -13,6 +12,8 @@ import '../features/auth/data/services/auth_api_service.dart';
 import '../features/auth/presentation/login/screens/reset_password_page.dart';
 import '../features/auth/presentation/login/screens/verify_reset_code_screen.dart';
 import '../features/auth/presentation/login/screens/forgot_password_screen.dart';
+// ✅ FIXED: Import correct HomeScreen (with BottomNav)
+import '../features/citizen/home/presentation/screens/home_screen.dart';
 
 class AppRouter {
 
@@ -49,22 +50,24 @@ class AppRouter {
 
   // ── Verify Code (Registration) ────────────────────
   static void gotoUserVerifyCodeScreen(
-    BuildContext context, {
-    required String email,
-    required String sharedReference,
-    required String password,
-  }) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => UserVerifyCodeScreen(
-          email: email,
-          sharedReference: sharedReference,
-          password: password,
-        ),
+  BuildContext context, {
+  required String email,
+  required String sharedReference,
+  required String password,
+  required int ownerProjectLinkId,
+}) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => UserVerifyCodeScreen(
+        email: email,
+        sharedReference: sharedReference,
+        password: password,
+        ownerProjectLinkId: ownerProjectLinkId,
       ),
-    );
-  }
+    ),
+  );
+}
 
   // ── Complete Profile ──────────────────────────────
   static void gotoCompleteProfile(BuildContext context) {
@@ -94,7 +97,6 @@ class AppRouter {
   }
 
   // ── STEP 3: Enter new password ────────────────────
-  // ✅ Now accepts code parameter passed from VerifyResetCodeScreen
   static void gotoForgotPasswordScreen(
     BuildContext context,
     String email, {
@@ -109,6 +111,7 @@ class AppRouter {
   }
 
   // ── Home ──────────────────────────────────────────
+  // ✅ FIXED: Now navigates to real HomeScreen with BottomNav
   static void gotoHomePage(BuildContext context) {
     Navigator.pushAndRemoveUntil(
       context,

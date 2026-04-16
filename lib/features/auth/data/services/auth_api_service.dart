@@ -10,6 +10,10 @@ class AuthApiService {
   final AuthTokenStore _tokenStore;
   final SessionRoleStore _roleStore;
 
+  // ✅ build4all base URL
+  static const String _build4allBaseUrl =
+      'https://static-sneeze-unfrozen.ngrok-free.dev';
+
   AuthApiService({
     ApiClient? client,
     AuthTokenStore? tokenStore,
@@ -19,10 +23,47 @@ class AuthApiService {
         _roleStore = roleStore ?? SessionRoleStore();
 
   // ============================================================
-  // SEND VERIFICATION EMAIL
+  // ✅ BUILD4ALL — Send verification
+  // POST https://build4all.../api/auth/send-verification
   // ============================================================
-  
-  // OLD: /auth/send-verification-email
+  Future<void> sendVerificationBuild4All({
+    required String email,
+    required String password,
+    required int ownerProjectLinkId,
+  }) async {
+    await _client.postToUrl(
+      '$_build4allBaseUrl/api/auth/send-verification',
+      body: {
+        'email': email,
+        'password': password,
+        'ownerProjectLinkId': ownerProjectLinkId,
+      },
+    );
+  }
+
+  // ============================================================
+  // ✅ BUILD4ALL — Verify OTP code
+  // POST https://build4all.../api/auth/verify-email-code
+  // Returns pendingId (userId) needed for complete-profile
+  // ============================================================
+  Future<int> verifyEmailCodeBuild4All({
+    required String email,
+    required String code,
+  }) async {
+    final response = await _client.postToUrl(
+      '$_build4allBaseUrl/api/auth/verify-email-code',
+      body: {
+        'email': email,
+        'code': code,
+      },
+    );
+    return response['user']['id'] as int;
+  }
+
+  // ============================================================
+  // BALADIYATI — Send verification email
+  // POST /auth/send-verification-email
+  // ============================================================
   Future<void> sendVerificationEmail({required String email}) async {
     await _client.post(
       '/auth/send-verification-email',
@@ -30,19 +71,10 @@ class AuthApiService {
     );
   }
 
-  // NEW: /api/auth/send-verification
-  Future<void> sendVerificationEmailNew({required String email}) async {
-    await _client.post(
-      '/api/auth/send-verification',
-      body: {'email': email},
-    );
-  }
-
   // ============================================================
-  // VERIFY OTP CODE
+  // BALADIYATI — Verify OTP code
+  // POST /auth/verify
   // ============================================================
-  
-  // OLD: /auth/verify
   Future<void> verifyEmailCode({
     required String email,
     required String code,
@@ -53,22 +85,10 @@ class AuthApiService {
     );
   }
 
-  // NEW: /api/auth/verify-email-code
-  Future<void> verifyEmailCodeNew({
-    required String email,
-    required String code,
-  }) async {
-    await _client.post(
-      '/api/auth/verify-email-code',
-      body: {'email': email, 'code': code},
-    );
-  }
-
   // ============================================================
-  // REGISTER / COMPLETE PROFILE
+  // BALADIYATI — Register
+  // POST /auth/users/register
   // ============================================================
-  
-  // OLD: /auth/users/register
   Future<AuthResponseModel> register({
     required String email,
     required String password,
@@ -96,65 +116,10 @@ class AuthApiService {
     return response;
   }
 
-  // NEW: /api/auth/complete-profile (Version 1 - Complete registration)
-  Future<AuthResponseModel> completeProfileNew({
-    required String email,
-    required String password,
-    required String fullName,
-    required String phone,
-    required String role,
-    required int municipalityId,
-    required String address,
-    required String username,
-  }) async {
-    final data = await _client.post(
-      '/api/auth/complete-profile',
-      body: {
-        'email': email,
-        'passwordHash': password,
-        'fullName': fullName,
-        'phone': phone,
-        'role': role,
-        'municipality': {'id': municipalityId},
-        'address': address,
-        'username': username,
-      },
-    );
-    final response = AuthResponseModel.fromJson(data);
-    if (response.token.isNotEmpty) {
-      await _tokenStore.saveToken(response.token);
-      await _client.saveToken(response.token);
-    }
-    return response;
-  }
-
-  // NEW: /api/auth/complete-profile (Version 2 - Update existing profile)
-  Future<Map<String, dynamic>> completeProfileUpdate({
-    required String address,
-    required String username,
-    required int municipalityId,
-  }) async {
-    final token = await _tokenStore.getToken();
-    if (token != null && token.isNotEmpty) {
-      await _client.saveToken(token);
-    }
-    final response = await _client.post(
-      '/api/auth/complete-profile',
-      body: {
-        'address': address,
-        'username': username,
-        'municipality': {'id': municipalityId},
-      },
-      requiresAuth: true,
-    );
-    return response;
-  }
-
   // ============================================================
-  // LOGIN
+  // BALADIYATI — Login
+  // POST /auth/users/login
   // ============================================================
-  
-  // OLD: /auth/users/login
   Future<AuthResponseModel> login({
     required String email,
     required String password,
@@ -176,33 +141,10 @@ class AuthApiService {
     return response;
   }
 
-  // NEW: /api/auth/user/login
-  Future<AuthResponseModel> loginNew({
-    required String email,
-    required String password,
-    required String role,
-  }) async {
-    final data = await _client.post(
-      '/api/auth/user/login',
-      body: {
-        'email': email,
-        'passwordHash': password,
-        'role': role,
-      },
-    );
-    final response = AuthResponseModel.fromJson(data);
-    if (response.token.isNotEmpty) {
-      await _tokenStore.saveToken(response.token);
-      await _client.saveToken(response.token);
-    }
-    return response;
-  }
-
   // ============================================================
-  // LOGOUT
+  // BALADIYATI — Logout
+  // POST /auth/logout
   // ============================================================
-  
-  // OLD: /auth/logout
   Future<void> logout() async {
     try {
       await _client.post('/auth/logout', requiresAuth: true);
@@ -212,21 +154,10 @@ class AuthApiService {
     await _roleStore.clearRole();
   }
 
-  // // NEW: /api/auth/logout
-  // Future<void> logoutNew() async {
-  //   try {
-  //     await _client.post('/api/auth/logout', requiresAuth: true);
-  //   } catch (_) {}
-  //   await _tokenStore.clearToken();
-  //   await _client.clearToken();
-  //   await _roleStore.clearRole();
-  // }
-
   // ============================================================
-  // FORGOT / RESET PASSWORD
+  // BALADIYATI — Forgot password
+  // POST /auth/forgot-password
   // ============================================================
-  
-  // OLD: /auth/forgot-password
   Future<String> forgetPassword({required String email}) async {
     final response = await _client.post(
       '/auth/forgot-password',
@@ -235,51 +166,11 @@ class AuthApiService {
     return response.toString();
   }
 
-  // NEW: /api/users/reset-password?ownerProjectLinkId={{ownerProjectLinkId}}
+  // ============================================================
+  // BALADIYATI — Reset password
+  // POST /auth/reset-password
+  // ============================================================
   Future<String> resetPassword({
-    required String email,
-    required int ownerProjectLinkId,
-  }) async {
-    final response = await _client.post(
-      '/api/users/reset-password?ownerProjectLinkId=$ownerProjectLinkId',
-      body: {'email': email},
-    );
-    return response.toString();
-  }
-
-  // ============================================================
-  // VERIFY RESET CODE
-  // ============================================================
-  
-  // OLD: /auth/verify-code
-  Future<void> verifyPasswordReset({
-    required String email,
-    required String code,
-  }) async {
-    await _client.post(
-      '/auth/verify-code',
-      body: {'email': email, 'code': code},
-    );
-  }
-
-  // NEW: /api/users/verify-reset-code?ownerProjectLinkId={{ownerProjectLinkId}}
-  Future<void> verifyResetCode({
-    required String email,
-    required String code,
-    required int ownerProjectLinkId,
-  }) async {
-    await _client.post(
-      '/api/users/verify-reset-code?ownerProjectLinkId=$ownerProjectLinkId',
-      body: {'email': email, 'code': code},
-    );
-  }
-
-  // ============================================================
-  // UPDATE PASSWORD
-  // ============================================================
-  
-  // OLD: /auth/reset-password
-  Future<String> resetPasswordOld({
     required String email,
     required String newPassword,
     required String confirmPassword,
@@ -295,29 +186,10 @@ class AuthApiService {
     return response.toString();
   }
 
-  // NEW: /api/users/update-password?ownerProjectLinkId={{ownerProjectLinkId}}
-  Future<String> updatePassword({
-    required String email,
-    required String newPassword,
-    required String confirmPassword,
-    required int ownerProjectLinkId,
-  }) async {
-    final response = await _client.post(
-      '/api/users/update-password?ownerProjectLinkId=$ownerProjectLinkId',
-      body: {
-        'email': email,
-        'newPassword': newPassword,
-        'confirmPassword': confirmPassword,
-      },
-    );
-    return response.toString();
-  }
-
   // ============================================================
-  // COMPLETE PROFILE (Old version - without email/password)
+  // BALADIYATI — Complete profile
+  // POST /auth/complete-profile
   // ============================================================
-  
-  // OLD: /auth/complete-profile
   Future<String> completeProfile({
     required String address,
     required String username,

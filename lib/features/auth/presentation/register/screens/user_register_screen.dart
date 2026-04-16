@@ -30,6 +30,9 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
   bool _obscurePassword = true;
   bool _isLoading = false;
 
+  // ✅ ownerProjectLinkId from build4all config
+  static const int _ownerProjectLinkId = 12;
+
   @override
   void dispose() {
     _nameCtrl.dispose();
@@ -39,7 +42,7 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
     super.dispose();
   }
 
-  // ✅ FIXED: password is NOT saved here — only non-sensitive data
+  // ✅ Save only non-sensitive data (no password)
   Future<void> _saveToPrefs(Map<String, dynamic> body) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('register_body', jsonEncode(body));
@@ -51,29 +54,33 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
     setState(() => _isLoading = true);
 
     final email = _emailCtrl.text.trim();
-    final password = _passwordCtrl.text.trim(); // kept in memory only
+    final password = _passwordCtrl.text.trim(); // stays in memory only
     final sharedReference = DateTime.now().millisecondsSinceEpoch.toString();
 
-    // ✅ FIXED: password is excluded from SharedPreferences
+    // ✅ Save non-sensitive data only — no password
     final body = {
       "fullName": _nameCtrl.text.trim(),
       "email": email,
       "phone": _phoneCtrl.text.trim(),
       "sharedReference": sharedReference,
     };
-
     await _saveToPrefs(body);
 
     try {
-      // ✅ STEP 1 --- Send verification email to backend
+      // ✅ STEP 1 — Call build4all API (ownerProjectLinkId required)
+      await _authApi.sendVerificationBuild4All(
+        email: email,
+        password: password,
+        ownerProjectLinkId: _ownerProjectLinkId,
+      );
+
+      // ✅ STEP 2 — Call baladiyati API
       await _authApi.sendVerificationEmail(email: email);
-      
-      
 
       setState(() => _isLoading = false);
       context.read<RegistrationStepCubit>().nextStep();
 
-      // ✅ STEP 2 --- Navigate to OTP screen, passing password in memory
+      // ✅ STEP 3 — Navigate to OTP, password passed in memory
       if (!mounted) return;
       Navigator.push(
         context,
@@ -81,18 +88,17 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
           builder: (_) => UserVerifyCodeScreen(
             email: email,
             sharedReference: sharedReference,
-            password: password, // ✅ FIXED: passed directly, never stored on disk
+            password: password,
+            ownerProjectLinkId: _ownerProjectLinkId,
           ),
         ),
       );
     } catch (e) {
       setState(() => _isLoading = false);
       if (!mounted) return;
+      final msg = e.toString().replaceAll('Exception:', '').trim();
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('فشل إرسال الرمز: ${e.toString()}'),
-          backgroundColor: Colors.red,
-        ),
+        SnackBar(content: Text(msg), backgroundColor: Colors.red),
       );
     }
   }
@@ -222,7 +228,7 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
                       ),
                       const SizedBox(height: 24),
 
-                      // BUTTON
+                      // REGISTER BUTTON
                       PrimaryButton(
                         label: l10n.registerButton,
                         isLoading: _isLoading,

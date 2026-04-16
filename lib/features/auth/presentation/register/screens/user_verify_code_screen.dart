@@ -14,13 +14,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class UserVerifyCodeScreen extends StatefulWidget {
   final String email;
   final String sharedReference;
-  final String password; // received from RegisterScreen, never stored on disk
+  final String password;       // ✅ in memory only, never stored on disk
+  final int ownerProjectLinkId; // ✅ from build4all config
 
   const UserVerifyCodeScreen({
     super.key,
     required this.email,
     required this.sharedReference,
     required this.password,
+    required this.ownerProjectLinkId,
   });
 
   @override
@@ -41,7 +43,7 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
     super.dispose();
   }
 
-  //  only reads non-sensitive data (fullName, email, phone) from prefs
+  // ✅ Only reads non-sensitive data (fullName, email, phone) — no password
   Future<Map<String, dynamic>?> _readStoredData() async {
     final prefs = await SharedPreferences.getInstance();
     final data = prefs.getString('register_body');
@@ -63,24 +65,24 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
     setState(() => _isLoading = true);
 
     try {
-      //  STEP 1 --- Verify OTP
+      // ✅ STEP 1 — Verify OTP with baladiyati
       await _authApi.verifyEmailCode(
         email: widget.email,
         code: code,
       );
 
-      //  STEP 2 --- Read saved register data (no password inside)
+      // ✅ STEP 2 — Read saved non-sensitive data
       final savedData = await _readStoredData();
       if (savedData == null) throw Exception('Register data not found');
 
-      // STEP 3 --- Call register using widget.password (in-memory, never stored)
+      // ✅ STEP 3 — Register on baladiyati with password from memory
       await _authApi.register(
         email: savedData['email'],
-        password: widget.password, //  from memory, not from disk
+        password: widget.password, // ✅ from memory, never from disk
         fullName: savedData['fullName'],
         phone: savedData['phone'],
         role: 'CITIZEN',
-        municipalityId: 1, // TEMP (will update later)
+        municipalityId: 1, // TEMP — will be updated later
       );
 
       if (!mounted) return;
@@ -94,7 +96,7 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
         ),
       );
 
-      //  STEP 4 --- Go to Complete Profile
+      // ✅ STEP 4 — Go to Complete Profile
       AppRouter.gotoCompleteProfile(context);
     } catch (e) {
       setState(() => _isLoading = false);
@@ -102,7 +104,7 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
       final errorMsg = e.toString().replaceAll('Exception:', '').trim();
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('خطأ: $errorMsg'),
+          content: Text(errorMsg),
           backgroundColor: Colors.red,
         ),
       );
@@ -119,7 +121,6 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // Step indicator (same as register page)
             const RegistrationStepIndicator(),
             Expanded(
               child: Center(
@@ -177,7 +178,8 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(color: primary, width: 2),
+                                  borderSide:
+                                      BorderSide(color: primary, width: 2),
                                 ),
                               ),
                             ),
@@ -198,7 +200,8 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
                           ),
                           onPressed: _isLoading ? null : () => _verify(l10n),
                           child: _isLoading
-                              ? const CircularProgressIndicator(color: Colors.white)
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white)
                               : Text(l10n.verifyButton,
                                   style: const TextStyle(
                                       fontSize: 16, color: Colors.white)),

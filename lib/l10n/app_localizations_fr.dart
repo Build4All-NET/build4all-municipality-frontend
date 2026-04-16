@@ -15,8 +15,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get appSubtitle => 'Municipalité Numérique';
 
   @override
-  String get appDescription =>
-      'Une plateforme numérique intégrée pour les services municipaux libanais';
+  String get appDescription => 'Une plateforme numérique intégrée pour les services municipaux libanais';
 
   @override
   String get getStarted => 'Commencer';
@@ -88,8 +87,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get invalidEmail => 'Veuillez entrer un email valide';
 
   @override
-  String get passwordTooShort =>
-      'Le mot de passe doit contenir au moins 6 caractères';
+  String get passwordTooShort => 'Le mot de passe doit contenir au moins 6 caractères';
 
   @override
   String get copyright => '© 2026 Baladiyati - Tous droits réservés';
@@ -104,8 +102,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get errorUserNotFound => 'Aucun compte trouvé avec cet email';
 
   @override
-  String get errorAccountNotVerified =>
-      'Veuillez vérifier votre email avant de vous connecter';
+  String get errorAccountNotVerified => 'Veuillez vérifier votre email avant de vous connecter';
 
   @override
   String get errorEmailExists => 'Cet email est déjà enregistré';
@@ -129,8 +126,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get passwordHint => 'Mot de passe';
 
   @override
-  String get passwordInfo =>
-      'Le mot de passe doit contenir au moins 6 caractères';
+  String get passwordInfo => 'Le mot de passe doit contenir au moins 6 caractères';
 
   @override
   String get sendCode => 'Envoyer le code';
@@ -157,8 +153,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get completeProfileTitle => 'Compléter le Profil';
 
   @override
-  String get completeProfileSubtitle =>
-      'Complétez vos informations pour accéder aux services';
+  String get completeProfileSubtitle => 'Complétez vos informations pour accéder aux services';
 
   @override
   String get usernameLabel => 'Nom d\'utilisateur';
@@ -182,8 +177,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get completeProfileSuccess => 'Profil complété avec succès!';
 
   @override
-  String get selectMunicipalityWarning =>
-      'Veuillez sélectionner une municipalité';
+  String get selectMunicipalityWarning => 'Veuillez sélectionner une municipalité';
 
   @override
   String get forgotPassword => 'Mot de passe oublié?';
@@ -201,8 +195,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get resetPasswordTitle => 'Réinitialiser le mot de passe';
 
   @override
-  String get resetPasswordSubtitle =>
-      'Entrez votre nouveau mot de passe et confirmez-le';
+  String get resetPasswordSubtitle => 'Entrez votre nouveau mot de passe et confirmez-le';
 
   @override
   String get newPassword => 'Nouveau mot de passe';
@@ -221,4 +214,232 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get passwordRequired => 'Le mot de passe est requis';
+
+  @override
+  String get navHome => 'Accueil';
+
+  @override
+  String get navServices => 'Services';
+
+  @override
+  String get navRequests => 'Demandes';
+
+  @override
+  String get navPayments => 'Paiements';
+
+  @override
+  String get navAccount => 'Compte';
+
+  @override
+  String get welcomeMessage => 'Bienvenue,';
+
+  @override
+  String get activeRequests => 'Demandes actives';
+
+  @override
+  String get awaitingPayment => 'En attente de paiement';
+
+  @override
+  String get completed => 'Complétées';
+
+  @override
+  String get quickActions => 'Actions rapides';
+
+  @override
+  String get newRequest => 'Nouvelle demande';
+
+  @override
+  String get serviceCategories => 'Catégories de services';
+
+  @override
+  String get viewAll => 'Voir tout';
+
+  @override
+  String get recentRequests => 'Demandes récentes';
+
+  @override
+  String get municipalAnnouncements => 'Annonces municipales';
+
+  @override
+  String get latestNews => 'Dernières nouvelles et mises à jour';
+
+  @override
+  String get workingHours => 'Nouveaux horaires: du lundi au vendredi, 8h - 14h';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get municipalServices => 'Services Municipaux';
+
+  @override
+  String get searchService => 'Rechercher un service...';
+
+  @override
+  String get selectCategory => 'Choisir une catégorie pour voir les services disponibles';
+
+  @override
+  String get serviceCount => 'services';
+
+  @override
+  String get myAccount => 'Mon Compte';
+
+  @override
+  String get editProfile => 'Modifier le profil';
+
+  @override
+  String get editInfo => 'Modifier les informations';
+
+  @override
+  String get changesSaved => 'Modifications enregistrées';
+
+  @override
+  String get save => 'Enregistrer';
+
+  @override
+  String get cancel => 'Annuler';
+
+  @override
+  String get logout => 'Se déconnecter';
+
+  @override
+  String get pending => 'En attente';
+
+  @override
+  String get paid => 'Payées';
+
+  @override
+  String get paidLabel => 'Payé';
+
+  @override
+  String get due => 'Dû';
+
+  @override
+  String get dueDate => 'Échéance:';
+
+  @override
+  String get paidDate => 'Payé le:';
+
+  @override
+  String get receiptNumber => 'Reçu:';
+
+  @override
+  String get downloadReceipt => 'Télécharger le reçu';
+
+  @override
+  String get payNow => 'Payer maintenant';
+
+  @override
+  String get paymentSuccess => 'Paiement réussi';
+
+  @override
+  String get lbp => 'LBP';
+
+  @override
+  String get noPayments => 'Aucun paiement';
+
+  @override
+  String get myRequests => 'Mes demandes';
+
+  @override
+  String get searchRequest => 'Rechercher par numéro ou nom...';
+
+  @override
+  String get filterAll => 'Tout';
+
+  @override
+  String get statusSubmitted => 'Soumise';
+
+  @override
+  String get statusUnderReview => 'En cours d\'examen';
+
+  @override
+  String get statusWaitingPayment => 'En attente de paiement';
+
+  @override
+  String get statusApproved => 'Approuvée';
+
+  @override
+  String get statusDelivered => 'Livrée';
+
+  @override
+  String get noRequests => 'Aucune demande trouvée';
+
+  @override
+  String get progress => 'Progression';
+
+  @override
+  String get timeline => 'Chronologie';
+
+  @override
+  String get details => 'Détails';
+
+  @override
+  String get descriptionLabel => 'Description';
+
+  @override
+  String get submissionDate => 'Date de soumission';
+
+  @override
+  String get amountDue => 'Montant dû';
+
+  @override
+  String get searchInServices => 'Rechercher dans les services...';
+
+  @override
+  String get noServices => 'Aucun service disponible';
+
+  @override
+  String get requiresInspection => 'Inspection requise';
+
+  @override
+  String get days => 'jours';
+
+  @override
+  String get free => 'Gratuit';
+
+  @override
+  String get serviceInfo => 'Informations sur le service';
+
+  @override
+  String get feeLabel => 'Frais:';
+
+  @override
+  String get processingTime => 'Délai de traitement:';
+
+  @override
+  String get requestDetails => 'Détails de la demande';
+
+  @override
+  String get titleLabel => 'Titre';
+
+  @override
+  String get titleHint => 'Entrez le titre de la demande';
+
+  @override
+  String get descriptionHint => 'Description détaillée...';
+
+  @override
+  String get locationLabel => 'Localisation';
+
+  @override
+  String get locationHint => 'Adresse ou GPS';
+
+  @override
+  String get requiredAttachments => 'Pièces jointes requises';
+
+  @override
+  String get tapToUpload => 'Appuyer pour télécharger';
+
+  @override
+  String get pdfOrImages => 'Photos ou fichiers PDF';
+
+  @override
+  String get filesSelected => 'fichier(s) sélectionné(s)';
+
+  @override
+  String get submitRequest => 'Soumettre la demande';
+
+  @override
+  String get requestSubmitted => 'Demande soumise avec succès';
 }

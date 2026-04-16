@@ -15,8 +15,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get appSubtitle => 'Digital Municipality';
 
   @override
-  String get appDescription =>
-      'An integrated digital platform for Lebanese municipal services';
+  String get appDescription => 'An integrated digital platform for Lebanese municipal services';
 
   @override
   String get getStarted => 'Get Started';
@@ -103,8 +102,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get errorUserNotFound => 'No account found with this email';
 
   @override
-  String get errorAccountNotVerified =>
-      'Please verify your email before logging in';
+  String get errorAccountNotVerified => 'Please verify your email before logging in';
 
   @override
   String get errorEmailExists => 'This email is already registered';
@@ -216,4 +214,232 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get passwordRequired => 'Password is required';
+
+  @override
+  String get navHome => 'Home';
+
+  @override
+  String get navServices => 'Services';
+
+  @override
+  String get navRequests => 'Requests';
+
+  @override
+  String get navPayments => 'Payments';
+
+  @override
+  String get navAccount => 'Account';
+
+  @override
+  String get welcomeMessage => 'Welcome,';
+
+  @override
+  String get activeRequests => 'Active Requests';
+
+  @override
+  String get awaitingPayment => 'Awaiting Payment';
+
+  @override
+  String get completed => 'Completed';
+
+  @override
+  String get quickActions => 'Quick Actions';
+
+  @override
+  String get newRequest => 'New Request';
+
+  @override
+  String get serviceCategories => 'Service Categories';
+
+  @override
+  String get viewAll => 'View All';
+
+  @override
+  String get recentRequests => 'Recent Requests';
+
+  @override
+  String get municipalAnnouncements => 'Municipal Announcements';
+
+  @override
+  String get latestNews => 'Latest news and updates';
+
+  @override
+  String get workingHours => 'New working hours: Monday to Friday, 8 AM - 2 PM';
+
+  @override
+  String get notifications => 'Notifications';
+
+  @override
+  String get municipalServices => 'Municipal Services';
+
+  @override
+  String get searchService => 'Search for a service...';
+
+  @override
+  String get selectCategory => 'Select a category to view available services';
+
+  @override
+  String get serviceCount => 'services';
+
+  @override
+  String get myAccount => 'My Account';
+
+  @override
+  String get editProfile => 'Edit Profile';
+
+  @override
+  String get editInfo => 'Edit Information';
+
+  @override
+  String get changesSaved => 'Changes saved';
+
+  @override
+  String get save => 'Save';
+
+  @override
+  String get cancel => 'Cancel';
+
+  @override
+  String get logout => 'Logout';
+
+  @override
+  String get pending => 'Pending';
+
+  @override
+  String get paid => 'Paid';
+
+  @override
+  String get paidLabel => 'Paid';
+
+  @override
+  String get due => 'Due';
+
+  @override
+  String get dueDate => 'Due:';
+
+  @override
+  String get paidDate => 'Paid:';
+
+  @override
+  String get receiptNumber => 'Receipt:';
+
+  @override
+  String get downloadReceipt => 'Download Receipt';
+
+  @override
+  String get payNow => 'Pay Now';
+
+  @override
+  String get paymentSuccess => 'Payment successful';
+
+  @override
+  String get lbp => 'LBP';
+
+  @override
+  String get noPayments => 'No payments';
+
+  @override
+  String get myRequests => 'My Requests';
+
+  @override
+  String get searchRequest => 'Search by number or name...';
+
+  @override
+  String get filterAll => 'All';
+
+  @override
+  String get statusSubmitted => 'Submitted';
+
+  @override
+  String get statusUnderReview => 'Under Review';
+
+  @override
+  String get statusWaitingPayment => 'Awaiting Payment';
+
+  @override
+  String get statusApproved => 'Approved';
+
+  @override
+  String get statusDelivered => 'Delivered';
+
+  @override
+  String get noRequests => 'No requests found';
+
+  @override
+  String get progress => 'Progress';
+
+  @override
+  String get timeline => 'Timeline';
+
+  @override
+  String get details => 'Details';
+
+  @override
+  String get descriptionLabel => 'Description';
+
+  @override
+  String get submissionDate => 'Submission Date';
+
+  @override
+  String get amountDue => 'Amount Due';
+
+  @override
+  String get searchInServices => 'Search services...';
+
+  @override
+  String get noServices => 'No services available';
+
+  @override
+  String get requiresInspection => 'Inspection Required';
+
+  @override
+  String get days => 'days';
+
+  @override
+  String get free => 'Free';
+
+  @override
+  String get serviceInfo => 'Service Information';
+
+  @override
+  String get feeLabel => 'Fee:';
+
+  @override
+  String get processingTime => 'Processing Time:';
+
+  @override
+  String get requestDetails => 'Request Details';
+
+  @override
+  String get titleLabel => 'Title';
+
+  @override
+  String get titleHint => 'Enter request title';
+
+  @override
+  String get descriptionHint => 'Detailed description...';
+
+  @override
+  String get locationLabel => 'Location';
+
+  @override
+  String get locationHint => 'Address or GPS location';
+
+  @override
+  String get requiredAttachments => 'Required Attachments';
+
+  @override
+  String get tapToUpload => 'Tap to upload attachments';
+
+  @override
+  String get pdfOrImages => 'Photos or PDF files';
+
+  @override
+  String get filesSelected => 'file(s) selected';
+
+  @override
+  String get submitRequest => 'Submit Request';
+
+  @override
+  String get requestSubmitted => 'Request submitted successfully';
 }

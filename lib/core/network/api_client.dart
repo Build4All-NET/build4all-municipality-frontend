@@ -14,7 +14,8 @@ class ApiClient {
   // Web (Chrome):      http://localhost:8091
   // Android Emulator:  http://10.0.2.2:8091
   // Real Phone (WiFi): http://192.168.0.101:8091
-  static const String baseUrl = 'http://localhost:8094';
+  static const String baseUrl = 'http://localhost:8092';
+  
   static const String _tokenKey = 'auth_token';
 
   // ─────────────────────────────────────────
@@ -30,7 +31,7 @@ class ApiClient {
   }
 
   // ─────────────────────────────────────────
-  // POST request
+  // POST request — uses baladiyati baseUrl
   // ─────────────────────────────────────────
   Future<dynamic> post(
     String endpoint, {
@@ -39,6 +40,23 @@ class ApiClient {
   }) async {
     final response = await http.post(
       Uri.parse('$baseUrl$endpoint'),
+      headers: await _headers(requiresAuth: requiresAuth),
+      body: body != null ? jsonEncode(body) : null,
+    ).timeout(const Duration(seconds: 30));
+
+    return _handleResponse(response);
+  }
+
+  // ─────────────────────────────────────────
+  // ✅ POST to full URL — for external APIs (build4all)
+  // ─────────────────────────────────────────
+  Future<dynamic> postToUrl(
+    String fullUrl, {
+    Map<String, dynamic>? body,
+    bool requiresAuth = false,
+  }) async {
+    final response = await http.post(
+      Uri.parse(fullUrl),
       headers: await _headers(requiresAuth: requiresAuth),
       body: body != null ? jsonEncode(body) : null,
     ).timeout(const Duration(seconds: 30));
@@ -72,25 +90,20 @@ class ApiClient {
   // ─────────────────────────────────────────
   dynamic _handleResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
-      // Empty body
       if (response.body.isEmpty) return {};
 
       final trimmed = response.body.trim();
 
-      // If it starts with { or [ → it's JSON
       if (trimmed.startsWith('{') || trimmed.startsWith('[')) {
         return jsonDecode(trimmed);
       }
 
-      //  If it's a plain String (like "Verification email sent successfully")
       return {'message': trimmed};
     }
 
-    // ─── Error handling ───────────────────
     try {
       final trimmed = response.body.trim();
 
-      // Try to parse as JSON error
       if (trimmed.startsWith('{')) {
         final error = jsonDecode(trimmed);
         final code = error['code'] ?? error['error'] ?? 'UNKNOWN';
@@ -98,7 +111,6 @@ class ApiClient {
         throw AppException(message, code: code);
       }
 
-      // Plain string error
       throw AppException(trimmed.isNotEmpty ? trimmed : 'Error ${response.statusCode}');
     } catch (e) {
       if (e is AppException) rethrow;
