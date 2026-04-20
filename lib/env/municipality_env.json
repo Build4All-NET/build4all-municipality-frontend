@@ -1,6 +1,7 @@
 
 {  
-  "API_BASE_URL": "https://static-sneeze-unfrozen.ngrok-free.dev/auth/",
+  "API_BASE_URL": "https://static-sneeze-unfrozen.ngrok-free.dev/api",
+  "ProjectBaseUrl" : "Http://localhost:8091",
   "APP_NAME": "FATIMA",
   "APP_TYPE": "ECOMMERCE",
   "OWNER_PROJECT_LINK_ID": "12",

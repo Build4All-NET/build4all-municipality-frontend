@@ -22,68 +22,11 @@ class AuthApiService {
         _tokenStore = tokenStore ?? AuthTokenStore(),
         _roleStore = roleStore ?? SessionRoleStore();
 
-  // ============================================================
-  // ✅ BUILD4ALL — Send verification
-  // POST https://build4all.../api/auth/send-verification
-  // ============================================================
-  Future<void> sendVerificationBuild4All({
-    required String email,
-    required String password,
-    required int ownerProjectLinkId,
-  }) async {
-    await _client.postToUrl(
-      '$_build4allBaseUrl/api/auth/send-verification',
-      body: {
-        'email': email,
-        'password': password,
-        'ownerProjectLinkId': ownerProjectLinkId,
-      },
-    );
-  }
 
-  // ============================================================
-  // ✅ BUILD4ALL — Verify OTP code
-  // POST https://build4all.../api/auth/verify-email-code
-  // Returns pendingId (userId) needed for complete-profile
-  // ============================================================
-  Future<int> verifyEmailCodeBuild4All({
-    required String email,
-    required String code,
-  }) async {
-    final response = await _client.postToUrl(
-      '$_build4allBaseUrl/api/auth/verify-email-code',
-      body: {
-        'email': email,
-        'code': code,
-      },
-    );
-    return response['user']['id'] as int;
-  }
 
-  // ============================================================
-  // BALADIYATI — Send verification email
-  // POST /auth/send-verification-email
-  // ============================================================
-  Future<void> sendVerificationEmail({required String email}) async {
-    await _client.post(
-      '/auth/send-verification-email',
-      body: {'email': email},
-    );
-  }
 
-  // ============================================================
-  // BALADIYATI — Verify OTP code
-  // POST /auth/verify
-  // ============================================================
-  Future<void> verifyEmailCode({
-    required String email,
-    required String code,
-  }) async {
-    await _client.post(
-      '/auth/verify',
-      body: {'email': email, 'code': code},
-    );
-  }
+
+
 
   // ============================================================
   // BALADIYATI — Register
@@ -123,14 +66,12 @@ class AuthApiService {
   Future<AuthResponseModel> login({
     required String email,
     required String password,
-    required String role,
   }) async {
     final data = await _client.post(
       '/auth/users/login',
       body: {
         'email': email,
         'passwordHash': password,
-        'role': role,
       },
     );
     final response = AuthResponseModel.fromJson(data);
@@ -153,6 +94,9 @@ class AuthApiService {
     await _client.clearToken();
     await _roleStore.clearRole();
   }
+
+  // refresh token 
+
 
   // ============================================================
   // BALADIYATI — Forgot password
@@ -190,6 +134,45 @@ class AuthApiService {
   // BALADIYATI — Complete profile
   // POST /auth/complete-profile
   // ============================================================
+
+ Future<AuthResponseModel> completeProfileNew({
+  required String email,
+  required String password,
+  required String fullName,
+  required String phone,
+  required String role,
+  required int municipalityId,
+  required String address,
+  required String username,
+}) async {
+
+  final data = await _client.post(
+    '/api/auth/complete-profile',
+    body: {
+      'email': email,
+      'passwordHash': password,
+      'fullName': fullName,
+      'phone': phone,
+      'role': role,
+      'municipality': {
+        'id': municipalityId,
+      },
+      'address': address,
+      'username': username,
+    },
+  );
+
+  final response = AuthResponseModel.fromJson(data);
+
+  if (response.token.isNotEmpty) {
+    await _tokenStore.saveToken(response.token);
+    await _client.saveToken(response.token);
+  }
+
+  return response;
+}
+
+
   Future<String> completeProfile({
     required String address,
     required String username,
@@ -210,7 +193,7 @@ class AuthApiService {
     );
     return response['message'] ?? 'Success';
   }
-
+     
   // ============================================================
   // TOKEN HELPERS
   // ============================================================

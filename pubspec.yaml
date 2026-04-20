@@ -29,6 +29,7 @@ dependencies:
 
   cupertino_icons: ^1.0.2
   dartz: ^0.10.1
+  dio: ^5.9.2
 
 dev_dependencies:
   flutter_test:

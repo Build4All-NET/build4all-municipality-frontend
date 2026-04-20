@@ -1,5 +1,8 @@
 // lib/features/auth/presentation/login/screens/login_screen.dart
 
+import 'package:baladiyati/core/auth/jwt_reader.dart';
+import 'package:baladiyati/core/network/dio_client.dart';
+import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
@@ -7,6 +10,8 @@ import 'package:baladiyati/features/auth/presentation/login/screens/reset_passwo
 import 'package:baladiyati/features/auth/presentation/register/screens/user_register_screen.dart';
 // ✅ FIXED: Import correct HomeScreen (with BottomNav)
 import 'package:baladiyati/features/citizen/home/presentation/screens/home_screen.dart';
+import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -27,6 +32,9 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   bool isCitizen = true;
 
+  final _authapi = AuthApi(DioClient.build);
+  final _muni  = AuthApi(DioClient.municipalityDio);
+  
   @override
   void dispose() {
     _emailCtrl.dispose();
@@ -34,13 +42,26 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _onLoginPressed(BuildContext context) {
+  Future<void> _onLoginPressed(BuildContext context) async {
     if (!_formKey.currentState!.validate()) return;
-    context.read<AuthBloc>().add(AuthLoginSubmitted(
-      email: _emailCtrl.text.trim(),
-      password: _passwordCtrl.text.trim(),
-      role: isCitizen ? 'CITIZEN' : 'EMPLOYEE',
-    ));
+    // context.read<AuthBloc>().add(AuthLoginSubmitted(
+    //   email: _emailCtrl.text.trim(),
+    //   password: _passwordCtrl.text.trim(),
+    // ));
+    final response = await _authapi.ownerLogin(
+      email: _emailCtrl.text,
+       password: _passwordCtrl.text,
+      ownerProjectLinkId: 1
+      );
+
+  final token = response.data['token'];
+
+if (token != null && token.toString().isNotEmpty) {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('auth_token', token);
+}
+
+
   }
 
   @override

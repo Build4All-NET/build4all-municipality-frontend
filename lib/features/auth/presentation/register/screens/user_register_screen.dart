@@ -4,11 +4,14 @@ import 'dart:convert';
 
 import 'package:baladiyati/common/registration_step_cubit.dart';
 import 'package:baladiyati/common/registration_step_indicator.dart';
+import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:baladiyati/features/auth/presentation/register/screens/user_verify_code_screen.dart';
+import '../../../../../core/network/dio_client.dart';
 import '../../../../../core/theme/theme_cubit.dart';
 import '../../../../../common/widgets/primary_button.dart';
 import '../../../../../features/auth/data/services/auth_api_service.dart';
@@ -26,12 +29,12 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
   final _emailCtrl = TextEditingController();
   final _phoneCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
-  final _authApi = AuthApiService();
+  final _authApi = AuthApi(DioClient.build);
   bool _obscurePassword = true;
   bool _isLoading = false;
 
   // ✅ ownerProjectLinkId from build4all config
-  static const int _ownerProjectLinkId = 12;
+  static const int _ownerProjectLinkId = 1;
 
   @override
   void dispose() {
@@ -65,17 +68,16 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
       "sharedReference": sharedReference,
     };
     await _saveToPrefs(body);
-
+    print("BASE URL: ${DioClient.build.options.baseUrl}");
+    print("EMAIL: $email");
+    print("PASSWORD: $password");
     try {
       // ✅ STEP 1 — Call build4all API (ownerProjectLinkId required)
-      await _authApi.sendVerificationBuild4All(
+      await _authApi.ownerSendOtp(
         email: email,
         password: password,
         ownerProjectLinkId: _ownerProjectLinkId,
       );
-
-      // ✅ STEP 2 — Call baladiyati API
-      await _authApi.sendVerificationEmail(email: email);
 
       setState(() => _isLoading = false);
       context.read<RegistrationStepCubit>().nextStep();
@@ -97,6 +99,7 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
       setState(() => _isLoading = false);
       if (!mounted) return;
       final msg = e.toString().replaceAll('Exception:', '').trim();
+      print(msg);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(msg), backgroundColor: Colors.red),
       );

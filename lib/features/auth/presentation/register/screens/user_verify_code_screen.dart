@@ -4,6 +4,9 @@ import 'dart:convert';
 
 import 'package:baladiyati/common/registration_step_cubit.dart';
 import 'package:baladiyati/common/registration_step_indicator.dart';
+import 'package:baladiyati/core/auth/jwt_reader.dart';
+import 'package:baladiyati/core/network/dio_client.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -11,10 +14,12 @@ import '../../../../../features/auth/data/services/auth_api_service.dart';
 import 'package:baladiyati/app/app_router.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
+import '../../../data/services/api_auth_build4all_service.dart';
+
 class UserVerifyCodeScreen extends StatefulWidget {
   final String email;
   final String sharedReference;
-  final String password;       // ✅ in memory only, never stored on disk
+  final String password; // ✅ in memory only, never stored on disk
   final int ownerProjectLinkId; // ✅ from build4all config
 
   const UserVerifyCodeScreen({
@@ -33,7 +38,7 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
   final List<TextEditingController> _controllers =
       List.generate(6, (_) => TextEditingController());
   final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
-  final _authApi = AuthApiService();
+  final _authApi = AuthApi(DioClient.build);
   bool _isLoading = false;
 
   @override
@@ -41,6 +46,11 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
     for (var c in _controllers) c.dispose();
     for (var f in _focusNodes) f.dispose();
     super.dispose();
+  }
+
+  Future<void> _saveToPrefs(Map<String, dynamic> body) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('register_body', jsonEncode(body));
   }
 
   // ✅ Only reads non-sensitive data (fullName, email, phone) — no password
@@ -53,63 +63,89 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
     return null;
   }
 
-  void _verify(AppLocalizations l10n) async {
-    final code = _controllers.map((c) => c.text).join();
-    if (code.length < 6) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(l10n.enterFullCode)),
-      );
-      return;
-    }
+ void _verify(AppLocalizations l10n) async {
+  final code = _controllers.map((c) => c.text).join();
 
-    setState(() => _isLoading = true);
-
-    try {
-      // ✅ STEP 1 — Verify OTP with baladiyati
-      await _authApi.verifyEmailCode(
-        email: widget.email,
-        code: code,
-      );
-
-      // ✅ STEP 2 — Read saved non-sensitive data
-      final savedData = await _readStoredData();
-      if (savedData == null) throw Exception('Register data not found');
-
-      // ✅ STEP 3 — Register on baladiyati with password from memory
-      await _authApi.register(
-        email: savedData['email'],
-        password: widget.password, // ✅ from memory, never from disk
-        fullName: savedData['fullName'],
-        phone: savedData['phone'],
-        role: 'CITIZEN',
-        municipalityId: 1, // TEMP — will be updated later
-      );
-
-      if (!mounted) return;
-      setState(() => _isLoading = false);
-      context.read<RegistrationStepCubit>().nextStep();
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.successRegister),
-          backgroundColor: Colors.green,
-        ),
-      );
-
-      // ✅ STEP 4 — Go to Complete Profile
-      AppRouter.gotoCompleteProfile(context);
-    } catch (e) {
-      setState(() => _isLoading = false);
-      if (!mounted) return;
-      final errorMsg = e.toString().replaceAll('Exception:', '').trim();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(errorMsg),
-          backgroundColor: Colors.red,
-        ),
-      );
-    }
+  if (code.length < 6) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(l10n.enterFullCode)),
+    );
+    return;
   }
+
+  setState(() => _isLoading = true);
+
+ print(widget.email + code);
+  try {
+    // ✅ STEP 1 — verify OTP
+    final response = await _authApi.ownerVerifyOtp(
+      email: widget.email,
+      code: code,
+    );
+
+    final responseData = response.data;
+    final int? id = responseData['user']['id'];
+
+    // if (id == null) {
+    //   throw Exception("ID not found in response");
+    // }
+
+    // ✅ STEP 2 — load existing register body
+    final prefs = await SharedPreferences.getInstance();
+
+    final String? existing = prefs.getString('register_body');
+
+    Map<String, dynamic> body = existing != null
+        ? jsonDecode(existing)
+        : {};
+
+    // ✅ STEP 3 — update EVERYTHING in ONE object
+    body = {
+      ...body,
+      "email": widget.email,
+      "sharedReference": widget.sharedReference,
+      "ownerProjectLinkId": widget.ownerProjectLinkId,
+      "otpVerified": true,
+      "userId": id,
+      "lastname": "joumaa"
+    };
+print("""
+pendingId: ${body?["userId"]}
+fullName: ${body?["fullName"]}
+ownerProjectLinkId: ${body?["ownerProjectLinkId"]}
+""");
+    print(body['email']);
+    await prefs.setString('register_body', jsonEncode(body));
+
+    if (!mounted) return;
+
+    setState(() => _isLoading = false);
+
+    context.read<RegistrationStepCubit>().nextStep();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(l10n.successRegister),
+        backgroundColor: Colors.green,
+      ),
+    );
+
+    // ✅ STEP 5 — navigate
+    AppRouter.gotoCompleteProfile(context);
+
+  } catch (e) {
+    setState(() => _isLoading = false);
+
+    final errorMsg = e.toString().replaceAll('Exception:', '').trim();
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(errorMsg),
+        backgroundColor: Colors.red,
+      ),
+    );
+  }
+}
 
   @override
   Widget build(BuildContext context) {

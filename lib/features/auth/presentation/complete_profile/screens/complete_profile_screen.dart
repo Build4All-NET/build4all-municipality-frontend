@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:baladiyati/app/app_router.dart';
 import 'package:baladiyati/common/registration_step_cubit.dart';
+import 'package:baladiyati/core/network/dio_client.dart';
+import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:baladiyati/features/auth/presentation/login/screens/login_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../bloc/complete_profile_bloc.dart';
 import '../bloc/complete_profile_event.dart';
 import '../bloc/complete_profile_state.dart';
@@ -30,24 +35,31 @@ class CompleteProfileScreen extends StatefulWidget {
   const CompleteProfileScreen({super.key});
 
   @override
-  State<CompleteProfileScreen> createState() =>
-      _CompleteProfileScreenState();
+  State<CompleteProfileScreen> createState() => _CompleteProfileScreenState();
 }
 
 class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _usernameCtrl = TextEditingController();
   final _addressCtrl = TextEditingController();
+  final _authApi = AuthApi(DioClient.build);
 
   final List<_Municipality> _municipalities = const [
-    _Municipality(id: 1, nameAr: 'بلدية بيروت', nameEn: 'Beirut', nameFr: 'Beyrouth'),
-    _Municipality(id: 2, nameAr: 'بلدية طرابلس', nameEn: 'Tripoli', nameFr: 'Tripoli'),
-    _Municipality(id: 3, nameAr: 'بلدية صيدا', nameEn: 'Sidon', nameFr: 'Saïda'),
+    _Municipality(
+        id: 1, nameAr: 'بلدية بيروت', nameEn: 'Beirut', nameFr: 'Beyrouth'),
+    _Municipality(
+        id: 2, nameAr: 'بلدية طرابلس', nameEn: 'Tripoli', nameFr: 'Tripoli'),
+    _Municipality(
+        id: 3, nameAr: 'بلدية صيدا', nameEn: 'Sidon', nameFr: 'Saïda'),
     _Municipality(id: 4, nameAr: 'بلدية صور', nameEn: 'Tyre', nameFr: 'Tyr'),
-    _Municipality(id: 5, nameAr: 'بلدية زحلة', nameEn: 'Zahle', nameFr: 'Zahlé'),
-    _Municipality(id: 6, nameAr: 'بلدية جونية', nameEn: 'Jounieh', nameFr: 'Jounieh'),
-    _Municipality(id: 7, nameAr: 'بلدية بعلبك', nameEn: 'Baalbek', nameFr: 'Baalbek'),
-    _Municipality(id: 8, nameAr: 'بلدية النبطية', nameEn: 'Nabatieh', nameFr: 'Nabatiyé'),
+    _Municipality(
+        id: 5, nameAr: 'بلدية زحلة', nameEn: 'Zahle', nameFr: 'Zahlé'),
+    _Municipality(
+        id: 6, nameAr: 'بلدية جونية', nameEn: 'Jounieh', nameFr: 'Jounieh'),
+    _Municipality(
+        id: 7, nameAr: 'بلدية بعلبك', nameEn: 'Baalbek', nameFr: 'Baalbek'),
+    _Municipality(
+        id: 8, nameAr: 'بلدية النبطية', nameEn: 'Nabatieh', nameFr: 'Nabatiyé'),
   ];
 
   _Municipality? _selectedMunicipality;
@@ -59,7 +71,17 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     super.dispose();
   }
 
-  void _onSubmit(BuildContext context, AppLocalizations l10n) {
+  Future<Map<String, dynamic>?> _getFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final String? data = prefs.getString('register_body');
+
+    if (data == null) return null;
+
+    return jsonDecode(data) as Map<String, dynamic>;
+  }
+
+  void _onSubmit(BuildContext context, AppLocalizations l10n) async {
     if (!_formKey.currentState!.validate()) return;
 
     if (_selectedMunicipality == null) {
@@ -72,15 +94,56 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       return;
     }
 
-    context.read<CompleteProfileBloc>().add(
-          CompleteProfileSubmitted(
-            username: _usernameCtrl.text.trim(),
-            address: _addressCtrl.text.trim(),
-            //municipalityId: _selectedMunicipality!.id, // 
+    try {
+      final body = await _getFromPrefs();
+
+    print("""
+pendingId: ${body?["userId"]}
+firstName: ${body?["fullName"]}
+lastName: ${body?["lastname"]}
+username: ${_usernameCtrl.text.trim()}
+isPublicProfile: ${body?["isPublicProfile"]}
+ownerProjectLinkId: ${body?["ownerProjectLinkId"]}
+""");
+      if (body == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text("No saved registration data found"),
           ),
         );
-        context.read<RegistrationStepCubit>().nextStep();
-        AppRouter.goToWelcome(context);
+        return;
+      }
+
+      await _authApi.ownerCompleteProfile(
+        pendingId: body["userId"].toString(),
+        firstName: body["fullName"],
+        lastName: body["lastname"],
+        username: _usernameCtrl.text.trim(), // 🔥 override safe value
+        isPublicProfile: false,
+        ownerProjectLinkId: body["ownerProjectLinkId"].toString(),
+      );
+
+      // ✅ ONLY AFTER SUCCESS
+      if (!context.mounted) return;
+
+      context.read<CompleteProfileBloc>().add(
+            CompleteProfileSubmitted(
+              username: _usernameCtrl.text.trim(),
+              address: _addressCtrl.text.trim(),
+            ),
+          );
+
+      context.read<RegistrationStepCubit>().nextStep();
+
+      AppRouter.goToWelcome(context);
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Error: $e"),
+          backgroundColor: Colors.red,
+        ),
+      );
+    }
   }
 
   String _getMunicipalityName(_Municipality m, AppLocalizations l10n) {
@@ -143,7 +206,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                           padding: const EdgeInsets.all(AppSizes.paddingLarge),
                           decoration: BoxDecoration(
                             color: Colors.white,
-                            borderRadius: BorderRadius.circular(AppSizes.radiusLarge),
+                            borderRadius:
+                                BorderRadius.circular(AppSizes.radiusLarge),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black.withOpacity(0.07),
@@ -194,7 +258,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                                 const SizedBox(height: 8),
                                 _textField(
                                   controller: _addressCtrl,
-                                  hint: 'Lebanon, Beirut, Building 5, Main Street',
+                                  hint:
+                                      'Lebanon, Beirut, Building 5, Main Street',
                                   icon: Icons.location_on_outlined,
                                   validator: (v) {
                                     if (v == null || v.trim().isEmpty) {
@@ -207,7 +272,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                                       return 'Address is too short';
                                     }
 
-                                    if (!RegExp(r'^[a-zA-Z0-9 ,.\-]+$').hasMatch(value)) {
+                                    if (!RegExp(r'^[a-zA-Z0-9 ,.\-]+$')
+                                        .hasMatch(value)) {
                                       return 'Use only English letters, numbers, commas and dots';
                                     }
 

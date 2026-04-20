@@ -13,3 +13,4 @@ class NetworkException extends AppException {
   factory NetworkException.serverError() =>
       const NetworkException('Server error. Please try later', code: 'SERVER_ERROR');
 }
+// to be dynamic

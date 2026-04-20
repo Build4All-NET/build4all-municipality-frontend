@@ -9,7 +9,7 @@ import 'auth_event.dart';
 import 'auth_state.dart';
 
 class AuthBloc extends Bloc<AuthEvent, AuthState> {
-  final AuthApiService authApi;
+  final AuthApiService authApi  ;
   final SessionRoleStore _roleStore = SessionRoleStore();
 
   AuthBloc({required this.authApi}) : super(AuthState.initial()) {
@@ -28,18 +28,15 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     try {
       final response = await authApi.login(
         email: event.email.trim(),
-        password: event.password,
-        role: event.role,
+        password: event.password
       );
 
       // Sauvegarde rôle
-      await _roleStore.saveRole(event.role);
 
       // Création user temporaire (pas de userId dans AuthResponseModel)
       final user = UserEntity(
         id: 0, // valeur temporaire
         email: event.email.trim(),
-        role: event.role,
       );
 
       emit(state.copyWith(
