@@ -493,7 +493,7 @@ jobs:
           echo ""
 
           RESPONSE=$(curl -sS -w "\n%{http_code}" -X POST \
-            "$API_BASE/api/auth/demo/create-apple-review-account?ownerProjectLinkId=$LINK_ID" \
+            "$API_BASE/api/auth/demo/create-apple-review-account?$LINK_ID" \
             -H "Content-Type: application/json" \
             -H "X-Auth-Token: ${{ secrets.CI_RUNTIME_TOKEN }}" \
             2>&1)

@@ -9,13 +9,11 @@ class SendVerificationCode {
 
   Future<Either<AuthFailure, void>> call({
     String? email,
-    String? phoneNumber,
     required String password,
     required int ownerProjectLinkId,
   }) {
     return repo.sendVerificationCode(
       email: email,
-      phoneNumber: phoneNumber,
       password: password,
       ownerProjectLinkId: ownerProjectLinkId,
     );

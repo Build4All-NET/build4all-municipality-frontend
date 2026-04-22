@@ -11,50 +11,11 @@ class AuthRepositoryImpl implements AuthRepository {
   // ─────────────────────────────────────────────────
   // STEP 1 — Send verification code
   // ✅ Actually calls POST /auth/send-verification-email
-  // ─────────────────────────────────────────────────
-  @override
-  Future<Either<AuthFailure, void>> sendVerificationCode({
-    String? email,
-    String? phoneNumber,
-    required String password,
-    required int ownerProjectLinkId,
-  }) async {
-    try {
-      if (email != null && email.isNotEmpty) {
-        await _api.sendVerificationEmail(email: email);
-      }
-      return const Right(null);
-    } catch (e) {
-      // ✅ Correct constructor: positional message, named code
-      return Left(AuthFailure(
-        e.toString(),
-        code: 'SEND_CODE_FAILED',
-      ));
-    }
-  }
 
   // ─────────────────────────────────────────────────
   // STEP 2 — Verify OTP code
   // ✅ Actually calls POST /auth/verify
-  // ─────────────────────────────────────────────────
- @override
-Future<Either<AuthFailure, int>> verifyEmailCode({
-  required String email,
-  required String code,
-}) async {
-  try {
-    await _api.verifyEmailCode(
-      email: email,   // ✅ ADD THIS
-      code: code,
-    );
-    return const Right(1);
-  } catch (e) {
-    return Left(AuthFailure(
-      e.toString(),
-      code: 'VERIFY_FAILED',
-    ));
-  }
-}
+
 
   // ─────────────────────────────────────────────────
   // Verify phone code (not implemented yet)
@@ -79,7 +40,6 @@ Future<Either<AuthFailure, int>> verifyEmailCode({
     final response = await _api.login(
       email: email,
       password: password,
-      role: 'CITIZEN',
     );
     return UserEntity(id: 0, username: email, email: email);
   }
@@ -107,5 +67,17 @@ Future<Either<AuthFailure, int>> verifyEmailCode({
       username: username,
       email: '$username@email.com',
     );
+  }
+
+  @override
+  Future<Either<AuthFailure, void>> sendVerificationCode({String? email, required String password, required int ownerProjectLinkId}) {
+    // TODO: implement sendVerificationCode
+    throw UnimplementedError();
+  }
+
+  @override
+  Future<Either<AuthFailure, int>> verifyEmailCode({required String email, required String code}) {
+    // TODO: implement verifyEmailCode
+    throw UnimplementedError();
   }
 }

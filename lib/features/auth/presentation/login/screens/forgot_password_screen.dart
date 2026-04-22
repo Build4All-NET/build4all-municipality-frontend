@@ -40,7 +40,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
     try {
       // ✅ Send email + code + new password to backend
-      await AuthApiService().resetPasswordOld(
+      await AuthApiService().resetPassword(
         email: widget.email,
         newPassword: passwordController.text.trim(),
         confirmPassword: confirmPasswordController.text.trim(),

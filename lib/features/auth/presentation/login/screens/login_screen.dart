@@ -1,12 +1,17 @@
 // lib/features/auth/presentation/login/screens/login_screen.dart
 
+import 'package:baladiyati/core/auth/jwt_reader.dart';
+import 'package:baladiyati/core/network/dio_client.dart';
+import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
-//import 'package:baladiyati/app/app_router.dart';
 import 'package:baladiyati/features/auth/presentation/login/screens/reset_password_page.dart';
 import 'package:baladiyati/features/auth/presentation/register/screens/user_register_screen.dart';
-import 'package:baladiyati/features/auth/presentation/complete_profile/screens/HomePage.dart';
+// ✅ FIXED: Import correct HomeScreen (with BottomNav)
+import 'package:baladiyati/features/citizen/home/presentation/screens/home_screen.dart';
+import 'package:http/http.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../bloc/auth_bloc.dart';
 import '../bloc/auth_event.dart';
 import '../bloc/auth_state.dart';
@@ -16,7 +21,6 @@ import '../../../../../common/widgets/primary_button.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
-
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
@@ -28,6 +32,9 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   bool isCitizen = true;
 
+  final _authapi = AuthApi(DioClient.build);
+  final _muni  = AuthApi(DioClient.municipalityDio);
+  
   @override
   void dispose() {
     _emailCtrl.dispose();
@@ -35,13 +42,26 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _onLoginPressed(BuildContext context) {
+  Future<void> _onLoginPressed(BuildContext context) async {
     if (!_formKey.currentState!.validate()) return;
-    context.read<AuthBloc>().add(AuthLoginSubmitted(
-      email: _emailCtrl.text.trim(),
-      password: _passwordCtrl.text.trim(),
-      role: isCitizen ? 'CITIZEN' : 'EMPLOYEE',
-    ));
+    // context.read<AuthBloc>().add(AuthLoginSubmitted(
+    //   email: _emailCtrl.text.trim(),
+    //   password: _passwordCtrl.text.trim(),
+    // ));
+    final response = await _authapi.ownerLogin(
+      email: _emailCtrl.text,
+       password: _passwordCtrl.text,
+      ownerProjectLinkId: 1
+      );
+
+  final token = response.data['token'];
+
+if (token != null && token.toString().isNotEmpty) {
+  final prefs = await SharedPreferences.getInstance();
+  await prefs.setString('auth_token', token);
+}
+
+
   }
 
   @override
@@ -58,30 +78,18 @@ class _LoginScreenState extends State<LoginScreen> {
           listener: (context, state) {
             if (state.errorMessage != null) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.errorMessage!),
-                  backgroundColor: Colors.red,
-                  duration: const Duration(seconds: 3),
-                ),
+                SnackBar(content: Text(state.errorMessage!), backgroundColor: Colors.red, duration: const Duration(seconds: 3)),
               );
             }
-
             if (state.isLoggedIn) {
               ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(l10n.successLogin),
-                  backgroundColor: Colors.green,
-                  duration: const Duration(seconds: 2),
-                ),
+                SnackBar(content: Text(l10n.successLogin), backgroundColor: Colors.green, duration: const Duration(seconds: 2)),
               );
-
               Future.delayed(const Duration(milliseconds: 500), () {
                 if (!mounted) return;
                 Navigator.pushAndRemoveUntil(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const HomeScreen(),
-                  ),
+                  MaterialPageRoute(builder: (_) => const HomeScreen()),
                   (_) => false,
                 );
               });
@@ -93,51 +101,25 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 20),
                 Expanded(
                   child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: AppSizes.paddingLarge),
+                    padding: const EdgeInsets.symmetric(horizontal: AppSizes.paddingLarge),
                     child: Container(
                       padding: EdgeInsets.all(card.padding),
-                      decoration: BoxDecoration(
-                        color: colors.surface,
-                        borderRadius: BorderRadius.circular(card.radius),
-                      ),
+                      decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(card.radius)),
                       child: Form(
                         key: _formKey,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Center(
-                              child: Text(l10n.loginTitle,
-                                  style: const TextStyle(
-                                      fontSize: 22,
-                                      fontWeight: FontWeight.bold)),
-                            ),
+                            Center(child: Text(l10n.loginTitle, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold))),
                             const SizedBox(height: 8),
-                            Center(
-                              child: Text(l10n.loginSubtitle,
-                                  style: const TextStyle(
-                                      fontSize: 14, color: Colors.grey)),
-                            ),
+                            Center(child: Text(l10n.loginSubtitle, style: const TextStyle(fontSize: 14, color: Colors.grey))),
                             const SizedBox(height: 24),
                             Container(
                               height: 50,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(14),
-                              ),
+                              decoration: BoxDecoration(color: Colors.grey.shade100, borderRadius: BorderRadius.circular(14)),
                               child: Row(children: [
-                                _roleTab(
-                                    context,
-                                    l10n.employee,
-                                    Icons.badge_outlined,
-                                    !isCitizen,
-                                    () => setState(() => isCitizen = false)),
-                                _roleTab(
-                                    context,
-                                    l10n.citizen,
-                                    Icons.person_outline,
-                                    isCitizen,
-                                    () => setState(() => isCitizen = true)),
+                                _roleTab(context, l10n.employee, Icons.badge_outlined, !isCitizen, () => setState(() => isCitizen = false)),
+                                _roleTab(context, l10n.citizen, Icons.person_outline, isCitizen, () => setState(() => isCitizen = true)),
                               ]),
                             ),
                             const SizedBox(height: 20),
@@ -146,13 +128,8 @@ class _LoginScreenState extends State<LoginScreen> {
                             TextFormField(
                               controller: _emailCtrl,
                               keyboardType: TextInputType.emailAddress,
-                              decoration:
-                                  InputDecoration(hintText: l10n.emailHint),
-                              validator: (v) {
-                                if (v == null || v.isEmpty)
-                                  return l10n.fieldRequired;
-                                return null;
-                              },
+                              decoration: InputDecoration(hintText: l10n.emailHint),
+                              validator: (v) => (v == null || v.isEmpty) ? l10n.fieldRequired : null,
                             ),
                             const SizedBox(height: 16),
                             Text(l10n.passwordLabel),
@@ -163,44 +140,25 @@ class _LoginScreenState extends State<LoginScreen> {
                               decoration: InputDecoration(
                                 hintText: l10n.passwordHint,
                                 suffixIcon: IconButton(
-                                  onPressed: () => setState(() =>
-                                      _obscurePassword = !_obscurePassword),
-                                  icon: Icon(_obscurePassword
-                                      ? Icons.lock_outline
-                                      : Icons.lock_open_outlined),
+                                  onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                                  icon: Icon(_obscurePassword ? Icons.lock_outline : Icons.lock_open_outlined),
                                 ),
                               ),
-                              validator: (v) {
-                                if (v == null || v.isEmpty)
-                                  return l10n.fieldRequired;
-                                return null;
-                              },
+                              validator: (v) => (v == null || v.isEmpty) ? l10n.fieldRequired : null,
                             ),
                             const SizedBox(height: 10),
                             Align(
                               alignment: Alignment.centerRight,
                               child: TextButton(
-                                // ✅ Login → ResetPasswordPage (email) → ForgotPasswordScreen (new password)
-                                onPressed: () => Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (_) => const ResetPasswordPage(),
-                                  ),
-                                ),
-                                child: Text(l10n.forgotPassword,
-                                    style: TextStyle(
-                                        color: colors.primary,
-                                        fontWeight: FontWeight.w600,
-                                        decoration: TextDecoration.underline)),
+                                onPressed: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ResetPasswordPage())),
+                                child: Text(l10n.forgotPassword, style: TextStyle(color: colors.primary, fontWeight: FontWeight.w600, decoration: TextDecoration.underline)),
                               ),
                             ),
                             const SizedBox(height: 10),
                             PrimaryButton(
                               label: l10n.loginButton,
                               isLoading: state.isLoading,
-                              onPressed: state.isLoading
-                                  ? () {}
-                                  : () => _onLoginPressed(context),
+                              onPressed: state.isLoading ? () {} : () => _onLoginPressed(context),
                             ),
                             const SizedBox(height: 20),
                             Row(
@@ -209,17 +167,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 Text(l10n.noAccount),
                                 const SizedBox(width: 4),
                                 GestureDetector(
-                                  onTap: () => Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (_) =>
-                                              const UserRegisterScreen())),
-                                  child: Text(l10n.registerNow,
-                                      style: TextStyle(
-                                          color: colors.primary,
-                                          fontWeight: FontWeight.bold,
-                                          decoration:
-                                              TextDecoration.underline)),
+                                  onTap: () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserRegisterScreen())),
+                                  child: Text(l10n.registerNow, style: TextStyle(color: colors.primary, fontWeight: FontWeight.bold, decoration: TextDecoration.underline)),
                                 ),
                               ],
                             ),
@@ -237,8 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _roleTab(BuildContext context, String label, IconData icon,
-      bool selected, VoidCallback onTap) {
+  Widget _roleTab(BuildContext context, String label, IconData icon, bool selected, VoidCallback onTap) {
     return Expanded(
       child: GestureDetector(
         onTap: onTap,
@@ -247,9 +195,7 @@ class _LoginScreenState extends State<LoginScreen> {
           margin: const EdgeInsets.all(4),
           padding: const EdgeInsets.symmetric(vertical: 12),
           decoration: BoxDecoration(
-            color: selected
-                ? Theme.of(context).primaryColor
-                : Colors.grey.shade200,
+            color: selected ? Theme.of(context).primaryColor : Colors.grey.shade200,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Row(
@@ -257,10 +203,7 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               Icon(icon, color: selected ? Colors.white : Colors.black87),
               const SizedBox(width: 6),
-              Text(label,
-                  style: TextStyle(
-                      color: selected ? Colors.white : Colors.black87,
-                      fontWeight: FontWeight.bold)),
+              Text(label, style: TextStyle(color: selected ? Colors.white : Colors.black87, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
