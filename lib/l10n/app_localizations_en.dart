@@ -442,4 +442,64 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get requestSubmitted => 'Request submitted successfully';
+
+  @override
+  String get authUsernameTaken => 'Username is already taken';
+
+  @override
+  String get authEmailAlreadyExists => 'This email is already registered';
+
+  @override
+  String get authPhoneAlreadyExists => 'This phone number is already registered';
+
+  @override
+  String get authUserNotFound => 'User not found';
+
+  @override
+  String get authWrongPassword => 'Incorrect password';
+
+  @override
+  String get authInvalidCredentials => 'Invalid login credentials';
+
+  @override
+  String get authAccountInactive => 'Account is inactive';
+
+  @override
+  String get httpValidationError => 'Some fields are invalid';
+
+  @override
+  String get httpConflict => 'Request conflict occurred';
+
+  @override
+  String get httpUnauthorized => 'You are not authorized';
+
+  @override
+  String get httpForbidden => 'You do not have permission';
+
+  @override
+  String get httpNotFound => 'Resource not found';
+
+  @override
+  String get httpServerError => 'Server error occurred';
+
+  @override
+  String get networkNoInternet => 'No internet connection';
+
+  @override
+  String get networkTimeout => 'Connection timed out';
+
+  @override
+  String get networkError => 'Network error occurred';
+
+  @override
+  String get authErrorGeneric => 'Something went wrong. Please try again';
+
+  @override
+  String get connection_offline => 'You are offline';
+
+  @override
+  String get connection_reconnecting => 'Reconnecting...';
+
+  @override
+  String get connection_issue => 'Connection issue';
 }

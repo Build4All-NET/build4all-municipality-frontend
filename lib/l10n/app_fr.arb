@@ -144,5 +144,31 @@
   "pdfOrImages": "Photos ou fichiers PDF",
   "filesSelected": "fichier(s) sélectionné(s)",
   "submitRequest": "Soumettre la demande",
-  "requestSubmitted": "Demande soumise avec succès"
+  "requestSubmitted": "Demande soumise avec succès",
+
+  "authUsernameTaken": "Nom d'utilisateur déjà utilisé",
+  "authEmailAlreadyExists": "Cet e-mail est déjà enregistré",
+  "authPhoneAlreadyExists": "Ce numéro de téléphone est déjà enregistré",
+
+  "authUserNotFound": "Utilisateur introuvable",
+  "authWrongPassword": "Mot de passe incorrect",
+  "authInvalidCredentials": "Identifiants invalides",
+  "authAccountInactive": "Le compte est inactif",
+
+  "httpValidationError": "Certaines données sont invalides",
+  "httpConflict": "Conflit dans la requête",
+  "httpUnauthorized": "Vous n'êtes pas autorisé",
+  "httpForbidden": "Vous n'avez pas la permission",
+  "httpNotFound": "Ressource introuvable",
+  "httpServerError": "Erreur du serveur",
+
+  "networkNoInternet": "Pas de connexion Internet",
+  "networkTimeout": "Délai de connexion dépassé",
+  "networkError": "Erreur réseau",
+
+  "authErrorGeneric": "Une erreur est survenue. Veuillez réessayer",
+
+  "connection_offline": "Vous êtes hors ligne",
+  "connection_reconnecting": "Reconnexion...",
+  "connection_issue": "Problème de connexion"
 }

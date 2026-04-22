@@ -188,40 +188,47 @@ ownerProjectLinkId: ${body?["ownerProjectLinkId"]}
                       const SizedBox(height: 20),
 
                       // OTP fields
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: List.generate(6, (index) {
-                          return SizedBox(
-                            width: 45,
-                            child: TextField(
-                              controller: _controllers[index],
-                              focusNode: _focusNodes[index],
-                              textAlign: TextAlign.center,
-                              keyboardType: TextInputType.number,
-                              maxLength: 1,
-                              onChanged: (value) {
-                                if (value.isNotEmpty && index < 5) {
-                                  _focusNodes[index + 1].requestFocus();
-                                } else if (value.isEmpty && index > 0) {
-                                  _focusNodes[index - 1].requestFocus();
-                                }
-                              },
-                              decoration: InputDecoration(
-                                counterText: "",
-                                enabledBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide: BorderSide(color: primary),
-                                ),
-                                focusedBorder: OutlineInputBorder(
-                                  borderRadius: BorderRadius.circular(10),
-                                  borderSide:
-                                      BorderSide(color: primary, width: 2),
-                                ),
-                              ),
-                            ),
-                          );
-                        }),
-                      ),
+                      Directionality(
+  textDirection: TextDirection.ltr,
+  child: Row(
+    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    children: List.generate(6, (index) {
+      return SizedBox(
+        width: 45,
+        child: TextField(
+          controller: _controllers[index],
+          focusNode: _focusNodes[index],
+
+          textDirection: TextDirection.ltr,
+          textAlign: TextAlign.center,
+
+          keyboardType: TextInputType.number,
+          maxLength: 1,
+
+          onChanged: (value) {
+            if (value.isNotEmpty && index < 5) {
+              _focusNodes[index + 1].requestFocus();
+            } else if (value.isEmpty && index > 0) {
+              _focusNodes[index - 1].requestFocus();
+            }
+          },
+
+          decoration: InputDecoration(
+            counterText: "",
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: primary),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(10),
+              borderSide: BorderSide(color: primary, width: 2),
+            ),
+          ),
+        ),
+      );
+    }),
+  ),
+),
                       const SizedBox(height: 25),
 
                       // VERIFY BUTTON
@@ -254,3 +261,5 @@ ownerProjectLinkId: ${body?["ownerProjectLinkId"]}
     );
   }
 }
+
+

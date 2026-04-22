@@ -966,6 +966,126 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Request submitted successfully'**
   String get requestSubmitted;
+
+  /// No description provided for @authUsernameTaken.
+  ///
+  /// In en, this message translates to:
+  /// **'Username is already taken'**
+  String get authUsernameTaken;
+
+  /// No description provided for @authEmailAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'This email is already registered'**
+  String get authEmailAlreadyExists;
+
+  /// No description provided for @authPhoneAlreadyExists.
+  ///
+  /// In en, this message translates to:
+  /// **'This phone number is already registered'**
+  String get authPhoneAlreadyExists;
+
+  /// No description provided for @authUserNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'User not found'**
+  String get authUserNotFound;
+
+  /// No description provided for @authWrongPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Incorrect password'**
+  String get authWrongPassword;
+
+  /// No description provided for @authInvalidCredentials.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid login credentials'**
+  String get authInvalidCredentials;
+
+  /// No description provided for @authAccountInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Account is inactive'**
+  String get authAccountInactive;
+
+  /// No description provided for @httpValidationError.
+  ///
+  /// In en, this message translates to:
+  /// **'Some fields are invalid'**
+  String get httpValidationError;
+
+  /// No description provided for @httpConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'Request conflict occurred'**
+  String get httpConflict;
+
+  /// No description provided for @httpUnauthorized.
+  ///
+  /// In en, this message translates to:
+  /// **'You are not authorized'**
+  String get httpUnauthorized;
+
+  /// No description provided for @httpForbidden.
+  ///
+  /// In en, this message translates to:
+  /// **'You do not have permission'**
+  String get httpForbidden;
+
+  /// No description provided for @httpNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Resource not found'**
+  String get httpNotFound;
+
+  /// No description provided for @httpServerError.
+  ///
+  /// In en, this message translates to:
+  /// **'Server error occurred'**
+  String get httpServerError;
+
+  /// No description provided for @networkNoInternet.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection'**
+  String get networkNoInternet;
+
+  /// No description provided for @networkTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection timed out'**
+  String get networkTimeout;
+
+  /// No description provided for @networkError.
+  ///
+  /// In en, this message translates to:
+  /// **'Network error occurred'**
+  String get networkError;
+
+  /// No description provided for @authErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again'**
+  String get authErrorGeneric;
+
+  /// No description provided for @connection_offline.
+  ///
+  /// In en, this message translates to:
+  /// **'You are offline'**
+  String get connection_offline;
+
+  /// No description provided for @connection_reconnecting.
+  ///
+  /// In en, this message translates to:
+  /// **'Reconnecting...'**
+  String get connection_reconnecting;
+
+  /// No description provided for @connection_issue.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection issue'**
+  String get connection_issue;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -28,4 +28,9 @@ class AuthTokenStore {
     final token = await getToken();
     return token != null && token.isNotEmpty;
   }
+
+ Future<String?> getRefreshToken() async {
+    final sp = await SharedPreferences.getInstance();
+    return sp.getString(_key);
+  }
 }

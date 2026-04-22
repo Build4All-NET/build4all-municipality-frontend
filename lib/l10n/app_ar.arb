@@ -144,5 +144,30 @@
   "pdfOrImages": "صور أو ملفات PDF",
   "filesSelected": "ملف محدد",
   "submitRequest": "تقديم الطلب",
-  "requestSubmitted": "تم تقديم الطلب بنجاح"
+  "requestSubmitted": "تم تقديم الطلب بنجاح",
+  "authUsernameTaken": "اسم المستخدم مستخدم بالفعل",
+  "authEmailAlreadyExists": "هذا البريد الإلكتروني مسجل بالفعل",
+  "authPhoneAlreadyExists": "رقم الهاتف مسجل بالفعل",
+
+  "authUserNotFound": "لم يتم العثور على المستخدم",
+  "authWrongPassword": "كلمة المرور غير صحيحة",
+  "authInvalidCredentials": "بيانات تسجيل الدخول غير صحيحة",
+  "authAccountInactive": "الحساب غير نشط",
+
+  "httpValidationError": "بعض البيانات غير صحيحة",
+  "httpConflict": "يوجد تعارض في الطلب",
+  "httpUnauthorized": "غير مصرح لك",
+  "httpForbidden": "ليس لديك صلاحية",
+  "httpNotFound": "العنصر غير موجود",
+  "httpServerError": "حدث خطأ في الخادم",
+
+  "networkNoInternet": "لا يوجد اتصال بالإنترنت",
+  "networkTimeout": "انتهت مهلة الاتصال",
+  "networkError": "حدث خطأ في الشبكة",
+
+  "authErrorGeneric": "حدث خطأ ما. الرجاء المحاولة مرة أخرى",
+  
+  "connection_offline": "أنت غير متصل بالإنترنت",
+  "connection_reconnecting": "إعادة الاتصال...",
+  "connection_issue": "مشكلة في الاتصال"
 }

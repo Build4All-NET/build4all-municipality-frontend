@@ -1,16 +1,30 @@
-// lib/core/exceptions/network_exception.dart
 import 'app_exception.dart';
 
 class NetworkException extends AppException {
-  const NetworkException(super.message, {super.code, super.original});
-
-  factory NetworkException.noConnection() =>
-      const NetworkException('No internet connection', code: 'NO_CONNECTION');
-
-  factory NetworkException.timeout() =>
-      const NetworkException('Connection timeout', code: 'TIMEOUT');
-
-  factory NetworkException.serverError() =>
-      const NetworkException('Server error. Please try later', code: 'SERVER_ERROR');
+  NetworkException(
+    String message, {
+    Object? original,
+  }) : super(
+          message,
+          code: 'NETWORK_ERROR',
+          original: original,
+        );
 }
-// to be dynamic
+
+class ServerException extends AppException {
+  final int statusCode;
+
+  ServerException(
+    String message, {
+    required this.statusCode,
+    Object? original,
+    String? code,
+  }) : super(
+          message,
+          code: code ?? 'SERVER_ERROR',
+          original: original,
+        );
+
+  @override
+  String toString() => 'ServerException($statusCode, $code): $message';
+}

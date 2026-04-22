@@ -5,16 +5,16 @@
 // ─────────────────────────────────────────
 
 import 'dart:convert';
+import 'package:baladiyati/core/exceptions/app_exception.dart';
+import 'package:baladiyati/core/exceptions/network_exception.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
-import '../exceptions/network_exception.dart';
-import '../exceptions/app_exception.dart';
 
 class ApiClient {
   // Web (Chrome):      http://localhost:8091
   // Android Emulator:  http://10.0.2.2:8091
   // Real Phone (WiFi): http://192.168.0.101:8091
-  static const String baseUrl = 'http://localhost:8092';
+  static const String baseUrl = 'http://localhost:8091';
   
   static const String _tokenKey = 'auth_token';
 
@@ -114,8 +114,10 @@ class ApiClient {
       throw AppException(trimmed.isNotEmpty ? trimmed : 'Error ${response.statusCode}');
     } catch (e) {
       if (e is AppException) rethrow;
-      throw NetworkException.serverError();
-    }
+throw ServerException(
+  'Server error. Please try later',
+  statusCode: response.statusCode,
+);    }
   }
 
   // ─────────────────────────────────────────

@@ -442,4 +442,64 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get requestSubmitted => 'تم تقديم الطلب بنجاح';
+
+  @override
+  String get authUsernameTaken => 'اسم المستخدم مستخدم بالفعل';
+
+  @override
+  String get authEmailAlreadyExists => 'هذا البريد الإلكتروني مسجل بالفعل';
+
+  @override
+  String get authPhoneAlreadyExists => 'رقم الهاتف مسجل بالفعل';
+
+  @override
+  String get authUserNotFound => 'لم يتم العثور على المستخدم';
+
+  @override
+  String get authWrongPassword => 'كلمة المرور غير صحيحة';
+
+  @override
+  String get authInvalidCredentials => 'بيانات تسجيل الدخول غير صحيحة';
+
+  @override
+  String get authAccountInactive => 'الحساب غير نشط';
+
+  @override
+  String get httpValidationError => 'بعض البيانات غير صحيحة';
+
+  @override
+  String get httpConflict => 'يوجد تعارض في الطلب';
+
+  @override
+  String get httpUnauthorized => 'غير مصرح لك';
+
+  @override
+  String get httpForbidden => 'ليس لديك صلاحية';
+
+  @override
+  String get httpNotFound => 'العنصر غير موجود';
+
+  @override
+  String get httpServerError => 'حدث خطأ في الخادم';
+
+  @override
+  String get networkNoInternet => 'لا يوجد اتصال بالإنترنت';
+
+  @override
+  String get networkTimeout => 'انتهت مهلة الاتصال';
+
+  @override
+  String get networkError => 'حدث خطأ في الشبكة';
+
+  @override
+  String get authErrorGeneric => 'حدث خطأ ما. الرجاء المحاولة مرة أخرى';
+
+  @override
+  String get connection_offline => 'أنت غير متصل بالإنترنت';
+
+  @override
+  String get connection_reconnecting => 'إعادة الاتصال...';
+
+  @override
+  String get connection_issue => 'مشكلة في الاتصال';
 }

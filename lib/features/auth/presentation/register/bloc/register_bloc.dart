@@ -31,7 +31,7 @@ class RegisterBloc extends Bloc<RegisterEvent, RegisterState> {
       final Either<AuthFailure, void> result = await sendVerificationCode(
         email: event.email.trim(),
         password: event.password,
-        ownerProjectLinkId: 0, // عدل حسب Env أو id المشروع
+        ownerProjectLinkId: 2, // عدل حسب Env أو id المشروع
       );
 
       result.fold(

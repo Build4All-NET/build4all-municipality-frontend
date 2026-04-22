@@ -442,4 +442,64 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get requestSubmitted => 'Demande soumise avec succès';
+
+  @override
+  String get authUsernameTaken => 'Nom d\'utilisateur déjà utilisé';
+
+  @override
+  String get authEmailAlreadyExists => 'Cet e-mail est déjà enregistré';
+
+  @override
+  String get authPhoneAlreadyExists => 'Ce numéro de téléphone est déjà enregistré';
+
+  @override
+  String get authUserNotFound => 'Utilisateur introuvable';
+
+  @override
+  String get authWrongPassword => 'Mot de passe incorrect';
+
+  @override
+  String get authInvalidCredentials => 'Identifiants invalides';
+
+  @override
+  String get authAccountInactive => 'Le compte est inactif';
+
+  @override
+  String get httpValidationError => 'Certaines données sont invalides';
+
+  @override
+  String get httpConflict => 'Conflit dans la requête';
+
+  @override
+  String get httpUnauthorized => 'Vous n\'êtes pas autorisé';
+
+  @override
+  String get httpForbidden => 'Vous n\'avez pas la permission';
+
+  @override
+  String get httpNotFound => 'Ressource introuvable';
+
+  @override
+  String get httpServerError => 'Erreur du serveur';
+
+  @override
+  String get networkNoInternet => 'Pas de connexion Internet';
+
+  @override
+  String get networkTimeout => 'Délai de connexion dépassé';
+
+  @override
+  String get networkError => 'Erreur réseau';
+
+  @override
+  String get authErrorGeneric => 'Une erreur est survenue. Veuillez réessayer';
+
+  @override
+  String get connection_offline => 'Vous êtes hors ligne';
+
+  @override
+  String get connection_reconnecting => 'Reconnexion...';
+
+  @override
+  String get connection_issue => 'Problème de connexion';
 }

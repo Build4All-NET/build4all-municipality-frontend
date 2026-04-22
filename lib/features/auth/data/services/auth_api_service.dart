@@ -1,5 +1,9 @@
 // lib/features/auth/data/services/auth_api_service.dart
 
+import 'package:baladiyati/core/exceptions/app_exception.dart';
+import 'package:baladiyati/core/exceptions/auth_exception.dart';
+import 'package:baladiyati/core/exceptions/network_exception.dart';
+
 import '../../../../core/network/api_client.dart';
 import '../models/auth_response_model.dart';
 import 'auth_token_store.dart';
@@ -12,7 +16,7 @@ class AuthApiService {
 
   // ✅ build4all base URL
   static const String _build4allBaseUrl =
-      'https://static-sneeze-unfrozen.ngrok-free.dev';
+      'https://unlivable-unison-password.ngrok-free.dev ';
 
   AuthApiService({
     ApiClient? client,
@@ -21,9 +25,6 @@ class AuthApiService {
   })  : _client = client ?? ApiClient(),
         _tokenStore = tokenStore ?? AuthTokenStore(),
         _roleStore = roleStore ?? SessionRoleStore();
-
-
-
 
 
 
@@ -40,24 +41,38 @@ class AuthApiService {
     required String role,
     required int municipalityId,
   }) async {
-    final data = await _client.post(
-      '/auth/users/register',
-      body: {
-        'email': email,
-        'passwordHash': password,
-        'fullName': fullName,
-        'phone': phone,
-        'role': role,
-        'municipality': {'id': municipalityId},
-      },
-    );
-    final response = AuthResponseModel.fromJson(data);
-    if (response.token.isNotEmpty) {
-      await _tokenStore.saveToken(response.token);
-      await _client.saveToken(response.token);
+    try {
+      final data = await _client.post(
+        '/auth/users/register',
+        body: {
+          'email': email,
+          'passwordHash': password,
+          'fullName': fullName,
+          'phone': phone,
+          'role': role,
+          'municipality': {'id': municipalityId},
+        },
+      );
+
+      final response = AuthResponseModel.fromJson(data);
+
+      if (response.token.isNotEmpty) {
+        await _tokenStore.saveToken(response.token);
+        await _client.saveToken(response.token);
+      }
+
+      return response;
+    } on AuthException {
+      rethrow;
+    } on NetworkException {
+      rethrow;
+    } on AppException {
+      rethrow;
+    } catch (e) {
+      throw AppException('Failed to register user', original: e);
     }
-    return response;
   }
+  
 
   // ============================================================
   // BALADIYATI — Login
@@ -67,21 +82,33 @@ class AuthApiService {
     required String email,
     required String password,
   }) async {
-    final data = await _client.post(
-      '/auth/users/login',
-      body: {
-        'email': email,
-        'passwordHash': password,
-      },
-    );
-    final response = AuthResponseModel.fromJson(data);
-    if (response.token.isNotEmpty) {
-      await _tokenStore.saveToken(response.token);
-      await _client.saveToken(response.token);
-    }
-    return response;
-  }
+    try {
+      final data = await _client.post(
+        '/auth/users/login',
+        body: {
+          'email': email,
+          'passwordHash': password,
+        },
+      );
 
+      final response = AuthResponseModel.fromJson(data);
+
+      if (response.token.isNotEmpty) {
+        await _tokenStore.saveToken(response.token);
+        await _client.saveToken(response.token);
+      }
+
+      return response;
+    } on AuthException {
+      rethrow;
+    } on NetworkException {
+      rethrow;
+    } on AppException {
+      rethrow;
+    } catch (e) {
+      throw AppException('Failed to login user', original: e);
+    }
+  }
   // ============================================================
   // BALADIYATI — Logout
   // POST /auth/logout
@@ -102,32 +129,49 @@ class AuthApiService {
   // BALADIYATI — Forgot password
   // POST /auth/forgot-password
   // ============================================================
-  Future<String> forgetPassword({required String email}) async {
-    final response = await _client.post(
-      '/auth/forgot-password',
-      body: {'email': email},
-    );
-    return response.toString();
+    Future<String> forgetPassword({
+    required String email,
+  }) async {
+    try {
+      final response = await _client.post(
+        '/auth/forgot-password',
+        body: {'email': email},
+      );
+
+      return response.toString();
+    } on AppException {
+      rethrow;
+    } catch (e) {
+      throw AppException('Failed to request password reset', original: e);
+    }
   }
+
 
   // ============================================================
   // BALADIYATI — Reset password
   // POST /auth/reset-password
   // ============================================================
-  Future<String> resetPassword({
+   Future<String> resetPassword({
     required String email,
     required String newPassword,
     required String confirmPassword,
   }) async {
-    final response = await _client.post(
-      '/auth/reset-password',
-      body: {
-        'email': email,
-        'newPassword': newPassword,
-        'confirmPassword': confirmPassword,
-      },
-    );
-    return response.toString();
+    try {
+      final response = await _client.post(
+        '/auth/reset-password',
+        body: {
+          'email': email,
+          'newPassword': newPassword,
+          'confirmPassword': confirmPassword,
+        },
+      );
+
+      return response.toString();
+    } on AppException {
+      rethrow;
+    } catch (e) {
+      throw AppException('Failed to reset password', original: e);
+    }
   }
 
   // ============================================================
@@ -135,65 +179,75 @@ class AuthApiService {
   // POST /auth/complete-profile
   // ============================================================
 
- Future<AuthResponseModel> completeProfileNew({
-  required String email,
-  required String password,
-  required String fullName,
-  required String phone,
-  required String role,
-  required int municipalityId,
-  required String address,
-  required String username,
-}) async {
+  Future<AuthResponseModel> completeProfileNew({
+    required String email,
+    required String password,
+    required String fullName,
+    required String phone,
+    required String role,
+    required int municipalityId,
+    required String address,
+    required String username,
+  }) async {
+    try {
+      final data = await _client.post(
+        '/api/auth/complete-profile',
+        body: {
+          'email': email,
+          'passwordHash': password,
+          'fullName': fullName,
+          'phone': phone,
+          'role': role,
+          'municipality': {'id': municipalityId},
+          'address': address,
+          'username': username,
+        },
+      );
 
-  final data = await _client.post(
-    '/api/auth/complete-profile',
-    body: {
-      'email': email,
-      'passwordHash': password,
-      'fullName': fullName,
-      'phone': phone,
-      'role': role,
-      'municipality': {
-        'id': municipalityId,
-      },
-      'address': address,
-      'username': username,
-    },
-  );
+      final response = AuthResponseModel.fromJson(data);
 
-  final response = AuthResponseModel.fromJson(data);
+      if (response.token.isNotEmpty) {
+        await _tokenStore.saveToken(response.token);
+        await _client.saveToken(response.token);
+      }
 
-  if (response.token.isNotEmpty) {
-    await _tokenStore.saveToken(response.token);
-    await _client.saveToken(response.token);
+      return response;
+    } on AppException {
+      rethrow;
+    } catch (e) {
+      throw AppException('Failed to complete profile', original: e);
+    }
   }
 
-  return response;
-}
-
-
-  Future<String> completeProfile({
+    Future<String> completeProfile({
     required String address,
     required String username,
     required int municipalityId,
   }) async {
-    final token = await _tokenStore.getToken();
-    if (token != null && token.isNotEmpty) {
-      await _client.saveToken(token);
-    }
-    final response = await _client.post(
-      '/auth/complete-profile',
-      body: {
-        'address': address,
-        'username': username,
-        'municipality': {'id': municipalityId},
-      },
-      requiresAuth: true,
-    );
-    return response['message'] ?? 'Success';
+    try {
+      final token = await _tokenStore.getToken();
+
+      if (token != null && token.isNotEmpty) {
+        await _client.saveToken(token);
+      }
+
+      final response = await _client.post(
+        '/auth/complete-profile',
+        body: {
+          'address': address,
+          'username': username,
+          'municipality': {'id': municipalityId},
+        },
+        requiresAuth: true,
+      );
+
+      return response['message'] ?? 'Success';
+    } on AppException {
+      rethrow;
+     } //catch (e) {
+    //   throw AppException('Failed to complete profile', original: e);
+    // }
   }
-     
   // ============================================================
   // TOKEN HELPERS
   // ============================================================
