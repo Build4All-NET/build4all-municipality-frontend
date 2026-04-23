@@ -3,6 +3,7 @@
 import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/core/exceptions/auth_exception.dart';
 import 'package:baladiyati/core/exceptions/network_exception.dart';
+import 'package:dio/dio.dart';
 
 import '../../../../core/network/api_client.dart';
 import '../models/auth_response_model.dart';
@@ -15,7 +16,7 @@ class AuthApiService {
   final SessionRoleStore _roleStore;
 
   // ✅ build4all base URL
-  static const String _build4allBaseUrl =
+  static const String _MunicipalityBaseUrl =
       'https://unlivable-unison-password.ngrok-free.dev ';
 
   AuthApiService({
@@ -25,6 +26,7 @@ class AuthApiService {
   })  : _client = client ?? ApiClient(),
         _tokenStore = tokenStore ?? AuthTokenStore(),
         _roleStore = roleStore ?? SessionRoleStore();
+        
 
 
 

@@ -59,32 +59,35 @@ class AuthApi {
   // REGISTER
   // ==========================================================
   Future<Response<dynamic>> register({
-    required String email,
-    required String password,
-    required String fullName,
-    required String phone,
-    required String role,
-    required int municipalityId,
-  }) async {
-    try {
-      return await _dio.post(
-        '/auth/users/register',
-        data: {
-          'email': email,
-          'passwordHash': password,
-          'fullName': fullName,
-          'phone': phone,
-          'role': role,
-          'municipality': {'id': municipalityId},
-        },
-      );
-    } on DioException catch (e) {
-      throw _handleError(e);
-    } catch (e) {
-      throw AppException('Registration failed', original: e);
-    }
+  required String email,
+  required String password,
+  required String fullName,
+  required String phone,
+  required String role,
+  required int municipalityId,
+  required int ownerProjectLinkId,
+  required int build4allId, 
+}) async {
+  try {
+    return await _dio.post(
+      '/auth/users/register',
+      data: {
+        'email': email,
+        'passwordHash': password,
+        'fullName': fullName,
+        'phone': phone,
+        'role': role,
+        'ownerProjectLinkId': ownerProjectLinkId,
+        'BuildForAllId': build4allId, // ✅ THIS is Build4All ID
+        'municipality': {'id': municipalityId},
+      },
+    );
+  } on DioException catch (e) {
+    throw _handleError(e);
+  } catch (e) {
+    throw AppException('Registration failed', original: e);
   }
-
+}
   // ==========================================================
   // OTP
   // ==========================================================
