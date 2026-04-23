@@ -97,7 +97,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     try {
       final body = await _getFromPrefs();
 
-    print("""
+      print("""
 pendingId: ${body?["userId"]}
 firstName: ${body?["fullName"]}
 lastName: ${body?["lastname"]}
@@ -123,6 +123,7 @@ ownerProjectLinkId: ${body?["ownerProjectLinkId"]}
         ownerProjectLinkId: body["ownerProjectLinkId"].toString(),
       );
 
+     
       // ✅ ONLY AFTER SUCCESS
       if (!context.mounted) return;
 

@@ -1,3 +1,4 @@
+import 'package:baladiyati/core/config/env.dart';
 import 'package:dio/dio.dart';
 import 'api_config.dart';
 
@@ -11,7 +12,7 @@ class DioClient {
     // ✅ MUNICIPALITY API
     municipalityDio = Dio(
       BaseOptions(
-        baseUrl: "${config.municipalityBaseUrl}/api", // ✅ add /api
+        baseUrl: "${Env.overrideBaseUrl}/api", // ✅ add /api
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 10),
         headers: {
@@ -23,7 +24,7 @@ class DioClient {
     // ✅ BUILD4ALL AUTH API
     build4allDio = Dio(
       BaseOptions(
-        baseUrl: "${config.build4allBaseUrl}/api", // ✅ add /api
+        baseUrl: "${Env.apiBaseUrl}/api", // ✅ add /api
         connectTimeout: const Duration(seconds: 10),
         receiveTimeout: const Duration(seconds: 10),
         headers: {
