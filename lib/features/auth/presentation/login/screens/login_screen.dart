@@ -11,7 +11,7 @@ import 'package:baladiyati/features/auth/data/services/api_auth_build4all_servic
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
-import 'package:baladiyati/features/auth/presentation/login/screens/reset_password_page.dart';
+import 'package:baladiyati/features/forgotpassword/presentation/screens/reset_password_page.dart';
 import 'package:baladiyati/features/auth/presentation/register/screens/user_register_screen.dart';
 import 'package:baladiyati/features/citizen/home/presentation/screens/home_screen.dart';
 import 'package:http/http.dart';
@@ -56,16 +56,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
     return jsonDecode(data) as Map<String, dynamic>;
   }
-  Future<void> printAllPrefs() async {
-  final prefs = await SharedPreferences.getInstance();
 
-  final keys = prefs.getKeys();
-
-  for (final key in keys) {
-    final value = prefs.get(key);
-    print('$key : $value');
-  }
-}
 
   Future<void> _onLoginPressed(BuildContext context) async {
   if (!_formKey.currentState!.validate()) return;

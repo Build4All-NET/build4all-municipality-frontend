@@ -17,7 +17,7 @@ class AuthApiService {
 
   // ✅ build4all base URL
   static const String _MunicipalityBaseUrl =
-      'https://unlivable-unison-password.ngrok-free.dev ';
+      'https://unlivable-unison-password.ngrok-free.dev';
 
   AuthApiService({
     ApiClient? client,
@@ -131,22 +131,22 @@ class AuthApiService {
   // BALADIYATI — Forgot password
   // POST /auth/forgot-password
   // ============================================================
-    Future<String> forgetPassword({
-    required String email,
-  }) async {
-    try {
-      final response = await _client.post(
-        '/auth/forgot-password',
-        body: {'email': email},
-      );
+  //   Future<String> forgetPassword({
+  //   required String email,
+  // }) async {
+  //   try {
+  //     final response = await _client.post(
+  //       '/auth/forgot-password',
+  //       body: {'email': email},
+  //     );
 
-      return response.toString();
-    } on AppException {
-      rethrow;
-    } catch (e) {
-      throw AppException('Failed to request password reset', original: e);
-    }
-  }
+  //     return response.toString();
+  //   } on AppException {
+  //     rethrow;
+  //   } catch (e) {
+  //     throw AppException('Failed to request password reset', original: e);
+  //   }
+  // }
 
 
   // ============================================================

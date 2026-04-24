@@ -9,9 +9,9 @@ import '../features/auth/presentation/register/screens/user_register_screen.dart
 import '../features/auth/presentation/register/screens/user_verify_code_screen.dart';
 import '../features/auth/presentation/complete_profile/screens/complete_profile_screen.dart';
 import '../features/auth/data/services/auth_api_service.dart';
-import '../features/auth/presentation/login/screens/reset_password_page.dart';
-import '../features/auth/presentation/login/screens/verify_reset_code_screen.dart';
-import '../features/auth/presentation/login/screens/forgot_password_screen.dart';
+import '../features/forgotpassword/presentation/screens/reset_password_page.dart';
+import '../features/forgotpassword/presentation/screens/verify_reset_code_screen.dart';
+import '../features/forgotpassword/presentation/screens/forgot_password_screen.dart';
 // ✅ FIXED: Import correct HomeScreen (with BottomNav)
 import '../features/citizen/home/presentation/screens/home_screen.dart';
 
