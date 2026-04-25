@@ -30,7 +30,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get citizen => 'مواطن';
 
   @override
-  String get employee => 'موظف';
+  String get employee => 'الموظف';
 
   @override
   String get emailLabel => 'البريد الإلكتروني';
@@ -243,10 +243,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get completed => 'مكتملة';
 
   @override
-  String get quickActions => 'الإجراءات السريعة';
+  String get quickActions => 'إجراءات سريعة';
 
   @override
-  String get newRequest => 'طلب جديد';
+  String get newRequest => 'تم استلام طلب جديد';
 
   @override
   String get serviceCategories => 'فئات الخدمات';
@@ -393,7 +393,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get requiresInspection => 'يتطلب كشف';
 
   @override
-  String get days => 'يوم';
+  String get days => 'أيام';
 
   @override
   String get free => 'مجاني';
@@ -502,4 +502,52 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get connection_issue => 'مشكلة في الاتصال';
+
+  @override
+  String get dashboard => 'لوحة التحكم';
+
+  @override
+  String get inProgress => 'قيد المعالجة';
+
+  @override
+  String get newRequests => 'طلبات جديدة';
+
+  @override
+  String get needReview => 'تحتاج مراجعة';
+
+  @override
+  String get completedToday => 'تم إنجازه اليوم';
+
+  @override
+  String get services => 'الخدمات';
+
+  @override
+  String get inbox => 'الوارد';
+
+  @override
+  String get announcements => 'الإعلانات';
+
+  @override
+  String get employees => 'الموظفون';
+
+  @override
+  String get recentActivity => 'النشاط الأخير';
+
+  @override
+  String get approvedRequest => 'تمت الموافقة على الطلب';
+
+  @override
+  String get missingDocs => 'مستندات ناقصة';
+
+  @override
+  String get monthPerformance => 'الأداء الشهري';
+
+  @override
+  String get completedRequests => 'الطلبات المنجزة';
+
+  @override
+  String get avgTime => 'متوسط الوقت';
+
+  @override
+  String get satisfaction => 'نسبة الرضا';
 }

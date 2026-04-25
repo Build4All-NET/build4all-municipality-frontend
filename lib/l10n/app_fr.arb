@@ -170,5 +170,31 @@
 
   "connection_offline": "Vous êtes hors ligne",
   "connection_reconnecting": "Reconnexion...",
-  "connection_issue": "Problème de connexion"
+  "connection_issue": "Problème de connexion",
+
+  "dashboard": "Tableau de bord",
+  "employee": "Employé",
+
+  "inProgress": "En cours",
+  "newRequests": "Nouvelles demandes",
+  "needReview": "À vérifier",
+  "completedToday": "Complétées aujourd’hui",
+
+  "quickActions": "Actions rapides",
+  "services": "Services",
+  "inbox": "Boîte de réception",
+  "announcements": "Annonces",
+  "employees": "Employés",
+
+  "recentActivity": "Activité récente",
+  "approvedRequest": "Demande approuvée",
+  "newRequest": "Nouvelle demande reçue",
+  "missingDocs": "Documents manquants",
+
+  "monthPerformance": "Performance mensuelle",
+  "completedRequests": "Demandes complétées",
+  "avgTime": "Temps moyen",
+  "satisfaction": "Satisfaction",
+  "days": "jours"
+
 }

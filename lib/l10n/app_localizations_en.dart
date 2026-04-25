@@ -246,7 +246,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get quickActions => 'Quick Actions';
 
   @override
-  String get newRequest => 'New Request';
+  String get newRequest => 'New request received';
 
   @override
   String get serviceCategories => 'Service Categories';
@@ -502,4 +502,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get connection_issue => 'Connection issue';
+
+  @override
+  String get dashboard => 'Dashboard';
+
+  @override
+  String get inProgress => 'In Progress';
+
+  @override
+  String get newRequests => 'New Requests';
+
+  @override
+  String get needReview => 'Need Review';
+
+  @override
+  String get completedToday => 'Completed Today';
+
+  @override
+  String get services => 'Services';
+
+  @override
+  String get inbox => 'Inbox';
+
+  @override
+  String get announcements => 'Announcements';
+
+  @override
+  String get employees => 'Employees';
+
+  @override
+  String get recentActivity => 'Recent Activity';
+
+  @override
+  String get approvedRequest => 'Approved request';
+
+  @override
+  String get missingDocs => 'Missing documents';
+
+  @override
+  String get monthPerformance => 'Monthly Performance';
+
+  @override
+  String get completedRequests => 'Completed Requests';
+
+  @override
+  String get avgTime => 'Average Time';
+
+  @override
+  String get satisfaction => 'Satisfaction';
 }

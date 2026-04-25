@@ -24,7 +24,7 @@ class ApiConfig {
   String.fromEnvironment('MUNI_API', defaultValue: 'http://10.0.2.2:8080');
 
   static const _defaultBuild4all =
-  String.fromEnvironment('BUILD4ALL_API', defaultValue: 'https://unlivable-unison-password.ngrok-free.dev ');
+  String.fromEnvironment('BUILD4ALL_API', defaultValue: ' https://perjury-threefold-unshipped.ngrok-free.dev');
 
   static Future<ApiConfig> load() async {
     String? muniFromPrefs;

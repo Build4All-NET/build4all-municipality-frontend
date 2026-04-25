@@ -105,7 +105,7 @@ class AppRouter {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (_) => ForgotPasswordScreen(email: email, code: code),
+        builder: (_) => ForgotPasswordScreen(email: email , code: code),
       ),
     );
   }

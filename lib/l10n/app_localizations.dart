@@ -574,7 +574,7 @@ abstract class AppLocalizations {
   /// No description provided for @newRequest.
   ///
   /// In en, this message translates to:
-  /// **'New Request'**
+  /// **'New request received'**
   String get newRequest;
 
   /// No description provided for @serviceCategories.
@@ -1086,6 +1086,102 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Connection issue'**
   String get connection_issue;
+
+  /// No description provided for @dashboard.
+  ///
+  /// In en, this message translates to:
+  /// **'Dashboard'**
+  String get dashboard;
+
+  /// No description provided for @inProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In Progress'**
+  String get inProgress;
+
+  /// No description provided for @newRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'New Requests'**
+  String get newRequests;
+
+  /// No description provided for @needReview.
+  ///
+  /// In en, this message translates to:
+  /// **'Need Review'**
+  String get needReview;
+
+  /// No description provided for @completedToday.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed Today'**
+  String get completedToday;
+
+  /// No description provided for @services.
+  ///
+  /// In en, this message translates to:
+  /// **'Services'**
+  String get services;
+
+  /// No description provided for @inbox.
+  ///
+  /// In en, this message translates to:
+  /// **'Inbox'**
+  String get inbox;
+
+  /// No description provided for @announcements.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcements'**
+  String get announcements;
+
+  /// No description provided for @employees.
+  ///
+  /// In en, this message translates to:
+  /// **'Employees'**
+  String get employees;
+
+  /// No description provided for @recentActivity.
+  ///
+  /// In en, this message translates to:
+  /// **'Recent Activity'**
+  String get recentActivity;
+
+  /// No description provided for @approvedRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved request'**
+  String get approvedRequest;
+
+  /// No description provided for @missingDocs.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing documents'**
+  String get missingDocs;
+
+  /// No description provided for @monthPerformance.
+  ///
+  /// In en, this message translates to:
+  /// **'Monthly Performance'**
+  String get monthPerformance;
+
+  /// No description provided for @completedRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed Requests'**
+  String get completedRequests;
+
+  /// No description provided for @avgTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Average Time'**
+  String get avgTime;
+
+  /// No description provided for @satisfaction.
+  ///
+  /// In en, this message translates to:
+  /// **'Satisfaction'**
+  String get satisfaction;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
