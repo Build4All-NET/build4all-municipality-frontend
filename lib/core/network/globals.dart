@@ -2,8 +2,9 @@
 library globals;
 
 import 'dart:convert';
+import 'package:baladiyati/core/config/env.dart';
 import 'package:baladiyati/core/network/connecting(wifiORserver)/connection_cubit.dart';
-import 'package:baladiyati/core/network/globals.dart' as Env;
+
 import 'package:baladiyati/core/network/interceptors/auth_body_injector.dart';
 import 'package:baladiyati/core/network/interceptors/refresh_token_interceptor.dart';
 import 'package:dio/dio.dart';

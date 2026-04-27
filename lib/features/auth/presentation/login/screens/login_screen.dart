@@ -36,9 +36,8 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _obscurePassword = true;
   bool isCitizen = true;
   static int ownerProjectLinkId = int.parse(Env.ownerProjectLinkId);
-  final _authapi = AuthApi(DioClient.build);
-  final _muniapi = AuthApi(DioClient.municipalityDio);
-  final _muni = AuthApi(DioClient.municipalityDio);
+ final _authApi = AuthApi(DioClient.build);
+final _municipalityAuthApi = AuthApi(DioClient.muni);
 
   @override
   void dispose() {
@@ -68,7 +67,7 @@ class _LoginScreenState extends State<LoginScreen> {
     // ================================
     // 1. LOGIN
     // ================================
-    final response = await _authapi.ownerLogin(
+    final response = await _authApi.ownerLogin(
       email: email,
       password: password,
       ownerProjectLinkId: ownerProjectLinkId,
@@ -111,7 +110,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       if (prefsData != null) {
         try {
-          await _muniapi.register(
+          await _municipalityAuthApi.register(
             email: email,
             password: password,
             fullName: prefsData['fullName'],

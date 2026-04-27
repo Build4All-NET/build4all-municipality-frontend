@@ -3,8 +3,11 @@ class Env {
     'API_BASE_URL',
     defaultValue: 'https://unlivable-unison-password.ngrok-free.dev',
   );
-  static const String overrideBaseUrl =
-    String.fromEnvironment('OVERRIDE_BASE_URL', defaultValue: '');
+ static const String overrideBaseUrl = String.fromEnvironment(
+  'OVERRIDE_BASE_URL',
+  defaultValue: 'http://10.0.2.2:8081',
+);
+
   static const wsPath = String.fromEnvironment(
     'WS_PATH',
     defaultValue: '/api/ws',
@@ -53,10 +56,10 @@ class Env {
     'ENABLED_FEATURES_JSON',
     defaultValue: '[]',
   );
-  static const appType = String.fromEnvironment(
-    'APP_TYPE',
-    defaultValue: 'ACTIVITIES',
-  );
+ static const appType = String.fromEnvironment(
+  'APP_TYPE',
+  defaultValue: 'MUNICIPALITY',
+);
   static const themeId = String.fromEnvironment('THEME_ID', defaultValue: '0');
   static const themeJsonB64 = String.fromEnvironment(
     'THEME_JSON_B64',

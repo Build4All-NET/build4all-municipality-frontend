@@ -2,37 +2,49 @@
 
 import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/core/exceptions/auth_exception.dart';
-import 'package:baladiyati/core/exceptions/network_exception.dart';
+import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:dio/dio.dart';
 
-import '../../../../core/network/api_client.dart';
 import '../models/auth_response_model.dart';
 import 'auth_token_store.dart';
 import 'session_role_store.dart';
 
 class AuthApiService {
-  final ApiClient _client;
   final AuthTokenStore _tokenStore;
   final SessionRoleStore _roleStore;
 
-  // ✅ build4all base URL
-  static const String _MunicipalityBaseUrl =
-      'https://unlivable-unison-password.ngrok-free.dev';
-
   AuthApiService({
-    ApiClient? client,
     AuthTokenStore? tokenStore,
     SessionRoleStore? roleStore,
-  })  : _client = client ?? ApiClient(),
-        _tokenStore = tokenStore ?? AuthTokenStore(),
+  })  : _tokenStore = tokenStore ?? AuthTokenStore(),
         _roleStore = roleStore ?? SessionRoleStore();
-        
 
+  Exception _handleDioError(
+    DioException e, {
+    String fallback = 'Request failed',
+  }) {
+    final data = e.response?.data;
 
+    String message = fallback;
+    String? code;
 
+    if (data is Map<String, dynamic>) {
+      message = (data['error'] ?? data['message'] ?? fallback).toString();
+      code = data['code']?.toString();
+    } else if (data is Map) {
+      message = (data['error'] ?? data['message'] ?? fallback).toString();
+      code = data['code']?.toString();
+    }
+
+    if (code != null && code.isNotEmpty) {
+      return AuthException(message, code: code, original: e);
+    }
+
+    return AppException(message, original: e);
+  }
 
   // ============================================================
-  // BALADIYATI — Register
+  // REGISTER — Build4All Core
   // POST /auth/users/register
   // ============================================================
   Future<AuthResponseModel> register({
@@ -42,31 +54,38 @@ class AuthApiService {
     required String phone,
     required String role,
     required int municipalityId,
+    int? ownerProjectLinkId,
+    int? ownerProjectId,
   }) async {
     try {
-      final data = await _client.post(
+      final response = await DioClient.build.post(
         '/auth/users/register',
-        body: {
-          'email': email,
+        data: {
+          'email': email.trim(),
           'passwordHash': password,
-          'fullName': fullName,
-          'phone': phone,
+          'fullName': fullName.trim(),
+          'phone': phone.trim(),
           'role': role,
+          if (ownerProjectLinkId != null)
+            'ownerProjectLinkId': ownerProjectLinkId,
+          if (ownerProjectId != null) 'ownerProjectId': ownerProjectId,
           'municipality': {'id': municipalityId},
         },
       );
 
-      final response = AuthResponseModel.fromJson(data);
+      final authResponse = AuthResponseModel.fromJson(
+        Map<String, dynamic>.from(response.data as Map),
+      );
 
-      if (response.token.isNotEmpty) {
-        await _tokenStore.saveToken(response.token);
-        await _client.saveToken(response.token);
+      if (authResponse.token.isNotEmpty) {
+        await _tokenStore.saveToken(authResponse.token);
+        DioClient.setAuthToken(authResponse.token);
       }
 
-      return response;
+      return authResponse;
+    } on DioException catch (e) {
+      throw _handleDioError(e, fallback: 'Failed to register user');
     } on AuthException {
-      rethrow;
-    } on NetworkException {
       rethrow;
     } on AppException {
       rethrow;
@@ -74,10 +93,9 @@ class AuthApiService {
       throw AppException('Failed to register user', original: e);
     }
   }
-  
 
   // ============================================================
-  // BALADIYATI — Login
+  // LOGIN — Build4All Core
   // POST /auth/users/login
   // ============================================================
   Future<AuthResponseModel> login({
@@ -85,25 +103,27 @@ class AuthApiService {
     required String password,
   }) async {
     try {
-      final data = await _client.post(
+      final response = await DioClient.build.post(
         '/auth/users/login',
-        body: {
-          'email': email,
+        data: {
+          'email': email.trim(),
           'passwordHash': password,
         },
       );
 
-      final response = AuthResponseModel.fromJson(data);
+      final authResponse = AuthResponseModel.fromJson(
+        Map<String, dynamic>.from(response.data as Map),
+      );
 
-      if (response.token.isNotEmpty) {
-        await _tokenStore.saveToken(response.token);
-        await _client.saveToken(response.token);
+      if (authResponse.token.isNotEmpty) {
+        await _tokenStore.saveToken(authResponse.token);
+        DioClient.setAuthToken(authResponse.token);
       }
 
-      return response;
+      return authResponse;
+    } on DioException catch (e) {
+      throw _handleDioError(e, fallback: 'Failed to login user');
     } on AuthException {
-      rethrow;
-    } on NetworkException {
       rethrow;
     } on AppException {
       rethrow;
@@ -111,64 +131,50 @@ class AuthApiService {
       throw AppException('Failed to login user', original: e);
     }
   }
+
   // ============================================================
-  // BALADIYATI — Logout
+  // LOGOUT — Build4All Core
   // POST /auth/logout
   // ============================================================
   Future<void> logout() async {
     try {
-      await _client.post('/auth/logout', requiresAuth: true);
-    } catch (_) {}
+      await DioClient.build.post('/auth/logout');
+    } catch (_) {
+      
+    }
+
     await _tokenStore.clearToken();
-    await _client.clearToken();
     await _roleStore.clearRole();
+    DioClient.clearAuthToken();
   }
 
-  // refresh token 
-
-
   // ============================================================
-  // BALADIYATI — Forgot password
-  // POST /auth/forgot-password
-  // ============================================================
-  //   Future<String> forgetPassword({
-  //   required String email,
-  // }) async {
-  //   try {
-  //     final response = await _client.post(
-  //       '/auth/forgot-password',
-  //       body: {'email': email},
-  //     );
-
-  //     return response.toString();
-  //   } on AppException {
-  //     rethrow;
-  //   } catch (e) {
-  //     throw AppException('Failed to request password reset', original: e);
-  //   }
-  // }
-
-
-  // ============================================================
-  // BALADIYATI — Reset password
+  // RESET PASSWORD — Build4All Core
   // POST /auth/reset-password
   // ============================================================
-   Future<String> resetPassword({
+  Future<String> resetPassword({
     required String email,
     required String newPassword,
     required String confirmPassword,
   }) async {
     try {
-      final response = await _client.post(
+      final response = await DioClient.build.post(
         '/auth/reset-password',
-        body: {
-          'email': email,
+        data: {
+          'email': email.trim(),
           'newPassword': newPassword,
           'confirmPassword': confirmPassword,
         },
       );
 
-      return response.toString();
+      final data = response.data;
+      if (data is Map && data['message'] != null) {
+        return data['message'].toString();
+      }
+
+      return 'Password reset successfully';
+    } on DioException catch (e) {
+      throw _handleDioError(e, fallback: 'Failed to reset password');
     } on AppException {
       rethrow;
     } catch (e) {
@@ -177,51 +183,10 @@ class AuthApiService {
   }
 
   // ============================================================
-  // BALADIYATI — Complete profile
+  // COMPLETE PROFILE — Build4All Core
   // POST /auth/complete-profile
   // ============================================================
-
-  Future<AuthResponseModel> completeProfileNew({
-    required String email,
-    required String password,
-    required String fullName,
-    required String phone,
-    required String role,
-    required int municipalityId,
-    required String address,
-    required String username,
-  }) async {
-    try {
-      final data = await _client.post(
-        '/api/auth/complete-profile',
-        body: {
-          'email': email,
-          'passwordHash': password,
-          'fullName': fullName,
-          'phone': phone,
-          'role': role,
-          'municipality': {'id': municipalityId},
-          'address': address,
-          'username': username,
-        },
-      );
-
-      final response = AuthResponseModel.fromJson(data);
-
-      if (response.token.isNotEmpty) {
-        await _tokenStore.saveToken(response.token);
-        await _client.saveToken(response.token);
-      }
-
-      return response;
-    } on AppException {
-      rethrow;
-    } catch (e) {
-      throw AppException('Failed to complete profile', original: e);
-    }
-  }
-
-    Future<String> completeProfile({
+  Future<String> completeProfile({
     required String address,
     required String username,
     required int municipalityId,
@@ -230,29 +195,37 @@ class AuthApiService {
       final token = await _tokenStore.getToken();
 
       if (token != null && token.isNotEmpty) {
-        await _client.saveToken(token);
+        DioClient.setAuthToken(token);
       }
 
-      final response = await _client.post(
+      final response = await DioClient.build.post(
         '/auth/complete-profile',
-        body: {
-          'address': address,
-          'username': username,
+        data: {
+          'address': address.trim(),
+          'username': username.trim(),
           'municipality': {'id': municipalityId},
         },
-        requiresAuth: true,
       );
 
-      return response['message'] ?? 'Success';
+      final data = response.data;
+      if (data is Map && data['message'] != null) {
+        return data['message'].toString();
+      }
+
+      return 'Success';
+    } on DioException catch (e) {
+      throw _handleDioError(e, fallback: 'Failed to complete profile');
     } on AppException {
       rethrow;
-     } //catch (e) {
-    //   throw AppException('Failed to complete profile', original: e);
-    // }
+    } catch (e) {
+      throw AppException('Failed to complete profile', original: e);
+    }
   }
+
   // ============================================================
   // TOKEN HELPERS
   // ============================================================
   Future<String?> getSavedToken() => _tokenStore.getToken();
+
   Future<bool> hasToken() => _tokenStore.hasToken();
 }

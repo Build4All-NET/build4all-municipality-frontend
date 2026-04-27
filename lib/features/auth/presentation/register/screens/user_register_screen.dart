@@ -4,6 +4,7 @@ import 'dart:convert';
 
 import 'package:baladiyati/common/registration_step_cubit.dart';
 import 'package:baladiyati/common/registration_step_indicator.dart';
+import 'package:baladiyati/core/config/env.dart';
 import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +35,9 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
   bool _isLoading = false;
 
   // ✅ ownerProjectLinkId from build4all config
-  static const int _ownerProjectLinkId = 1;
+ int get _ownerProjectLinkId {
+  return int.tryParse(Env.ownerProjectLinkId) ?? 0;
+}
 
   @override
   void dispose() {
