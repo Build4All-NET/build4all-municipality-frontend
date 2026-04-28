@@ -32,10 +32,12 @@ class RecentRequestsSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
     return Column(
       children: [
-        // Header row
+        // Section header.
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -43,25 +45,30 @@ class RecentRequestsSection extends StatelessWidget {
               onTap: onViewAll,
               child: Text(
                 l10n.viewAll,
-                style: const TextStyle(
-                    color: Color(0xFF2F6FED),
-                    fontWeight: FontWeight.w500),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: cs.primary,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
             Text(
               l10n.recentRequests,
-              style: const TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: cs.onSurface,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
+
         const SizedBox(height: 12),
 
-        // Request cards
-        ...requests.map((request) => _RequestCard(
-              request: request,
-              onTap: () => onRequestTap(request),
-            )),
+        ...requests.map(
+          (request) => _RequestCard(
+            request: request,
+            onTap: () => onRequestTap(request),
+          ),
+        ),
       ],
     );
   }
@@ -71,11 +78,22 @@ class _RequestCard extends StatelessWidget {
   final RecentRequestItem request;
   final VoidCallback onTap;
 
-  const _RequestCard({required this.request, required this.onTap});
+  const _RequestCard({
+    required this.request,
+    required this.onTap,
+  });
 
   @override
   Widget build(BuildContext context) {
     final isWaitingPayment = request.status == 'waiting_payment';
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
+    final badgeBackground = isWaitingPayment
+        ? cs.error.withOpacity(0.10)
+        : cs.primary.withOpacity(0.10);
+
+    final badgeTextColor = isWaitingPayment ? cs.error : cs.primary;
 
     return GestureDetector(
       onTap: onTap,
@@ -83,11 +101,11 @@ class _RequestCard extends StatelessWidget {
         margin: const EdgeInsets.only(bottom: 10),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: cs.surface,
           borderRadius: BorderRadius.circular(14),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.04),
+              color: cs.onSurface.withOpacity(0.04),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -96,49 +114,57 @@ class _RequestCard extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Date + status badge
+            // Date + status badge.
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
                   padding: const EdgeInsets.symmetric(
-                      horizontal: 10, vertical: 4),
+                    horizontal: 10,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: isWaitingPayment
-                        ? const Color(0xFFFFF3E0)
-                        : const Color(0xFFFFFDE7),
+                    color: badgeBackground,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
                     isWaitingPayment ? 'بانتظار الدفع' : 'قيد التدقيق',
-                    style: TextStyle(
+                    style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
-                      color: isWaitingPayment
-                          ? Colors.orange.shade700
-                          : Colors.yellow.shade800,
+                      color: badgeTextColor,
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 6),
+
                 Row(
                   children: [
-                    const Icon(Icons.access_time,
-                        size: 12, color: Colors.grey),
+                    Icon(
+                      Icons.access_time,
+                      size: 12,
+                      color: cs.outline,
+                    ),
                     const SizedBox(width: 4),
-                    Text(request.date,
-                        style: const TextStyle(
-                            fontSize: 11, color: Colors.grey)),
+                    Text(
+                      request.date,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontSize: 11,
+                        color: cs.outline,
+                      ),
+                    ),
                   ],
                 ),
               ],
             ),
 
-            // Request name
             Text(
               request.nameAr,
-              style: const TextStyle(
-                  fontSize: 14, fontWeight: FontWeight.w600),
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: cs.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ],
         ),

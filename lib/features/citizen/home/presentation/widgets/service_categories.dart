@@ -7,40 +7,34 @@ class ServiceCategoryItem {
   final String nameAr;
   final String nameEn;
   final IconData icon;
-  final Color color;
 
   const ServiceCategoryItem({
     required this.nameAr,
     required this.nameEn,
     required this.icon,
-    required this.color,
   });
 }
 
 final List<ServiceCategoryItem> serviceCategories = [
-  ServiceCategoryItem(
+  const ServiceCategoryItem(
     nameAr: 'الخدمات العامة',
     nameEn: 'General Services',
     icon: Icons.description_outlined,
-    color: const Color(0xFF3B82F6),
   ),
-  ServiceCategoryItem(
+  const ServiceCategoryItem(
     nameAr: 'الخدمات التجارية والمهنية',
     nameEn: 'Commercial Services',
     icon: Icons.storefront_outlined,
-    color: const Color(0xFFF59E0B),
   ),
-  ServiceCategoryItem(
+  const ServiceCategoryItem(
     nameAr: 'الخدمات العقارية',
     nameEn: 'Real Estate',
     icon: Icons.apartment_outlined,
-    color: const Color(0xFF8B5CF6),
   ),
-  ServiceCategoryItem(
+  const ServiceCategoryItem(
     nameAr: 'الخدمات الهندسية',
     nameEn: 'Engineering',
     icon: Icons.engineering_outlined,
-    color: const Color(0xFF10B981),
   ),
 ];
 
@@ -57,10 +51,12 @@ class ServiceCategoriesSection extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
     return Column(
       children: [
-        // Header row
+        // Section header.
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -68,21 +64,24 @@ class ServiceCategoriesSection extends StatelessWidget {
               onTap: onViewAll,
               child: Text(
                 l10n.viewAll,
-                style: const TextStyle(
-                    color: Color(0xFF2F6FED),
-                    fontWeight: FontWeight.w500),
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: cs.primary,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
             ),
             Text(
               l10n.serviceCategories,
-              style: const TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.bold),
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: cs.onSurface,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ],
         ),
+
         const SizedBox(height: 12),
 
-        // Grid
         GridView.count(
           crossAxisCount: 2,
           shrinkWrap: true,
@@ -95,11 +94,11 @@ class ServiceCategoriesSection extends StatelessWidget {
               onTap: () => onCategoryTap(category),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: cs.surface,
                   borderRadius: BorderRadius.circular(16),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: cs.onSurface.withOpacity(0.05),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -112,18 +111,25 @@ class ServiceCategoriesSection extends StatelessWidget {
                       width: 48,
                       height: 48,
                       decoration: BoxDecoration(
-                        color: category.color.withOpacity(0.15),
+                        color: cs.primary.withOpacity(0.12),
                         shape: BoxShape.circle,
                       ),
-                      child: Icon(category.icon,
-                          color: category.color, size: 24),
+                      child: Icon(
+                        category.icon,
+                        color: cs.primary,
+                        size: 24,
+                      ),
                     ),
+
                     const SizedBox(height: 8),
+
                     Text(
                       category.nameAr,
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                          fontSize: 12, fontWeight: FontWeight.w500),
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: cs.onSurface,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),

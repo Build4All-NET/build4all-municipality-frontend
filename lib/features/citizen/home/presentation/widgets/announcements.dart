@@ -9,37 +9,56 @@ class AnnouncementsCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
+        // Soft card using dynamic primary color.
+        gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFFEFF6FF), Color(0xFFEEF2FF)],
+          colors: [
+            cs.primary.withOpacity(0.08),
+            cs.primary.withOpacity(0.04),
+          ],
         ),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFBFDBFE)),
+        border: Border.all(
+          color: cs.primary.withOpacity(0.20),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           Text(
             l10n.municipalAnnouncements,
-            style: const TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: cs.onSurface,
+              fontWeight: FontWeight.bold,
+            ),
           ),
+
           const SizedBox(height: 4),
+
           Text(
             l10n.latestNews,
-            style: const TextStyle(fontSize: 12, color: Colors.grey),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: cs.outline,
+            ),
           ),
+
           const SizedBox(height: 10),
+
           Text(
             l10n.workingHours,
             textAlign: TextAlign.right,
-            style: const TextStyle(fontSize: 13),
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: cs.onSurface,
+              fontSize: 13,
+            ),
           ),
         ],
       ),

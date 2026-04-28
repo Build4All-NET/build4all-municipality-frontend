@@ -1,4 +1,5 @@
 // lib/common/widgets/primary_button.dart
+
 import 'package:flutter/material.dart';
 import '../../core/config/app_sizes.dart';
 
@@ -23,6 +24,10 @@ class PrimaryButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
+    final resolvedBackground = backgroundColor ?? cs.primary;
+    final resolvedTextColor = textColor ?? cs.onPrimary;
 
     return SizedBox(
       width: width ?? double.infinity,
@@ -30,18 +35,25 @@ class PrimaryButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: isLoading ? null : onPressed,
         style: ElevatedButton.styleFrom(
-          backgroundColor: backgroundColor ?? theme.colorScheme.primary,
-          foregroundColor: textColor ?? theme.colorScheme.onPrimary,
+          backgroundColor: resolvedBackground,
+          foregroundColor: resolvedTextColor,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
           ),
           elevation: 0,
         ).copyWith(
           backgroundColor: MaterialStateProperty.resolveWith((states) {
+            // Pressed state uses dynamic primary color with opacity,
+            // instead of a hardcoded dark blue.
             if (states.contains(MaterialState.pressed)) {
-              return const Color(0xFF0D47A1); // dark blue عند الضغط
+              return resolvedBackground.withOpacity(0.85);
             }
-            return backgroundColor ?? theme.colorScheme.primary;
+
+            if (states.contains(MaterialState.disabled)) {
+              return cs.outline.withOpacity(0.25);
+            }
+
+            return resolvedBackground;
           }),
         ),
         child: isLoading
@@ -50,12 +62,13 @@ class PrimaryButton extends StatelessWidget {
                 height: 22,
                 child: CircularProgressIndicator(
                   strokeWidth: 2.5,
-                  color: textColor ?? Colors.white,
+                  color: resolvedTextColor,
                 ),
               )
             : Text(
                 label,
-                style: const TextStyle(
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: resolvedTextColor,
                   fontSize: 17,
                   fontWeight: FontWeight.bold,
                 ),
