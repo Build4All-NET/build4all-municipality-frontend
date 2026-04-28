@@ -1,6 +1,7 @@
 // lib/app/app.dart
 
 import 'package:baladiyati/common/registration_step_cubit.dart';
+import 'package:baladiyati/features/auth/presentation/gate/auth_gate.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -44,7 +45,7 @@ class MyApp extends StatelessWidget {
               GlobalWidgetsLocalizations.delegate,
               GlobalCupertinoLocalizations.delegate,
             ],
-            home: const WelcomeScreen(),
+           home: const AuthGate(),
           );
         },
       ),

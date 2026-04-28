@@ -502,4 +502,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get connection_issue => 'مشكلة في الاتصال';
+
+  @override
+  String get chooseHowToContinue => 'اختر طريقة المتابعة';
+
+  @override
+  String get continueAsCitizen => 'المتابعة كمواطن';
+
+  @override
+  String get continueAsAdmin => 'المتابعة كمسؤول';
+
+  @override
+  String get loginFailed => 'فشل تسجيل الدخول';
 }

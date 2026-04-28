@@ -6,7 +6,10 @@ import 'package:baladiyati/core/auth/jwt_claims.dart';
 import 'package:baladiyati/core/config/env.dart';
 import 'package:baladiyati/core/config/jwt_store.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
+import 'package:baladiyati/features/admin/admin_dashboard_placeholder_screen.dart';
+import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
+import 'package:baladiyati/features/auth/domain/facade/dual_login_orchestrator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
@@ -58,78 +61,176 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _onLoginPressed(BuildContext context) async {
-    if (!_formKey.currentState!.validate()) return;
+    final l10n = AppLocalizations.of(context)!;
+  if (!_formKey.currentState!.validate()) return;
 
-    try {
-      final email = _emailCtrl.text.trim();
-      final password = _passwordCtrl.text.trim();
+  final email = _emailCtrl.text.trim();
+  final password = _passwordCtrl.text.trim();
 
-      final response = await _authApi.ownerLogin(
-        email: email,
-        password: password,
-        ownerProjectLinkId: ownerProjectLinkId,
-      );
+  try {
+    // 1. Try admin + user login
+    final dual = await DualLoginOrchestrator(
+      authApi: _authApi,
+      adminStore: AdminTokenStore(),
+    ).login(
+      identifier: email,
+      password: password,
+      ownerProjectLinkId: ownerProjectLinkId,
+    );
 
-      final token = response.data['token'];
+    if (!mounted) return;
 
-      if (token == null || token.toString().isEmpty) {
-        throw Exception('Token is empty');
-      }
-
-      await JwtStore.save(token);
-
-      final claims = JwtClaims.decode(token);
-      if (claims == null || claims['id'] == null) {
-        throw Exception('Invalid token');
-      }
-
-      final userId = int.parse(claims['id'].toString());
-
-      if (!mounted) return;
-
-      Navigator.pushAndRemoveUntil(
-        context,
-        MaterialPageRoute(builder: (_) => const HomeScreen()),
-        (_) => false,
-      );
-
-      final prefs = await SharedPreferences.getInstance();
-      final isRegistered = prefs.getBool('is_registered') ?? false;
-
-      if (!isRegistered) {
-        final prefsData = await _getFromPrefs();
-
-        if (prefsData != null) {
-          try {
-            await _municipalityAuthApi.register(
-              email: email,
-              password: password,
-              fullName: prefsData['fullName'],
-              phone: prefsData['phone'],
-              role: prefsData['role'],
-              municipalityId: prefsData['municipality_id'],
-              ownerProjectLinkId: ownerProjectLinkId,
-              build4allId: userId,
-            );
-
-            await prefs.setBool('is_registered', true);
-          } catch (_) {
-            // Municipality registration is a secondary sync.
-            // Login should not fail if this background registration fails.
-          }
-        }
-      }
-    } catch (_) {
-      if (!mounted) return;
-
+    // ❌ no login
+    if (dual.none) {
       AppToast.show(
         context,
-        message: 'Login failed',
+        message: dual.error ?? l10n.loginFailed,
         type: AppToastType.error,
       );
+      return;
     }
-  }
 
+    // ✅ BOTH → show modal
+    if (dual.both) {
+      _showRoleChooser(context, dual);
+      return;
+    }
+
+    // ✅ USER ONLY
+    if (dual.userOk) {
+  await AdminTokenStore().clear();
+  await JwtStore.save(dual.userToken!);
+
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(builder: (_) => const HomeScreen()),
+    (_) => false,
+  );
+  return;
+}
+
+    // ✅ ADMIN ONLY
+    if (dual.adminOk) {
+  await JwtStore.clear(); 
+
+  await AdminTokenStore().save(
+    token: dual.admin!.token,
+    role: dual.admin!.role,
+    refreshToken: dual.admin!.refreshToken,
+    tenantId: ownerProjectLinkId.toString(),
+  );
+
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const AdminDashboardPlaceholderScreen(),
+    ),
+    (_) => false,
+  );
+  return;
+}
+  } catch (e) {
+    if (!mounted) return;
+
+    AppToast.show(
+      context,
+      message: e.toString(),
+      type: AppToastType.error,
+    );
+  }
+}
+
+void _showRoleChooser(BuildContext context, DualLoginResult dual) {
+  final l10n = AppLocalizations.of(context)!;
+  final theme = Theme.of(context);
+  final cs = theme.colorScheme;
+
+  showModalBottomSheet(
+    context: context,
+    backgroundColor: cs.surface,
+    shape: const RoundedRectangleBorder(
+      borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+    ),
+    builder: (_) {
+      return SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                l10n.chooseHowToContinue,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.bold,
+                  color: cs.onSurface,
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              ListTile(
+                leading: Icon(Icons.person, color: cs.primary),
+                title: Text(
+                  l10n.continueAsCitizen,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: cs.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onTap: () async {
+                  Navigator.pop(context);
+
+                  await AdminTokenStore().clear();
+                  await JwtStore.save(dual.userToken!);
+
+                  if (!mounted) return;
+
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const HomeScreen()),
+                    (_) => false,
+                  );
+                },
+              ),
+
+              ListTile(
+                leading: Icon(Icons.admin_panel_settings, color: cs.primary),
+                title: Text(
+                  l10n.continueAsAdmin,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: cs.onSurface,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                onTap: () async {
+                  Navigator.pop(context);
+
+                  await JwtStore.clear();
+                  await AdminTokenStore().save(
+  token: dual.admin!.token,
+  role: dual.admin!.role,
+  refreshToken: dual.admin!.refreshToken,
+  tenantId: ownerProjectLinkId.toString(),
+);
+
+                  if (!mounted) return;
+
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => const AdminDashboardPlaceholderScreen(),
+                    ),
+                    (_) => false,
+                  );
+                },
+              ),
+            ],
+          ),
+        ),
+      );
+    },
+  );
+}
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
