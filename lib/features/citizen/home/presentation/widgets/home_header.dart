@@ -27,27 +27,36 @@ class HomeHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
     return Container(
-      decoration: const BoxDecoration(
+      // 🔥 Gradient now uses dynamic theme colors instead of hardcoded
+      decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
-          colors: [Color(0xFF1E3A5F), Color(0xFF2F6FED)],
+          colors: [
+            cs.primary.withOpacity(0.9),
+            cs.primary,
+          ],
         ),
-        borderRadius: BorderRadius.only(
+        borderRadius: const BorderRadius.only(
           bottomLeft: Radius.circular(28),
           bottomRight: Radius.circular(28),
         ),
       ),
+
       padding: const EdgeInsets.fromLTRB(20, 50, 20, 24),
+
       child: Column(
         children: [
-          // Top row: name + notification bell
+          // 🔹 Top row
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Notification bell (left for RTL)
+              // 🔔 Notification icon
               GestureDetector(
                 onTap: onNotificationTap,
                 child: Stack(
@@ -55,12 +64,17 @@ class HomeHeader extends StatelessWidget {
                     Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.2),
+                        // instead of white → use onPrimary with opacity
+                        color: cs.onPrimary.withOpacity(0.2),
                         borderRadius: BorderRadius.circular(12),
                       ),
-                      child: const Icon(Icons.notifications_outlined,
-                          color: Colors.white, size: 24),
+                      child: Icon(
+                        Icons.notifications_outlined,
+                        color: cs.onPrimary,
+                        size: 24,
+                      ),
                     ),
+
                     if (notificationCount > 0)
                       Positioned(
                         top: 0,
@@ -68,17 +82,18 @@ class HomeHeader extends StatelessWidget {
                         child: Container(
                           width: 18,
                           height: 18,
-                          decoration: const BoxDecoration(
-                            color: Colors.red,
+                          decoration: BoxDecoration(
+                            color: cs.error, // 🔥 was Colors.red
                             shape: BoxShape.circle,
                           ),
                           child: Center(
                             child: Text(
                               '$notificationCount',
-                              style: const TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 10,
-                                  fontWeight: FontWeight.bold),
+                              style: TextStyle(
+                                color: cs.onError,
+                                fontSize: 10,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
                         ),
@@ -87,28 +102,34 @@ class HomeHeader extends StatelessWidget {
                 ),
               ),
 
-              // User name + municipality (right for RTL)
+              // 👤 User info
               Column(
                 crossAxisAlignment: CrossAxisAlignment.end,
                 children: [
                   Text(
                     l10n.welcomeMessage,
-                    style: const TextStyle(
-                        color: Colors.white70, fontSize: 13),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: cs.onPrimary.withOpacity(0.7),
+                    ),
                   ),
+
                   const SizedBox(height: 4),
+
                   Text(
                     userName,
-                    style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold),
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: cs.onPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
+
                   const SizedBox(height: 2),
+
                   Text(
                     municipality,
-                    style: const TextStyle(
-                        color: Colors.white70, fontSize: 13),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: cs.onPrimary.withOpacity(0.7),
+                    ),
                   ),
                 ],
               ),
@@ -117,7 +138,7 @@ class HomeHeader extends StatelessWidget {
 
           const SizedBox(height: 24),
 
-          // Stats row
+          // 📊 Stats row
           Row(
             children: [
               _StatCard(
@@ -158,27 +179,41 @@ class _StatCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+
     return Expanded(
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+
         decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.15),
+          color: cs.onPrimary.withOpacity(0.15),
           borderRadius: BorderRadius.circular(16),
         ),
+
         child: Column(
           children: [
-            Icon(icon, color: Colors.white, size: 20),
+            Icon(icon, color: cs.onPrimary, size: 20),
+
             const SizedBox(height: 6),
-            Text(value,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold)),
+
+            Text(
+              value,
+              style: theme.textTheme.titleLarge?.copyWith(
+                color: cs.onPrimary,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+
             const SizedBox(height: 4),
-            Text(label,
-                textAlign: TextAlign.center,
-                style: const TextStyle(
-                    color: Colors.white70, fontSize: 11)),
+
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: cs.onPrimary.withOpacity(0.7),
+              ),
+            ),
           ],
         ),
       ),

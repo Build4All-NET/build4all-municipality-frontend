@@ -16,15 +16,19 @@ class QuickActions extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        // Uses dynamic surface color from remote theme.
+        color: cs.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            // Soft shadow based on current text color.
+            color: cs.onSurface.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
           ),
@@ -35,27 +39,33 @@ class QuickActions extends StatelessWidget {
         children: [
           Text(
             l10n.quickActions,
-            style: const TextStyle(
-                fontSize: 16, fontWeight: FontWeight.bold),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.bold,
+              color: cs.onSurface,
+            ),
           ),
+
           const SizedBox(height: 12),
+
           Row(
             children: [
-              // Payments button
+              // Payments action.
               Expanded(
                 child: _ActionButton(
                   icon: Icons.error_outline,
-                  iconColor: Colors.orange,
+                  iconColor: cs.error,
                   label: l10n.navPayments,
                   onTap: onPayments,
                 ),
               ),
+
               const SizedBox(width: 12),
-              // New Request button
+
+              // New request action.
               Expanded(
                 child: _ActionButton(
                   icon: Icons.description_outlined,
-                  iconColor: const Color(0xFF1E3A5F),
+                  iconColor: cs.primary,
                   label: l10n.newRequest,
                   onTap: onNewRequest,
                 ),
@@ -83,20 +93,37 @@ class _ActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey.shade200),
+          border: Border.all(
+            color: cs.outline.withOpacity(0.18),
+          ),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           children: [
-            Icon(icon, color: iconColor, size: 28),
+            Icon(
+              icon,
+              color: iconColor,
+              size: 28,
+            ),
+
             const SizedBox(height: 8),
-            Text(label,
-                style: const TextStyle(fontSize: 13)),
+
+            Text(
+              label,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: cs.onSurface,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
           ],
         ),
       ),

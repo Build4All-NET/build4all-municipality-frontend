@@ -31,7 +31,7 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             title: 'بلديتي',
             debugShowCheckedModeBanner: false,
-            theme: AppThemeBuilder.build(themeState.tokens),
+            theme: themeState.themeData,
             locale: locale ?? const Locale('ar'),
             supportedLocales: const [
               Locale('ar'),

@@ -1,12 +1,8 @@
 // lib/features/auth/presentation/gate/auth_gate.dart
-// ─────────────────────────────────────────
-// Decides where to go on app start:
-// - Has token → go to Home
-// - No token  → go to Welcome
-// ─────────────────────────────────────────
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+
 import '../login/bloc/auth_bloc.dart';
 import '../login/bloc/auth_state.dart';
 import '../../data/services/auth_token_store.dart';
@@ -29,22 +25,25 @@ class _AuthGateState extends State<AuthGate> {
   Future<void> _checkToken() async {
     final store = AuthTokenStore();
     final hasToken = await store.hasToken();
+
     if (!hasToken && mounted) {
-      // No token → stay on welcome
+      // No token → stay on WelcomeScreen.
     }
-    // if has token → navigate to Home
+
+    // TODO: If token exists, navigate to HomeScreen when auth flow is ready.
   }
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return BlocListener<AuthBloc, AuthState>(
       listener: (context, state) {
         if (state.isLoggedIn) {
-          //  Navigate to Home screen
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Login successful! Home screen coming soon.'),
-              backgroundColor: Colors.green,
+            SnackBar(
+              content: const Text('Login successful! Home screen coming soon.'),
+              backgroundColor: cs.primary,
             ),
           );
         }
