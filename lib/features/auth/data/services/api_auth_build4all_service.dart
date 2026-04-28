@@ -1,5 +1,6 @@
 import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/core/exceptions/auth_exception.dart';
+import 'package:baladiyati/features/auth/data/models/admin_login_response.dart';
 import 'package:dio/dio.dart';
 
 class AuthApi {
@@ -200,4 +201,29 @@ class AuthApi {
       throw AppException('Logout failed', original: e);
     }
   }
+
+  Future<AdminLoginResponse> adminLogin({
+  required String usernameOrEmail,
+  required String password,
+  required int ownerProjectLinkId,
+}) async {
+  try {
+    final response = await _dio.post(
+      '/auth/admin/login/front',
+      data: {
+        'usernameOrEmail': usernameOrEmail,
+        'password': password,
+        'ownerProjectId': ownerProjectLinkId,
+      },
+    );
+
+    return AdminLoginResponse.fromJson(
+      Map<String, dynamic>.from(response.data as Map),
+    );
+  } on DioException catch (e) {
+    throw _handleError(e, fallback: 'Admin login failed');
+  } catch (e) {
+    throw AppException('Admin login failed', original: e);
+  }
+}
 }
