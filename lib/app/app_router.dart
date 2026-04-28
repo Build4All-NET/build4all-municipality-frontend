@@ -12,8 +12,10 @@ import '../features/auth/data/services/auth_api_service.dart';
 import '../features/auth/presentation/login/screens/reset_password_page.dart';
 import '../features/auth/presentation/login/screens/verify_reset_code_screen.dart';
 import '../features/auth/presentation/login/screens/forgot_password_screen.dart';
-// ✅ FIXED: Import correct HomeScreen (with BottomNav)
+//  Import correct HomeScreen (with BottomNav)
 import '../features/citizen/home/presentation/screens/home_screen.dart';
+import '../features/citizen/profile/presentation/screens/profile_screen.dart';
+
 
 class AppRouter {
 
@@ -111,7 +113,7 @@ class AppRouter {
   }
 
   // ── Home ──────────────────────────────────────────
-  // ✅ FIXED: Now navigates to real HomeScreen with BottomNav
+  //  Now navigates to real HomeScreen with BottomNav
   static void gotoHomePage(BuildContext context) {
     Navigator.pushAndRemoveUntil(
       context,
@@ -119,4 +121,13 @@ class AppRouter {
       (_) => false,
     );
   }
+
+  // ── Profile ───────────────────────────────────────
+static void goToProfile(BuildContext context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(builder: (_) => const ProfileScreen()),
+  );
 }
+}
+

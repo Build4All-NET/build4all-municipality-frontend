@@ -1,5 +1,6 @@
 {
-    "API_BASE_URL": "https://unlivable-unison-password.ngrok-free.dev ",
+    "API_BASE_URL": "https://geek-charter-anatomy.ngrok-free.dev ",
+    "OVERRIDE_BASE_URL": "https://geek-charter-anatomy.ngrok-free.dev",
     "ProjectBaseUrl": "Http://localhost:8091",
     "APP_NAME": "FATIMA",
     "APP_TYPE": "ECOMMERCE",

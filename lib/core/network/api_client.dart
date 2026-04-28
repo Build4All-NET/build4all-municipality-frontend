@@ -15,16 +15,19 @@ class ApiClient {
   // Android Emulator:  http://10.0.2.2:8091
   // Real Phone (WiFi): http://192.168.0.101:8091
   static const String baseUrl = 'http://localhost:8091';
-  
+
   static const String _tokenKey = 'auth_token';
 
   // ─────────────────────────────────────────
   // GET request
   // ─────────────────────────────────────────
-  Future<dynamic> get(String endpoint) async {
+  Future<dynamic> get(
+    String endpoint, {
+    Map<String, String>? extraHeaders,
+  }) async {
     final response = await http.get(
       Uri.parse('$baseUrl$endpoint'),
-      headers: await _headers(),
+      headers: await _headers(extraHeaders: extraHeaders),
     ).timeout(const Duration(seconds: 30));
 
     return _handleResponse(response);
@@ -37,10 +40,14 @@ class ApiClient {
     String endpoint, {
     Map<String, dynamic>? body,
     bool requiresAuth = false,
+    Map<String, String>? extraHeaders,
   }) async {
     final response = await http.post(
       Uri.parse('$baseUrl$endpoint'),
-      headers: await _headers(requiresAuth: requiresAuth),
+      headers: await _headers(
+        requiresAuth: requiresAuth,
+        extraHeaders: extraHeaders,
+      ),
       body: body != null ? jsonEncode(body) : null,
     ).timeout(const Duration(seconds: 30));
 
@@ -48,7 +55,7 @@ class ApiClient {
   }
 
   // ─────────────────────────────────────────
-  // ✅ POST to full URL — for external APIs (build4all)
+  //  POST to full URL — for external APIs
   // ─────────────────────────────────────────
   Future<dynamic> postToUrl(
     String fullUrl, {
@@ -65,9 +72,33 @@ class ApiClient {
   }
 
   // ─────────────────────────────────────────
+  //  PATCH request — for profile update
+  // ─────────────────────────────────────────
+  Future<dynamic> patch(
+    String endpoint, {
+    Map<String, dynamic>? body,
+    bool requiresAuth = true,
+    Map<String, String>? extraHeaders,
+  }) async {
+    final response = await http.patch(
+      Uri.parse('$baseUrl$endpoint'),
+      headers: await _headers(
+        requiresAuth: requiresAuth,
+        extraHeaders: extraHeaders,
+      ),
+      body: body != null ? jsonEncode(body) : null,
+    ).timeout(const Duration(seconds: 30));
+
+    return _handleResponse(response);
+  }
+
+  // ─────────────────────────────────────────
   // Build headers
   // ─────────────────────────────────────────
-  Future<Map<String, String>> _headers({bool requiresAuth = false}) async {
+  Future<Map<String, String>> _headers({
+    bool requiresAuth = false,
+    Map<String, String>? extraHeaders,
+  }) async {
     final headers = <String, String>{
       'Content-Type': 'application/json',
       'Accept': 'application/json',
@@ -78,6 +109,11 @@ class ApiClient {
       if (token != null) {
         headers['Authorization'] = 'Bearer $token';
       }
+    }
+
+    // Add extra headers (like Owner-Project-Link-Id)
+    if (extraHeaders != null) {
+      headers.addAll(extraHeaders);
     }
 
     return headers;
@@ -111,13 +147,15 @@ class ApiClient {
         throw AppException(message, code: code);
       }
 
-      throw AppException(trimmed.isNotEmpty ? trimmed : 'Error ${response.statusCode}');
+      throw AppException(
+          trimmed.isNotEmpty ? trimmed : 'Error ${response.statusCode}');
     } catch (e) {
       if (e is AppException) rethrow;
-throw ServerException(
-  'Server error. Please try later',
-  statusCode: response.statusCode,
-);    }
+      throw ServerException(
+        'Server error. Please try later',
+        statusCode: response.statusCode,
+      );
+    }
   }
 
   // ─────────────────────────────────────────

@@ -16,7 +16,7 @@ class AuthApiService {
 
   // ✅ build4all base URL
   static const String _build4allBaseUrl =
-      'https://unlivable-unison-password.ngrok-free.dev ';
+      ' https://geek-charter-anatomy.ngrok-free.dev ';
 
   AuthApiService({
     ApiClient? client,
