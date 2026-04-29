@@ -78,7 +78,7 @@ class AuthApiService {
       );
 
       if (authResponse.token.isNotEmpty) {
-        await _tokenStore.saveToken(authResponse.token);
+        await _tokenStore.saveToken(token: authResponse.token);
         DioClient.setAuthToken(authResponse.token);
       }
 
@@ -116,7 +116,7 @@ class AuthApiService {
       );
 
       if (authResponse.token.isNotEmpty) {
-        await _tokenStore.saveToken(authResponse.token);
+        await _tokenStore.saveToken(token: authResponse.token);
         DioClient.setAuthToken(authResponse.token);
       }
 
