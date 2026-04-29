@@ -232,7 +232,7 @@ jobs:
 
           vn_str = (str(vn).strip() if vn not in (None,"",[]) else "")
 
-           override_base = (
+          override_base = (
               pick("OVERRIDE_BASE_URL")
               or pick("API_BASE_URL_OVERRIDE")
               or pick("MUNI_API")
@@ -241,7 +241,7 @@ jobs:
               or pick("municipalityBaseUrl")
               or pick("overrideBaseUrl")
               or ""
-            )
+          )
 
           override_base = str(override_base).strip().rstrip("/")
 
