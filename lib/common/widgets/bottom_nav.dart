@@ -16,15 +16,21 @@ class BottomNav extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final cs = Theme.of(context).colorScheme;
 
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTap,
       type: BottomNavigationBarType.fixed,
-      selectedItemColor: const Color(0xFF1E3A5F),
-      unselectedItemColor: Colors.grey,
+
+      // Dynamic colors from THEME_JSON_B64.
+      backgroundColor: cs.surface,
+      selectedItemColor: cs.primary,
+      unselectedItemColor: cs.outline,
+
       selectedFontSize: 11,
       unselectedFontSize: 11,
+
       items: [
         BottomNavigationBarItem(
           icon: const Icon(Icons.home_outlined),

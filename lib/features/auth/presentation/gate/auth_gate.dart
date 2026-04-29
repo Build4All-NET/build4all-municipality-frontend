@@ -1,16 +1,13 @@
 // lib/features/auth/presentation/gate/auth_gate.dart
-// ─────────────────────────────────────────
-// Decides where to go on app start:
-// - Has token → go to Home
-// - No token  → go to Welcome
-// ─────────────────────────────────────────
 
+import 'package:baladiyati/features/admin/admin_dashboard_placeholder_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_bloc/flutter_bloc.dart';
-import '../login/bloc/auth_bloc.dart';
-import '../login/bloc/auth_state.dart';
-import '../../data/services/auth_token_store.dart';
-import '../../../welcome/presentation/screens/welcome_screen.dart';
+
+import 'package:baladiyati/core/config/jwt_store.dart';
+import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
+import 'package:baladiyati/features/welcome/presentation/screens/welcome_screen.dart';
+import 'package:baladiyati/features/citizen/home/presentation/screens/home_screen.dart';
+
 
 class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
@@ -20,36 +17,53 @@ class AuthGate extends StatefulWidget {
 }
 
 class _AuthGateState extends State<AuthGate> {
+  late final Future<Widget> _startScreenFuture;
+
   @override
   void initState() {
     super.initState();
-    _checkToken();
+    _startScreenFuture = _resolveStartScreen();
   }
 
-  Future<void> _checkToken() async {
-    final store = AuthTokenStore();
-    final hasToken = await store.hasToken();
-    if (!hasToken && mounted) {
-      // No token → stay on welcome
+  Future<Widget> _resolveStartScreen() async {
+    final adminStore = AdminTokenStore();
+
+    // 1. Admin has priority if admin token exists.
+    final adminToken = await adminStore.getToken();
+    if (adminToken != null && adminToken.trim().isNotEmpty) {
+      return const AdminDashboardPlaceholderScreen();
     }
-    // if has token → navigate to Home
+
+    // 2. Then check normal citizen/user token.
+    final userToken = await JwtStore.getToken();
+    if (userToken != null && userToken.trim().isNotEmpty) {
+      return const HomeScreen();
+    }
+
+    // 3. No session found.
+    return const WelcomeScreen();
   }
 
   @override
   Widget build(BuildContext context) {
-    return BlocListener<AuthBloc, AuthState>(
-      listener: (context, state) {
-        if (state.isLoggedIn) {
-          //  Navigate to Home screen
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Login successful! Home screen coming soon.'),
-              backgroundColor: Colors.green,
+    final cs = Theme.of(context).colorScheme;
+
+    return FutureBuilder<Widget>(
+      future: _startScreenFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState != ConnectionState.done) {
+          return Scaffold(
+            backgroundColor: cs.background,
+            body: Center(
+              child: CircularProgressIndicator(
+                color: cs.primary,
+              ),
             ),
           );
         }
+
+        return snapshot.data ?? const WelcomeScreen();
       },
-      child: const WelcomeScreen(),
     );
   }
 }

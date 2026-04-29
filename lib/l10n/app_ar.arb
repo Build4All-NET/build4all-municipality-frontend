@@ -194,6 +194,11 @@
   "completedRequests": "الطلبات المنجزة",
   "avgTime": "متوسط الوقت",
   "satisfaction": "نسبة الرضا",
-  "days": "أيام"
+  "days": "أيام",
+
+  "chooseHowToContinue": "اختر طريقة المتابعة",
+"continueAsCitizen": "المتابعة كمواطن",
+"continueAsAdmin": "المتابعة كمسؤول",
+"loginFailed": "فشل تسجيل الدخول"
 
 }

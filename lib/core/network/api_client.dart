@@ -1,93 +1,125 @@
 // lib/core/network/api_client.dart
-// ─────────────────────────────────────────
-// Central HTTP client for all API calls
-// Handles headers, errors, and token
-// ─────────────────────────────────────────
 
 import 'dart:convert';
+
+import 'package:baladiyati/core/config/env.dart';
 import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/core/exceptions/network_exception.dart';
+import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
 import 'package:http/http.dart' as http;
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiClient {
-  // Web (Chrome):      http://localhost:8091
-  // Android Emulator:  http://10.0.2.2:8091
-  // Real Phone (WiFi): http://192.168.0.101:8091
-  static const String baseUrl = 'http://localhost:8091';
-  
-  static const String _tokenKey = 'auth_token';
+  // Municipality API base URL comes from dart-define/env.
+  static String get baseUrl => Env.overrideBaseUrl.replaceAll(RegExp(r'/+$'), '');
 
-  // ─────────────────────────────────────────
-  // GET request
-  // ─────────────────────────────────────────
-  Future<dynamic> get(String endpoint) async {
-    final response = await http.get(
-      Uri.parse('$baseUrl$endpoint'),
-      headers: await _headers(),
-    ).timeout(const Duration(seconds: 30));
+  final AuthTokenStore _tokenStore;
+
+  ApiClient({
+    AuthTokenStore? tokenStore,
+  }) : _tokenStore = tokenStore ?? AuthTokenStore();
+
+  Future<dynamic> get(
+    String endpoint, {
+    bool requiresAuth = false,
+    Map<String, String>? extraHeaders,
+  }) async {
+    final response = await http
+        .get(
+          Uri.parse('$baseUrl$endpoint'),
+          headers: await _headers(
+            requiresAuth: requiresAuth,
+            extraHeaders: extraHeaders,
+          ),
+        )
+        .timeout(const Duration(seconds: 30));
 
     return _handleResponse(response);
   }
 
-  // ─────────────────────────────────────────
-  // POST request — uses baladiyati baseUrl
-  // ─────────────────────────────────────────
   Future<dynamic> post(
     String endpoint, {
     Map<String, dynamic>? body,
     bool requiresAuth = false,
+    Map<String, String>? extraHeaders,
   }) async {
-    final response = await http.post(
-      Uri.parse('$baseUrl$endpoint'),
-      headers: await _headers(requiresAuth: requiresAuth),
-      body: body != null ? jsonEncode(body) : null,
-    ).timeout(const Duration(seconds: 30));
+    final response = await http
+        .post(
+          Uri.parse('$baseUrl$endpoint'),
+          headers: await _headers(
+            requiresAuth: requiresAuth,
+            extraHeaders: extraHeaders,
+          ),
+          body: body != null ? jsonEncode(body) : null,
+        )
+        .timeout(const Duration(seconds: 30));
 
     return _handleResponse(response);
   }
 
-  // ─────────────────────────────────────────
-  // ✅ POST to full URL — for external APIs (build4all)
-  // ─────────────────────────────────────────
   Future<dynamic> postToUrl(
     String fullUrl, {
     Map<String, dynamic>? body,
     bool requiresAuth = false,
+    Map<String, String>? extraHeaders,
   }) async {
-    final response = await http.post(
-      Uri.parse(fullUrl),
-      headers: await _headers(requiresAuth: requiresAuth),
-      body: body != null ? jsonEncode(body) : null,
-    ).timeout(const Duration(seconds: 30));
+    final response = await http
+        .post(
+          Uri.parse(fullUrl),
+          headers: await _headers(
+            requiresAuth: requiresAuth,
+            extraHeaders: extraHeaders,
+          ),
+          body: body != null ? jsonEncode(body) : null,
+        )
+        .timeout(const Duration(seconds: 30));
 
     return _handleResponse(response);
   }
 
-  // ─────────────────────────────────────────
-  // Build headers
-  // ─────────────────────────────────────────
-  Future<Map<String, String>> _headers({bool requiresAuth = false}) async {
+  Future<dynamic> patch(
+    String endpoint, {
+    Map<String, dynamic>? body,
+    bool requiresAuth = true,
+    Map<String, String>? extraHeaders,
+  }) async {
+    final response = await http
+        .patch(
+          Uri.parse('$baseUrl$endpoint'),
+          headers: await _headers(
+            requiresAuth: requiresAuth,
+            extraHeaders: extraHeaders,
+          ),
+          body: body != null ? jsonEncode(body) : null,
+        )
+        .timeout(const Duration(seconds: 30));
+
+    return _handleResponse(response);
+  }
+
+  Future<Map<String, String>> _headers({
+    bool requiresAuth = false,
+    Map<String, String>? extraHeaders,
+  }) async {
     final headers = <String, String>{
       'Content-Type': 'application/json',
       'Accept': 'application/json',
     };
 
     if (requiresAuth) {
-      final token = await getToken();
-      if (token != null) {
-        headers['Authorization'] = 'Bearer $token';
+      final token = await _tokenStore.getToken();
+
+      if (token != null && token.trim().isNotEmpty) {
+        headers['Authorization'] = 'Bearer ${_normalizeToken(token)}';
       }
+    }
+
+    if (extraHeaders != null) {
+      headers.addAll(extraHeaders);
     }
 
     return headers;
   }
 
-  // ─────────────────────────────────────────
-  // Handle response — supports BOTH:
-  //   - Plain String: "Verification email sent"
-  //   - JSON Object:  { "token": "...", "message": "..." }
-  // ─────────────────────────────────────────
   dynamic _handleResponse(http.Response response) {
     if (response.statusCode >= 200 && response.statusCode < 300) {
       if (response.body.isEmpty) return {};
@@ -108,33 +140,36 @@ class ApiClient {
         final error = jsonDecode(trimmed);
         final code = error['code'] ?? error['error'] ?? 'UNKNOWN';
         final message = error['message'] ?? 'Something went wrong';
+
         throw AppException(message, code: code);
       }
 
-      throw AppException(trimmed.isNotEmpty ? trimmed : 'Error ${response.statusCode}');
+      throw AppException(
+        trimmed.isNotEmpty ? trimmed : 'Error ${response.statusCode}',
+      );
     } catch (e) {
       if (e is AppException) rethrow;
-throw ServerException(
-  'Server error. Please try later',
-  statusCode: response.statusCode,
-);    }
+
+      throw ServerException(
+        'Server error. Please try later',
+        statusCode: response.statusCode,
+      );
+    }
   }
 
-  // ─────────────────────────────────────────
-  // Token helpers
-  // ─────────────────────────────────────────
-  Future<void> saveToken(String token) async {
-    final sp = await SharedPreferences.getInstance();
-    await sp.setString(_tokenKey, token);
+  String _normalizeToken(String token) {
+    final value = token.trim();
+
+    if (value.toLowerCase().startsWith('bearer ')) {
+      return value.substring(7).trim();
+    }
+
+    return value;
   }
 
-  Future<String?> getToken() async {
-    final sp = await SharedPreferences.getInstance();
-    return sp.getString(_tokenKey);
-  }
+  Future<void> saveToken(String token) => _tokenStore.saveToken(token: token);
 
-  Future<void> clearToken() async {
-    final sp = await SharedPreferences.getInstance();
-    await sp.remove(_tokenKey);
-  }
+  Future<String?> getToken() => _tokenStore.getToken();
+
+  Future<void> clearToken() => _tokenStore.clear();
 }

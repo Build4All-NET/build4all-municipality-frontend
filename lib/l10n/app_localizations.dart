@@ -1087,6 +1087,7 @@ abstract class AppLocalizations {
   /// **'Connection issue'**
   String get connection_issue;
 
+
   /// No description provided for @dashboard.
   ///
   /// In en, this message translates to:
@@ -1182,6 +1183,31 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Satisfaction'**
   String get satisfaction;
+
+  /// No description provided for @chooseHowToContinue.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose how to continue'**
+  String get chooseHowToContinue;
+
+  /// No description provided for @continueAsCitizen.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue as Citizen'**
+  String get continueAsCitizen;
+
+  /// No description provided for @continueAsAdmin.
+  ///
+  /// In en, this message translates to:
+  /// **'Continue as Admin'**
+  String get continueAsAdmin;
+
+  /// No description provided for @loginFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Login failed'**
+  String get loginFailed;
+
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

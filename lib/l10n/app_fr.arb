@@ -195,6 +195,10 @@
   "completedRequests": "Demandes complétées",
   "avgTime": "Temps moyen",
   "satisfaction": "Satisfaction",
-  "days": "jours"
+  "days": "jours",
+  "chooseHowToContinue": "Choisissez comment continuer",
+"continueAsCitizen": "Continuer comme citoyen",
+"continueAsAdmin": "Continuer comme administrateur",
+"loginFailed": "Échec de la connexion"
 
 }

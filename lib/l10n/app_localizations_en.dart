@@ -504,6 +504,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get connection_issue => 'Connection issue';
 
   @override
+
   String get dashboard => 'Dashboard';
 
   @override
@@ -550,4 +551,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get satisfaction => 'Satisfaction';
+
+  String get chooseHowToContinue => 'Choose how to continue';
+
+  @override
+  String get continueAsCitizen => 'Continue as Citizen';
+
+  @override
+  String get continueAsAdmin => 'Continue as Admin';
+
+  @override
+  String get loginFailed => 'Login failed';
+
 }

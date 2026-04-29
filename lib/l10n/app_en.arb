@@ -172,6 +172,7 @@
   "connection_reconnecting": "Reconnecting...",
   "connection_issue": "Connection issue",
 
+
   "dashboard": "Dashboard",
   "employee": "Employee",
 
@@ -195,6 +196,12 @@
   "completedRequests": "Completed Requests",
   "avgTime": "Average Time",
   "satisfaction": "Satisfaction",
-  "days": "days"
+  "days": "days",
+
+
+  "chooseHowToContinue": "Choose how to continue",
+"continueAsCitizen": "Continue as Citizen",
+"continueAsAdmin": "Continue as Admin",
+"loginFailed": "Login failed"
 
 }
