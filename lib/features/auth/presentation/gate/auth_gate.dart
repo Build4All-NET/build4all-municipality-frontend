@@ -1,6 +1,6 @@
 // lib/features/auth/presentation/gate/auth_gate.dart
 
-import 'package:baladiyati/features/admin/admin_dashboard_placeholder_screen.dart';
+import 'package:baladiyati/features/admin/Dashboard/presentation/screens/Dashboard_screen_admin.dart';
 import 'package:flutter/material.dart';
 
 import 'package:baladiyati/core/config/jwt_store.dart';
@@ -31,7 +31,7 @@ class _AuthGateState extends State<AuthGate> {
     // 1. Admin has priority if admin token exists.
     final adminToken = await adminStore.getToken();
     if (adminToken != null && adminToken.trim().isNotEmpty) {
-      return const AdminDashboardPlaceholderScreen();
+      return const DashboardPage();
     }
 
     // 2. Then check normal citizen/user token.

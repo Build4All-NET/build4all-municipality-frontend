@@ -6,7 +6,7 @@ import 'package:baladiyati/core/auth/jwt_claims.dart';
 import 'package:baladiyati/core/config/env.dart';
 import 'package:baladiyati/core/config/jwt_store.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
-import 'package:baladiyati/features/admin/admin_dashboard_placeholder_screen.dart';
+import 'package:baladiyati/features/admin/Dashboard/presentation/screens/Dashboard_screen_admin.dart';
 import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
 import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
@@ -125,7 +125,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Navigator.pushAndRemoveUntil(
     context,
     MaterialPageRoute(
-      builder: (_) => const AdminDashboardPlaceholderScreen(),
+      builder: (_) => const DashboardPage(),
     ),
     (_) => false,
   );
@@ -235,7 +235,7 @@ await AdminTokenStore().save(
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const AdminDashboardPlaceholderScreen(),
+                      builder: (_) => const DashboardPage(),
                     ),
                     (_) => false,
                   );
