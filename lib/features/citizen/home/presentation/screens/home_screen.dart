@@ -1,8 +1,11 @@
 // lib/features/citizen/home/presentation/screens/home_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:baladiyati/common/widgets/bottom_nav.dart';
 import 'package:baladiyati/features/citizen/payments/presentation/screens/payments_screen.dart';
+import 'package:baladiyati/features/citizen/profile/presentation/bloc/profile_bloc.dart';
 import 'package:baladiyati/features/citizen/profile/presentation/screens/profile_screen.dart';
 import 'package:baladiyati/features/citizen/services/presentation/screens/services_screen.dart';
 import 'package:baladiyati/features/citizen/notifications/presentation/screens/notifications_screen.dart';
@@ -51,9 +54,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final colors = Theme.of(context).colorScheme;
 
     return Scaffold(
-      // Uses the dynamic background color from THEME_JSON_B64.
       backgroundColor: colors.background,
-
       body: IndexedStack(
         index: _currentIndex,
         children: [
@@ -61,10 +62,15 @@ class _HomeScreenState extends State<HomeScreen> {
           const ServicesScreen(),
           const RequestsScreen(),
           const PaymentsScreen(),
-          const ProfileScreen(),
+
+          // ProfileScreen needs ProfileBloc because it calls:
+          // context.read<ProfileBloc>() in initState.
+          BlocProvider(
+            create: (_) => ProfileBloc(),
+            child: const ProfileScreen(),
+          ),
         ],
       ),
-
       bottomNavigationBar: BottomNav(
         currentIndex: _currentIndex,
         onTap: (index) => setState(() => _currentIndex = index),
@@ -90,37 +96,28 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
           ),
-
           Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               children: [
                 const SizedBox(height: 8),
-
                 QuickActions(
                   onNewRequest: () => setState(() => _currentIndex = 1),
                   onPayments: () => setState(() => _currentIndex = 3),
                 ),
-
                 const SizedBox(height: 20),
-
                 ServiceCategoriesSection(
                   onViewAll: () => setState(() => _currentIndex = 1),
                   onCategoryTap: (_) => setState(() => _currentIndex = 1),
                 ),
-
                 const SizedBox(height: 20),
-
                 RecentRequestsSection(
                   requests: _recentRequests,
                   onViewAll: () => setState(() => _currentIndex = 2),
                   onRequestTap: (_) => setState(() => _currentIndex = 2),
                 ),
-
                 const SizedBox(height: 20),
-
                 const AnnouncementsCard(),
-
                 const SizedBox(height: 20),
               ],
             ),

@@ -1,7 +1,7 @@
 class Env {
   static const apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'https://unlivable-unison-password.ngrok-free.dev',
+    defaultValue: ' https://geek-charter-anatomy.ngrok-free.dev',
   );
  static const String overrideBaseUrl = String.fromEnvironment(
   'OVERRIDE_BASE_URL',
