@@ -69,6 +69,41 @@ class _LoginScreenState extends State<LoginScreen> {
   final email = _emailCtrl.text.trim();
   final password = _passwordCtrl.text.trim();
 
+final prefsData = await _getFromPrefs();
+print("PREFS DATA: $prefsData");
+if (prefsData != null) {
+  try {
+    final municipalityId = 1;
+    final ownerProjectLinkId = int.tryParse(prefsData['ownerProjectLinkId']?.toString() ?? '');
+    final ownerProjectId = int.tryParse( Env.projectId ?? '');
+
+    if (municipalityId == null || ownerProjectLinkId == null || ownerProjectId == null) {
+      print("REGISTER ERROR: Invalid numeric values in prefs");
+      return;
+    }
+
+    // await _municipalityAuthApi.register(
+    //   email: prefsData['email']?.toString() ?? '',
+    //   password: prefsData['password']?.toString() ?? '',
+    //   fullName: prefsData['fullName']?.toString() ?? '',
+    //   phone: prefsData['phone']?.toString() ?? '',
+    //   role: prefsData['role']?.toString() ?? '',
+    //   municipalityId: municipalityId,
+    //   ownerProjectLinkId: ownerProjectLinkId,
+    //   build4allId: ownerProjectId,
+    // );
+
+    print("REGISTER DONE BEFORE LOGIN");
+
+  } catch (e) {
+    print("REGISTER ERROR: $e");
+  }
+}
+
+
+
+
+
   try {
     // 1. Try admin + user login
     final dual = await DualLoginOrchestrator(
