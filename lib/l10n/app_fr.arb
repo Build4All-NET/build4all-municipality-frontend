@@ -170,5 +170,9 @@
 
   "connection_offline": "Vous êtes hors ligne",
   "connection_reconnecting": "Reconnexion...",
-  "connection_issue": "Problème de connexion"
+  "connection_issue": "Problème de connexion",
+  "chooseHowToContinue": "Choisissez comment continuer",
+"continueAsCitizen": "Continuer comme citoyen",
+"continueAsAdmin": "Continuer comme administrateur",
+"loginFailed": "Échec de la connexion"
 }

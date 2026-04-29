@@ -1,12 +1,16 @@
 // lib/features/citizen/home/presentation/screens/home_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
 import 'package:baladiyati/common/widgets/bottom_nav.dart';
 import 'package:baladiyati/features/citizen/payments/presentation/screens/payments_screen.dart';
+import 'package:baladiyati/features/citizen/profile/presentation/bloc/profile_bloc.dart';
 import 'package:baladiyati/features/citizen/profile/presentation/screens/profile_screen.dart';
 import 'package:baladiyati/features/citizen/services/presentation/screens/services_screen.dart';
 import 'package:baladiyati/features/citizen/notifications/presentation/screens/notifications_screen.dart';
 import 'package:baladiyati/features/citizen/requests/presentation/screens/requests_screen.dart';
+
 import '../widgets/home_header.dart';
 import '../widgets/quick_actions.dart';
 import '../widgets/service_categories.dart';
@@ -15,6 +19,7 @@ import '../widgets/announcements.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
   @override
   State<HomeScreen> createState() => _HomeScreenState();
 }
@@ -30,14 +35,26 @@ class _HomeScreenState extends State<HomeScreen> {
   final int _completed = 5;
 
   final List<RecentRequestItem> _recentRequests = const [
-    RecentRequestItem(id: '1', nameAr: 'براءة ذمة بلدية', status: 'waiting_payment', date: '١٧-٠٣-٢٠٢٦'),
-    RecentRequestItem(id: '2', nameAr: 'شكوى - إنارة شارع', status: 'under_review', date: '١٥-٠٣-٢٠٢٦'),
+    RecentRequestItem(
+      id: '1',
+      nameAr: 'براءة ذمة بلدية',
+      status: 'waiting_payment',
+      date: '١٧-٠٣-٢٠٢٦',
+    ),
+    RecentRequestItem(
+      id: '2',
+      nameAr: 'شكوى - إنارة شارع',
+      status: 'under_review',
+      date: '١٥-٠٣-٢٠٢٦',
+    ),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F4F6),
+      backgroundColor: colors.background,
       body: IndexedStack(
         index: _currentIndex,
         children: [
@@ -45,7 +62,13 @@ class _HomeScreenState extends State<HomeScreen> {
           const ServicesScreen(),
           const RequestsScreen(),
           const PaymentsScreen(),
-          const ProfileScreen(),
+
+          // ProfileScreen needs ProfileBloc because it calls:
+          // context.read<ProfileBloc>() in initState.
+          BlocProvider(
+            create: (_) => ProfileBloc(),
+            child: const ProfileScreen(),
+          ),
         ],
       ),
       bottomNavigationBar: BottomNav(
@@ -68,7 +91,9 @@ class _HomeScreenState extends State<HomeScreen> {
             completed: _completed,
             onNotificationTap: () => Navigator.push(
               context,
-              MaterialPageRoute(builder: (_) => const NotificationsScreen()),
+              MaterialPageRoute(
+                builder: (_) => const NotificationsScreen(),
+              ),
             ),
           ),
           Padding(

@@ -77,7 +77,12 @@ class AuthRefreshCoordinator {
       if (newAccess.isEmpty || newRefresh.isEmpty) {
         throw Exception('BAD_REFRESH_RESPONSE');
       }
-await _userStore.saveToken(newAccess);
+await _userStore.saveToken(
+  token: newAccess,
+  refreshToken: newRefresh,
+  tenantId: tenantId,
+  wasInactive: false,
+);
       // await _userStore.saveToken(
       //   token: newAccess,
       //   wasInactive: false,

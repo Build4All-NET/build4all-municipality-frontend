@@ -9,13 +9,15 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:baladiyati/features/auth/presentation/login/screens/login_screen.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
 import '../bloc/complete_profile_bloc.dart';
 import '../bloc/complete_profile_event.dart';
 import '../bloc/complete_profile_state.dart';
 import '../../../data/services/auth_api_service.dart';
-import '../../../../../../core/config/app_colors.dart';
 import '../../../../../../core/config/app_sizes.dart';
 import '../../../../../../common/widgets/primary_button.dart';
+import '../../../../../../common/widgets/app_toast.dart';
+import '../../../../../../common/widgets/app_text_field.dart';
 
 class _Municipality {
   final int id;
@@ -45,21 +47,14 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final _authApi = AuthApi(DioClient.build);
 
   final List<_Municipality> _municipalities = const [
-    _Municipality(
-        id: 1, nameAr: 'بلدية بيروت', nameEn: 'Beirut', nameFr: 'Beyrouth'),
-    _Municipality(
-        id: 2, nameAr: 'بلدية طرابلس', nameEn: 'Tripoli', nameFr: 'Tripoli'),
-    _Municipality(
-        id: 3, nameAr: 'بلدية صيدا', nameEn: 'Sidon', nameFr: 'Saïda'),
+    _Municipality(id: 1, nameAr: 'بلدية بيروت', nameEn: 'Beirut', nameFr: 'Beyrouth'),
+    _Municipality(id: 2, nameAr: 'بلدية طرابلس', nameEn: 'Tripoli', nameFr: 'Tripoli'),
+    _Municipality(id: 3, nameAr: 'بلدية صيدا', nameEn: 'Sidon', nameFr: 'Saïda'),
     _Municipality(id: 4, nameAr: 'بلدية صور', nameEn: 'Tyre', nameFr: 'Tyr'),
-    _Municipality(
-        id: 5, nameAr: 'بلدية زحلة', nameEn: 'Zahle', nameFr: 'Zahlé'),
-    _Municipality(
-        id: 6, nameAr: 'بلدية جونية', nameEn: 'Jounieh', nameFr: 'Jounieh'),
-    _Municipality(
-        id: 7, nameAr: 'بلدية بعلبك', nameEn: 'Baalbek', nameFr: 'Baalbek'),
-    _Municipality(
-        id: 8, nameAr: 'بلدية النبطية', nameEn: 'Nabatieh', nameFr: 'Nabatiyé'),
+    _Municipality(id: 5, nameAr: 'بلدية زحلة', nameEn: 'Zahle', nameFr: 'Zahlé'),
+    _Municipality(id: 6, nameAr: 'بلدية جونية', nameEn: 'Jounieh', nameFr: 'Jounieh'),
+    _Municipality(id: 7, nameAr: 'بلدية بعلبك', nameEn: 'Baalbek', nameFr: 'Baalbek'),
+    _Municipality(id: 8, nameAr: 'بلدية النبطية', nameEn: 'Nabatieh', nameFr: 'Nabatiyé'),
   ];
 
   _Municipality? _selectedMunicipality;
@@ -73,23 +68,19 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   Future<Map<String, dynamic>?> _getFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
-
-    final String? data = prefs.getString('register_body');
-
+    final data = prefs.getString('register_body');
     if (data == null) return null;
-
     return jsonDecode(data) as Map<String, dynamic>;
   }
 
-  void _onSubmit(BuildContext context, AppLocalizations l10n) async {
+  Future<void> _onSubmit(BuildContext context, AppLocalizations l10n) async {
     if (!_formKey.currentState!.validate()) return;
 
     if (_selectedMunicipality == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(l10n.selectMunicipalityWarning),
-          backgroundColor: Colors.orange,
-        ),
+      AppToast.show(
+        context,
+        message: l10n.selectMunicipalityWarning,
+        type: AppToastType.error,
       );
       return;
     }
@@ -97,33 +88,24 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
     try {
       final body = await _getFromPrefs();
 
-    print("""
-pendingId: ${body?["userId"]}
-firstName: ${body?["fullName"]}
-lastName: ${body?["lastname"]}
-username: ${_usernameCtrl.text.trim()}
-isPublicProfile: ${body?["isPublicProfile"]}
-ownerProjectLinkId: ${body?["ownerProjectLinkId"]}
-""");
       if (body == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text("No saved registration data found"),
-          ),
+        AppToast.show(
+          context,
+          message: 'No saved registration data found',
+          type: AppToastType.error,
         );
         return;
       }
 
       await _authApi.ownerCompleteProfile(
-        pendingId: body["userId"].toString(),
-        firstName: body["fullName"],
-        lastName: body["lastname"],
-        username: _usernameCtrl.text.trim(), // 🔥 override safe value
+        pendingId: body['userId'].toString(),
+        firstName: body['fullName'],
+        lastName: body['lastname'],
+        username: _usernameCtrl.text.trim(),
         isPublicProfile: false,
-        ownerProjectLinkId: body["ownerProjectLinkId"].toString(),
+        ownerProjectLinkId: body['ownerProjectLinkId'].toString(),
       );
 
-      // ✅ ONLY AFTER SUCCESS
       if (!context.mounted) return;
 
       context.read<CompleteProfileBloc>().add(
@@ -137,11 +119,12 @@ ownerProjectLinkId: ${body?["ownerProjectLinkId"]}
 
       AppRouter.goToWelcome(context);
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text("Error: $e"),
-          backgroundColor: Colors.red,
-        ),
+      if (!context.mounted) return;
+
+      AppToast.show(
+        context,
+        message: 'Error: $e',
+        type: AppToastType.error,
       );
     }
   }
@@ -156,168 +139,161 @@ ownerProjectLinkId: ${body?["ownerProjectLinkId"]}
   Widget build(BuildContext context) {
     return BlocProvider(
       create: (_) => CompleteProfileBloc(authApi: AuthApiService()),
-      child: Builder(builder: (context) {
-        return BlocConsumer<CompleteProfileBloc, CompleteProfileState>(
-          listener: (context, state) {
-            final l10n = AppLocalizations.of(context)!;
+      child: Builder(
+        builder: (context) {
+          return BlocConsumer<CompleteProfileBloc, CompleteProfileState>(
+            listener: (context, state) {
+              final l10n = AppLocalizations.of(context)!;
 
-            if (state.isSuccess) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(l10n.completeProfileSuccess),
-                  backgroundColor: Colors.green,
-                ),
-              );
-
-              Future.delayed(const Duration(milliseconds: 500), () {
-                if (!mounted) return;
-                Navigator.pushAndRemoveUntil(
+              if (state.isSuccess) {
+                AppToast.show(
                   context,
-                  MaterialPageRoute(
-                    builder: (_) => const LoginScreen(),
-                  ),
-                  (_) => false,
+                  message: l10n.completeProfileSuccess,
+                  type: AppToastType.success,
                 );
-              });
-            }
 
-            if (state.errorMessage != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(
-                  content: Text(state.errorMessage!),
-                  backgroundColor: Colors.red,
-                ),
-              );
-            }
-          },
-          builder: (context, state) {
-            final l10n = AppLocalizations.of(context)!;
+                Future.delayed(const Duration(milliseconds: 500), () {
+                  if (!mounted) return;
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(builder: (_) => const LoginScreen()),
+                    (_) => false,
+                  );
+                });
+              }
 
-            return Scaffold(
-              backgroundColor: AppColors.background,
-              body: SafeArea(
-                child: Column(
-                  children: [
-                    _buildHeader(context),
-                    Expanded(
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.all(AppSizes.paddingLarge),
-                        child: Container(
+              if (state.errorMessage != null) {
+                AppToast.show(
+                  context,
+                  message: state.errorMessage!,
+                  type: AppToastType.error,
+                );
+              }
+            },
+            builder: (context, state) {
+              final l10n = AppLocalizations.of(context)!;
+              final theme = Theme.of(context);
+              final cs = theme.colorScheme;
+
+              return Scaffold(
+                backgroundColor: cs.background,
+                body: SafeArea(
+                  child: Column(
+                    children: [
+                      _buildHeader(context),
+                      Expanded(
+                        child: SingleChildScrollView(
                           padding: const EdgeInsets.all(AppSizes.paddingLarge),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius:
-                                BorderRadius.circular(AppSizes.radiusLarge),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.07),
-                                blurRadius: 20,
-                                offset: const Offset(0, 4),
-                              )
-                            ],
-                          ),
-                          child: Form(
-                            key: _formKey,
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.end,
-                              children: [
-                                Center(
-                                  child: Text(
-                                    l10n.completeProfileTitle,
-                                    style: const TextStyle(
-                                      fontSize: 24,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppColors.darkBlue,
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(height: 28),
-
-                                // USERNAME
-                                _label(l10n.usernameLabel),
-                                const SizedBox(height: 8),
-                                _textField(
-                                  controller: _usernameCtrl,
-                                  hint: l10n.usernameHint,
-                                  icon: Icons.person_outline,
-                                  validator: (v) {
-                                    if (v == null || v.trim().isEmpty) {
-                                      return l10n.fieldRequired;
-                                    }
-                                    if (v.trim().length < 3) {
-                                      return l10n.usernameTooShort;
-                                    }
-                                    return null;
-                                  },
-                                ),
-
-                                const SizedBox(height: 16),
-
-                                // ADDRESS ✅ UPDATED
-                                _label(l10n.addressLabel),
-                                const SizedBox(height: 8),
-                                _textField(
-                                  controller: _addressCtrl,
-                                  hint:
-                                      'Lebanon, Beirut, Building 5, Main Street',
-                                  icon: Icons.location_on_outlined,
-                                  validator: (v) {
-                                    if (v == null || v.trim().isEmpty) {
-                                      return l10n.fieldRequired;
-                                    }
-
-                                    final value = v.trim();
-
-                                    if (value.length < 10) {
-                                      return 'Address is too short';
-                                    }
-
-                                    if (!RegExp(r'^[a-zA-Z0-9 ,.\-]+$')
-                                        .hasMatch(value)) {
-                                      return 'Use only English letters, numbers, commas and dots';
-                                    }
-
-                                    final parts = value.split(',');
-                                    if (parts.length < 4) {
-                                      return 'Format: Country, City, Building, Street';
-                                    }
-
-                                    return null;
-                                  },
-                                ),
-
-                                const SizedBox(height: 16),
-
-                                // MUNICIPALITY
-                                _label(l10n.municipalityLabel),
-                                const SizedBox(height: 8),
-                                _municipalityDropdown(l10n),
-
-                                const SizedBox(height: 28),
-
-                                PrimaryButton(
-                                  label: l10n.completeProfileButton,
-                                  isLoading: state.isLoading,
-                                  onPressed: () => _onSubmit(context, l10n),
+                          child: Container(
+                            padding: const EdgeInsets.all(AppSizes.paddingLarge),
+                            decoration: BoxDecoration(
+                              color: cs.surface,
+                              borderRadius: BorderRadius.circular(AppSizes.radiusLarge),
+                              boxShadow: [
+                                BoxShadow(
+                                  color: cs.onSurface.withOpacity(0.07),
+                                  blurRadius: 20,
+                                  offset: const Offset(0, 4),
                                 ),
                               ],
+                            ),
+                            child: Form(
+                              key: _formKey,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.end,
+                                children: [
+                                  Center(
+                                    child: Text(
+                                      l10n.completeProfileTitle,
+                                      style: theme.textTheme.titleLarge?.copyWith(
+                                        fontWeight: FontWeight.bold,
+                                        color: cs.onSurface,
+                                      ),
+                                    ),
+                                  ),
+
+                                  const SizedBox(height: 28),
+
+                                  AppTextField(
+                                    controller: _usernameCtrl,
+                                    label: l10n.usernameLabel,
+                                    hint: l10n.usernameHint,
+                                    icon: Icons.person_outline,
+                                    textAlign: TextAlign.right,
+                                    validator: (v) {
+                                      if (v == null || v.trim().isEmpty) {
+                                        return l10n.fieldRequired;
+                                      }
+                                      if (v.trim().length < 3) {
+                                        return l10n.usernameTooShort;
+                                      }
+                                      return null;
+                                    },
+                                  ),
+
+                                  const SizedBox(height: 16),
+
+                                  AppTextField(
+                                    controller: _addressCtrl,
+                                    label: l10n.addressLabel,
+                                    hint: 'Lebanon, Beirut, Building 5, Main Street',
+                                    icon: Icons.location_on_outlined,
+                                    textAlign: TextAlign.right,
+                                    validator: (v) {
+                                      if (v == null || v.trim().isEmpty) {
+                                        return l10n.fieldRequired;
+                                      }
+
+                                      final value = v.trim();
+
+                                      if (value.length < 10) {
+                                        return 'Address is too short';
+                                      }
+
+                                      if (!RegExp(r'^[a-zA-Z0-9 ,.\-]+$').hasMatch(value)) {
+                                        return 'Use only English letters, numbers, commas and dots';
+                                      }
+
+                                      if (value.split(',').length < 4) {
+                                        return 'Format: Country, City, Building, Street';
+                                      }
+
+                                      return null;
+                                    },
+                                  ),
+
+                                  const SizedBox(height: 16),
+
+                                  _municipalityDropdown(context, l10n),
+
+                                  const SizedBox(height: 28),
+
+                                  PrimaryButton(
+                                    label: l10n.completeProfileButton,
+                                    isLoading: state.isLoading,
+                                    onPressed: () => _onSubmit(context, l10n),
+                                  ),
+                                ],
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
-        );
-      }),
+              );
+            },
+          );
+        },
+      ),
     );
   }
 
   Widget _buildHeader(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
     return Padding(
       padding: const EdgeInsets.symmetric(
@@ -329,44 +305,70 @@ ownerProjectLinkId: ${body?["ownerProjectLinkId"]}
         children: [
           GestureDetector(
             onTap: () => Navigator.pop(context),
-            child: const Icon(Icons.arrow_back_ios_new),
+            child: Icon(Icons.arrow_back_ios_new, color: cs.onSurface),
           ),
-          Text(l10n.appTitle),
+          Text(
+            l10n.appTitle,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: cs.onSurface,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
         ],
       ),
     );
   }
 
-  Widget _label(String text) => Text(text);
+  Widget _municipalityDropdown(BuildContext context, AppLocalizations l10n) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
-  Widget _textField({
-    required TextEditingController controller,
-    required String hint,
-    required IconData icon,
-    required String? Function(String?) validator,
-  }) {
-    return TextFormField(
-      controller: controller,
-      textAlign: TextAlign.right,
-      decoration: InputDecoration(
-        hintText: hint,
-        prefixIcon: Icon(icon),
-      ),
-      validator: validator,
-    );
-  }
-
-  Widget _municipalityDropdown(AppLocalizations l10n) {
-    return DropdownButton<_Municipality>(
-      value: _selectedMunicipality,
-      hint: Text(l10n.selectMunicipality),
-      items: _municipalities
-          .map((m) => DropdownMenuItem(
-                value: m,
-                child: Text(_getMunicipalityName(m, l10n)),
-              ))
-          .toList(),
-      onChanged: (val) => setState(() => _selectedMunicipality = val),
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        Text(
+          l10n.municipalityLabel,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: cs.onSurface,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+        const SizedBox(height: 8),
+        DropdownButtonFormField<_Municipality>(
+          value: _selectedMunicipality,
+          isExpanded: true,
+          decoration: InputDecoration(
+            filled: true,
+            fillColor: cs.surface,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+            ),
+          ),
+          hint: Text(
+            l10n.selectMunicipality,
+            style: theme.textTheme.bodyMedium?.copyWith(color: cs.outline),
+          ),
+          dropdownColor: cs.surface,
+          items: _municipalities
+              .map(
+                (m) => DropdownMenuItem(
+                  value: m,
+                  child: Text(
+                    _getMunicipalityName(m, l10n),
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: cs.onSurface,
+                    ),
+                  ),
+                ),
+              )
+              .toList(),
+          onChanged: (val) => setState(() => _selectedMunicipality = val),
+          validator: (val) {
+            if (val == null) return l10n.selectMunicipalityWarning;
+            return null;
+          },
+        ),
+      ],
     );
   }
 }

@@ -502,4 +502,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get connection_issue => 'Problème de connexion';
+
+  @override
+  String get chooseHowToContinue => 'Choisissez comment continuer';
+
+  @override
+  String get continueAsCitizen => 'Continuer comme citoyen';
+
+  @override
+  String get continueAsAdmin => 'Continuer comme administrateur';
+
+  @override
+  String get loginFailed => 'Échec de la connexion';
 }

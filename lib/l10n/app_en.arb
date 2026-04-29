@@ -170,5 +170,9 @@
 
   "connection_offline": "You are offline",
   "connection_reconnecting": "Reconnecting...",
-  "connection_issue": "Connection issue"
+  "connection_issue": "Connection issue",
+  "chooseHowToContinue": "Choose how to continue",
+"continueAsCitizen": "Continue as Citizen",
+"continueAsAdmin": "Continue as Admin",
+"loginFailed": "Login failed"
 }
