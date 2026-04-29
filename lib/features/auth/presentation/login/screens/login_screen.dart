@@ -9,6 +9,8 @@ import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/admin/admin_dashboard_placeholder_screen.dart';
 import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
+import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
+import 'package:baladiyati/features/auth/data/services/session_role_store.dart';
 import 'package:baladiyati/features/auth/domain/facade/dual_login_orchestrator.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -181,7 +183,19 @@ void _showRoleChooser(BuildContext context, DualLoginResult dual) {
                   Navigator.pop(context);
 
                   await AdminTokenStore().clear();
-                  await JwtStore.save(dual.userToken!);
+
+await JwtStore.save(dual.userToken!);
+await SessionRoleStore().saveRole('CITIZEN');
+
+await AuthTokenStore().saveToken(
+  token: dual.userToken!,
+  refreshToken: dual.userRefreshToken,
+  tenantId: ownerProjectLinkId.toString(),
+  userJson: dual.userData?['user'] is Map<String, dynamic>
+      ? Map<String, dynamic>.from(dual.userData!['user'] as Map)
+      : null,
+      
+);
 
                   if (!mounted) return;
 
@@ -205,8 +219,11 @@ void _showRoleChooser(BuildContext context, DualLoginResult dual) {
                 onTap: () async {
                   Navigator.pop(context);
 
-                  await JwtStore.clear();
-                  await AdminTokenStore().save(
+                 await AuthTokenStore().clear();
+await JwtStore.clear();
+await SessionRoleStore().saveRole(dual.admin!.role);
+
+await AdminTokenStore().save(
   token: dual.admin!.token,
   role: dual.admin!.role,
   refreshToken: dual.admin!.refreshToken,

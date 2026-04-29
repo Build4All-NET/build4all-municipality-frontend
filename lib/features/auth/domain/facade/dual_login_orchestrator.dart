@@ -1,3 +1,5 @@
+// lib/features/auth/domain/facade/dual_login_orchestrator.dart
+
 import 'package:baladiyati/features/auth/data/models/admin_login_response.dart';
 import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
@@ -7,7 +9,9 @@ class DualLoginResult {
   final bool userOk;
 
   final AdminLoginResponse? admin;
+
   final String? userToken;
+  final String? userRefreshToken;
   final Map<String, dynamic>? userData;
 
   final String? error;
@@ -17,6 +21,7 @@ class DualLoginResult {
     required this.userOk,
     this.admin,
     this.userToken,
+    this.userRefreshToken,
     this.userData,
     this.error,
   });
@@ -27,6 +32,10 @@ class DualLoginResult {
 
 class DualLoginOrchestrator {
   final AuthApi authApi;
+
+  // Kept for compatibility with current constructor usage.
+  // Do not save tokens here. Token persistence belongs to LoginScreen
+  // after the final role choice is known.
   final AdminTokenStore adminStore;
 
   const DualLoginOrchestrator({
@@ -36,9 +45,11 @@ class DualLoginOrchestrator {
 
   String _stripBearer(String token) {
     final value = token.trim();
+
     if (value.toLowerCase().startsWith('bearer ')) {
       return value.substring(7).trim();
     }
+
     return value;
   }
 
@@ -48,13 +59,15 @@ class DualLoginOrchestrator {
     required int ownerProjectLinkId,
   }) async {
     AdminLoginResponse? admin;
+
     String? userToken;
+    String? userRefreshToken;
     Map<String, dynamic>? userData;
 
     Object? adminError;
     Object? userError;
 
-    // 1. Try admin login.
+    // 1. Try admin/owner login.
     try {
       final adminResponse = await authApi.adminLogin(
         usernameOrEmail: identifier,
@@ -62,11 +75,17 @@ class DualLoginOrchestrator {
         ownerProjectLinkId: ownerProjectLinkId,
       );
 
-      final token = _stripBearer(adminResponse.token);
+      final cleanToken = _stripBearer(adminResponse.token);
+      final cleanRole = adminResponse.role.trim();
 
-      if (token.isNotEmpty && adminResponse.role.trim().isNotEmpty) {
-        admin = adminResponse;
-
+      if (cleanToken.isNotEmpty && cleanRole.isNotEmpty) {
+        admin = AdminLoginResponse(
+          token: cleanToken,
+          refreshToken: adminResponse.refreshToken.trim(),
+          role: cleanRole,
+          admin: adminResponse.admin,
+          ownerProjectId: adminResponse.ownerProjectId,
+        );
       }
     } catch (e) {
       adminError = e;
@@ -81,10 +100,13 @@ class DualLoginOrchestrator {
       );
 
       final data = Map<String, dynamic>.from(userResponse.data as Map);
-      final token = (data['token'] ?? '').toString();
+
+      final token = (data['token'] ?? '').toString().trim();
+      final refreshToken = (data['refreshToken'] ?? '').toString().trim();
 
       if (token.isNotEmpty) {
-        userToken = token;
+        userToken = _stripBearer(token);
+        userRefreshToken = refreshToken.isEmpty ? null : refreshToken;
         userData = data;
       }
     } catch (e) {
@@ -109,6 +131,7 @@ class DualLoginOrchestrator {
       userOk: userOk,
       admin: admin,
       userToken: userToken,
+      userRefreshToken: userRefreshToken,
       userData: userData,
     );
   }
