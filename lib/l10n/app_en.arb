@@ -171,8 +171,37 @@
   "connection_offline": "You are offline",
   "connection_reconnecting": "Reconnecting...",
   "connection_issue": "Connection issue",
+
+
+  "dashboard": "Dashboard",
+  "employee": "Employee",
+
+  "inProgress": "In Progress",
+  "newRequests": "New Requests",
+  "needReview": "Need Review",
+  "completedToday": "Completed Today",
+
+  "quickActions": "Quick Actions",
+  "services": "Services",
+  "inbox": "Inbox",
+  "announcements": "Announcements",
+  "employees": "Employees",
+
+  "recentActivity": "Recent Activity",
+  "approvedRequest": "Approved request",
+  "newRequest": "New request received",
+  "missingDocs": "Missing documents",
+
+  "monthPerformance": "Monthly Performance",
+  "completedRequests": "Completed Requests",
+  "avgTime": "Average Time",
+  "satisfaction": "Satisfaction",
+  "days": "days",
+
+
   "chooseHowToContinue": "Choose how to continue",
 "continueAsCitizen": "Continue as Citizen",
 "continueAsAdmin": "Continue as Admin",
 "loginFailed": "Login failed"
+
 }

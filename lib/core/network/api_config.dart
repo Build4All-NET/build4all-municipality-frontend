@@ -22,9 +22,11 @@ class ApiConfig {
   static const _prefsKeyMunicipality = 'municipality_api_root';
   static const _prefsKeyBuild4all = 'build4all_api_root';
 
-  // Use Env so GitHub Actions / dart-define controls URLs.
-  static String get _defaultMunicipality => Env.overrideBaseUrl;
-  static String get _defaultBuild4all => Env.apiBaseUrl;
+
+
+// Use Env so GitHub Actions / dart-define controls URLs.
+static String get _defaultMunicipality => Env.overrideBaseUrl;
+static String get _defaultBuild4all => Env.apiBaseUrl;
 
   static Future<ApiConfig> load() async {
     String? muniFromPrefs;

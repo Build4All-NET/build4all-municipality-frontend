@@ -246,7 +246,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get quickActions => 'Actions rapides';
 
   @override
-  String get newRequest => 'Nouvelle demande';
+  String get newRequest => 'Nouvelle demande reçue';
 
   @override
   String get serviceCategories => 'Catégories de services';
@@ -504,6 +504,54 @@ class AppLocalizationsFr extends AppLocalizations {
   String get connection_issue => 'Problème de connexion';
 
   @override
+
+  String get dashboard => 'Tableau de bord';
+
+  @override
+  String get inProgress => 'En cours';
+
+  @override
+  String get newRequests => 'Nouvelles demandes';
+
+  @override
+  String get needReview => 'À vérifier';
+
+  @override
+  String get completedToday => 'Complétées aujourd’hui';
+
+  @override
+  String get services => 'Services';
+
+  @override
+  String get inbox => 'Boîte de réception';
+
+  @override
+  String get announcements => 'Annonces';
+
+  @override
+  String get employees => 'Employés';
+
+  @override
+  String get recentActivity => 'Activité récente';
+
+  @override
+  String get approvedRequest => 'Demande approuvée';
+
+  @override
+  String get missingDocs => 'Documents manquants';
+
+  @override
+  String get monthPerformance => 'Performance mensuelle';
+
+  @override
+  String get completedRequests => 'Demandes complétées';
+
+  @override
+  String get avgTime => 'Temps moyen';
+
+  @override
+  String get satisfaction => 'Satisfaction';
+
   String get chooseHowToContinue => 'Choisissez comment continuer';
 
   @override
@@ -514,4 +562,5 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get loginFailed => 'Échec de la connexion';
+
 }

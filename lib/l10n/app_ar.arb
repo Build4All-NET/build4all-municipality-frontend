@@ -170,8 +170,35 @@
   "connection_offline": "أنت غير متصل بالإنترنت",
   "connection_reconnecting": "إعادة الاتصال...",
   "connection_issue": "مشكلة في الاتصال",
+
+  "dashboard": "لوحة التحكم",
+  "employee": "الموظف",
+
+  "inProgress": "قيد المعالجة",
+  "newRequests": "طلبات جديدة",
+  "needReview": "تحتاج مراجعة",
+  "completedToday": "تم إنجازه اليوم",
+
+  "quickActions": "إجراءات سريعة",
+  "services": "الخدمات",
+  "inbox": "الوارد",
+  "announcements": "الإعلانات",
+  "employees": "الموظفون",
+
+  "recentActivity": "النشاط الأخير",
+  "approvedRequest": "تمت الموافقة على الطلب",
+  "newRequest": "تم استلام طلب جديد",
+  "missingDocs": "مستندات ناقصة",
+
+  "monthPerformance": "الأداء الشهري",
+  "completedRequests": "الطلبات المنجزة",
+  "avgTime": "متوسط الوقت",
+  "satisfaction": "نسبة الرضا",
+  "days": "أيام",
+
   "chooseHowToContinue": "اختر طريقة المتابعة",
 "continueAsCitizen": "المتابعة كمواطن",
 "continueAsAdmin": "المتابعة كمسؤول",
 "loginFailed": "فشل تسجيل الدخول"
+
 }
