@@ -47,14 +47,21 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final _authApi = AuthApi(DioClient.build);
 
   final List<_Municipality> _municipalities = const [
-    _Municipality(id: 1, nameAr: 'بلدية بيروت', nameEn: 'Beirut', nameFr: 'Beyrouth'),
-    _Municipality(id: 2, nameAr: 'بلدية طرابلس', nameEn: 'Tripoli', nameFr: 'Tripoli'),
-    _Municipality(id: 3, nameAr: 'بلدية صيدا', nameEn: 'Sidon', nameFr: 'Saïda'),
+    _Municipality(
+        id: 1, nameAr: 'بلدية بيروت', nameEn: 'Beirut', nameFr: 'Beyrouth'),
+    _Municipality(
+        id: 2, nameAr: 'بلدية طرابلس', nameEn: 'Tripoli', nameFr: 'Tripoli'),
+    _Municipality(
+        id: 3, nameAr: 'بلدية صيدا', nameEn: 'Sidon', nameFr: 'Saïda'),
     _Municipality(id: 4, nameAr: 'بلدية صور', nameEn: 'Tyre', nameFr: 'Tyr'),
-    _Municipality(id: 5, nameAr: 'بلدية زحلة', nameEn: 'Zahle', nameFr: 'Zahlé'),
-    _Municipality(id: 6, nameAr: 'بلدية جونية', nameEn: 'Jounieh', nameFr: 'Jounieh'),
-    _Municipality(id: 7, nameAr: 'بلدية بعلبك', nameEn: 'Baalbek', nameFr: 'Baalbek'),
-    _Municipality(id: 8, nameAr: 'بلدية النبطية', nameEn: 'Nabatieh', nameFr: 'Nabatiyé'),
+    _Municipality(
+        id: 5, nameAr: 'بلدية زحلة', nameEn: 'Zahle', nameFr: 'Zahlé'),
+    _Municipality(
+        id: 6, nameAr: 'بلدية جونية', nameEn: 'Jounieh', nameFr: 'Jounieh'),
+    _Municipality(
+        id: 7, nameAr: 'بلدية بعلبك', nameEn: 'Baalbek', nameFr: 'Baalbek'),
+    _Municipality(
+        id: 8, nameAr: 'بلدية النبطية', nameEn: 'Nabatieh', nameFr: 'Nabatiyé'),
   ];
 
   _Municipality? _selectedMunicipality;
@@ -97,10 +104,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         return;
       }
 
+      print('${body['userId']} ${body['fullName']} ${body['lastname']} ${_usernameCtrl.text}');
       await _authApi.ownerCompleteProfile(
         pendingId: body['userId'].toString(),
-        firstName: body['fullName'],
-        lastName: body['lastname'],
+        firstName: body['fullName'].toString(),
+        lastName: body['lastname'].toString(),
         username: _usernameCtrl.text.trim(),
         isPublicProfile: false,
         ownerProjectLinkId: body['ownerProjectLinkId'].toString(),
@@ -185,10 +193,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                         child: SingleChildScrollView(
                           padding: const EdgeInsets.all(AppSizes.paddingLarge),
                           child: Container(
-                            padding: const EdgeInsets.all(AppSizes.paddingLarge),
+                            padding:
+                                const EdgeInsets.all(AppSizes.paddingLarge),
                             decoration: BoxDecoration(
                               color: cs.surface,
-                              borderRadius: BorderRadius.circular(AppSizes.radiusLarge),
+                              borderRadius:
+                                  BorderRadius.circular(AppSizes.radiusLarge),
                               boxShadow: [
                                 BoxShadow(
                                   color: cs.onSurface.withOpacity(0.07),
@@ -205,15 +215,14 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                                   Center(
                                     child: Text(
                                       l10n.completeProfileTitle,
-                                      style: theme.textTheme.titleLarge?.copyWith(
+                                      style:
+                                          theme.textTheme.titleLarge?.copyWith(
                                         fontWeight: FontWeight.bold,
                                         color: cs.onSurface,
                                       ),
                                     ),
                                   ),
-
                                   const SizedBox(height: 28),
-
                                   AppTextField(
                                     controller: _usernameCtrl,
                                     label: l10n.usernameLabel,
@@ -230,13 +239,12 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                                       return null;
                                     },
                                   ),
-
                                   const SizedBox(height: 16),
-
                                   AppTextField(
                                     controller: _addressCtrl,
                                     label: l10n.addressLabel,
-                                    hint: 'Lebanon, Beirut, Building 5, Main Street',
+                                    hint:
+                                        'Lebanon, Beirut, Building 5, Main Street',
                                     icon: Icons.location_on_outlined,
                                     textAlign: TextAlign.right,
                                     validator: (v) {
@@ -250,7 +258,8 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                                         return 'Address is too short';
                                       }
 
-                                      if (!RegExp(r'^[a-zA-Z0-9 ,.\-]+$').hasMatch(value)) {
+                                      if (!RegExp(r'^[a-zA-Z0-9 ,.\-]+$')
+                                          .hasMatch(value)) {
                                         return 'Use only English letters, numbers, commas and dots';
                                       }
 
@@ -261,13 +270,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                                       return null;
                                     },
                                   ),
-
                                   const SizedBox(height: 16),
-
                                   _municipalityDropdown(context, l10n),
-
                                   const SizedBox(height: 28),
-
                                   PrimaryButton(
                                     label: l10n.completeProfileButton,
                                     isLoading: state.isLoading,
