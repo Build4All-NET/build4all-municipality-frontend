@@ -66,10 +66,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fullNameHint => 'Ahmad Khalil';
 
   @override
-  String get phoneLabel => 'Phone Number';
+  String get phoneLabel => 'Phone';
 
   @override
-  String get phoneHint => '+961';
+  String get phoneHint => 'Enter your phone number';
 
   @override
   String get registerButton => 'Create Account';
@@ -117,7 +117,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emailMethod => 'Email';
 
   @override
-  String get selectMunicipality => 'Select Municipality';
+  String get selectMunicipality => 'Select municipality';
 
   @override
   String get municipalityLabel => 'Municipality';
@@ -168,7 +168,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addressLabel => 'Address';
 
   @override
-  String get addressHint => 'Beirut, Lebanon';
+  String get addressHint => 'Enter your address';
 
   @override
   String get completeProfileButton => 'Complete Profile';
@@ -504,7 +504,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get connection_issue => 'Connection issue';
 
   @override
-
   String get dashboard => 'Dashboard';
 
   @override
@@ -552,6 +551,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get satisfaction => 'Satisfaction';
 
+  @override
   String get chooseHowToContinue => 'Choose how to continue';
 
   @override
@@ -563,4 +563,72 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get loginFailed => 'Login failed';
 
+  @override
+  String get firstNameLabel => 'First name';
+
+  @override
+  String get firstNameHint => 'Enter your first name';
+
+  @override
+  String get lastNameLabel => 'Last name';
+
+  @override
+  String get lastNameHint => 'Enter your last name';
+
+  @override
+  String get firstNameTooShort => 'First name is too short';
+
+  @override
+  String get lastNameTooShort => 'Last name is too short';
+
+  @override
+  String get usernameInvalidChars => 'Use only letters, numbers, dot, or underscore';
+
+  @override
+  String get missingRegistrationData => 'No saved registration data found. Please register again.';
+
+  @override
+  String get missingUserIdVerifyAgain => 'Missing user id. Please verify your code again.';
+
+  @override
+  String get missingOwnerProjectLinkId => 'Missing owner project link id. Please register again.';
+
+  @override
+  String get verificationUserIdMissing => 'Verification succeeded but user id was missing.';
+
+  @override
+  String get municipalityProfileTitle => 'Complete municipality profile';
+
+  @override
+  String get municipalityProfileSubtitle => 'Add the information required by your municipality.';
+
+  @override
+  String get completeMunicipalityProfileButton => 'Save and continue';
+
+  @override
+  String get municipalityProfileSaved => 'Municipality profile saved successfully';
+
+  @override
+  String get municipalityProfileSaveFailed => 'Failed to save municipality profile';
+
+  @override
+  String get loadingMunicipalitiesFailed => 'Failed to load municipalities';
+
+  @override
+  String get noMunicipalitiesFound => 'No municipalities found';
+
+  @override
+  String get phoneInvalid => 'Phone number must contain 8 to 15 digits';
+
+  @override
+  String get addressTooShort => 'Address is too short';
+
+  @override
+  String get missingBuild4allToken => 'Missing login token. Please login again.';
+
+  @override
+  String get missingBuild4allUser => 'Missing user data. Please login again.';
+
+  @override
+  String get missingMunicipalityId => 'Missing municipality id';
 }

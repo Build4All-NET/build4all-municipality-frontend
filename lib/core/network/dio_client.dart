@@ -10,7 +10,12 @@ class DioClient {
 
   static Future<void> init() async {
     final build4allBaseUrl = _withApiSuffix(Env.apiBaseUrl);
-    final municipalityBaseUrl = _withApiSuffix(Env.overrideBaseUrl);
+    final municipalityBaseUrl = _cleanBaseUrl(Env.overrideBaseUrl);
+
+    print('BUILD4ALL_BASE_URL = $build4allBaseUrl');
+    print('MUNICIPALITY_BASE_URL = $municipalityBaseUrl');
+    print('OWNER_PROJECT_LINK_ID = ${Env.ownerProjectLinkId}');
+    print('PROJECT_ID = ${Env.projectId}');
 
     build4allDio = Dio(
       BaseOptions(
@@ -49,22 +54,24 @@ class DioClient {
 
   static Dio get muni => municipalityDio;
 
+ static void setAuthToken(String? token) {
+  globals.setAuthToken(token);
 
-  static void setAuthToken(String? token) {
-    globals.setAuthToken(token);
+  final raw = (token ?? '').trim();
 
-    final cleanToken = globals.readAuthToken();
-
-    if (cleanToken.trim().isEmpty) {
-      build4allDio.options.headers.remove('Authorization');
-      municipalityDio.options.headers.remove('Authorization');
-      return;
-    }
-
-    build4allDio.options.headers['Authorization'] = cleanToken;
-    municipalityDio.options.headers['Authorization'] = cleanToken;
+  if (raw.isEmpty) {
+    build4allDio.options.headers.remove('Authorization');
+    municipalityDio.options.headers.remove('Authorization');
+    return;
   }
 
+  final bearer = raw.toLowerCase().startsWith('bearer ')
+      ? raw
+      : 'Bearer $raw';
+
+  build4allDio.options.headers['Authorization'] = bearer;
+  municipalityDio.options.headers['Authorization'] = bearer;
+}
   static void clearAuthToken() {
     setAuthToken(null);
   }
@@ -87,16 +94,17 @@ class DioClient {
     );
   }
 
+  static String _cleanBaseUrl(String rawUrl) {
+    return rawUrl.trim().replaceAll(RegExp(r'/+$'), '');
+  }
+
   static String _withApiSuffix(String rawUrl) {
-    final clean = rawUrl.trim().replaceAll(RegExp(r'/+$'), '');
+    final clean = _cleanBaseUrl(rawUrl);
 
     if (clean.endsWith('/api')) {
       return clean;
     }
-print('OWNER_PROJECT_LINK_ID = ${Env.ownerProjectLinkId}');
-print('PROJECT_ID = ${Env.projectId}');
-    return '$clean/api';
 
-    
+    return '$clean/api';
   }
 }

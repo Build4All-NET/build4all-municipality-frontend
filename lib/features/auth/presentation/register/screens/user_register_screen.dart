@@ -6,18 +6,17 @@ import 'package:baladiyati/common/registration_step_cubit.dart';
 import 'package:baladiyati/common/registration_step_indicator.dart';
 import 'package:baladiyati/common/widgets/app_text_field.dart';
 import 'package:baladiyati/common/widgets/app_toast.dart';
+import 'package:baladiyati/common/widgets/primary_button.dart';
 import 'package:baladiyati/core/config/env.dart';
+import 'package:baladiyati/core/network/dio_client.dart';
+import 'package:baladiyati/core/theme/theme_cubit.dart';
 import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
+import 'package:baladiyati/features/auth/data/services/auth_api_service.dart';
+import 'package:baladiyati/features/auth/presentation/register/screens/user_verify_code_screen.dart';
+import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'package:baladiyati/features/auth/presentation/register/screens/user_verify_code_screen.dart';
-
-import '../../../../../core/network/dio_client.dart';
-import '../../../../../core/theme/theme_cubit.dart';
-import '../../../../../common/widgets/primary_button.dart';
-import '../../../../../features/auth/data/services/auth_api_service.dart';
 
 class UserRegisterScreen extends StatefulWidget {
   const UserRegisterScreen({super.key});
@@ -28,9 +27,8 @@ class UserRegisterScreen extends StatefulWidget {
 
 class _UserRegisterScreenState extends State<UserRegisterScreen> {
   final _formKey = GlobalKey<FormState>();
-  final _nameCtrl = TextEditingController();
+
   final _emailCtrl = TextEditingController();
-  final _phoneCtrl = TextEditingController();
   final _passwordCtrl = TextEditingController();
 
   final _authApi = AuthApi(DioClient.build);
@@ -42,9 +40,7 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
 
   @override
   void dispose() {
-    _nameCtrl.dispose();
     _emailCtrl.dispose();
-    _phoneCtrl.dispose();
     _passwordCtrl.dispose();
     super.dispose();
   }
@@ -57,22 +53,21 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
   Future<void> _onSubmit(AppLocalizations l10n) async {
     if (!_formKey.currentState!.validate()) return;
 
-    setState(() => _isLoading = true);
-
     final email = _emailCtrl.text.trim();
     final password = _passwordCtrl.text.trim();
     final sharedReference = DateTime.now().millisecondsSinceEpoch.toString();
 
+    setState(() => _isLoading = true);
+
     final body = {
-      'fullName': _nameCtrl.text.trim(),
       'email': email,
-      'phone': _phoneCtrl.text.trim(),
       'sharedReference': sharedReference,
+      'ownerProjectLinkId': _ownerProjectLinkId,
     };
 
-    await _saveToPrefs(body);
-
     try {
+      await _saveToPrefs(body);
+
       await _authApi.ownerSendOtp(
         email: email,
         password: password,
@@ -82,6 +77,7 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
       if (!mounted) return;
 
       setState(() => _isLoading = false);
+
       context.read<RegistrationStepCubit>().nextStep();
 
       Navigator.push(
@@ -150,22 +146,6 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
                       const SizedBox(height: 20),
 
                       AppTextField(
-                        controller: _nameCtrl,
-                        label: l10n.fullNameLabel,
-                        hint: l10n.fullNameHint,
-                        icon: Icons.person_outline,
-                        textAlign: TextAlign.right,
-                        validator: (v) {
-                          if (v == null || v.trim().isEmpty) {
-                            return l10n.fieldRequired;
-                          }
-                          return null;
-                        },
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      AppTextField(
                         controller: _emailCtrl,
                         label: l10n.emailLabel,
                         hint: l10n.emailHint,
@@ -173,32 +153,20 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
                         keyboardType: TextInputType.emailAddress,
                         textAlign: TextAlign.left,
                         validator: (v) {
-                          if (v == null || v.trim().isEmpty) {
+                          final value = v?.trim() ?? '';
+
+                          if (value.isEmpty) {
                             return l10n.fieldRequired;
                           }
-                          if (!v.contains('@') || !v.contains('.')) {
+
+                          final emailRegex = RegExp(
+                            r'^[^\s@]+@[^\s@]+\.[^\s@]+$',
+                          );
+
+                          if (!emailRegex.hasMatch(value)) {
                             return l10n.invalidEmail;
                           }
-                          return null;
-                        },
-                      ),
 
-                      const SizedBox(height: 16),
-
-                      AppTextField(
-                        controller: _phoneCtrl,
-                        label: l10n.phoneLabel,
-                        hint: l10n.phoneHint,
-                        icon: Icons.phone_outlined,
-                        keyboardType: TextInputType.phone,
-                        textAlign: TextAlign.left,
-                        validator: (v) {
-                          if (v == null || v.trim().isEmpty) {
-                            return l10n.fieldRequired;
-                          }
-                          if (!RegExp(r'^[0-9]{8}$').hasMatch(v.trim())) {
-                            return l10n.eightDigits;
-                          }
                           return null;
                         },
                       ),
@@ -213,9 +181,11 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
                         obscureText: _obscurePassword,
                         textAlign: TextAlign.left,
                         suffixIcon: IconButton(
-                          onPressed: () => setState(
-                            () => _obscurePassword = !_obscurePassword,
-                          ),
+                          onPressed: () {
+                            setState(() {
+                              _obscurePassword = !_obscurePassword;
+                            });
+                          },
                           icon: Icon(
                             _obscurePassword
                                 ? Icons.visibility_off_outlined
@@ -224,12 +194,16 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
                           ),
                         ),
                         validator: (v) {
-                          if (v == null || v.trim().isEmpty) {
+                          final value = v?.trim() ?? '';
+
+                          if (value.isEmpty) {
                             return l10n.fieldRequired;
                           }
-                          if (v.trim().length < 6) {
+
+                          if (value.length < 6) {
                             return l10n.passwordTooShort;
                           }
+
                           return null;
                         },
                       ),
@@ -239,7 +213,10 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
                       PrimaryButton(
                         label: l10n.registerButton,
                         isLoading: _isLoading,
-                        onPressed: () => _onSubmit(l10n),
+                        onPressed: () {
+                          if (_isLoading) return;
+                          _onSubmit(l10n);
+                        },
                       ),
 
                       const SizedBox(height: 16),
