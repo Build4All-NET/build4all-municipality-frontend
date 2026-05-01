@@ -69,7 +69,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get phoneLabel => 'Téléphone';
 
   @override
-  String get phoneHint => 'Entrez votre numéro de téléphone';
+  String get phoneHint => '+961';
 
   @override
   String get registerButton => 'Créer le Compte';
@@ -117,7 +117,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get emailMethod => 'Email';
 
   @override
-  String get selectMunicipality => 'Sélectionnez une municipalité';
+  String get selectMunicipality => 'Sélectionner la Municipalité';
 
   @override
   String get municipalityLabel => 'Municipalité';
@@ -168,7 +168,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get addressLabel => 'Adresse';
 
   @override
-  String get addressHint => 'Entrez votre adresse';
+  String get addressHint => 'Beyrouth, Liban';
 
   @override
   String get completeProfileButton => 'Compléter le Profil';
@@ -516,7 +516,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get needReview => 'À vérifier';
 
   @override
-  String get completedToday => 'Complétées aujourd’hui';
+  String get completedToday => 'Complétées aujourd\'hui';
 
   @override
   String get services => 'Services';
@@ -585,7 +585,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get usernameInvalidChars => 'Utilisez uniquement des lettres, chiffres, points ou underscores';
 
   @override
-  String get missingRegistrationData => 'Aucune donnée d’inscription trouvée. Veuillez vous inscrire à nouveau.';
+  String get missingRegistrationData => 'Aucune donnée d\'inscription trouvée. Veuillez vous inscrire à nouveau.';
 
   @override
   String get missingUserIdVerifyAgain => 'Identifiant utilisateur manquant. Veuillez vérifier le code à nouveau.';
@@ -594,7 +594,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get missingOwnerProjectLinkId => 'Identifiant du projet manquant. Veuillez vous inscrire à nouveau.';
 
   @override
-  String get verificationUserIdMissing => 'La vérification a réussi mais l’identifiant utilisateur est manquant.';
+  String get verificationUserIdMissing => 'La vérification a réussi mais l\'identifiant utilisateur est manquant.';
 
   @override
   String get municipalityProfileTitle => 'Compléter le profil municipal';
@@ -609,7 +609,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get municipalityProfileSaved => 'Profil municipal enregistré avec succès';
 
   @override
-  String get municipalityProfileSaveFailed => 'Échec de l’enregistrement du profil municipal';
+  String get municipalityProfileSaveFailed => 'Échec de l\'enregistrement du profil municipal';
 
   @override
   String get loadingMunicipalitiesFailed => 'Échec du chargement des municipalités';
@@ -621,7 +621,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get phoneInvalid => 'Le numéro doit contenir entre 8 et 15 chiffres';
 
   @override
-  String get addressTooShort => 'L’adresse est trop courte';
+  String get addressTooShort => 'L\'adresse est trop courte';
 
   @override
   String get missingBuild4allToken => 'Token de connexion manquant. Veuillez vous reconnecter.';

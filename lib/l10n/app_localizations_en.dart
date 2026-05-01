@@ -66,10 +66,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fullNameHint => 'Ahmad Khalil';
 
   @override
-  String get phoneLabel => 'Phone';
+  String get phoneLabel => 'Phone Number';
 
   @override
-  String get phoneHint => 'Enter your phone number';
+  String get phoneHint => '+961';
 
   @override
   String get registerButton => 'Create Account';
@@ -117,7 +117,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get emailMethod => 'Email';
 
   @override
-  String get selectMunicipality => 'Select municipality';
+  String get selectMunicipality => 'Select Municipality';
 
   @override
   String get municipalityLabel => 'Municipality';
@@ -168,7 +168,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addressLabel => 'Address';
 
   @override
-  String get addressHint => 'Enter your address';
+  String get addressHint => 'Beirut, Lebanon';
 
   @override
   String get completeProfileButton => 'Complete Profile';
