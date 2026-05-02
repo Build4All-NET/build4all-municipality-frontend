@@ -21,6 +21,7 @@ class ProfileApiService {
     try {
       final data = await _client.get(
         '/users/profile',
+        requiresAuth: true, // ✅ FIXED HERE
         extraHeaders: {
           'Owner-Project-Link-Id': ownerProjectLinkId.toString(),
         },
@@ -53,9 +54,7 @@ class ProfileApiService {
         '/users/profile',
         requiresAuth: true,
         body: {
-          // Always send ownerProjectLinkId so the server knows which project
           'ownerProjectLinkId': ownerProjectLinkId,
-          // Only include fields that were provided
           if (fullName != null) 'fullName': fullName,
           if (phone != null) 'phone': phone,
           if (address != null) 'address': address,

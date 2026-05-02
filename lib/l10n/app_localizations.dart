@@ -214,13 +214,13 @@ abstract class AppLocalizations {
   /// No description provided for @phoneLabel.
   ///
   /// In en, this message translates to:
-  /// **'Phone'**
+  /// **'Phone Number'**
   String get phoneLabel;
 
   /// No description provided for @phoneHint.
   ///
   /// In en, this message translates to:
-  /// **'Enter your phone number'**
+  /// **'+961'**
   String get phoneHint;
 
   /// No description provided for @registerButton.
@@ -316,7 +316,7 @@ abstract class AppLocalizations {
   /// No description provided for @selectMunicipality.
   ///
   /// In en, this message translates to:
-  /// **'Select municipality'**
+  /// **'Select Municipality'**
   String get selectMunicipality;
 
   /// No description provided for @municipalityLabel.
@@ -418,7 +418,7 @@ abstract class AppLocalizations {
   /// No description provided for @addressHint.
   ///
   /// In en, this message translates to:
-  /// **'Enter your address'**
+  /// **'Beirut, Lebanon'**
   String get addressHint;
 
   /// No description provided for @completeProfileButton.

@@ -79,7 +79,7 @@
   "awaitingPayment": "Awaiting Payment",
   "completed": "Completed",
   "quickActions": "Quick Actions",
-  "newRequest": "New Request",
+  "newRequest": "New request received",
   "serviceCategories": "Service Categories",
   "viewAll": "View All",
   "recentRequests": "Recent Requests",
@@ -145,65 +145,47 @@
   "filesSelected": "file(s) selected",
   "submitRequest": "Submit Request",
   "requestSubmitted": "Request submitted successfully",
-  
   "authUsernameTaken": "Username is already taken",
   "authEmailAlreadyExists": "This email is already registered",
   "authPhoneAlreadyExists": "This phone number is already registered",
-
   "authUserNotFound": "User not found",
   "authWrongPassword": "Incorrect password",
   "authInvalidCredentials": "Invalid login credentials",
   "authAccountInactive": "Account is inactive",
-
   "httpValidationError": "Some fields are invalid",
   "httpConflict": "Request conflict occurred",
   "httpUnauthorized": "You are not authorized",
   "httpForbidden": "You do not have permission",
   "httpNotFound": "Resource not found",
   "httpServerError": "Server error occurred",
-
   "networkNoInternet": "No internet connection",
   "networkTimeout": "Connection timed out",
   "networkError": "Network error occurred",
-
   "authErrorGeneric": "Something went wrong. Please try again",
-
   "connection_offline": "You are offline",
   "connection_reconnecting": "Reconnecting...",
   "connection_issue": "Connection issue",
-
-
   "dashboard": "Dashboard",
-  "employee": "Employee",
-
   "inProgress": "In Progress",
   "newRequests": "New Requests",
   "needReview": "Need Review",
   "completedToday": "Completed Today",
-
-  "quickActions": "Quick Actions",
   "services": "Services",
   "inbox": "Inbox",
   "announcements": "Announcements",
   "employees": "Employees",
-
   "recentActivity": "Recent Activity",
   "approvedRequest": "Approved request",
-  "newRequest": "New request received",
   "missingDocs": "Missing documents",
-
   "monthPerformance": "Monthly Performance",
   "completedRequests": "Completed Requests",
   "avgTime": "Average Time",
   "satisfaction": "Satisfaction",
-  "days": "days",
-
-
   "chooseHowToContinue": "Choose how to continue",
-"continueAsCitizen": "Continue as Citizen",
-"continueAsAdmin": "Continue as Admin",
-"loginFailed": "Login failed",
-"firstNameLabel": "First name",
+  "continueAsCitizen": "Continue as Citizen",
+  "continueAsAdmin": "Continue as Admin",
+  "loginFailed": "Login failed",
+  "firstNameLabel": "First name",
   "firstNameHint": "Enter your first name",
   "lastNameLabel": "Last name",
   "lastNameHint": "Enter your last name",
@@ -216,13 +198,6 @@
   "verificationUserIdMissing": "Verification succeeded but user id was missing.",
   "municipalityProfileTitle": "Complete municipality profile",
   "municipalityProfileSubtitle": "Add the information required by your municipality.",
-  "phoneLabel": "Phone",
-  "phoneHint": "Enter your phone number",
-  "addressLabel": "Address",
-  "addressHint": "Enter your address",
-  "municipalityLabel": "Municipality",
-  "selectMunicipality": "Select municipality",
-  "selectMunicipalityWarning": "Please select a municipality",
   "completeMunicipalityProfileButton": "Save and continue",
   "municipalityProfileSaved": "Municipality profile saved successfully",
   "municipalityProfileSaveFailed": "Failed to save municipality profile",
@@ -233,6 +208,4 @@
   "missingBuild4allToken": "Missing login token. Please login again.",
   "missingBuild4allUser": "Missing user data. Please login again.",
   "missingMunicipalityId": "Missing municipality id"
-
-
 }
