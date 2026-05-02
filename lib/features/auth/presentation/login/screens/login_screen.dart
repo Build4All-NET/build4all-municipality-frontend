@@ -160,7 +160,7 @@ if (prefsData != null) {
   Navigator.pushAndRemoveUntil(
     context,
     MaterialPageRoute(
-      builder: (_) => const DashboardPage(),
+      builder: (_) =>  DashboardPage(),
     ),
     (_) => false,
   );
@@ -270,7 +270,7 @@ await AdminTokenStore().save(
                   Navigator.pushAndRemoveUntil(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => const DashboardPage(),
+                      builder: (_) =>  DashboardPage(),
                     ),
                     (_) => false,
                   );

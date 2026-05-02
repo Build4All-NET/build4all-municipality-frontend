@@ -276,7 +276,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get searchService => 'Search for a service...';
 
   @override
-  String get selectCategory => 'Select a category to view available services';
+  String get selectCategory => 'Select category';
 
   @override
   String get serviceCount => 'services';
@@ -504,7 +504,6 @@ class AppLocalizationsEn extends AppLocalizations {
   String get connection_issue => 'Connection issue';
 
   @override
-
   String get dashboard => 'Dashboard';
 
   @override
@@ -552,6 +551,7 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get satisfaction => 'Satisfaction';
 
+  @override
   String get chooseHowToContinue => 'Choose how to continue';
 
   @override
@@ -563,4 +563,165 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get loginFailed => 'Login failed';
 
+  @override
+  String get violations => 'Violations';
+
+  @override
+  String get departments => 'Departments Management';
+
+  @override
+  String get profile => 'Profile';
+
+  @override
+  String get announcementsManagement => 'Announcements Management';
+
+  @override
+  String get newAnnouncement => 'New Announcement';
+
+  @override
+  String get createAnnouncement => 'Create New Announcement';
+
+  @override
+  String get publishAnnouncement => 'Publish Announcement';
+
+  @override
+  String get titleAr => 'Title (Arabic)';
+
+  @override
+  String get titleEn => 'Title (English)';
+
+  @override
+  String get contentAr => 'Content (Arabic)';
+
+  @override
+  String get contentEn => 'Content (English)';
+
+  @override
+  String get enterTitleAr => 'Enter title';
+
+  @override
+  String get enterTitleEn => 'Enter title';
+
+  @override
+  String get enterContentAr => 'Enter content';
+
+  @override
+  String get enterContentEn => 'Enter content';
+
+  @override
+  String get published => 'Published';
+
+  @override
+  String get sampleTitle => 'Working hours update';
+
+  @override
+  String get sampleDescription => 'Monday to Friday 8AM - 2PM';
+
+  @override
+  String get addViolation => 'Add Violation';
+
+  @override
+  String get search => 'Search...';
+
+  @override
+  String get all => 'All';
+
+  @override
+  String get engineering => 'Engineering';
+
+  @override
+  String get finance => 'Finance';
+
+  @override
+  String get police => 'Police';
+
+  @override
+  String get titleArabic => 'Title (Arabic)';
+
+  @override
+  String get titleEnglish => 'Title (English)';
+
+  @override
+  String get contentArabic => 'Content (Arabic)';
+
+  @override
+  String get contentEnglish => 'Content (English)';
+
+  @override
+  String get price => 'Price';
+
+  @override
+  String get publish => 'Publish';
+
+  @override
+  String get createViolation => 'Create Violation';
+
+  @override
+  String get name => 'Name';
+
+  @override
+  String get enterName => 'Enter name';
+
+  @override
+  String get citizenName => 'Citizen Name';
+
+  @override
+  String get enterCitizenName => 'Enter citizen name';
+
+  @override
+  String get description => 'Description';
+
+  @override
+  String get enterDescription => 'Enter description';
+
+  @override
+  String get location => 'Location';
+
+  @override
+  String get enterLocation => 'Enter location';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get selectDate => 'Select date';
+
+  @override
+  String get category => 'Category';
+
+  @override
+  String get amount => 'Amount';
+
+  @override
+  String get enterAmount => 'Enter amount';
+
+  @override
+  String get create => 'Create';
+
+  @override
+  String get newViolation => 'New Violation';
+
+  @override
+  String get newDepartment => 'New Department';
+
+  @override
+  String get addDepartment => 'Add Department';
+
+  @override
+  String get departmentName => 'Department Name';
+
+  @override
+  String get isFixed => 'Fixed Department';
+
+  @override
+  String get fixed => 'Fixed';
+
+  @override
+  String get notFixed => 'Not Fixed';
+
+  @override
+  String get addDepartmentButton => 'Add Department';
+
+  @override
+  String get department => 'Department';
 }

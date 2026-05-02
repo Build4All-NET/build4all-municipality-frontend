@@ -634,7 +634,7 @@ abstract class AppLocalizations {
   /// No description provided for @selectCategory.
   ///
   /// In en, this message translates to:
-  /// **'Select a category to view available services'**
+  /// **'Select category'**
   String get selectCategory;
 
   /// No description provided for @serviceCount.
@@ -1087,7 +1087,6 @@ abstract class AppLocalizations {
   /// **'Connection issue'**
   String get connection_issue;
 
-
   /// No description provided for @dashboard.
   ///
   /// In en, this message translates to:
@@ -1208,6 +1207,329 @@ abstract class AppLocalizations {
   /// **'Login failed'**
   String get loginFailed;
 
+  /// No description provided for @violations.
+  ///
+  /// In en, this message translates to:
+  /// **'Violations'**
+  String get violations;
+
+  /// No description provided for @departments.
+  ///
+  /// In en, this message translates to:
+  /// **'Departments Management'**
+  String get departments;
+
+  /// No description provided for @profile.
+  ///
+  /// In en, this message translates to:
+  /// **'Profile'**
+  String get profile;
+
+  /// No description provided for @announcementsManagement.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcements Management'**
+  String get announcementsManagement;
+
+  /// No description provided for @newAnnouncement.
+  ///
+  /// In en, this message translates to:
+  /// **'New Announcement'**
+  String get newAnnouncement;
+
+  /// No description provided for @createAnnouncement.
+  ///
+  /// In en, this message translates to:
+  /// **'Create New Announcement'**
+  String get createAnnouncement;
+
+  /// No description provided for @publishAnnouncement.
+  ///
+  /// In en, this message translates to:
+  /// **'Publish Announcement'**
+  String get publishAnnouncement;
+
+  /// No description provided for @titleAr.
+  ///
+  /// In en, this message translates to:
+  /// **'Title (Arabic)'**
+  String get titleAr;
+
+  /// No description provided for @titleEn.
+  ///
+  /// In en, this message translates to:
+  /// **'Title (English)'**
+  String get titleEn;
+
+  /// No description provided for @contentAr.
+  ///
+  /// In en, this message translates to:
+  /// **'Content (Arabic)'**
+  String get contentAr;
+
+  /// No description provided for @contentEn.
+  ///
+  /// In en, this message translates to:
+  /// **'Content (English)'**
+  String get contentEn;
+
+  /// No description provided for @enterTitleAr.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter title'**
+  String get enterTitleAr;
+
+  /// No description provided for @enterTitleEn.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter title'**
+  String get enterTitleEn;
+
+  /// No description provided for @enterContentAr.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter content'**
+  String get enterContentAr;
+
+  /// No description provided for @enterContentEn.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter content'**
+  String get enterContentEn;
+
+  /// No description provided for @published.
+  ///
+  /// In en, this message translates to:
+  /// **'Published'**
+  String get published;
+
+  /// No description provided for @sampleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Working hours update'**
+  String get sampleTitle;
+
+  /// No description provided for @sampleDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Monday to Friday 8AM - 2PM'**
+  String get sampleDescription;
+
+  /// No description provided for @addViolation.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Violation'**
+  String get addViolation;
+
+  /// No description provided for @search.
+  ///
+  /// In en, this message translates to:
+  /// **'Search...'**
+  String get search;
+
+  /// No description provided for @all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// No description provided for @engineering.
+  ///
+  /// In en, this message translates to:
+  /// **'Engineering'**
+  String get engineering;
+
+  /// No description provided for @finance.
+  ///
+  /// In en, this message translates to:
+  /// **'Finance'**
+  String get finance;
+
+  /// No description provided for @police.
+  ///
+  /// In en, this message translates to:
+  /// **'Police'**
+  String get police;
+
+  /// No description provided for @titleArabic.
+  ///
+  /// In en, this message translates to:
+  /// **'Title (Arabic)'**
+  String get titleArabic;
+
+  /// No description provided for @titleEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'Title (English)'**
+  String get titleEnglish;
+
+  /// No description provided for @contentArabic.
+  ///
+  /// In en, this message translates to:
+  /// **'Content (Arabic)'**
+  String get contentArabic;
+
+  /// No description provided for @contentEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'Content (English)'**
+  String get contentEnglish;
+
+  /// No description provided for @price.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get price;
+
+  /// No description provided for @publish.
+  ///
+  /// In en, this message translates to:
+  /// **'Publish'**
+  String get publish;
+
+  /// No description provided for @createViolation.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Violation'**
+  String get createViolation;
+
+  /// No description provided for @name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get name;
+
+  /// No description provided for @enterName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter name'**
+  String get enterName;
+
+  /// No description provided for @citizenName.
+  ///
+  /// In en, this message translates to:
+  /// **'Citizen Name'**
+  String get citizenName;
+
+  /// No description provided for @enterCitizenName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter citizen name'**
+  String get enterCitizenName;
+
+  /// No description provided for @description.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get description;
+
+  /// No description provided for @enterDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter description'**
+  String get enterDescription;
+
+  /// No description provided for @location.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get location;
+
+  /// No description provided for @enterLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter location'**
+  String get enterLocation;
+
+  /// No description provided for @date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get date;
+
+  /// No description provided for @selectDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select date'**
+  String get selectDate;
+
+  /// No description provided for @category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get category;
+
+  /// No description provided for @amount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get amount;
+
+  /// No description provided for @enterAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter amount'**
+  String get enterAmount;
+
+  /// No description provided for @create.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get create;
+
+  /// No description provided for @newViolation.
+  ///
+  /// In en, this message translates to:
+  /// **'New Violation'**
+  String get newViolation;
+
+  /// No description provided for @newDepartment.
+  ///
+  /// In en, this message translates to:
+  /// **'New Department'**
+  String get newDepartment;
+
+  /// No description provided for @addDepartment.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Department'**
+  String get addDepartment;
+
+  /// No description provided for @departmentName.
+  ///
+  /// In en, this message translates to:
+  /// **'Department Name'**
+  String get departmentName;
+
+  /// No description provided for @isFixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed Department'**
+  String get isFixed;
+
+  /// No description provided for @fixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed'**
+  String get fixed;
+
+  /// No description provided for @notFixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Fixed'**
+  String get notFixed;
+
+  /// No description provided for @addDepartmentButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Department'**
+  String get addDepartmentButton;
+
+  /// No description provided for @department.
+  ///
+  /// In en, this message translates to:
+  /// **'Department'**
+  String get department;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -276,7 +276,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get searchService => 'Rechercher un service...';
 
   @override
-  String get selectCategory => 'Choisir une catégorie pour voir les services disponibles';
+  String get selectCategory => 'Sélectionnez la catégorie';
 
   @override
   String get serviceCount => 'services';
@@ -300,7 +300,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get cancel => 'Annuler';
 
   @override
-  String get logout => 'Se déconnecter';
+  String get logout => 'Déconnexion';
 
   @override
   String get pending => 'En attente';
@@ -504,7 +504,6 @@ class AppLocalizationsFr extends AppLocalizations {
   String get connection_issue => 'Problème de connexion';
 
   @override
-
   String get dashboard => 'Tableau de bord';
 
   @override
@@ -552,6 +551,7 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get satisfaction => 'Satisfaction';
 
+  @override
   String get chooseHowToContinue => 'Choisissez comment continuer';
 
   @override
@@ -563,4 +563,165 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get loginFailed => 'Échec de la connexion';
 
+  @override
+  String get violations => 'Infractions';
+
+  @override
+  String get departments => 'Gestion des départements';
+
+  @override
+  String get profile => 'Profil';
+
+  @override
+  String get announcementsManagement => 'Gestion des annonces';
+
+  @override
+  String get newAnnouncement => 'Nouvelle annonce';
+
+  @override
+  String get createAnnouncement => 'Créer une nouvelle annonce';
+
+  @override
+  String get publishAnnouncement => 'Publier l\'annonce';
+
+  @override
+  String get titleAr => 'Titre (Arabe)';
+
+  @override
+  String get titleEn => 'Titre (Anglais)';
+
+  @override
+  String get contentAr => 'Contenu (Arabe)';
+
+  @override
+  String get contentEn => 'Contenu (Anglais)';
+
+  @override
+  String get enterTitleAr => 'Entrez le titre';
+
+  @override
+  String get enterTitleEn => 'Entrez le titre';
+
+  @override
+  String get enterContentAr => 'Entrez le contenu';
+
+  @override
+  String get enterContentEn => 'Entrez le contenu';
+
+  @override
+  String get published => 'Publié';
+
+  @override
+  String get sampleTitle => 'Nouveaux horaires de travail';
+
+  @override
+  String get sampleDescription => 'Du lundi au vendredi, de 8h à 14h';
+
+  @override
+  String get addViolation => 'Ajouter une infraction';
+
+  @override
+  String get search => 'Rechercher...';
+
+  @override
+  String get all => 'Tous';
+
+  @override
+  String get engineering => 'Ingénierie';
+
+  @override
+  String get finance => 'Finance';
+
+  @override
+  String get police => 'Police';
+
+  @override
+  String get titleArabic => 'Titre (Arabe)';
+
+  @override
+  String get titleEnglish => 'Titre (Anglais)';
+
+  @override
+  String get contentArabic => 'Contenu (Arabe)';
+
+  @override
+  String get contentEnglish => 'Contenu (Anglais)';
+
+  @override
+  String get price => 'Prix';
+
+  @override
+  String get publish => 'Publier';
+
+  @override
+  String get createViolation => 'Créer une infraction';
+
+  @override
+  String get name => 'Nom';
+
+  @override
+  String get enterName => 'Entrez le nom';
+
+  @override
+  String get citizenName => 'Nom du citoyen';
+
+  @override
+  String get enterCitizenName => 'Entrez le nom du citoyen';
+
+  @override
+  String get description => 'Description';
+
+  @override
+  String get enterDescription => 'Entrez la description';
+
+  @override
+  String get location => 'Emplacement';
+
+  @override
+  String get enterLocation => 'Entrez l\'emplacement';
+
+  @override
+  String get date => 'Date';
+
+  @override
+  String get selectDate => 'Sélectionnez la date';
+
+  @override
+  String get category => 'Catégorie';
+
+  @override
+  String get amount => 'Montant';
+
+  @override
+  String get enterAmount => 'Entrez le montant';
+
+  @override
+  String get create => 'Créer';
+
+  @override
+  String get newViolation => 'Nouvelle infraction';
+
+  @override
+  String get newDepartment => 'Nouveau département';
+
+  @override
+  String get addDepartment => 'Ajouter un département';
+
+  @override
+  String get departmentName => 'Nom du département';
+
+  @override
+  String get isFixed => 'Département fixe';
+
+  @override
+  String get fixed => 'Fixe';
+
+  @override
+  String get notFixed => 'Non fixe';
+
+  @override
+  String get addDepartmentButton => 'Ajouter le département';
+
+  @override
+  String get department => 'Département';
 }

@@ -276,7 +276,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get searchService => 'ابحث عن خدمة...';
 
   @override
-  String get selectCategory => 'اختر فئة الخدمة للاطلاع على الخدمات المتاحة';
+  String get selectCategory => 'اختر القسم';
 
   @override
   String get serviceCount => 'خدمة';
@@ -504,7 +504,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get connection_issue => 'مشكلة في الاتصال';
 
   @override
-
   String get dashboard => 'لوحة التحكم';
 
   @override
@@ -552,6 +551,7 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get satisfaction => 'نسبة الرضا';
 
+  @override
   String get chooseHowToContinue => 'اختر طريقة المتابعة';
 
   @override
@@ -563,4 +563,165 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get loginFailed => 'فشل تسجيل الدخول';
 
+  @override
+  String get violations => 'المخالفات';
+
+  @override
+  String get departments => 'إدارة الأقسام';
+
+  @override
+  String get profile => 'الملف الشخصي';
+
+  @override
+  String get announcementsManagement => 'إدارة الإعلانات';
+
+  @override
+  String get newAnnouncement => 'إعلان جديد';
+
+  @override
+  String get createAnnouncement => 'إنشاء إعلان جديد';
+
+  @override
+  String get publishAnnouncement => 'نشر الإعلان';
+
+  @override
+  String get titleAr => 'العنوان (عربي)';
+
+  @override
+  String get titleEn => 'العنوان (English)';
+
+  @override
+  String get contentAr => 'المحتوى (عربي)';
+
+  @override
+  String get contentEn => 'المحتوى (English)';
+
+  @override
+  String get enterTitleAr => 'أدخل العنوان';
+
+  @override
+  String get enterTitleEn => 'Enter title';
+
+  @override
+  String get enterContentAr => 'أدخل المحتوى';
+
+  @override
+  String get enterContentEn => 'Enter content';
+
+  @override
+  String get published => 'منشور';
+
+  @override
+  String get sampleTitle => 'ساعات العمل الجديدة';
+
+  @override
+  String get sampleDescription => 'الإثنين إلى الجمعة 8 صباحاً - 2 ظهراً';
+
+  @override
+  String get addViolation => 'إضافة مخالفة';
+
+  @override
+  String get search => 'بحث...';
+
+  @override
+  String get all => 'الكل';
+
+  @override
+  String get engineering => 'الهندسة';
+
+  @override
+  String get finance => 'المالية';
+
+  @override
+  String get police => 'الشرطة';
+
+  @override
+  String get titleArabic => 'العنوان (عربي)';
+
+  @override
+  String get titleEnglish => 'العنوان (English)';
+
+  @override
+  String get contentArabic => 'المحتوى (عربي)';
+
+  @override
+  String get contentEnglish => 'المحتوى (English)';
+
+  @override
+  String get price => 'السعر';
+
+  @override
+  String get publish => 'نشر';
+
+  @override
+  String get createViolation => 'إنشاء مخالفة';
+
+  @override
+  String get name => 'الاسم';
+
+  @override
+  String get enterName => 'أدخل الاسم';
+
+  @override
+  String get citizenName => 'اسم المواطن';
+
+  @override
+  String get enterCitizenName => 'أدخل اسم المواطن';
+
+  @override
+  String get description => 'الوصف';
+
+  @override
+  String get enterDescription => 'أدخل الوصف';
+
+  @override
+  String get location => 'الموقع';
+
+  @override
+  String get enterLocation => 'أدخل الموقع';
+
+  @override
+  String get date => 'التاريخ';
+
+  @override
+  String get selectDate => 'اختر التاريخ';
+
+  @override
+  String get category => 'القسم';
+
+  @override
+  String get amount => 'المبلغ';
+
+  @override
+  String get enterAmount => 'أدخل المبلغ';
+
+  @override
+  String get create => 'إنشاء';
+
+  @override
+  String get newViolation => 'مخالفة جديدة';
+
+  @override
+  String get newDepartment => 'قسم جديد';
+
+  @override
+  String get addDepartment => 'إضافة قسم جديد';
+
+  @override
+  String get departmentName => 'اسم القسم';
+
+  @override
+  String get isFixed => 'قسم ثابت';
+
+  @override
+  String get fixed => 'ثابت';
+
+  @override
+  String get notFixed => 'غير ثابت';
+
+  @override
+  String get addDepartmentButton => 'إضافة القسم';
+
+  @override
+  String get department => 'القسم';
 }

@@ -1,12 +1,12 @@
 class Env {
   static const apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: ' https://perjury-threefold-unshipped.ngrok-free.dev',
+    defaultValue: ' http://192.168.0.117:8081',
 
   );
  static const String overrideBaseUrl = String.fromEnvironment(
   'OVERRIDE_BASE_URL',
-  defaultValue: 'http://10.0.2.2:8081',
+  defaultValue: 'http://192.168.0.117:8091',
 );
 
   static const wsPath = String.fromEnvironment(

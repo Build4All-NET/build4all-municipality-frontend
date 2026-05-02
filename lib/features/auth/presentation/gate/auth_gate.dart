@@ -31,7 +31,7 @@ class _AuthGateState extends State<AuthGate> {
     // 1. Admin has priority if admin token exists.
     final adminToken = await adminStore.getToken();
     if (adminToken != null && adminToken.trim().isNotEmpty) {
-      return const DashboardPage();
+      return  DashboardPage();
     }
 
     // 2. Then check normal citizen/user token.
