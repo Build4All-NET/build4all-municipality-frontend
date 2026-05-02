@@ -22,12 +22,10 @@ class QuickActions extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        // Uses dynamic surface color from remote theme.
         color: cs.surface,
         borderRadius: BorderRadius.circular(16),
         boxShadow: [
           BoxShadow(
-            // Soft shadow based on current text color.
             color: cs.onSurface.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, 2),
@@ -44,12 +42,10 @@ class QuickActions extends StatelessWidget {
               color: cs.onSurface,
             ),
           ),
-
           const SizedBox(height: 12),
-
           Row(
             children: [
-              // Payments action.
+              // Payments action
               Expanded(
                 child: _ActionButton(
                   icon: Icons.error_outline,
@@ -58,10 +54,8 @@ class QuickActions extends StatelessWidget {
                   onTap: onPayments,
                 ),
               ),
-
               const SizedBox(width: 12),
-
-              // New request action.
+              // New request action
               Expanded(
                 child: _ActionButton(
                   icon: Icons.description_outlined,
@@ -101,21 +95,13 @@ class _ActionButton extends StatelessWidget {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 16),
         decoration: BoxDecoration(
-          border: Border.all(
-            color: cs.outline.withOpacity(0.18),
-          ),
+          border: Border.all(color: cs.outline.withOpacity(0.18)),
           borderRadius: BorderRadius.circular(12),
         ),
         child: Column(
           children: [
-            Icon(
-              icon,
-              color: iconColor,
-              size: 28,
-            ),
-
+            Icon(icon, color: iconColor, size: 28),
             const SizedBox(height: 8),
-
             Text(
               label,
               textAlign: TextAlign.center,

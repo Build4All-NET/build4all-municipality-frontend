@@ -28,7 +28,7 @@ class ServiceItem {
 final Map<String, List<ServiceItem>> servicesByCategory = {
   'general': [
     ServiceItem(
-      id: 'g1',
+      id: '2',
       nameAr: 'شكوى أو مراجعة',
       descriptionAr: 'تقديم شكوى أو مراجعة بلدية مع تحديد الموقع وإرفاق الصور',
       fee: 0,

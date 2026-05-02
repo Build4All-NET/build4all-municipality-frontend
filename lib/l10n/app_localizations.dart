@@ -1207,6 +1207,7 @@ abstract class AppLocalizations {
   /// **'Login failed'**
   String get loginFailed;
 
+
   /// No description provided for @violations.
   ///
   /// In en, this message translates to:
@@ -1530,6 +1531,145 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Department'**
   String get department;
+
+  /// No description provided for @firstNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'First name'**
+  String get firstNameLabel;
+
+  /// No description provided for @firstNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your first name'**
+  String get firstNameHint;
+
+  /// No description provided for @lastNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Last name'**
+  String get lastNameLabel;
+
+  /// No description provided for @lastNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your last name'**
+  String get lastNameHint;
+
+  /// No description provided for @firstNameTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'First name is too short'**
+  String get firstNameTooShort;
+
+  /// No description provided for @lastNameTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Last name is too short'**
+  String get lastNameTooShort;
+
+  /// No description provided for @usernameInvalidChars.
+  ///
+  /// In en, this message translates to:
+  /// **'Use only letters, numbers, dot, or underscore'**
+  String get usernameInvalidChars;
+
+  /// No description provided for @missingRegistrationData.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved registration data found. Please register again.'**
+  String get missingRegistrationData;
+
+  /// No description provided for @missingUserIdVerifyAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing user id. Please verify your code again.'**
+  String get missingUserIdVerifyAgain;
+
+  /// No description provided for @missingOwnerProjectLinkId.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing owner project link id. Please register again.'**
+  String get missingOwnerProjectLinkId;
+
+  /// No description provided for @verificationUserIdMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification succeeded but user id was missing.'**
+  String get verificationUserIdMissing;
+
+  /// No description provided for @municipalityProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete municipality profile'**
+  String get municipalityProfileTitle;
+
+  /// No description provided for @municipalityProfileSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add the information required by your municipality.'**
+  String get municipalityProfileSubtitle;
+
+  /// No description provided for @completeMunicipalityProfileButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save and continue'**
+  String get completeMunicipalityProfileButton;
+
+  /// No description provided for @municipalityProfileSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Municipality profile saved successfully'**
+  String get municipalityProfileSaved;
+
+  /// No description provided for @municipalityProfileSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save municipality profile'**
+  String get municipalityProfileSaveFailed;
+
+  /// No description provided for @loadingMunicipalitiesFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load municipalities'**
+  String get loadingMunicipalitiesFailed;
+
+  /// No description provided for @noMunicipalitiesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No municipalities found'**
+  String get noMunicipalitiesFound;
+
+  /// No description provided for @phoneInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number must contain 8 to 15 digits'**
+  String get phoneInvalid;
+
+  /// No description provided for @addressTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Address is too short'**
+  String get addressTooShort;
+
+  /// No description provided for @missingBuild4allToken.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing login token. Please login again.'**
+  String get missingBuild4allToken;
+
+  /// No description provided for @missingBuild4allUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing user data. Please login again.'**
+  String get missingBuild4allUser;
+
+  /// No description provided for @missingMunicipalityId.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing municipality id'**
+  String get missingMunicipalityId;
+
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

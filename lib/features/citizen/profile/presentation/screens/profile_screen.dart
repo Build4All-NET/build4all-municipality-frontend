@@ -4,12 +4,19 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:baladiyati/core/l10n/locale_cubit.dart';
+import 'package:baladiyati/core/config/jwt_store.dart';
+import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/auth/presentation/login/bloc/auth_bloc.dart';
 import 'package:baladiyati/features/auth/presentation/login/bloc/auth_event.dart';
 import 'package:baladiyati/app/app_router.dart';
+import 'package:baladiyati/features/auth/data/services/auth_api_service.dart';
+import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
+import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
+import 'package:baladiyati/features/auth/data/services/session_role_store.dart';
 import 'package:baladiyati/features/citizen/profile/presentation/bloc/profile_bloc.dart';
 import 'package:baladiyati/features/citizen/profile/presentation/bloc/profile_event.dart';
 import 'package:baladiyati/features/citizen/profile/presentation/bloc/profile_state.dart';
+import 'package:baladiyati/features/welcome/presentation/screens/welcome_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -23,11 +30,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
   final _phoneCtrl = TextEditingController();
   final _addressCtrl = TextEditingController();
   final _usernameCtrl = TextEditingController();
+  bool _isLoggingOut = false;
 
   @override
   void initState() {
     super.initState();
-    // Load real profile from API
     context.read<ProfileBloc>().add(ProfileLoadRequested());
   }
 
@@ -48,6 +55,35 @@ class _ProfileScreenState extends State<ProfileScreen> {
       _usernameCtrl.text = state.profile!.username ?? '';
     }
   }
+
+  Future<void> _handleLogout(BuildContext context) async {
+  // Save navigator before async operations
+  final navigator = Navigator.of(context);
+  
+  setState(() => _isLoggingOut = true);
+  
+  try {
+    await AuthApiService().logout();
+  } catch (e) {
+    // ignore
+  } finally {
+    // Clear ALL token stores
+    await AdminTokenStore().clear();
+    await AuthTokenStore().clear();
+    await JwtStore.clear();
+    await SessionRoleStore().clearRole();
+    DioClient.clearAuthToken();
+
+    if (mounted) {
+      setState(() => _isLoggingOut = false);
+      //  Use saved navigator - no context needed
+      navigator.pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const WelcomeScreen()),
+        (_) => false,
+      );
+    }
+  }
+}
 
   void _showEditDialog(BuildContext context, AppLocalizations l10n) {
     showDialog(
@@ -77,7 +113,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
             onPressed: () {
               Navigator.pop(context);
-              // Call real API to update profile
               context.read<ProfileBloc>().add(ProfileUpdateSubmitted(
                 fullName: _nameCtrl.text.trim(),
                 phone: _phoneCtrl.text.trim(),
@@ -98,7 +133,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.end,
       children: [
-        Text(label, style: const TextStyle(fontSize: 12, color: Colors.grey)),
+        Text(label,
+            style: const TextStyle(fontSize: 12, color: Colors.grey)),
         const SizedBox(height: 4),
         TextField(
           controller: ctrl,
@@ -124,12 +160,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return BlocConsumer<ProfileBloc, ProfileState>(
       listener: (context, state) {
-        // Fill controllers when profile loaded
         if (state.profile != null) {
           _fillControllers(state);
         }
-
-        // Show success message after update
         if (state.isUpdateSuccess) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -138,8 +171,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
             ),
           );
         }
-
-        // Show error
         if (state.errorMessage != null) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -154,7 +185,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           backgroundColor: const Color(0xFFF3F4F6),
           body: state.isLoading
               ? const Center(
-                  child: CircularProgressIndicator(color: Color(0xFF1E3A5F)))
+                  child: CircularProgressIndicator(
+                      color: Color(0xFF1E3A5F)))
               : SingleChildScrollView(
                   child: Column(
                     children: [
@@ -165,10 +197,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           gradient: LinearGradient(
                             begin: Alignment.topLeft,
                             end: Alignment.bottomRight,
-                            colors: [Color(0xFF1E3A5F), Color(0xFF2F6FED)],
+                            colors: [
+                              Color(0xFF1E3A5F),
+                              Color(0xFF2F6FED)
+                            ],
                           ),
                         ),
-                        padding: const EdgeInsets.fromLTRB(20, 56, 20, 40),
+                        padding:
+                            const EdgeInsets.fromLTRB(20, 56, 20, 40),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
@@ -184,10 +220,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               mainAxisAlignment: MainAxisAlignment.end,
                               children: [
                                 Column(
-                                  crossAxisAlignment: CrossAxisAlignment.end,
+                                  crossAxisAlignment:
+                                      CrossAxisAlignment.end,
                                   children: [
                                     Text(
-                                      // ✅ Real name from API
                                       state.profile?.fullName ?? '---',
                                       style: const TextStyle(
                                           color: Colors.white,
@@ -208,14 +244,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   width: 72,
                                   height: 72,
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.2),
+                                    color:
+                                        Colors.white.withOpacity(0.2),
                                     shape: BoxShape.circle,
                                   ),
                                   child: Center(
                                     child: Text(
-                                      // ✅ First letter of name
-                                      state.profile?.fullName?.isNotEmpty == true
-                                          ? state.profile!.fullName![0].toUpperCase()
+                                      state.profile?.fullName
+                                                  ?.isNotEmpty ==
+                                              true
+                                          ? state.profile!.fullName![0]
+                                              .toUpperCase()
                                           : '?',
                                       style: const TextStyle(
                                           color: Colors.white,
@@ -243,34 +282,38 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
+                                    color:
+                                        Colors.black.withOpacity(0.05),
                                     blurRadius: 8,
                                   ),
                                 ],
                               ),
                               child: Column(
                                 children: [
-                                  //  Real phone from API
                                   _infoRow(
                                       Icons.phone_outlined,
                                       l10n.phoneLabel,
                                       state.profile?.phone ?? '---'),
                                   const Divider(
-                                      height: 1, indent: 16, endIndent: 16),
-                                  //  Real email from API
+                                      height: 1,
+                                      indent: 16,
+                                      endIndent: 16),
                                   _infoRow(
                                       Icons.email_outlined,
                                       l10n.emailLabel,
                                       state.profile?.email ?? '---'),
                                   const Divider(
-                                      height: 1, indent: 16, endIndent: 16),
-                                  // Real address from API
+                                      height: 1,
+                                      indent: 16,
+                                      endIndent: 16),
                                   _infoRow(
                                       Icons.location_on_outlined,
                                       l10n.addressLabel,
                                       state.profile?.address ?? '---'),
                                   const Divider(
-                                      height: 1, indent: 16, endIndent: 16),
+                                      height: 1,
+                                      indent: 16,
+                                      endIndent: 16),
                                   _infoRow(
                                       Icons.apartment_outlined,
                                       l10n.municipalityLabel,
@@ -286,11 +329,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               width: double.infinity,
                               child: state.isUpdating
                                   ? const Center(
-                                      child: CircularProgressIndicator())
+                                      child:
+                                          CircularProgressIndicator())
                                   : OutlinedButton.icon(
                                       style: OutlinedButton.styleFrom(
-                                        padding: const EdgeInsets.symmetric(
-                                            vertical: 14),
+                                        padding:
+                                            const EdgeInsets.symmetric(
+                                                vertical: 14),
                                         shape: RoundedRectangleBorder(
                                           borderRadius:
                                               BorderRadius.circular(14),
@@ -298,7 +343,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                       ),
                                       onPressed: () =>
                                           _showEditDialog(context, l10n),
-                                      icon: const Icon(Icons.edit_outlined),
+                                      icon: const Icon(
+                                          Icons.edit_outlined),
                                       label: Text(l10n.editInfo),
                                     ),
                             ),
@@ -312,7 +358,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 borderRadius: BorderRadius.circular(16),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withOpacity(0.05),
+                                    color:
+                                        Colors.black.withOpacity(0.05),
                                     blurRadius: 8,
                                   ),
                                 ],
@@ -341,8 +388,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                           : currentLang == 'fr'
                                               ? 'Français'
                                               : 'English',
-                                      style:
-                                          const TextStyle(color: Colors.grey),
+                                      style: const TextStyle(
+                                          color: Colors.grey),
                                     ),
                                     const Icon(Icons.chevron_left,
                                         color: Colors.grey),
@@ -363,17 +410,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   padding: const EdgeInsets.symmetric(
                                       vertical: 14),
                                   shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(14),
+                                    borderRadius:
+                                        BorderRadius.circular(14),
                                   ),
                                 ),
-                                onPressed: () {
-                                  context
-                                      .read<AuthBloc>()
-                                      .add(AuthLoggedOut());
-                                  AppRouter.goToWelcome(context);
-                                },
-                                icon: const Icon(Icons.logout),
-                                label: Text(l10n.logout),
+                                onPressed: _isLoggingOut
+                                    ? null
+                                    : () => _handleLogout(context),
+                                icon: _isLoggingOut
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          color: Colors.white,
+                                          strokeWidth: 2,
+                                        ),
+                                      )
+                                    : const Icon(Icons.logout),
+                                label: Text(
+                                    _isLoggingOut ? '...' : l10n.logout),
                               ),
                             ),
 
@@ -391,7 +446,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _infoRow(IconData icon, String label, String value) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding:
+          const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
       child: Row(
         children: [
           Icon(icon, color: Colors.grey, size: 20),
@@ -400,8 +456,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
               Text(label,
-                  style:
-                      const TextStyle(fontSize: 11, color: Colors.grey)),
+                  style: const TextStyle(
+                      fontSize: 11, color: Colors.grey)),
               const SizedBox(height: 2),
               Text(value,
                   style: const TextStyle(

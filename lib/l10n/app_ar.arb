@@ -200,6 +200,7 @@
 "continueAsCitizen": "المتابعة كمواطن",
 "continueAsAdmin": "المتابعة كمسؤول",
 "loginFailed": "فشل تسجيل الدخول",
+
   "violations": "المخالفات",
   "departments": "الأقسام",
   "profile": "الملف الشخصي",
@@ -265,6 +266,38 @@
   "department": "القسم"
 
 
+
+
+ "firstNameLabel": "الاسم الأول",
+  "firstNameHint": "أدخل الاسم الأول",
+  "lastNameLabel": "اسم العائلة",
+  "lastNameHint": "أدخل اسم العائلة",
+  "firstNameTooShort": "الاسم الأول قصير جدًا",
+  "lastNameTooShort": "اسم العائلة قصير جدًا",
+  "usernameInvalidChars": "استخدم فقط أحرفًا أو أرقامًا أو نقطة أو شرطة سفلية",
+  "missingRegistrationData": "لم يتم العثور على بيانات التسجيل. يرجى التسجيل من جديد.",
+  "missingUserIdVerifyAgain": "رقم المستخدم غير موجود. يرجى تأكيد الرمز من جديد.",
+  "missingOwnerProjectLinkId": "معرّف المشروع غير موجود. يرجى التسجيل من جديد.",
+  "verificationUserIdMissing": "تم التحقق بنجاح لكن رقم المستخدم غير موجود.",
+   "municipalityProfileTitle": "إكمال ملف البلدية",
+  "municipalityProfileSubtitle": "أضف المعلومات المطلوبة من البلدية.",
+  "phoneLabel": "رقم الهاتف",
+  "phoneHint": "أدخل رقم الهاتف",
+  "addressLabel": "العنوان",
+  "addressHint": "أدخل العنوان",
+  "municipalityLabel": "البلدية",
+  "selectMunicipality": "اختر البلدية",
+  "selectMunicipalityWarning": "يرجى اختيار البلدية",
+  "completeMunicipalityProfileButton": "حفظ ومتابعة",
+  "municipalityProfileSaved": "تم حفظ ملف البلدية بنجاح",
+  "municipalityProfileSaveFailed": "فشل حفظ ملف البلدية",
+  "loadingMunicipalitiesFailed": "فشل تحميل البلديات",
+  "noMunicipalitiesFound": "لا توجد بلديات",
+  "phoneInvalid": "رقم الهاتف يجب أن يحتوي على 8 إلى 15 رقمًا",
+  "addressTooShort": "العنوان قصير جدًا",
+  "missingBuild4allToken": "رمز تسجيل الدخول غير موجود. يرجى تسجيل الدخول من جديد.",
+  "missingBuild4allUser": "بيانات المستخدم غير موجودة. يرجى تسجيل الدخول من جديد.",
+  "missingMunicipalityId": "معرّف البلدية غير موجود"
 
 
 }

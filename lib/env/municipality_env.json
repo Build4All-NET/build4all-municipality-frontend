@@ -1,10 +1,10 @@
 {
 
-    "API_BASE_URL": "http://192.168.10.117:8089",
-    "OVERRIDE_BASE_URL": "http://192.168.10.117:8081",
+    "API_BASE_URL": "http://192.168.0.104:8090",
+    "OVERRIDE_BASE_URL": "http://192.168.0.104:8093",
 
 
-    "APP_NAME": "FATIMA",
+    "APP_NAME": "Municipality",
     "APP_TYPE": "MUNICIPALITY",
     "OWNER_PROJECT_LINK_ID": "1",
     "PROJECT_ID": "1",
