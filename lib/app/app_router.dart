@@ -1,5 +1,18 @@
 // lib/app/app_router.dart
 
+import 'package:baladiyati/core/network/dio_client.dart';
+import 'package:baladiyati/features/admin/Departement/data/Repository/Departement_Repo_Impl.dart';
+import 'package:baladiyati/features/admin/Departement/data/Service/Departement_Api_Service.dart';
+import 'package:baladiyati/features/admin/Departement/domain/Usecases/Get_Departement.dart';
+import 'package:baladiyati/features/admin/Departement/presentation/bloc/Departement_Event.dart';
+import 'package:baladiyati/features/admin/Departement/presentation/bloc/Departement_bloc.dart';
+import 'package:baladiyati/features/admin/Departement/presentation/screens/Departement_Screen.dart';
+import 'package:baladiyati/features/admin/violations/data/Repository/violation_Repository_impl.dart';
+import 'package:baladiyati/features/admin/violations/data/services/violation_api_services.dart';
+import 'package:baladiyati/features/admin/violations/domain/Usecase/AddViolation.dart';
+import 'package:baladiyati/features/admin/violations/domain/Usecase/Getviolation.dart';
+import 'package:baladiyati/features/admin/violations/presentation/bloc/violation_bloc.dart';
+import 'package:baladiyati/features/admin/violations/presentation/screens/violationpage.dart';
 import 'package:baladiyati/features/citizen/profile/presentation/bloc/profile_bloc.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -122,4 +135,38 @@ class AppRouter {
 )
     );
   }
+  static void goToViolations(BuildContext context) {
+  final repo = ViolationRepositoryImpl(ViolationApiService());
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => BlocProvider(
+        create: (_) => ViolationBloc(
+          AddViolation(repo),
+          GetViolations(repo),
+        ),
+        child: const ViolationsPage(),
+      ),
+    ),
+  );
+}
+static void goToDepartments(BuildContext context) {
+  final repo = DepartmentRepositoryImpl(
+    DepartmentApiService(DioClient.muni),
+  );
+
+  final getDepartments = GetDepartments(repo);
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => BlocProvider(
+        create: (_) =>
+            DepartmentBloc(getDepartments)..add(LoadDepartments()),
+        child: const DepartmentsPage(),
+      ),
+    ),
+  );
+}
 }

@@ -3,7 +3,7 @@
 import 'package:baladiyati/core/config/env.dart';
 import 'package:baladiyati/core/config/jwt_store.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
-import 'package:baladiyati/features/admin/admin_dashboard_placeholder_screen.dart';
+import 'package:baladiyati/features/admin/Dashboard/presentation/screens/Dashboard_screen_admin.dart';
 import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
 import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
@@ -190,6 +190,29 @@ class _LoginScreenState extends State<LoginScreen> {
       tenantId: ownerProjectLinkId.toString(),
     );
 
+
+    // ✅ ADMIN ONLY
+    if (dual.adminOk) {
+  await JwtStore.clear(); 
+
+  await AdminTokenStore().save(
+    token: dual.admin!.token,
+    role: dual.admin!.role,
+    refreshToken: dual.admin!.refreshToken,
+    tenantId: ownerProjectLinkId.toString(),
+  );
+
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(
+      builder: (_) =>  DashboardPage(),
+    ),
+    (_) => false,
+  );
+  return;
+}
+  } catch (e) {
+
     if (!mounted) return;
 
     Navigator.pushAndRemoveUntil(
@@ -329,6 +352,28 @@ class _LoginScreenState extends State<LoginScreen> {
                   },
                 ),
 
+                onTap: () async {
+                  Navigator.pop(context);
+
+                 await AuthTokenStore().clear();
+await JwtStore.clear();
+await SessionRoleStore().saveRole(dual.admin!.role);
+
+await AdminTokenStore().save(
+  token: dual.admin!.token,
+  role: dual.admin!.role,
+  refreshToken: dual.admin!.refreshToken,
+  tenantId: ownerProjectLinkId.toString(),
+);
+
+                  if (!mounted) return;
+
+                  Navigator.pushAndRemoveUntil(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) =>  DashboardPage(),
+
+
                 ListTile(
                   leading: Icon(Icons.admin_panel_settings, color: cs.primary),
                   title: Text(
@@ -336,6 +381,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: cs.onSurface,
                       fontWeight: FontWeight.w600,
+
                     ),
                   ),
                   onTap: () async {

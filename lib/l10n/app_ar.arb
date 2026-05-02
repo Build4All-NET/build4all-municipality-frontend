@@ -200,6 +200,74 @@
 "continueAsCitizen": "المتابعة كمواطن",
 "continueAsAdmin": "المتابعة كمسؤول",
 "loginFailed": "فشل تسجيل الدخول",
+
+  "violations": "المخالفات",
+  "departments": "الأقسام",
+  "profile": "الملف الشخصي",
+  "logout": "تسجيل الخروج",
+  
+  "announcementsManagement": "إدارة الإعلانات",
+  "newAnnouncement": "إعلان جديد",
+  "createAnnouncement": "إنشاء إعلان جديد",
+  "publishAnnouncement": "نشر الإعلان",
+  "titleAr": "العنوان (عربي)",
+  "titleEn": "العنوان (English)",
+  "contentAr": "المحتوى (عربي)",
+  "contentEn": "المحتوى (English)",
+  "enterTitleAr": "أدخل العنوان",
+  "enterTitleEn": "Enter title",
+  "enterContentAr": "أدخل المحتوى",
+  "enterContentEn": "Enter content",
+  "published": "منشور",
+  "sampleTitle": "ساعات العمل الجديدة",
+  "sampleDescription": "الإثنين إلى الجمعة 8 صباحاً - 2 ظهراً",
+  
+  "violations": "المخالفات",
+  "addViolation": "إضافة مخالفة",
+  "search": "بحث...",
+  "all": "الكل",
+  "engineering": "الهندسة",
+  "finance": "المالية",
+  "police": "الشرطة",
+  "titleArabic": "العنوان (عربي)",
+  "titleEnglish": "العنوان (English)",
+  "contentArabic": "المحتوى (عربي)",
+  "contentEnglish": "المحتوى (English)",
+  "price": "السعر",
+  "publish": "نشر",
+  
+  "createViolation": "إنشاء مخالفة",
+  "name": "الاسم",
+  "enterName": "أدخل الاسم",
+  "citizenName": "اسم المواطن",
+  "enterCitizenName": "أدخل اسم المواطن",
+  "description": "الوصف",
+  "enterDescription": "أدخل الوصف",
+  "location": "الموقع",
+  "enterLocation": "أدخل الموقع",
+  "date": "التاريخ",
+  "selectDate": "اختر التاريخ",
+  "category": "القسم",
+  "selectCategory": "اختر القسم",
+  "amount": "المبلغ",
+  "enterAmount": "أدخل المبلغ",
+  "create": "إنشاء",
+  "newViolation": "مخالفة جديدة",
+  
+  "departments": "إدارة الأقسام",
+  "newDepartment": "قسم جديد",
+  "addDepartment": "إضافة قسم جديد",
+  "departmentName": "اسم القسم",
+  "description": "الوصف",
+  "isFixed": "قسم ثابت",
+  "fixed": "ثابت",
+  "notFixed": "غير ثابت",
+  "addDepartmentButton": "إضافة القسم",
+  "department": "القسم"
+
+
+
+
  "firstNameLabel": "الاسم الأول",
   "firstNameHint": "أدخل الاسم الأول",
   "lastNameLabel": "اسم العائلة",
@@ -230,5 +298,6 @@
   "missingBuild4allToken": "رمز تسجيل الدخول غير موجود. يرجى تسجيل الدخول من جديد.",
   "missingBuild4allUser": "بيانات المستخدم غير موجودة. يرجى تسجيل الدخول من جديد.",
   "missingMunicipalityId": "معرّف البلدية غير موجود"
+
 
 }

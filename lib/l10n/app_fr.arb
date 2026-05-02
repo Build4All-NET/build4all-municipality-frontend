@@ -182,6 +182,79 @@
   "avgTime": "Temps moyen",
   "satisfaction": "Satisfaction",
   "chooseHowToContinue": "Choisissez comment continuer",
+
+"continueAsCitizen": "Continuer comme citoyen",
+"continueAsAdmin": "Continuer comme administrateur",
+"loginFailed": "Échec de la connexion",
+  "violations": "Infractions",
+  "departments": "Départements",
+  "profile": "Profil",
+  "logout": "Déconnexion",
+
+  "announcementsManagement": "Gestion des annonces",
+  "newAnnouncement": "Nouvelle annonce",
+  "createAnnouncement": "Créer une nouvelle annonce",
+  "publishAnnouncement": "Publier l'annonce",
+  "titleAr": "Titre (Arabe)",
+  "titleEn": "Titre (Anglais)",
+  "contentAr": "Contenu (Arabe)",
+  "contentEn": "Contenu (Anglais)",
+  "enterTitleAr": "Entrez le titre",
+  "enterTitleEn": "Entrez le titre",
+  "enterContentAr": "Entrez le contenu",
+  "enterContentEn": "Entrez le contenu",
+  "published": "Publié",
+  "sampleTitle": "Nouveaux horaires de travail",
+  "sampleDescription": "Du lundi au vendredi, de 8h à 14h",
+  
+  "violations": "Infractions",
+  "addViolation": "Ajouter une infraction",
+  "search": "Rechercher...",
+  "all": "Tous",
+  "engineering": "Ingénierie",
+  "finance": "Finance",
+  "police": "Police",
+  "titleArabic": "Titre (Arabe)",
+  "titleEnglish": "Titre (Anglais)",
+  "contentArabic": "Contenu (Arabe)",
+  "contentEnglish": "Contenu (Anglais)",
+  "price": "Prix",
+  "publish": "Publier",
+ 
+  "createViolation": "Créer une infraction",
+  "name": "Nom",
+  "enterName": "Entrez le nom",
+  "citizenName": "Nom du citoyen",
+  "enterCitizenName": "Entrez le nom du citoyen",
+  "description": "Description",
+  "enterDescription": "Entrez la description",
+  "location": "Emplacement",
+  "enterLocation": "Entrez l'emplacement",
+  "date": "Date",
+  "selectDate": "Sélectionnez la date",
+  "category": "Catégorie",
+  "selectCategory": "Sélectionnez la catégorie",
+  "amount": "Montant",
+  "enterAmount": "Entrez le montant",
+  "create": "Créer",
+  "newViolation": "Nouvelle infraction",
+  
+  "departments": "Gestion des départements",
+  "newDepartment": "Nouveau département",
+  "addDepartment": "Ajouter un département",
+  "departmentName": "Nom du département",
+  "description": "Description",
+  "isFixed": "Département fixe",
+  "fixed": "Fixe",
+  "notFixed": "Non fixe",
+  "addDepartmentButton": "Ajouter le département",
+  "department": "Département"
+
+
+
+
+}
+
   "continueAsCitizen": "Continuer comme citoyen",
   "continueAsAdmin": "Continuer comme administrateur",
   "loginFailed": "Échec de la connexion",
@@ -209,3 +282,4 @@
   "missingBuild4allUser": "Données utilisateur manquantes. Veuillez vous reconnecter.",
   "missingMunicipalityId": "Identifiant de municipalité manquant"
 }
+

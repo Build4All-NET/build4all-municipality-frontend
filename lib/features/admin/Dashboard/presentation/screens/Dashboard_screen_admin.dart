@@ -1,8 +1,17 @@
+import 'package:baladiyati/app/app_router.dart';
+import 'package:baladiyati/core/network/api_client.dart';
+
+import 'package:baladiyati/features/admin/announcements/presentation/screens/announcementscreen.dart';
+import 'package:baladiyati/features/admin/violations/presentation/screens/violationpage.dart';
+import 'package:baladiyati/features/auth/data/services/auth_api_service.dart';
+import 'package:baladiyati/features/auth/presentation/login/screens/login_screen.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
+
 class DashboardPage extends StatelessWidget {
-  const DashboardPage({super.key});
+   DashboardPage({super.key});
+  final AuthApiService authApiService = AuthApiService();
 
   @override
   Widget build(BuildContext context) {
@@ -10,12 +19,37 @@ class DashboardPage extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: const Color(0xFFF5F6FA),
+
+      /// 🔹 APP BAR (Profile + Logout)
+      appBar: AppBar(
+        backgroundColor: const Color(0xFF2F5DA9),
+        title: Text(loc.dashboard),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.person),
+            onPressed: () {
+              Navigator.pushNamed(context, "/profile");
+            },
+          ),
+          IconButton(
+  icon: const Icon(Icons.logout),
+  onPressed: () async {
+    await authApiService.logout();
+
+    if (!context.mounted) return;
+
+    AppRouter.goToLogin(context);
+  },
+),
+],
+),
+
       body: SafeArea(
         child: SingleChildScrollView(
           child: Column(
             children: [
 
-              ///  HEADER
+              /// 🔷 HEADER
               Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(20),
@@ -30,18 +64,6 @@ class DashboardPage extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
 
-                    /// TITLE
-                    Text(
-                      loc.dashboard,
-                      style: const TextStyle(
-                        color: Colors.white,
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-
-                    const SizedBox(height: 10),
-
                     Text(
                       loc.employee,
                       style: const TextStyle(color: Colors.white70),
@@ -49,7 +71,7 @@ class DashboardPage extends StatelessWidget {
 
                     const SizedBox(height: 20),
 
-                    /// 🔲 TOP CARDS
+                    /// 🔲 STAT CARDS
                     GridView.count(
                       shrinkWrap: true,
                       crossAxisCount: 2,
@@ -93,10 +115,66 @@ class DashboardPage extends StatelessWidget {
                       mainAxisSpacing: 15,
                       physics: const NeverScrollableScrollPhysics(),
                       children: [
-                        _actionCard(loc.services, Icons.description, Colors.green),
-                        _actionCard(loc.inbox, Icons.inbox, Colors.blue),
-                        _actionCard(loc.announcements, Icons.campaign, Colors.orange),
-                        _actionCard(loc.employees, Icons.people, Colors.purple),
+
+                        _actionCard(
+                          loc.services,
+                          Icons.description,
+                          Colors.green,
+                          onTap: () {
+                            Navigator.pushNamed(context, "/services");
+                          },
+                        ),
+
+                        _actionCard(
+                          loc.inbox,
+                          Icons.inbox,
+                          Colors.blue,
+                          onTap: () {
+                            Navigator.pushNamed(context, "/inbox");
+                          },
+                        ),
+
+                       _actionCard(
+  loc.violations,
+  Icons.gavel,
+  Colors.red,
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const ViolationsPage()),
+    );
+  },),
+
+                        _actionCard(
+                          loc.departments,
+                          Icons.account_tree,
+                          Colors.teal,
+                          onTap: () {
+                              AppRouter.goToDepartments(context); 
+
+                          },
+                        ),
+
+                        _actionCard(
+                          loc.employees,
+                          Icons.person,
+                          Colors.indigo,
+                          onTap: () {
+                            Navigator.pushNamed(context, "/staff");
+                          },
+                        ),
+
+                        _actionCard(
+  loc.announcements,
+  Icons.campaign,
+  Colors.orange,
+  onTap: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const AnnouncementsPage()),
+    );
+  },
+),
                       ],
                     ),
                   ],
@@ -163,21 +241,25 @@ class DashboardPage extends StatelessWidget {
     );
   }
 
-  /// ⚡ ACTION CARD
-  Widget _actionCard(String title, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, color: color, size: 35),
-          const SizedBox(height: 10),
-          Text(title),
-        ],
+  /// ⚡ ACTION CARD (with click)
+  Widget _actionCard(String title, IconData icon, Color color,
+      {VoidCallback? onTap}) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        padding: const EdgeInsets.all(20),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, color: color, size: 35),
+            const SizedBox(height: 10),
+            Text(title),
+          ],
+        ),
       ),
     );
   }
