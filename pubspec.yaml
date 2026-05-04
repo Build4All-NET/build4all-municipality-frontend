@@ -24,6 +24,8 @@ dependencies:
   flutter_secure_storage: ^9.0.0
   flutter_launcher_icons: ^0.13.1
   flutter_native_splash: ^2.4.1
+  image_picker: ^1.1.2
+  phone_form_field: ^10.0.1
 
   # Utils
   equatable: ^2.0.5

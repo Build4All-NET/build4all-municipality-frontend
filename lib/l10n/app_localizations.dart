@@ -1138,7 +1138,7 @@ abstract class AppLocalizations {
   /// No description provided for @employees.
   ///
   /// In en, this message translates to:
-  /// **'Employees'**
+  /// **'Employees Management'**
   String get employees;
 
   /// No description provided for @recentActivity.
@@ -1349,7 +1349,7 @@ abstract class AppLocalizations {
   /// No description provided for @police.
   ///
   /// In en, this message translates to:
-  /// **'Police'**
+  /// **'Police Officer'**
   String get police;
 
   /// No description provided for @titleArabic.
@@ -1532,6 +1532,101 @@ abstract class AppLocalizations {
   /// **'Department'**
   String get department;
 
+  /// No description provided for @edit.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit'**
+  String get edit;
+
+  /// No description provided for @delete.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete'**
+  String get delete;
+
+  /// No description provided for @update.
+  ///
+  /// In en, this message translates to:
+  /// **'Update'**
+  String get update;
+
+  /// No description provided for @confirmDelete.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Delete'**
+  String get confirmDelete;
+
+  /// No description provided for @deleteDepartmentConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this department?'**
+  String get deleteDepartmentConfirm;
+
+  /// No description provided for @noData.
+  ///
+  /// In en, this message translates to:
+  /// **'No data'**
+  String get noData;
+
+  /// No description provided for @addEmployee.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Employee'**
+  String get addEmployee;
+
+  /// No description provided for @fullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Full Name'**
+  String get fullName;
+
+  /// No description provided for @email.
+  ///
+  /// In en, this message translates to:
+  /// **'Email'**
+  String get email;
+
+  /// No description provided for @phone.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone'**
+  String get phone;
+
+  /// No description provided for @add.
+  ///
+  /// In en, this message translates to:
+  /// **'Add'**
+  String get add;
+
+  /// No description provided for @selectDepartment.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Department'**
+  String get selectDepartment;
+
+  /// No description provided for @selectRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Role'**
+  String get selectRole;
+
+  /// No description provided for @role.
+  ///
+  /// In en, this message translates to:
+  /// **'Role'**
+  String get role;
+
+  /// No description provided for @engineer.
+  ///
+  /// In en, this message translates to:
+  /// **'Engineer'**
+  String get engineer;
+
+  /// No description provided for @accountant.
+  ///
+  /// In en, this message translates to:
+  /// **'Accountant'**
+  String get accountant;
   /// No description provided for @firstNameLabel.
   ///
   /// In en, this message translates to:

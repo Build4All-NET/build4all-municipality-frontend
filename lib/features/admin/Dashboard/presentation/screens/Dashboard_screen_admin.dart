@@ -160,7 +160,8 @@ class DashboardPage extends StatelessWidget {
                           Icons.person,
                           Colors.indigo,
                           onTap: () {
-                            Navigator.pushNamed(context, "/staff");
+                                                  AppRouter.goToEmployees(context); 
+
                           },
                         ),
 

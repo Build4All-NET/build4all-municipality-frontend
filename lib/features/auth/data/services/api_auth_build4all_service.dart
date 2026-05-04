@@ -8,9 +8,6 @@ class AuthApi {
 
   AuthApi(this._dio);
 
-  // ==========================================================
-  // ERROR HANDLER SIMPLE (IMPORTANT)
-  // ==========================================================
   Exception _handleError(DioException e, {String fallback = 'Request failed'}) {
     final data = e.response?.data;
 
@@ -19,12 +16,11 @@ class AuthApi {
 
     if (data is Map) {
       message = data['error'] ?? data['message'];
-      code = data['code'];
+      code = data['code']?.toString();
     }
 
     final msg = (message ?? fallback).toString();
 
-    // 👉 si backend donne un code auth → AuthException
     if (code != null) {
       return AuthException(msg, code: code, original: e);
     }
@@ -32,9 +28,6 @@ class AuthApi {
     return AppException(msg, original: e);
   }
 
-  // ==========================================================
-  // LOGIN
-  // ==========================================================
   Future<Response<dynamic>> ownerLogin({
     required String email,
     required String password,
@@ -44,54 +37,18 @@ class AuthApi {
       return await _dio.post(
         '/auth/user/login',
         data: {
-          'email': email,
-          'password': password,
+          'email': email.trim(),
+          'password': password.trim(),
           'ownerProjectLinkId': ownerProjectLinkId,
         },
       );
     } on DioException catch (e) {
-      throw _handleError(e);
+      throw _handleError(e, fallback: 'Login failed');
     } catch (e) {
       throw AppException('Login failed', original: e);
     }
   }
 
-  // ==========================================================
-  // REGISTER
-  // ==========================================================
-  Future<Response<dynamic>> register({
-  required String email,
-  required String password,
-  required String fullName,
-  required String phone,
-  required String role,
-  required int municipalityId,
-  required int ownerProjectLinkId,
-  required int build4allId, 
-}) async {
-  try {
-    return await _dio.post(
-      '/auth/users/register',
-      data: {
-        'email': email,
-        'passwordHash': password,
-        'fullName': fullName,
-        'phone': phone,
-        'role': role,
-        'ownerProjectLinkId': ownerProjectLinkId,
-        'BuildForAllId': build4allId, // ✅ THIS is Build4All ID
-        'municipality': {'id': municipalityId},
-      },
-    );
-  } on DioException catch (e) {
-    throw _handleError(e);
-  } catch (e) {
-    throw AppException('Registration failed', original: e);
-  }
-}
-  // ==========================================================
-  // OTP
-  // ==========================================================
   Future<Response<dynamic>> ownerSendOtp({
     required String email,
     required String password,
@@ -101,15 +58,15 @@ class AuthApi {
       return await _dio.post(
         '/auth/send-verification',
         data: {
-          "email": email,
-          "password": password,
-          "ownerProjectLinkId": ownerProjectLinkId,
+          'email': email.trim(),
+          'password': password.trim(),
+          'ownerProjectLinkId': ownerProjectLinkId,
         },
       );
     } on DioException catch (e) {
-      throw _handleError(e);
+      throw _handleError(e, fallback: 'Failed to send verification code');
     } catch (e) {
-      throw AppException('Failed to send OTP', original: e);
+      throw AppException('Failed to send verification code', original: e);
     }
   }
 
@@ -121,20 +78,17 @@ class AuthApi {
       return await _dio.post(
         '/auth/verify-email-code',
         data: {
-          'email': email,
-          'code': code,
+          'email': email.trim(),
+          'code': code.trim(),
         },
       );
     } on DioException catch (e) {
-      throw _handleError(e);
+      throw _handleError(e, fallback: 'Failed to verify code');
     } catch (e) {
-      throw AppException('Failed to verify OTP', original: e);
+      throw AppException('Failed to verify code', original: e);
     }
   }
 
-  // ==========================================================
-  // PROFILE
-  // ==========================================================
   Future<Response<dynamic>> ownerCompleteProfile({
     required String pendingId,
     required String username,
@@ -142,15 +96,18 @@ class AuthApi {
     required String lastName,
     required bool isPublicProfile,
     required String ownerProjectLinkId,
+    String? profileImagePath,
   }) async {
     try {
       final formData = FormData.fromMap({
-        'pendingId': pendingId,
-        'username': username,
-        'firstName': firstName,
-        'lastName': lastName,
+        'pendingId': pendingId.trim(),
+        'username': username.trim(),
+        'firstName': firstName.trim(),
+        'lastName': lastName.trim(),
         'isPublicProfile': isPublicProfile.toString(),
-        'ownerProjectLinkId': ownerProjectLinkId,
+        'ownerProjectLinkId': ownerProjectLinkId.trim(),
+        if (profileImagePath != null && profileImagePath.trim().isNotEmpty)
+          'profileImage': await MultipartFile.fromFile(profileImagePath),
       });
 
       return await _dio.post(
@@ -158,20 +115,19 @@ class AuthApi {
         data: formData,
       );
     } on DioException catch (e) {
-      throw _handleError(e);
+      throw _handleError(e, fallback: 'Failed to complete profile');
     } catch (e) {
       throw AppException('Failed to complete profile', original: e);
     }
   }
 
-  // ==========================================================
-  // REFRESH
-  // ==========================================================
   Future<Response<dynamic>> refresh(String refreshToken) async {
     try {
       return await _dio.post(
         '/auth/refresh',
-        data: {'refreshToken': refreshToken.trim()},
+        data: {
+          'refreshToken': refreshToken.trim(),
+        },
       );
     } on DioException catch (e) {
       throw AuthException(
@@ -184,46 +140,45 @@ class AuthApi {
     }
   }
 
-  // ==========================================================
-  // LOGOUT
-  // ==========================================================
   Future<Response<dynamic>> logout({
     required String refreshToken,
   }) async {
     try {
       return await _dio.post(
         '/auth/logout',
-        data: {'refreshToken': refreshToken.trim()},
+        data: {
+          'refreshToken': refreshToken.trim(),
+        },
       );
     } on DioException catch (e) {
-      throw AppException('Logout failed', original: e);
+      throw _handleError(e, fallback: 'Logout failed');
     } catch (e) {
       throw AppException('Logout failed', original: e);
     }
   }
 
   Future<AdminLoginResponse> adminLogin({
-  required String usernameOrEmail,
-  required String password,
-  required int ownerProjectLinkId,
-}) async {
-  try {
-    final response = await _dio.post(
-      '/auth/admin/login/front',
-      data: {
-        'usernameOrEmail': usernameOrEmail,
-        'password': password,
-        'ownerProjectId': ownerProjectLinkId,
-      },
-    );
+    required String usernameOrEmail,
+    required String password,
+    required int ownerProjectLinkId,
+  }) async {
+    try {
+      final response = await _dio.post(
+        '/auth/admin/login/front',
+        data: {
+          'usernameOrEmail': usernameOrEmail.trim(),
+          'password': password.trim(),
+          'ownerProjectId': ownerProjectLinkId,
+        },
+      );
 
-    return AdminLoginResponse.fromJson(
-      Map<String, dynamic>.from(response.data as Map),
-    );
-  } on DioException catch (e) {
-    throw _handleError(e, fallback: 'Admin login failed');
-  } catch (e) {
-    throw AppException('Admin login failed', original: e);
+      return AdminLoginResponse.fromJson(
+        Map<String, dynamic>.from(response.data as Map),
+      );
+    } on DioException catch (e) {
+      throw _handleError(e, fallback: 'Admin login failed');
+    } catch (e) {
+      throw AppException('Admin login failed', original: e);
+    }
   }
-}
 }

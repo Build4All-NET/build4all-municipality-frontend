@@ -1,9 +1,8 @@
-// lib/features/auth/presentation/municipality_profile/screens/municipality_profile_setup_screen.dart
-
 import 'package:baladiyati/common/widgets/app_text_field.dart';
 import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/common/widgets/primary_button.dart';
 import 'package:baladiyati/core/config/app_sizes.dart';
+import 'package:baladiyati/core/config/jwt_store.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/core/theme/theme_cubit.dart';
 import 'package:baladiyati/features/citizen/home/presentation/screens/home_screen.dart';
@@ -11,6 +10,7 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:phone_form_field/phone_form_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 class MunicipalityProfileSetupScreen extends StatefulWidget {
@@ -36,10 +36,10 @@ class _MunicipalityProfileSetupScreenState
     extends State<MunicipalityProfileSetupScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  final _phoneCtrl = TextEditingController();
   final _addressCtrl = TextEditingController();
-
   final Dio _dio = DioClient.muni;
+
+  late final PhoneController _phoneCtrl;
 
   bool _isLoading = false;
 
@@ -54,7 +54,10 @@ class _MunicipalityProfileSetupScreenState
   @override
   void initState() {
     super.initState();
-    _prefillUserPhone();
+
+    _phoneCtrl = PhoneController(
+      initialValue: _initialPhoneNumber(),
+    );
   }
 
   @override
@@ -64,7 +67,7 @@ class _MunicipalityProfileSetupScreenState
     super.dispose();
   }
 
-  void _prefillUserPhone() {
+  PhoneNumber _initialPhoneNumber() {
     final phone = (widget.build4allUser['phoneNumber'] ??
             widget.build4allUser['phone'] ??
             '')
@@ -72,8 +75,18 @@ class _MunicipalityProfileSetupScreenState
         .trim();
 
     if (phone.isNotEmpty && phone != 'null') {
-      _phoneCtrl.text = phone;
+      try {
+        if (phone.startsWith('+')) {
+          return PhoneNumber.parse(phone);
+        }
+
+        return PhoneNumber.parse('+961$phone');
+      } catch (_) {
+        return PhoneNumber.parse('+961');
+      }
     }
+
+    return PhoneNumber.parse('+961');
   }
 
   String _cleanError(Object e) {
@@ -97,6 +110,16 @@ class _MunicipalityProfileSetupScreenState
     }
 
     return 'Bearer $token';
+  }
+
+  String _rawToken() {
+    final token = widget.build4allToken.trim();
+
+    if (token.toLowerCase().startsWith('bearer ')) {
+      return token.substring(7).trim();
+    }
+
+    return token;
   }
 
   String _email() {
@@ -124,13 +147,49 @@ class _MunicipalityProfileSetupScreenState
     return _email().split('@').first;
   }
 
+  String _phoneForBackend() {
+    final phone = _phoneCtrl.value;
+
+    final nsn = phone.nsn.trim().replaceAll(RegExp(r'\s+'), '');
+
+    if (nsn.isNotEmpty) return nsn;
+
+    return phone.international.trim().replaceAll(RegExp(r'[^0-9]'), '');
+  }
+
   String _completionPrefsKey() {
     return 'municipality_profile_completed_${widget.ownerProjectLinkId}_${_userId()}';
   }
 
+  /// IMPORTANT:
+  /// Do NOT save AuthTokenStore here with refreshToken: null.
+  /// LoginScreen already saves AuthTokenStore correctly with refresh token.
+  /// Here we only keep JwtStore/Dio fallback updated.
+  Future<void> _saveSessionTokenFallbackOnly() async {
+    final token = _rawToken();
+
+    if (token.isEmpty) return;
+
+    await JwtStore.save(token);
+    DioClient.setAuthToken(token);
+  }
+
   Future<void> _markMunicipalityProfileCompleted() async {
     final prefs = await SharedPreferences.getInstance();
+
     await prefs.setBool(_completionPrefsKey(), true);
+
+    final userId = _userId();
+
+    if (userId > 0) {
+      await prefs.setInt('userId', userId);
+      await prefs.setString('build4allUserId', userId.toString());
+    }
+
+    final token = _rawToken();
+    if (token.isNotEmpty) {
+      await prefs.setString('build4allToken', token);
+    }
   }
 
   bool _isAlreadyExistsError(Object e) {
@@ -149,8 +208,10 @@ class _MunicipalityProfileSetupScreenState
 
       return code.contains('EMAIL_ALREADY_EXISTS') ||
           code.contains('USER_ALREADY_EXISTS') ||
+          code.contains('PROFILE_ALREADY_EXISTS') ||
           message.contains('already') ||
-          message.contains('email already');
+          message.contains('email already') ||
+          message.contains('profile already');
     }
 
     return false;
@@ -205,7 +266,7 @@ class _MunicipalityProfileSetupScreenState
           'email': _email(),
           'passwordHash': 'BUILD4ALL_USER',
           'fullName': _fullName(),
-          'phone': _phoneCtrl.text.trim(),
+          'phone': _phoneForBackend(),
           'address': _addressCtrl.text.trim(),
           'role': 'USER',
           'municipality': {
@@ -214,6 +275,7 @@ class _MunicipalityProfileSetupScreenState
         },
       );
 
+      await _saveSessionTokenFallbackOnly();
       await _markMunicipalityProfileCompleted();
 
       if (!mounted) return;
@@ -231,6 +293,7 @@ class _MunicipalityProfileSetupScreenState
       );
     } catch (e) {
       if (_isAlreadyExistsError(e)) {
+        await _saveSessionTokenFallbackOnly();
         await _markMunicipalityProfileCompleted();
 
         if (!mounted) return;
@@ -314,9 +377,7 @@ class _MunicipalityProfileSetupScreenState
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 8),
-
                         Center(
                           child: Text(
                             l10n.municipalityProfileSubtitle,
@@ -326,33 +387,9 @@ class _MunicipalityProfileSetupScreenState
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 24),
-
-                        AppTextField(
-                          controller: _phoneCtrl,
-                          label: l10n.phoneLabel,
-                          hint: l10n.phoneHint,
-                          icon: Icons.phone_outlined,
-                          keyboardType: TextInputType.phone,
-                          textAlign: TextAlign.left,
-                          validator: (v) {
-                            final value = v?.trim() ?? '';
-
-                            if (value.isEmpty) {
-                              return l10n.fieldRequired;
-                            }
-
-                            if (!RegExp(r'^[0-9]{8,15}$').hasMatch(value)) {
-                              return l10n.phoneInvalid;
-                            }
-
-                            return null;
-                          },
-                        ),
-
+                        _buildPhoneField(context, l10n),
                         const SizedBox(height: 16),
-
                         AppTextField(
                           controller: _addressCtrl,
                           label: l10n.addressLabel,
@@ -362,24 +399,15 @@ class _MunicipalityProfileSetupScreenState
                           validator: (v) {
                             final value = v?.trim() ?? '';
 
-                            if (value.isEmpty) {
-                              return l10n.fieldRequired;
-                            }
-
-                            if (value.length < 6) {
-                              return l10n.addressTooShort;
-                            }
+                            if (value.isEmpty) return l10n.fieldRequired;
+                            if (value.length < 6) return l10n.addressTooShort;
 
                             return null;
                           },
                         ),
-
                         const SizedBox(height: 16),
-
                         _buildMunicipalityDropdown(context, l10n),
-
                         const SizedBox(height: 28),
-
                         PrimaryButton(
                           label: l10n.completeMunicipalityProfileButton,
                           isLoading: _isLoading,
@@ -396,6 +424,55 @@ class _MunicipalityProfileSetupScreenState
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildPhoneField(
+    BuildContext context,
+    AppLocalizations l10n,
+  ) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Directionality(
+      textDirection: TextDirection.ltr,
+      child: PhoneFormField(
+        controller: _phoneCtrl,
+        enabled: !_isLoading,
+        countrySelectorNavigator: const CountrySelectorNavigator.dialog(),
+        decoration: InputDecoration(
+          labelText: l10n.phoneLabel,
+          hintText: l10n.phoneHint,
+          prefixIcon: const Icon(Icons.phone_outlined),
+          filled: true,
+          fillColor: cs.surface,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+            borderSide: BorderSide(
+              color: cs.outline.withOpacity(0.35),
+            ),
+          ),
+          focusedBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+            borderSide: BorderSide(
+              color: cs.primary,
+              width: 2,
+            ),
+          ),
+        ),
+        validator: PhoneValidator.compose([
+          PhoneValidator.required(
+            context,
+            errorText: l10n.fieldRequired,
+          ),
+          PhoneValidator.validMobile(
+            context,
+            errorText: l10n.phoneInvalid,
+          ),
+        ]),
       ),
     );
   }
@@ -480,10 +557,7 @@ class _MunicipalityProfileSetupScreenState
                   setState(() => _selectedMunicipality = value);
                 },
           validator: (value) {
-            if (value == null) {
-              return l10n.selectMunicipalityWarning;
-            }
-
+            if (value == null) return l10n.selectMunicipalityWarning;
             return null;
           },
         ),
