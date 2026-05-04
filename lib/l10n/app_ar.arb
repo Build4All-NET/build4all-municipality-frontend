@@ -262,7 +262,33 @@
   "fixed": "ثابت",
   "notFixed": "غير ثابت",
   "addDepartmentButton": "إضافة القسم",
-  "department": "القسم"
+  "department": "القسم",
+  
+  "edit": "تعديل",
+  "delete": "حذف",
+  "update": "تحديث",
+  "save": "حفظ",
+  "cancel": "إلغاء",
+  "confirmDelete": "تأكيد الحذف",
+  "deleteDepartmentConfirm": "هل تريد حذف هذا القسم؟",
+  
+  "employees": "إدارة الموظفين",
+  "noData": "لا يوجد بيانات",
+  "addEmployee": "إضافة موظف",
+  "fullName": "الاسم الكامل",
+  "email": "البريد الإلكتروني",
+  "phone": "رقم الهاتف",
+  "add": "إضافة",
+   "selectDepartment": "اختر القسم",
+  "selectRole": "اختر الدور",
+  "role": "الصلاحية",
+  "employee": "موظف",
+  "police": "شرطي",
+  "engineer": "مهندس",
+  "accountant": "محاسب"
+
+
+
 
 
 

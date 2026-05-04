@@ -1,108 +1,102 @@
-import 'package:baladiyati/features/admin/Departement/domain/Entities/Departement.dart';
-import 'package:baladiyati/features/admin/Departement/presentation/bloc/Departement_Event.dart';
-import 'package:baladiyati/features/admin/Departement/presentation/bloc/Departement_bloc.dart';
+import 'package:baladiyati/features/admin/Departement/data/Model/Departement_model.dart';
+import 'package:baladiyati/features/admin/Departement/presentation/cubit/Departement_cubit.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-
 class AddDepartmentDialog extends StatefulWidget {
-  const AddDepartmentDialog({super.key});
+  final DepartmentModel? department;
+
+  const AddDepartmentDialog({super.key, this.department});
 
   @override
-  State<AddDepartmentDialog> createState() =>
-      _AddDepartmentDialogState();
+  State<AddDepartmentDialog> createState() => _AddDepartmentDialogState();
 }
 
-class _AddDepartmentDialogState
-    extends State<AddDepartmentDialog> {
-  final nameController = TextEditingController();
-  final descController = TextEditingController();
+class _AddDepartmentDialogState extends State<AddDepartmentDialog> {
+  final name = TextEditingController();
+  final description = TextEditingController();
 
-  bool isFixed = false;
+  @override
+  void initState() {
+    super.initState();
+
+    if (widget.department != null) {
+      name.text = widget.department!.name;
+      description.text = widget.department!.description;
+    }
+  }
+
+  @override
+  void dispose() {
+    name.dispose();
+    description.dispose();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
-    final t = AppLocalizations.of(context)!;
+    final loc = AppLocalizations.of(context)!;
 
-    return Dialog(
-      shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(20)),
-      child: Padding(
-        padding: const EdgeInsets.all(20),
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Text(
-                t.addDepartment,
-                style:
-                    const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
+    return AlertDialog(
+      title: Text(
+        widget.department == null ? loc.newDepartment : loc.edit,
+      ),
 
-              const SizedBox(height: 20),
+      content: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
 
-              _buildField(t.departmentName, nameController),
-              _buildField(t.description, descController),
+          TextField(
+            controller: name,
+            decoration: InputDecoration(
+              labelText: loc.name,
+            ),
+          ),
 
-              const SizedBox(height: 10),
+          TextField(
+            controller: description,
+            decoration: InputDecoration(
+              labelText: loc.description,
+            ),
+          ),
+        ],
+      ),
 
-              Row(
-                children: [
-                  Checkbox(
-                    value: isFixed,
-                    onChanged: (val) {
-                      setState(() => isFixed = val ?? false);
-                    },
-                  ),
-                  Text(t.isFixed),
-                ],
-              ),
+      actions: [
 
-              const SizedBox(height: 20),
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: Text(loc.cancel),
+        ),
 
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xff1F3A5F),
-                    padding:
-                        const EdgeInsets.symmetric(vertical: 14),
-                  ),
-                  onPressed: () {
-                    final department = Department(
-                      id: 0,
-                      name: nameController.text,
-                      description: descController.text,
-                      isFixed: isFixed,
-                    );
+        ElevatedButton(
+          onPressed: () {
+            if (name.text.isEmpty || description.text.isEmpty) return;
 
-                    context.read<DepartmentBloc>().add(
-                          CreateDepartmentEvent(department),
-                        );
+            final model = DepartmentModel(
+              id: widget.department?.id ??
+                  DateTime.now().millisecondsSinceEpoch,
+              name: name.text,
+              description: description.text,
+              isFixed: widget.department?.isFixed ?? false,
+            );
 
-                    Navigator.pop(context);
-                  },
-                  child: Text(t.addDepartmentButton),
-                ),
-              )
-            ],
+            final cubit = context.read<DepartmentCubit>();
+
+            if (widget.department == null) {
+              cubit.add(model);
+            } else {
+              cubit.update(model);
+            }
+
+            Navigator.pop(context);
+          },
+          child: Text(
+            widget.department == null ? loc.add : loc.edit,
           ),
         ),
-      ),
-    );
-  }
-
-  Widget _buildField(String hint, TextEditingController controller) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 10),
-      child: TextField(
-        controller: controller,
-        decoration: InputDecoration(
-          hintText: hint,
-          border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(12)),
-        ),
-      ),
+      ],
     );
   }
 }

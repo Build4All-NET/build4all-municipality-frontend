@@ -30,7 +30,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get citizen => 'مواطن';
 
   @override
-  String get employee => 'الموظف';
+  String get employee => 'موظف';
 
   @override
   String get emailLabel => 'البريد الإلكتروني';
@@ -528,7 +528,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get announcements => 'الإعلانات';
 
   @override
-  String get employees => 'الموظفون';
+  String get employees => 'إدارة الموظفين';
 
   @override
   String get recentActivity => 'النشاط الأخير';
@@ -633,7 +633,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get finance => 'المالية';
 
   @override
-  String get police => 'الشرطة';
+  String get police => 'شرطي';
 
   @override
   String get titleArabic => 'العنوان (عربي)';
@@ -724,4 +724,52 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get department => 'القسم';
+
+  @override
+  String get edit => 'تعديل';
+
+  @override
+  String get delete => 'حذف';
+
+  @override
+  String get update => 'تحديث';
+
+  @override
+  String get confirmDelete => 'تأكيد الحذف';
+
+  @override
+  String get deleteDepartmentConfirm => 'هل تريد حذف هذا القسم؟';
+
+  @override
+  String get noData => 'لا يوجد بيانات';
+
+  @override
+  String get addEmployee => 'إضافة موظف';
+
+  @override
+  String get fullName => 'الاسم الكامل';
+
+  @override
+  String get email => 'البريد الإلكتروني';
+
+  @override
+  String get phone => 'رقم الهاتف';
+
+  @override
+  String get add => 'إضافة';
+
+  @override
+  String get selectDepartment => 'اختر القسم';
+
+  @override
+  String get selectRole => 'اختر الدور';
+
+  @override
+  String get role => 'الصلاحية';
+
+  @override
+  String get engineer => 'مهندس';
+
+  @override
+  String get accountant => 'محاسب';
 }

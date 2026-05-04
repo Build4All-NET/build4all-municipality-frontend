@@ -528,7 +528,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get announcements => 'Annonces';
 
   @override
-  String get employees => 'Employés';
+  String get employees => 'Gestion des employés';
 
   @override
   String get recentActivity => 'Activité récente';
@@ -633,7 +633,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get finance => 'Finance';
 
   @override
-  String get police => 'Police';
+  String get police => 'Agent de police';
 
   @override
   String get titleArabic => 'Titre (Arabe)';
@@ -724,4 +724,52 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get department => 'Département';
+
+  @override
+  String get edit => 'Modifier';
+
+  @override
+  String get delete => 'Supprimer';
+
+  @override
+  String get update => 'Mettre à jour';
+
+  @override
+  String get confirmDelete => 'Confirmer la suppression';
+
+  @override
+  String get deleteDepartmentConfirm => 'Voulez-vous supprimer ce département ?';
+
+  @override
+  String get noData => 'Aucune donnée';
+
+  @override
+  String get addEmployee => 'Ajouter un employé';
+
+  @override
+  String get fullName => 'Nom complet';
+
+  @override
+  String get email => 'Email';
+
+  @override
+  String get phone => 'Téléphone';
+
+  @override
+  String get add => 'Ajouter';
+
+  @override
+  String get selectDepartment => 'Choisir département';
+
+  @override
+  String get selectRole => 'Choisir rôle';
+
+  @override
+  String get role => 'Rôle';
+
+  @override
+  String get engineer => 'Ingénieur';
+
+  @override
+  String get accountant => 'Comptable';
 }

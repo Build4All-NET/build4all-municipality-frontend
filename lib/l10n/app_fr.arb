@@ -262,7 +262,32 @@
   "fixed": "Fixe",
   "notFixed": "Non fixe",
   "addDepartmentButton": "Ajouter le département",
-  "department": "Département"
+  "department": "Département",
+  
+  "edit": "Modifier",
+  "delete": "Supprimer",
+  "update": "Mettre à jour",
+  "save": "Enregistrer",
+  "cancel": "Annuler",
+  "confirmDelete": "Confirmer la suppression",
+  "deleteDepartmentConfirm": "Voulez-vous supprimer ce département ?",
+
+
+  "employees": "Gestion des employés",
+  "noData": "Aucune donnée",
+  "addEmployee": "Ajouter un employé",
+  "fullName": "Nom complet",
+  "email": "Email",
+  "phone": "Téléphone",
+  "add": "Ajouter",
+   "selectDepartment": "Choisir département",
+  "selectRole": "Choisir rôle",
+  "role": "Rôle",
+  "employee": "Employé",
+  "police": "Agent de police",
+  "engineer": "Ingénieur",
+  "accountant": "Comptable"
+
 
 
 

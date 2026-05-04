@@ -265,7 +265,33 @@
   "fixed": "Fixed",
   "notFixed": "Not Fixed",
   "addDepartmentButton": "Add Department",
-  "department": "Department"
+  "department": "Department",
+  
+  "edit": "Edit",
+  "delete": "Delete",
+  "update": "Update",
+  "save": "Save",
+  "cancel": "Cancel",
+  "confirmDelete": "Confirm Delete",
+  "deleteDepartmentConfirm": "Are you sure you want to delete this department?",
+  
+  "employees": "Employees Management",
+  "noData": "No data",
+  "addEmployee": "Add Employee",
+  "fullName": "Full Name",
+  "email": "Email",
+  "phone": "Phone",
+  "add": "Add",
+   "selectDepartment": "Select Department",
+  "selectRole": "Select Role",
+  "role": "Role",
+  "employee": "Employee",
+  "police": "Police Officer",
+  "engineer": "Engineer",
+  "accountant": "Accountant"
+
+
+
 
 
 }
