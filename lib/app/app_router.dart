@@ -6,7 +6,18 @@ import 'package:baladiyati/features/admin/Departement/data/Service/Departement_A
 import 'package:baladiyati/features/admin/Departement/domain/Usecases/Get_Departement.dart';
 import 'package:baladiyati/features/admin/Departement/presentation/bloc/Departement_Event.dart';
 import 'package:baladiyati/features/admin/Departement/presentation/bloc/Departement_bloc.dart';
+import 'package:baladiyati/features/admin/Departement/presentation/cubit/Departement_cubit.dart';
+import 'package:baladiyati/features/admin/Departement/presentation/screens/Add_Depart_screen.dart';
 import 'package:baladiyati/features/admin/Departement/presentation/screens/Departement_Screen.dart';
+import 'package:baladiyati/features/admin/Role/Presenatation/cubit/role_cubit.dart';
+import 'package:baladiyati/features/admin/Role/data/service/Role_Api_Service.dart';
+import 'package:baladiyati/features/admin/staff/Domain/Usecase/GetEmploye.dart';
+import 'package:baladiyati/features/admin/staff/Domain/Usecase/GreateEmploye.dart';
+import 'package:baladiyati/features/admin/staff/Presentation/bloc/Empl_bloc.dart';
+import 'package:baladiyati/features/admin/staff/Presentation/bloc/Empl_event.dart';
+import 'package:baladiyati/features/admin/staff/Presentation/screens/Employe_screen.dart';
+import 'package:baladiyati/features/admin/staff/data/Repository/Empl_Repo.dart';
+import 'package:baladiyati/features/admin/staff/data/Service/Employe_Api_Service.dart';
 import 'package:baladiyati/features/admin/violations/data/Repository/violation_Repository_impl.dart';
 import 'package:baladiyati/features/admin/violations/data/services/violation_api_services.dart';
 import 'package:baladiyati/features/admin/violations/domain/Usecase/AddViolation.dart';
@@ -161,12 +172,60 @@ static void goToDepartments(BuildContext context) {
   Navigator.push(
     context,
     MaterialPageRoute(
-      builder: (_) => BlocProvider(
-        create: (_) =>
-            DepartmentBloc(getDepartments)..add(LoadDepartments()),
-        child: const DepartmentsPage(),
+      builder: (_) {
+        final bloc = DepartmentBloc(getDepartments);
+
+        bloc.add(LoadDepartments()); // ✔️ هون صح
+
+        return BlocProvider(
+          create: (_) => bloc,
+          child: const DepartmentsScreen(),
+        );
+      },
+    ),
+  );
+}
+ // ================= EMPLOYEES =================
+ 
+static void goToEmployees(BuildContext context) {
+
+  final employeeRepo = EmployeeRepositoryImpl(
+    EmployeeApiService(DioClient.muni),
+  );
+
+  final roleApi = RoleApiService(DioClient.muni);
+
+  final departmentApi = DepartmentApiService(DioClient.muni);
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => MultiBlocProvider(
+        providers: [
+
+          // ================= EMPLOYEE BLOC =================
+          BlocProvider(
+            create: (_) => EmployeeBloc(
+              GetEmployees(employeeRepo),
+              CreateEmployee(employeeRepo),
+            )..add(LoadEmployees()),
+          ),
+
+          // ================= ROLE CUBIT =================
+          BlocProvider(
+            create: (_) => RoleCubit(roleApi)..load(),
+          ),
+
+          // ================= DEPARTMENT CUBIT =================
+          BlocProvider(
+            create: (_) => DepartmentCubit(departmentApi)..load(),
+          ),
+        ],
+
+        child: EmployeesScreen(),
       ),
     ),
   );
 }
 }
+

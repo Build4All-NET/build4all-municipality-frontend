@@ -7,28 +7,21 @@ class DepartmentApiService {
   DepartmentApiService(this.dio);
 
   Future<List<DepartmentModel>> getAll() async {
-    final res = await dio.get('/api/admin/departments/all');
-
+    final res = await dio.get("/departments/all");
     return (res.data as List)
         .map((e) => DepartmentModel.fromJson(e))
         .toList();
   }
 
-  Future<void> create(DepartmentModel model) async {
-    await dio.post(
-      '/api/admin/departments/create',
-      data: model.toJson(),
-    );
+  Future<void> add(DepartmentModel model) async {
+    await dio.post("/departments/create", data: model.toJson());
   }
 
   Future<void> update(int id, DepartmentModel model) async {
-    await dio.put(
-      '/api/admin/departments/$id',
-      data: model.toJson(),
-    );
+    await dio.put("/departments/$id", data: model.toJson());
   }
 
   Future<void> delete(int id) async {
-    await dio.delete('/api/admin/departments/$id');
+    await dio.delete("/departments/$id");
   }
 }
