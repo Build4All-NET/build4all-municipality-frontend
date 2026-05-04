@@ -1,31 +1,46 @@
-// lib/features/profile/data/models/profile_model.dart
-
 import '../../domain/entities/profile_entity.dart';
+import 'build4all_profile_model.dart';
+import 'municipality_profile_model.dart';
 
 class ProfileModel extends ProfileEntity {
   const ProfileModel({
-    required super.id,
-    super.fullName,
-    super.phone,
-    super.email,
-    super.address,
-    super.username,
-    super.avatarUrl,
-    super.municipalityId,
-    super.ownerProjectLinkId,
+    required super.build4allId,
+    required super.firstName,
+    required super.lastName,
+    required super.username,
+    required super.email,
+    required super.profilePictureUrl,
+    required super.isPublicProfile,
+    required super.coreStatus,
+    required super.municipalityProfileId,
+    required super.phone,
+    required super.address,
+    required super.municipalityStatus,
+    required super.municipalityId,
+    required super.municipalityName,
+    required super.ownerProjectLinkId,
   });
 
-  factory ProfileModel.fromJson(Map<String, dynamic> json) {
+  factory ProfileModel.fromParts({
+    required Build4AllProfileModel core,
+    required MunicipalityProfileModel municipality,
+  }) {
     return ProfileModel(
-      id: json['id'] ?? 0,
-      fullName: json['fullName'],
-      phone: json['phone'],
-      email: json['email'],
-      address: json['address'],
-      username: json['username'],
-      avatarUrl: json['avatarUrl'],
-      municipalityId: json['municipalityId'],
-      ownerProjectLinkId: json['ownerProjectLinkId'],
+      build4allId: core.id,
+      firstName: core.firstName,
+      lastName: core.lastName,
+      username: core.username,
+      email: core.email,
+      profilePictureUrl: core.profilePictureUrl,
+      isPublicProfile: core.isPublicProfile,
+      coreStatus: core.status,
+      municipalityProfileId: municipality.id,
+      phone: municipality.phone,
+      address: municipality.address,
+      municipalityStatus: municipality.status,
+      municipalityId: municipality.municipalityId,
+      municipalityName: municipality.municipalityName,
+      ownerProjectLinkId: municipality.ownerProjectLinkId,
     );
   }
 }

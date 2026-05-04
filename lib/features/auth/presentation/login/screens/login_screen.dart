@@ -8,13 +8,13 @@ import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
 import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
 import 'package:baladiyati/features/auth/data/services/session_role_store.dart';
-import 'package:baladiyati/features/auth/data/services/auth_api_service.dart';
 import 'package:baladiyati/features/auth/domain/facade/dual_login_orchestrator.dart';
 import 'package:baladiyati/features/auth/presentation/municipality_profile/screens/municipality_profile_setup_screen.dart';
 import 'package:baladiyati/features/auth/presentation/register/screens/user_register_screen.dart';
 import 'package:baladiyati/features/citizen/home/presentation/screens/home_screen.dart';
 import 'package:baladiyati/features/forgotpassword/presentation/screens/reset_password_page.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,11 +59,29 @@ class _LoginScreenState extends State<LoginScreen> {
     return e.toString().replaceAll('Exception:', '').trim();
   }
 
+  String _bearer(String token) {
+    final clean = token.trim();
+
+    if (clean.toLowerCase().startsWith('bearer ')) {
+      return clean;
+    }
+
+    return 'Bearer $clean';
+  }
+
   Map<String, dynamic> _extractUserMap(DualLoginResult dual) {
     final data = dual.userData;
-    if (data == null) return <String, dynamic>{};
+
+    if (data == null) {
+      return <String, dynamic>{};
+    }
+
     final user = data['user'];
-    if (user is Map) return Map<String, dynamic>.from(user);
+
+    if (user is Map) {
+      return Map<String, dynamic>.from(user);
+    }
+
     return <String, dynamic>{};
   }
 
@@ -71,37 +89,139 @@ class _LoginScreenState extends State<LoginScreen> {
     return int.tryParse(userMap['id']?.toString() ?? '') ?? 0;
   }
 
-  String _municipalityProfileCompletedKey({required int ownerProjectLinkId, required int userId}) {
+  String _municipalityProfileCompletedKey({
+    required int ownerProjectLinkId,
+    required int userId,
+  }) {
     return 'municipality_profile_completed_${ownerProjectLinkId}_$userId';
   }
 
-  Future<bool> _isMunicipalityProfileCompleted({required int ownerProjectLinkId, required int userId}) async {
-    if (ownerProjectLinkId <= 0 || userId <= 0) return false;
+  Future<bool> _isMunicipalityProfileCompletedLocal({
+    required int ownerProjectLinkId,
+    required int userId,
+  }) async {
+    if (ownerProjectLinkId <= 0 || userId <= 0) {
+      return false;
+    }
+
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getBool(_municipalityProfileCompletedKey(ownerProjectLinkId: ownerProjectLinkId, userId: userId)) ?? false;
+
+    return prefs.getBool(
+          _municipalityProfileCompletedKey(
+            ownerProjectLinkId: ownerProjectLinkId,
+            userId: userId,
+          ),
+        ) ??
+        false;
   }
 
-  Future<void> _saveCitizenSession({required DualLoginResult dual, required Map<String, dynamic> userMap}) async {
+  Future<void> _markMunicipalityProfileCompletedLocal({
+    required int ownerProjectLinkId,
+    required int userId,
+  }) async {
+    if (ownerProjectLinkId <= 0 || userId <= 0) {
+      return;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setBool(
+      _municipalityProfileCompletedKey(
+        ownerProjectLinkId: ownerProjectLinkId,
+        userId: userId,
+      ),
+      true,
+    );
+  }
+
+  Future<bool> _hasMunicipalityProfileOnBackend({
+    required String token,
+  }) async {
+    try {
+      final response = await DioClient.muni.get(
+        '/users/profile',
+        options: Options(
+          headers: {
+            'Authorization': _bearer(token),
+          },
+        ),
+      );
+
+      return response.statusCode == 200;
+    } on DioException catch (e) {
+      final status = e.response?.statusCode ?? 0;
+
+      if (status == 404) {
+        return false;
+      }
+
+      rethrow;
+    }
+  }
+
+  Future<void> _saveCitizenSession({
+    required DualLoginResult dual,
+    required Map<String, dynamic> userMap,
+  }) async {
     final token = dual.userToken;
-    if (token == null || token.trim().isEmpty) throw Exception('Missing user token.');
+
+    if (token == null || token.trim().isEmpty) {
+      throw Exception('Missing user token.');
+    }
+
     await AdminTokenStore().clear();
     await JwtStore.save(token);
     await SessionRoleStore().saveRole('CITIZEN');
+
     await AuthTokenStore().saveToken(
       token: token,
       refreshToken: dual.userRefreshToken,
       tenantId: ownerProjectLinkId.toString(),
       userJson: userMap,
     );
+
     DioClient.setAuthToken(token);
   }
 
-  Future<void> _goAfterCitizenLogin({required DualLoginResult dual, required String email}) async {
+  Future<void> _goAfterCitizenLogin({
+    required DualLoginResult dual,
+    required String email,
+  }) async {
     final userMap = _extractUserMap(dual);
     final userId = _extractUserId(userMap);
-    await _saveCitizenSession(dual: dual, userMap: userMap);
-    final completed = await _isMunicipalityProfileCompleted(ownerProjectLinkId: ownerProjectLinkId, userId: userId);
-    if (!mounted) return;
+
+    await _saveCitizenSession(
+      dual: dual,
+      userMap: userMap,
+    );
+
+    final completedLocal = await _isMunicipalityProfileCompletedLocal(
+      ownerProjectLinkId: ownerProjectLinkId,
+      userId: userId,
+    );
+
+    bool completedRemote = false;
+
+    try {
+      completedRemote = await _hasMunicipalityProfileOnBackend(
+        token: dual.userToken!,
+      );
+    } catch (_) {
+      completedRemote = completedLocal;
+    }
+
+    final completed = completedLocal || completedRemote;
+
+    if (completedRemote) {
+      await _markMunicipalityProfileCompletedLocal(
+        ownerProjectLinkId: ownerProjectLinkId,
+        userId: userId,
+      );
+    }
+
+    if (!mounted) {
+      return;
+    }
 
     if (!completed) {
       Navigator.pushAndRemoveUntil(
@@ -121,15 +241,18 @@ class _LoginScreenState extends State<LoginScreen> {
 
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      MaterialPageRoute(
+        builder: (_) => const HomeScreen(),
+      ),
       (_) => false,
     );
   }
 
-  // FIX: Fixed the misplaced try-catch and routing logic here
   Future<void> _goAfterAdminLogin(DualLoginResult dual) async {
     try {
-      if (dual.admin == null) throw Exception('Missing admin login data.');
+      if (dual.admin == null) {
+        throw Exception('Missing admin login data.');
+      }
 
       await AuthTokenStore().clear();
       await JwtStore.clear();
@@ -142,26 +265,44 @@ class _LoginScreenState extends State<LoginScreen> {
         tenantId: ownerProjectLinkId.toString(),
       );
 
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (_) => DashboardPage()),
+        MaterialPageRoute(
+          builder: (_) => DashboardPage(),
+        ),
         (_) => false,
       );
     } catch (e) {
-      if (!mounted) return;
-      AppToast.show(context, message: _cleanError(e), type: AppToastType.error);
+      if (!mounted) {
+        return;
+      }
+
+      AppToast.show(
+        context,
+        message: _cleanError(e),
+        type: AppToastType.error,
+      );
     }
   }
 
   Future<void> _onLoginPressed(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
-    if (_isLoading) return;
-    if (!_formKey.currentState!.validate()) return;
+
+    if (_isLoading) {
+      return;
+    }
+
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
     final email = _emailCtrl.text.trim();
     final password = _passwordCtrl.text.trim();
+
     setState(() => _isLoading = true);
 
     try {
@@ -174,10 +315,16 @@ class _LoginScreenState extends State<LoginScreen> {
         ownerProjectLinkId: ownerProjectLinkId,
       );
 
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       if (dual.none) {
-        AppToast.show(context, message: dual.error ?? l10n.loginFailed, type: AppToastType.error);
+        AppToast.show(
+          context,
+          message: dual.error ?? l10n.loginFailed,
+          type: AppToastType.error,
+        );
         return;
       }
 
@@ -188,7 +335,10 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       if (dual.userOk) {
-        await _goAfterCitizenLogin(dual: dual, email: email);
+        await _goAfterCitizenLogin(
+          dual: dual,
+          email: email,
+        );
         return;
       }
 
@@ -197,10 +347,19 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
     } catch (e) {
-      if (!mounted) return;
-      AppToast.show(context, message: _cleanError(e), type: AppToastType.error);
+      if (!mounted) {
+        return;
+      }
+
+      AppToast.show(
+        context,
+        message: _cleanError(e),
+        type: AppToastType.error,
+      );
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
@@ -212,7 +371,11 @@ class _LoginScreenState extends State<LoginScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: cs.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
+      ),
       builder: (_) {
         return SafeArea(
           child: Padding(
@@ -222,38 +385,82 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 Text(
                   l10n.chooseHowToContinue,
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: cs.onSurface),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: cs.onSurface,
+                  ),
                 ),
                 const SizedBox(height: 20),
                 ListTile(
-                  leading: Icon(Icons.person, color: cs.primary),
-                  title: Text(l10n.continueAsCitizen, style: theme.textTheme.bodyMedium?.copyWith(color: cs.onSurface, fontWeight: FontWeight.w600)),
+                  leading: Icon(
+                    Icons.person,
+                    color: cs.primary,
+                  ),
+                  title: Text(
+                    l10n.continueAsCitizen,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: cs.onSurface,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   onTap: () async {
                     Navigator.pop(context);
                     setState(() => _isLoading = true);
+
                     try {
-                      await _goAfterCitizenLogin(dual: dual, email: _emailCtrl.text.trim());
+                      await _goAfterCitizenLogin(
+                        dual: dual,
+                        email: _emailCtrl.text.trim(),
+                      );
                     } catch (e) {
-                      if (!mounted) return;
-                      AppToast.show(context, message: _cleanError(e), type: AppToastType.error);
+                      if (!mounted) {
+                        return;
+                      }
+
+                      AppToast.show(
+                        context,
+                        message: _cleanError(e),
+                        type: AppToastType.error,
+                      );
                     } finally {
-                      if (mounted) setState(() => _isLoading = false);
+                      if (mounted) {
+                        setState(() => _isLoading = false);
+                      }
                     }
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.admin_panel_settings, color: cs.primary),
-                  title: Text(l10n.continueAsAdmin, style: theme.textTheme.bodyMedium?.copyWith(color: cs.onSurface, fontWeight: FontWeight.w600)),
+                  leading: Icon(
+                    Icons.admin_panel_settings,
+                    color: cs.primary,
+                  ),
+                  title: Text(
+                    l10n.continueAsAdmin,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: cs.onSurface,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
                   onTap: () async {
                     Navigator.pop(context);
                     setState(() => _isLoading = true);
+
                     try {
                       await _goAfterAdminLogin(dual);
                     } catch (e) {
-                      if (!mounted) return;
-                      AppToast.show(context, message: _cleanError(e), type: AppToastType.error);
+                      if (!mounted) {
+                        return;
+                      }
+
+                      AppToast.show(
+                        context,
+                        message: _cleanError(e),
+                        type: AppToastType.error,
+                      );
                     } finally {
-                      if (mounted) setState(() => _isLoading = false);
+                      if (mounted) {
+                        setState(() => _isLoading = false);
+                      }
                     }
                   },
                 ),
@@ -267,7 +474,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
-    // ... Keeping your build method as is since it was mostly correct ...
     final l10n = AppLocalizations.of(context)!;
     final themeState = context.watch<ThemeCubit>().state;
     final colors = themeState.tokens.colors;
@@ -283,26 +489,62 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 20),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: AppSizes.paddingLarge),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSizes.paddingLarge,
+                ),
                 child: Container(
                   padding: EdgeInsets.all(card.padding),
-                  decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(card.radius)),
+                  decoration: BoxDecoration(
+                    color: colors.surface,
+                    borderRadius: BorderRadius.circular(card.radius),
+                  ),
                   child: Form(
                     key: _formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Center(child: Text(l10n.loginTitle, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: cs.onSurface))),
+                        Center(
+                          child: Text(
+                            l10n.loginTitle,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: cs.onSurface,
+                            ),
+                          ),
+                        ),
                         const SizedBox(height: 8),
-                        Center(child: Text(l10n.loginSubtitle, textAlign: TextAlign.center, style: theme.textTheme.bodySmall?.copyWith(color: cs.outline))),
+                        Center(
+                          child: Text(
+                            l10n.loginSubtitle,
+                            textAlign: TextAlign.center,
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: cs.outline,
+                            ),
+                          ),
+                        ),
                         const SizedBox(height: 24),
                         Container(
                           height: 50,
-                          decoration: BoxDecoration(color: cs.surfaceVariant, borderRadius: BorderRadius.circular(14)),
+                          decoration: BoxDecoration(
+                            color: cs.surfaceVariant,
+                            borderRadius: BorderRadius.circular(14),
+                          ),
                           child: Row(
                             children: [
-                              _roleTab(context, l10n.employee, Icons.badge_outlined, !isCitizen, () => setState(() => isCitizen = false)),
-                              _roleTab(context, l10n.citizen, Icons.person_outline, isCitizen, () => setState(() => isCitizen = true)),
+                              _roleTab(
+                                context,
+                                l10n.employee,
+                                Icons.badge_outlined,
+                                !isCitizen,
+                                () => setState(() => isCitizen = false),
+                              ),
+                              _roleTab(
+                                context,
+                                l10n.citizen,
+                                Icons.person_outline,
+                                isCitizen,
+                                () => setState(() => isCitizen = true),
+                              ),
                             ],
                           ),
                         ),
@@ -314,7 +556,11 @@ class _LoginScreenState extends State<LoginScreen> {
                           icon: Icons.email_outlined,
                           keyboardType: TextInputType.emailAddress,
                           textAlign: TextAlign.left,
-                          validator: (v) => (v?.trim().isEmpty ?? true) ? l10n.fieldRequired : null,
+                          validator: (v) {
+                            return (v?.trim().isEmpty ?? true)
+                                ? l10n.fieldRequired
+                                : null;
+                          },
                         ),
                         const SizedBox(height: 16),
                         AppTextField(
@@ -325,16 +571,47 @@ class _LoginScreenState extends State<LoginScreen> {
                           obscureText: _obscurePassword,
                           textAlign: TextAlign.left,
                           suffixIcon: IconButton(
-                            onPressed: _isLoading ? null : () => setState(() => _obscurePassword = !_obscurePassword),
-                            icon: Icon(_obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: cs.primary),
+                            onPressed: _isLoading
+                                ? null
+                                : () {
+                                    setState(
+                                      () => _obscurePassword = !_obscurePassword,
+                                    );
+                                  },
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                              color: cs.primary,
+                            ),
                           ),
-                          validator: (v) => (v?.trim().isEmpty ?? true) ? l10n.fieldRequired : null,
+                          validator: (v) {
+                            return (v?.trim().isEmpty ?? true)
+                                ? l10n.fieldRequired
+                                : null;
+                          },
                         ),
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
-                            onPressed: _isLoading ? null : () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ResetPasswordPage())),
-                            child: Text(l10n.forgotPassword, style: TextStyle(color: cs.primary, fontWeight: FontWeight.w600)),
+                            onPressed: _isLoading
+                                ? null
+                                : () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) =>
+                                            const ResetPasswordPage(),
+                                      ),
+                                    );
+                                  },
+                            child: Text(
+                              l10n.forgotPassword,
+                              style: TextStyle(
+                                color: cs.primary,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                           ),
                         ),
                         PrimaryButton(
@@ -346,11 +623,33 @@ class _LoginScreenState extends State<LoginScreen> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(l10n.noAccount, style: theme.textTheme.bodyMedium?.copyWith(color: cs.onSurface)),
+                            Text(
+                              l10n.noAccount,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: cs.onSurface,
+                              ),
+                            ),
                             const SizedBox(width: 4),
                             GestureDetector(
-                              onTap: _isLoading ? null : () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserRegisterScreen())),
-                              child: Text(l10n.registerNow, style: TextStyle(color: cs.primary, fontWeight: FontWeight.bold, decoration: TextDecoration.underline)),
+                              onTap: _isLoading
+                                  ? null
+                                  : () {
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              const UserRegisterScreen(),
+                                        ),
+                                      );
+                                    },
+                              child: Text(
+                                l10n.registerNow,
+                                style: TextStyle(
+                                  color: cs.primary,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
                             ),
                           ],
                         ),
@@ -366,8 +665,15 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _roleTab(BuildContext context, String label, IconData icon, bool selected, VoidCallback onTap) {
+  Widget _roleTab(
+    BuildContext context,
+    String label,
+    IconData icon,
+    bool selected,
+    VoidCallback onTap,
+  ) {
     final cs = Theme.of(context).colorScheme;
+
     return Expanded(
       child: GestureDetector(
         onTap: _isLoading ? null : onTap,
@@ -375,13 +681,25 @@ class _LoginScreenState extends State<LoginScreen> {
           duration: const Duration(milliseconds: 200),
           margin: const EdgeInsets.all(4),
           padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(color: selected ? cs.primary : cs.surface, borderRadius: BorderRadius.circular(12)),
+          decoration: BoxDecoration(
+            color: selected ? cs.primary : cs.surface,
+            borderRadius: BorderRadius.circular(12),
+          ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(icon, color: selected ? cs.onPrimary : cs.onSurface),
+              Icon(
+                icon,
+                color: selected ? cs.onPrimary : cs.onSurface,
+              ),
               const SizedBox(width: 6),
-              Text(label, style: TextStyle(color: selected ? cs.onPrimary : cs.onSurface, fontWeight: FontWeight.bold)),
+              Text(
+                label,
+                style: TextStyle(
+                  color: selected ? cs.onPrimary : cs.onSurface,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ],
           ),
         ),
