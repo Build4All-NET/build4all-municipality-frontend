@@ -3,7 +3,7 @@
 import 'package:baladiyati/core/config/env.dart';
 import 'package:baladiyati/core/config/jwt_store.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
-import 'package:baladiyati/features/admin/admin_dashboard_placeholder_screen.dart';
+import 'package:baladiyati/features/admin/Dashboard/presentation/screens/Dashboard_screen_admin.dart';
 import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
 import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
@@ -119,7 +119,9 @@ class _LoginScreenState extends State<LoginScreen> {
     required int ownerProjectLinkId,
     required int userId,
   }) async {
-    if (ownerProjectLinkId <= 0 || userId <= 0) return;
+    if (ownerProjectLinkId <= 0 || userId <= 0) {
+      return;
+    }
 
     final prefs = await SharedPreferences.getInstance();
 
@@ -168,20 +170,15 @@ class _LoginScreenState extends State<LoginScreen> {
     }
 
     await AdminTokenStore().clear();
-
     await JwtStore.save(token);
-
     await SessionRoleStore().saveRole('CITIZEN');
 
-debugPrint('LOGIN userToken exists = ${dual.userToken != null && dual.userToken!.isNotEmpty}');
-debugPrint('LOGIN refreshToken exists = ${dual.userRefreshToken != null && dual.userRefreshToken!.isNotEmpty}');
     await AuthTokenStore().saveToken(
       token: token,
       refreshToken: dual.userRefreshToken,
       tenantId: ownerProjectLinkId.toString(),
       userJson: userMap,
     );
-    await AuthTokenStore().debugDump();
 
     DioClient.setAuthToken(token);
   }
@@ -222,7 +219,9 @@ debugPrint('LOGIN refreshToken exists = ${dual.userRefreshToken != null && dual.
       );
     }
 
-    if (!mounted) return;
+    if (!mounted) {
+      return;
+    }
 
     if (!completed) {
       Navigator.pushAndRemoveUntil(
@@ -242,44 +241,64 @@ debugPrint('LOGIN refreshToken exists = ${dual.userRefreshToken != null && dual.
 
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
-      (_) => false,
-    );
-  }
-
-  Future<void> _goAfterAdminLogin(DualLoginResult dual) async {
-    if (dual.admin == null) {
-      throw Exception('Missing admin login data.');
-    }
-
-    await AuthTokenStore().clear();
-    await JwtStore.clear();
-
-    await SessionRoleStore().saveRole(dual.admin!.role);
-
-    await AdminTokenStore().save(
-      token: dual.admin!.token,
-      role: dual.admin!.role,
-      refreshToken: dual.admin!.refreshToken,
-      tenantId: ownerProjectLinkId.toString(),
-    );
-
-    if (!mounted) return;
-
-    Navigator.pushAndRemoveUntil(
-      context,
       MaterialPageRoute(
-        builder: (_) => const AdminDashboardPlaceholderScreen(),
+        builder: (_) => const HomeScreen(),
       ),
       (_) => false,
     );
   }
 
+  Future<void> _goAfterAdminLogin(DualLoginResult dual) async {
+    try {
+      if (dual.admin == null) {
+        throw Exception('Missing admin login data.');
+      }
+
+      await AuthTokenStore().clear();
+      await JwtStore.clear();
+      await SessionRoleStore().saveRole(dual.admin!.role);
+
+      await AdminTokenStore().save(
+        token: dual.admin!.token,
+        role: dual.admin!.role,
+        refreshToken: dual.admin!.refreshToken,
+        tenantId: ownerProjectLinkId.toString(),
+      );
+
+      if (!mounted) {
+        return;
+      }
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (_) => DashboardPage(),
+        ),
+        (_) => false,
+      );
+    } catch (e) {
+      if (!mounted) {
+        return;
+      }
+
+      AppToast.show(
+        context,
+        message: _cleanError(e),
+        type: AppToastType.error,
+      );
+    }
+  }
+
   Future<void> _onLoginPressed(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
 
-    if (_isLoading) return;
-    if (!_formKey.currentState!.validate()) return;
+    if (_isLoading) {
+      return;
+    }
+
+    if (!_formKey.currentState!.validate()) {
+      return;
+    }
 
     final email = _emailCtrl.text.trim();
     final password = _passwordCtrl.text.trim();
@@ -296,7 +315,9 @@ debugPrint('LOGIN refreshToken exists = ${dual.userRefreshToken != null && dual.
         ownerProjectLinkId: ownerProjectLinkId,
       );
 
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       if (dual.none) {
         AppToast.show(
@@ -326,7 +347,9 @@ debugPrint('LOGIN refreshToken exists = ${dual.userRefreshToken != null && dual.
         return;
       }
     } catch (e) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       AppToast.show(
         context,
@@ -349,7 +372,9 @@ debugPrint('LOGIN refreshToken exists = ${dual.userRefreshToken != null && dual.
       context: context,
       backgroundColor: cs.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
       ),
       builder: (_) {
         return SafeArea(
@@ -367,7 +392,10 @@ debugPrint('LOGIN refreshToken exists = ${dual.userRefreshToken != null && dual.
                 ),
                 const SizedBox(height: 20),
                 ListTile(
-                  leading: Icon(Icons.person, color: cs.primary),
+                  leading: Icon(
+                    Icons.person,
+                    color: cs.primary,
+                  ),
                   title: Text(
                     l10n.continueAsCitizen,
                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -377,7 +405,6 @@ debugPrint('LOGIN refreshToken exists = ${dual.userRefreshToken != null && dual.
                   ),
                   onTap: () async {
                     Navigator.pop(context);
-
                     setState(() => _isLoading = true);
 
                     try {
@@ -386,7 +413,9 @@ debugPrint('LOGIN refreshToken exists = ${dual.userRefreshToken != null && dual.
                         email: _emailCtrl.text.trim(),
                       );
                     } catch (e) {
-                      if (!mounted) return;
+                      if (!mounted) {
+                        return;
+                      }
 
                       AppToast.show(
                         context,
@@ -401,7 +430,10 @@ debugPrint('LOGIN refreshToken exists = ${dual.userRefreshToken != null && dual.
                   },
                 ),
                 ListTile(
-                  leading: Icon(Icons.admin_panel_settings, color: cs.primary),
+                  leading: Icon(
+                    Icons.admin_panel_settings,
+                    color: cs.primary,
+                  ),
                   title: Text(
                     l10n.continueAsAdmin,
                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -411,13 +443,14 @@ debugPrint('LOGIN refreshToken exists = ${dual.userRefreshToken != null && dual.
                   ),
                   onTap: () async {
                     Navigator.pop(context);
-
                     setState(() => _isLoading = true);
 
                     try {
                       await _goAfterAdminLogin(dual);
                     } catch (e) {
-                      if (!mounted) return;
+                      if (!mounted) {
+                        return;
+                      }
 
                       AppToast.show(
                         context,
@@ -442,11 +475,9 @@ debugPrint('LOGIN refreshToken exists = ${dual.userRefreshToken != null && dual.
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-
     final themeState = context.watch<ThemeCubit>().state;
     final colors = themeState.tokens.colors;
     final card = themeState.tokens.card;
-
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
@@ -526,13 +557,9 @@ debugPrint('LOGIN refreshToken exists = ${dual.userRefreshToken != null && dual.
                           keyboardType: TextInputType.emailAddress,
                           textAlign: TextAlign.left,
                           validator: (v) {
-                            final value = v?.trim() ?? '';
-
-                            if (value.isEmpty) {
-                              return l10n.fieldRequired;
-                            }
-
-                            return null;
+                            return (v?.trim().isEmpty ?? true)
+                                ? l10n.fieldRequired
+                                : null;
                           },
                         ),
                         const SizedBox(height: 16),
@@ -547,9 +574,9 @@ debugPrint('LOGIN refreshToken exists = ${dual.userRefreshToken != null && dual.
                             onPressed: _isLoading
                                 ? null
                                 : () {
-                                    setState(() {
-                                      _obscurePassword = !_obscurePassword;
-                                    });
+                                    setState(
+                                      () => _obscurePassword = !_obscurePassword,
+                                    );
                                   },
                             icon: Icon(
                               _obscurePassword
@@ -559,13 +586,9 @@ debugPrint('LOGIN refreshToken exists = ${dual.userRefreshToken != null && dual.
                             ),
                           ),
                           validator: (v) {
-                            final value = v?.trim() ?? '';
-
-                            if (value.isEmpty) {
-                              return l10n.fieldRequired;
-                            }
-
-                            return null;
+                            return (v?.trim().isEmpty ?? true)
+                                ? l10n.fieldRequired
+                                : null;
                           },
                         ),
                         Align(
@@ -594,10 +617,7 @@ debugPrint('LOGIN refreshToken exists = ${dual.userRefreshToken != null && dual.
                         PrimaryButton(
                           label: l10n.loginButton,
                           isLoading: _isLoading,
-                          onPressed: () {
-                            if (_isLoading) return;
-                            _onLoginPressed(context);
-                          },
+                          onPressed: () => _onLoginPressed(context),
                         ),
                         const SizedBox(height: 20),
                         Row(

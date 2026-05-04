@@ -269,42 +269,42 @@ class ProfileApiService {
     }
   }
 
- Future<MunicipalityProfileModel> updateMunicipalityProfile({
-  required String phone,
-  required String address,
-}) async {
-  try {
-    final token = await _token();
-    final ownerProjectLinkId = int.tryParse(Env.ownerProjectLinkId) ?? 0;
+  Future<MunicipalityProfileModel> updateMunicipalityProfile({
+    required String phone,
+    required String address,
+  }) async {
+    try {
+      final token = await _token();
+      final ownerProjectLinkId = int.tryParse(Env.ownerProjectLinkId) ?? 0;
 
-    if (ownerProjectLinkId <= 0) {
-      throw AppException('Missing owner project link id.');
-    }
+      if (ownerProjectLinkId <= 0) {
+        throw AppException('Missing owner project link id.');
+      }
 
-    final response = await _muniDio.patch(
-      '/users/profile',
-      data: {
-        'ownerProjectLinkId': ownerProjectLinkId,
-        'phone': phone.trim(),
-        'address': address.trim(),
-      },
-      options: Options(
-        headers: {
-          'Authorization': token,
-          'Owner-Project-Link-Id': ownerProjectLinkId.toString(),
-          'X-Owner-Project-Link-Id': ownerProjectLinkId.toString(),
+      final response = await _muniDio.patch(
+        '/users/profile',
+        data: {
+          'ownerProjectLinkId': ownerProjectLinkId,
+          'phone': phone.trim(),
+          'address': address.trim(),
         },
-      ),
-    );
+        options: Options(
+          headers: {
+            'Authorization': token,
+            'Owner-Project-Link-Id': ownerProjectLinkId.toString(),
+            'X-Owner-Project-Link-Id': ownerProjectLinkId.toString(),
+          },
+        ),
+      );
 
-    return MunicipalityProfileModel.fromJson(
-      Map<String, dynamic>.from(response.data as Map),
-    );
-  } on DioException catch (e) {
-    throw _handleError(e, fallback: 'Failed to update municipality profile');
-  } catch (e) {
-    if (e is AppException) rethrow;
-    throw AppException('Failed to update municipality profile', original: e);
+      return MunicipalityProfileModel.fromJson(
+        Map<String, dynamic>.from(response.data as Map),
+      );
+    } on DioException catch (e) {
+      throw _handleError(e, fallback: 'Failed to update municipality profile');
+    } catch (e) {
+      if (e is AppException) rethrow;
+      throw AppException('Failed to update municipality profile', original: e);
+    }
   }
-}
 }

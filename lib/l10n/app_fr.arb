@@ -118,7 +118,7 @@
   "awaitingPayment": "En attente de paiement",
   "completed": "Terminé",
   "quickActions": "Actions rapides",
-  "newRequest": "Nouvelle demande",
+  "newRequest": "Nouvelle demande reçue",
   "serviceCategories": "Catégories de services",
   "viewAll": "Voir tout",
   "recentRequests": "Demandes récentes",
@@ -190,35 +190,37 @@
   "submitRequest": "Soumettre la demande",
   "requestSubmitted": "Demande soumise avec succès",
 
-  "authUsernameTaken": "Le nom d'utilisateur est déjà utilisé",
+  "authUsernameTaken": "Nom d'utilisateur déjà utilisé",
   "authEmailAlreadyExists": "Cet e-mail est déjà enregistré",
   "authPhoneAlreadyExists": "Ce numéro de téléphone est déjà enregistré",
   "authUserNotFound": "Utilisateur introuvable",
   "authWrongPassword": "Mot de passe incorrect",
   "authInvalidCredentials": "Identifiants de connexion invalides",
   "authAccountInactive": "Le compte est inactif",
-  "authErrorGeneric": "Une erreur s'est produite. Veuillez réessayer",
 
-  "httpValidationError": "Certains champs sont invalides",
-  "httpConflict": "Un conflit est survenu dans la demande",
+  "httpValidationError": "Certaines données sont invalides",
+  "httpConflict": "Conflit dans la requête",
   "httpUnauthorized": "Vous n'êtes pas autorisé",
   "httpForbidden": "Vous n'avez pas la permission",
   "httpNotFound": "Ressource introuvable",
   "httpServerError": "Erreur du serveur",
 
-  "networkNoInternet": "Aucune connexion Internet",
+  "networkNoInternet": "Pas de connexion Internet",
   "networkTimeout": "Délai de connexion dépassé",
   "networkError": "Erreur réseau",
+
+  "authErrorGeneric": "Une erreur est survenue. Veuillez réessayer",
 
   "connection_offline": "Vous êtes hors ligne",
   "connection_reconnecting": "Reconnexion...",
   "connection_issue": "Problème de connexion",
-
   "dashboard": "Tableau de bord",
   "inProgress": "En cours",
   "newRequests": "Nouvelles demandes",
-  "needReview": "À examiner",
-  "completedToday": "Terminées aujourd'hui",
+  "needReview": "À vérifier",
+  "completedToday": "Complétées aujourd’hui",
+
+  "quickActions": "Actions rapides",
   "services": "Services",
   "inbox": "Boîte de réception",
   "announcements": "Annonces",
@@ -230,33 +232,41 @@
   "completedRequests": "Demandes terminées",
   "avgTime": "Temps moyen",
   "satisfaction": "Satisfaction",
-
+  "days": "jours",
   "chooseHowToContinue": "Choisissez comment continuer",
-  "continueAsCitizen": "Continuer comme citoyen",
-  "continueAsAdmin": "Continuer comme administrateur",
+"continueAsCitizen": "Continuer comme citoyen",
+"continueAsAdmin": "Continuer comme administrateur",
+"loginFailed": "Échec de la connexion",
+ "firstNameLabel": "Prénom",
+  "firstNameHint": "Entrez votre prénom",
+  "lastNameLabel": "Nom",
+  "lastNameHint": "Entrez votre nom",
+  "firstNameTooShort": "Le prénom est trop court",
+  "lastNameTooShort": "Le nom est trop court",
+  "usernameInvalidChars": "Utilisez uniquement des lettres, chiffres, points ou underscores",
+  "missingRegistrationData": "Aucune donnée d’inscription trouvée. Veuillez vous inscrire à nouveau.",
+  "missingUserIdVerifyAgain": "Identifiant utilisateur manquant. Veuillez vérifier le code à nouveau.",
+  "missingOwnerProjectLinkId": "Identifiant du projet manquant. Veuillez vous inscrire à nouveau.",
+  "verificationUserIdMissing": "La vérification a réussi mais l’identifiant utilisateur est manquant.",
+    "municipalityProfileTitle": "Compléter le profil municipal",
+  "municipalityProfileSubtitle": "Ajoutez les informations requises par votre municipalité.",
+  "phoneLabel": "Téléphone",
+  "phoneHint": "Entrez votre numéro de téléphone",
+  "addressLabel": "Adresse",
+  "addressHint": "Entrez votre adresse",
+  "municipalityLabel": "Municipalité",
+  "selectMunicipality": "Sélectionnez une municipalité",
+  "selectMunicipalityWarning": "Veuillez sélectionner une municipalité",
+  "completeMunicipalityProfileButton": "Enregistrer et continuer",
+  "municipalityProfileSaved": "Profil municipal enregistré avec succès",
+  "municipalityProfileSaveFailed": "Échec de l’enregistrement du profil municipal",
+  "loadingMunicipalitiesFailed": "Échec du chargement des municipalités",
+  "noMunicipalitiesFound": "Aucune municipalité trouvée",
+  "phoneInvalid": "Le numéro doit contenir entre 8 et 15 chiffres",
+  "addressTooShort": "L’adresse est trop courte",
+  "missingBuild4allToken": "Token de connexion manquant. Veuillez vous reconnecter.",
+  "missingBuild4allUser": "Données utilisateur manquantes. Veuillez vous reconnecter.",
+  "missingMunicipalityId": "Identifiant de municipalité manquant"
 
-  "chooseProfileImage": "Choisir une photo de profil",
-  "changeProfileImage": "Changer la photo",
-  "removeProfileImage": "Supprimer l'image",
-
-  "notAvailable": "Non disponible",
-  "@notAvailable": {
-    "description": "Shown when a value is not available"
-  },
-  "loggingOut": "Déconnexion...",
-  "@loggingOut": {
-    "description": "Shown while the user is logging out"
-  },
-  "arabicLanguage": "Arabe",
-  "@arabicLanguage": {
-    "description": "Arabic language label"
-  },
-  "englishLanguage": "Anglais",
-  "@englishLanguage": {
-    "description": "English language label"
-  },
-  "frenchLanguage": "Français",
-  "@frenchLanguage": {
-    "description": "French language label"
-  }
 }
+

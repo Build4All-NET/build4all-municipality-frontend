@@ -15,7 +15,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get appSubtitle => 'البلدية الرقمية';
 
   @override
-  String get appDescription => 'منصة رقمية متكاملة للخدمات البلدية في لبنان';
+  String get appDescription => 'منصة رقمية متكاملة لخدمات البلدية اللبنانية';
 
   @override
   String get getStarted => 'ابدأ الآن';
@@ -24,13 +24,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get loginTitle => 'تسجيل الدخول';
 
   @override
-  String get loginSubtitle => 'ادخل إلى حسابك البلدي';
+  String get loginSubtitle => 'الوصول إلى حسابك في البلدية';
 
   @override
   String get citizen => 'مواطن';
 
   @override
-  String get employee => 'موظف';
+  String get employee => 'الموظف';
 
   @override
   String get emailLabel => 'البريد الإلكتروني';
@@ -42,37 +42,16 @@ class AppLocalizationsAr extends AppLocalizations {
   String get emailHint => 'user@example.com';
 
   @override
-  String get passwordHint => 'كلمة المرور';
-
-  @override
-  String get passwordInfo => 'يجب أن تكون كلمة المرور 6 أحرف على الأقل';
-
-  @override
   String get loginButton => 'تسجيل الدخول';
 
   @override
-  String get loginFailed => 'فشل تسجيل الدخول';
-
-  @override
   String get sendCodeButton => 'إرسال الرمز';
-
-  @override
-  String get sendCode => 'إرسال الرمز';
-
-  @override
-  String get forgotPassword => 'هل نسيت كلمة المرور؟';
 
   @override
   String get noAccount => 'ليس لديك حساب؟';
 
   @override
   String get registerNow => 'سجّل الآن';
-
-  @override
-  String get alreadyHaveAccount => 'لديك حساب بالفعل؟';
-
-  @override
-  String get loginNow => 'تسجيل الدخول';
 
   @override
   String get registerTitle => 'إنشاء حساب';
@@ -87,76 +66,46 @@ class AppLocalizationsAr extends AppLocalizations {
   String get fullNameHint => 'أحمد خليل';
 
   @override
-  String get firstNameLabel => 'الاسم الأول';
-
-  @override
-  String get firstNameHint => 'أدخل اسمك الأول';
-
-  @override
-  String get lastNameLabel => 'اسم العائلة';
-
-  @override
-  String get lastNameHint => 'أدخل اسم العائلة';
-
-  @override
-  String get firstNameTooShort => 'الاسم الأول قصير جدًا';
-
-  @override
-  String get lastNameTooShort => 'اسم العائلة قصير جدًا';
-
-  @override
-  String get usernameLabel => 'اسم المستخدم';
-
-  @override
-  String get usernameHint => 'أدخل اسم المستخدم';
-
-  @override
-  String get usernameTooShort => 'اسم المستخدم قصير جدًا';
-
-  @override
-  String get usernameInvalidChars => 'استخدم فقط الأحرف والأرقام والنقطة أو الشرطة السفلية';
-
-  @override
-  String get phoneLabel => 'الهاتف';
+  String get phoneLabel => 'رقم الهاتف';
 
   @override
   String get phoneHint => 'أدخل رقم الهاتف';
 
   @override
-  String get registerButton => 'إنشاء حساب';
+  String get registerButton => 'إنشاء الحساب';
+
+  @override
+  String get alreadyHaveAccount => 'لديك حساب بالفعل؟';
+
+  @override
+  String get loginNow => 'تسجيل الدخول';
 
   @override
   String get fieldRequired => 'هذا الحقل مطلوب';
 
   @override
-  String get invalidEmail => 'يرجى إدخال بريد إلكتروني صالح';
+  String get invalidEmail => 'الرجاء إدخال بريد إلكتروني صحيح';
 
   @override
-  String get passwordTooShort => 'يجب أن تكون كلمة المرور 6 أحرف على الأقل';
+  String get passwordTooShort => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
 
   @override
-  String get gmailOnly => 'يُسمح فقط ببريد Gmail';
+  String get copyright => '© ٢٠٢٦ بلديتي - جميع الحقوق محفوظة';
 
   @override
-  String get eightDigits => 'يجب أن يكون 8 أرقام';
-
-  @override
-  String get copyright => '© 2026 بلديتي - جميع الحقوق محفوظة';
-
-  @override
-  String get errorGeneric => 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
+  String get errorGeneric => 'حدث خطأ ما. الرجاء المحاولة مرة أخرى.';
 
   @override
   String get errorInvalidCredentials => 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
 
   @override
-  String get errorUserNotFound => 'لا يوجد حساب بهذا البريد الإلكتروني';
+  String get errorUserNotFound => 'لم يتم العثور على حساب بهذا البريد الإلكتروني';
 
   @override
-  String get errorAccountNotVerified => 'يرجى تأكيد بريدك الإلكتروني قبل تسجيل الدخول';
+  String get errorAccountNotVerified => 'الرجاء التحقق من بريدك الإلكتروني قبل تسجيل الدخول';
 
   @override
-  String get errorEmailExists => 'هذا البريد الإلكتروني مسجّل مسبقًا';
+  String get errorEmailExists => 'هذا البريد الإلكتروني مسجل بالفعل';
 
   @override
   String get successLogin => 'تم تسجيل الدخول بنجاح!';
@@ -165,16 +114,31 @@ class AppLocalizationsAr extends AppLocalizations {
   String get successRegister => 'تم إنشاء الحساب بنجاح!';
 
   @override
-  String get emailMethod => 'البريد الإلكتروني';
+  String get emailMethod => 'بريد إلكتروني';
 
   @override
-  String get info => 'سنرسل رمزًا مكوّنًا من 6 أرقام إلى بريدك الإلكتروني.';
+  String get selectMunicipality => 'اختر البلدية';
+
+  @override
+  String get municipalityLabel => 'البلدية';
+
+  @override
+  String get passwordHint => 'كلمة المرور';
+
+  @override
+  String get passwordInfo => 'كلمة المرور يجب أن تكون 6 أحرف على الأقل';
+
+  @override
+  String get sendCode => 'إرسال الرمز';
+
+  @override
+  String get info => 'سنرسل رمز مكوّن من 6 أرقام إلى بريدك الإلكتروني.';
 
   @override
   String get verifyTitle => 'أدخل رمز التحقق';
 
   @override
-  String get verifySubtitle => 'أرسلنا رمزًا إلى بريدك الإلكتروني';
+  String get verifySubtitle => 'لقد أرسلنا رمزًا إلى بريدك';
 
   @override
   String get verifyButton => 'تحقق';
@@ -183,16 +147,28 @@ class AppLocalizationsAr extends AppLocalizations {
   String get verifySuccess => 'تم التحقق بنجاح';
 
   @override
-  String get enterFullCode => 'أدخل الرمز كاملًا';
-
-  @override
-  String get verificationUserIdMissing => 'تم التحقق لكن رقم المستخدم غير موجود.';
+  String get enterFullCode => 'أدخل الرمز كاملاً';
 
   @override
   String get completeProfileTitle => 'إكمال الملف الشخصي';
 
   @override
-  String get completeProfileSubtitle => 'أكمل معلوماتك للوصول إلى الخدمات';
+  String get completeProfileSubtitle => 'أكمل بياناتك للوصول إلى الخدمات';
+
+  @override
+  String get usernameLabel => 'اسم المستخدم';
+
+  @override
+  String get usernameHint => 'أدخل اسم المستخدم';
+
+  @override
+  String get usernameTooShort => 'اسم المستخدم قصير جداً';
+
+  @override
+  String get addressLabel => 'العنوان';
+
+  @override
+  String get addressHint => 'أدخل العنوان';
 
   @override
   String get completeProfileButton => 'إكمال الملف الشخصي';
@@ -201,70 +177,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get completeProfileSuccess => 'تم إكمال الملف الشخصي بنجاح!';
 
   @override
-  String get missingRegistrationData => 'لا توجد بيانات تسجيل محفوظة. يرجى التسجيل مرة أخرى.';
-
-  @override
-  String get missingUserIdVerifyAgain => 'رقم المستخدم غير موجود. يرجى التحقق من الرمز مرة أخرى.';
-
-  @override
-  String get missingOwnerProjectLinkId => 'رابط المشروع غير موجود. يرجى التسجيل مرة أخرى.';
-
-  @override
-  String get municipalityProfileTitle => 'إكمال ملف البلدية';
-
-  @override
-  String get municipalityProfileSubtitle => 'أضف المعلومات المطلوبة من بلديتك.';
-
-  @override
-  String get municipalityLabel => 'البلدية';
-
-  @override
-  String get selectMunicipality => 'اختر البلدية';
-
-  @override
   String get selectMunicipalityWarning => 'يرجى اختيار البلدية';
 
   @override
-  String get completeMunicipalityProfileButton => 'حفظ ومتابعة';
+  String get forgotPassword => 'هل نسيت كلمة المرور؟';
 
   @override
-  String get municipalityProfileSaved => 'تم حفظ ملف البلدية بنجاح';
+  String get selectLanguage => 'اختر اللغة';
 
   @override
-  String get municipalityProfileSaveFailed => 'فشل حفظ ملف البلدية';
+  String get gmailOnly => 'فقط Gmail مسموح';
 
   @override
-  String get loadingMunicipalitiesFailed => 'فشل تحميل البلديات';
-
-  @override
-  String get noMunicipalitiesFound => 'لا توجد بلديات';
-
-  @override
-  String get missingMunicipalityId => 'رقم البلدية غير موجود';
-
-  @override
-  String get addressLabel => 'العنوان';
-
-  @override
-  String get addressHint => 'أدخل عنوانك';
-
-  @override
-  String get addressTooShort => 'العنوان قصير جدًا';
-
-  @override
-  String get phoneInvalid => 'يجب أن يحتوي رقم الهاتف على 8 إلى 15 رقمًا';
-
-  @override
-  String get missingBuild4allToken => 'رمز تسجيل الدخول غير موجود. يرجى تسجيل الدخول مرة أخرى.';
-
-  @override
-  String get missingBuild4allUser => 'بيانات المستخدم غير موجودة. يرجى تسجيل الدخول مرة أخرى.';
+  String get eightDigits => 'يجب 8 أرقام';
 
   @override
   String get resetPasswordTitle => 'إعادة تعيين كلمة المرور';
 
   @override
-  String get resetPasswordSubtitle => 'أدخل كلمة المرور الجديدة وقم بتأكيدها';
+  String get resetPasswordSubtitle => 'أدخل كلمة المرور الجديدة وتأكيدها';
 
   @override
   String get newPassword => 'كلمة المرور الجديدة';
@@ -285,9 +216,6 @@ class AppLocalizationsAr extends AppLocalizations {
   String get passwordRequired => 'كلمة المرور مطلوبة';
 
   @override
-  String get selectLanguage => 'اختر اللغة';
-
-  @override
   String get navHome => 'الرئيسية';
 
   @override
@@ -297,28 +225,28 @@ class AppLocalizationsAr extends AppLocalizations {
   String get navRequests => 'الطلبات';
 
   @override
-  String get navPayments => 'المدفوعات';
+  String get navPayments => 'الدفعات';
 
   @override
   String get navAccount => 'الحساب';
 
   @override
-  String get welcomeMessage => 'مرحبًا،';
+  String get welcomeMessage => 'مرحباً،';
 
   @override
-  String get activeRequests => 'الطلبات النشطة';
+  String get activeRequests => 'طلبات نشطة';
 
   @override
-  String get awaitingPayment => 'بانتظار الدفع';
+  String get awaitingPayment => 'في انتظار الدفع';
 
   @override
-  String get completed => 'مكتمل';
+  String get completed => 'مكتملة';
 
   @override
   String get quickActions => 'إجراءات سريعة';
 
   @override
-  String get newRequest => 'طلب جديد';
+  String get newRequest => 'تم استلام طلب جديد';
 
   @override
   String get serviceCategories => 'فئات الخدمات';
@@ -336,7 +264,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get latestNews => 'آخر الأخبار والتحديثات';
 
   @override
-  String get workingHours => 'ساعات العمل الجديدة: من الاثنين إلى الجمعة، 8 صباحًا - 2 ظهرًا';
+  String get workingHours => 'ساعات العمل الجديدة: من الاثنين إلى الجمعة، ٨ ص - ٢ م';
 
   @override
   String get notifications => 'الإشعارات';
@@ -348,34 +276,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get searchService => 'ابحث عن خدمة...';
 
   @override
-  String get selectCategory => 'اختر فئة لعرض الخدمات المتاحة';
+  String get selectCategory => 'اختر القسم';
 
   @override
-  String get serviceCount => 'خدمات';
-
-  @override
-  String get searchInServices => 'ابحث في الخدمات...';
-
-  @override
-  String get noServices => 'لا توجد خدمات متاحة';
-
-  @override
-  String get requiresInspection => 'يتطلب كشفًا';
-
-  @override
-  String get days => 'أيام';
-
-  @override
-  String get free => 'مجاني';
-
-  @override
-  String get serviceInfo => 'معلومات الخدمة';
-
-  @override
-  String get feeLabel => 'الرسوم:';
-
-  @override
-  String get processingTime => 'مدة المعالجة:';
+  String get serviceCount => 'خدمة';
 
   @override
   String get myAccount => 'حسابي';
@@ -402,7 +306,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get pending => 'قيد الانتظار';
 
   @override
-  String get paid => 'مدفوع';
+  String get paid => 'مدفوعة';
 
   @override
   String get paidLabel => 'مدفوع';
@@ -411,13 +315,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get due => 'مستحق';
 
   @override
-  String get dueDate => 'الاستحقاق:';
+  String get dueDate => 'مستحق بتاريخ:';
 
   @override
-  String get paidDate => 'تاريخ الدفع:';
+  String get paidDate => 'دفع بتاريخ:';
 
   @override
-  String get receiptNumber => 'الإيصال:';
+  String get receiptNumber => 'رقم الإيصال:';
 
   @override
   String get downloadReceipt => 'تحميل الإيصال';
@@ -432,7 +336,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get lbp => 'ل.ل';
 
   @override
-  String get noPayments => 'لا توجد مدفوعات';
+  String get noPayments => 'لا توجد دفعات';
 
   @override
   String get myRequests => 'طلباتي';
@@ -444,19 +348,19 @@ class AppLocalizationsAr extends AppLocalizations {
   String get filterAll => 'الكل';
 
   @override
-  String get statusSubmitted => 'تم الإرسال';
+  String get statusSubmitted => 'مقدمة';
 
   @override
-  String get statusUnderReview => 'قيد المراجعة';
+  String get statusUnderReview => 'قيد التدقيق';
 
   @override
   String get statusWaitingPayment => 'بانتظار الدفع';
 
   @override
-  String get statusApproved => 'تمت الموافقة';
+  String get statusApproved => 'موافق عليها';
 
   @override
-  String get statusDelivered => 'تم التسليم';
+  String get statusDelivered => 'مستلمة';
 
   @override
   String get noRequests => 'لا توجد طلبات';
@@ -465,7 +369,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get progress => 'التقدم';
 
   @override
-  String get timeline => 'الخط الزمني';
+  String get timeline => 'المسار الزمني';
 
   @override
   String get details => 'التفاصيل';
@@ -480,6 +384,30 @@ class AppLocalizationsAr extends AppLocalizations {
   String get amountDue => 'المبلغ المستحق';
 
   @override
+  String get searchInServices => 'ابحث في الخدمات...';
+
+  @override
+  String get noServices => 'لا توجد خدمات متاحة';
+
+  @override
+  String get requiresInspection => 'يتطلب كشف';
+
+  @override
+  String get days => 'أيام';
+
+  @override
+  String get free => 'مجاني';
+
+  @override
+  String get serviceInfo => 'معلومات الخدمة';
+
+  @override
+  String get feeLabel => 'الرسوم:';
+
+  @override
+  String get processingTime => 'مدة الإنجاز:';
+
+  @override
   String get requestDetails => 'تفاصيل الطلب';
 
   @override
@@ -489,7 +417,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get titleHint => 'أدخل عنوان الطلب';
 
   @override
-  String get descriptionHint => 'وصف تفصيلي...';
+  String get descriptionHint => 'وصف تفصيلي للطلب...';
 
   @override
   String get locationLabel => 'الموقع';
@@ -507,25 +435,25 @@ class AppLocalizationsAr extends AppLocalizations {
   String get pdfOrImages => 'صور أو ملفات PDF';
 
   @override
-  String get filesSelected => 'ملف/ملفات محددة';
+  String get filesSelected => 'ملف محدد';
 
   @override
-  String get submitRequest => 'إرسال الطلب';
+  String get submitRequest => 'تقديم الطلب';
 
   @override
-  String get requestSubmitted => 'تم إرسال الطلب بنجاح';
+  String get requestSubmitted => 'تم تقديم الطلب بنجاح';
 
   @override
   String get authUsernameTaken => 'اسم المستخدم مستخدم بالفعل';
 
   @override
-  String get authEmailAlreadyExists => 'هذا البريد الإلكتروني مسجّل مسبقًا';
+  String get authEmailAlreadyExists => 'هذا البريد الإلكتروني مسجل بالفعل';
 
   @override
-  String get authPhoneAlreadyExists => 'رقم الهاتف مسجّل مسبقًا';
+  String get authPhoneAlreadyExists => 'رقم الهاتف مسجل بالفعل';
 
   @override
-  String get authUserNotFound => 'المستخدم غير موجود';
+  String get authUserNotFound => 'لم يتم العثور على المستخدم';
 
   @override
   String get authWrongPassword => 'كلمة المرور غير صحيحة';
@@ -537,13 +465,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get authAccountInactive => 'الحساب غير نشط';
 
   @override
-  String get authErrorGeneric => 'حدث خطأ ما. يرجى المحاولة مرة أخرى';
+  String get httpValidationError => 'بعض البيانات غير صحيحة';
 
   @override
-  String get httpValidationError => 'بعض الحقول غير صحيحة';
-
-  @override
-  String get httpConflict => 'حدث تعارض في الطلب';
+  String get httpConflict => 'يوجد تعارض في الطلب';
 
   @override
   String get httpUnauthorized => 'غير مصرح لك';
@@ -552,7 +477,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get httpForbidden => 'ليس لديك صلاحية';
 
   @override
-  String get httpNotFound => 'المورد غير موجود';
+  String get httpNotFound => 'العنصر غير موجود';
 
   @override
   String get httpServerError => 'حدث خطأ في الخادم';
@@ -567,10 +492,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get networkError => 'حدث خطأ في الشبكة';
 
   @override
-  String get connection_offline => 'أنت غير متصل';
+  String get authErrorGeneric => 'حدث خطأ ما. الرجاء المحاولة مرة أخرى';
 
   @override
-  String get connection_reconnecting => 'جاري إعادة الاتصال...';
+  String get connection_offline => 'أنت غير متصل بالإنترنت';
+
+  @override
+  String get connection_reconnecting => 'إعادة الاتصال...';
 
   @override
   String get connection_issue => 'مشكلة في الاتصال';
@@ -579,22 +507,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get dashboard => 'لوحة التحكم';
 
   @override
-  String get inProgress => 'قيد التنفيذ';
+  String get inProgress => 'قيد المعالجة';
 
   @override
   String get newRequests => 'طلبات جديدة';
 
   @override
-  String get needReview => 'بحاجة إلى مراجعة';
+  String get needReview => 'تحتاج مراجعة';
 
   @override
-  String get completedToday => 'مكتملة اليوم';
+  String get completedToday => 'تم إنجازه اليوم';
 
   @override
   String get services => 'الخدمات';
 
   @override
-  String get inbox => 'البريد الوارد';
+  String get inbox => 'الوارد';
 
   @override
   String get announcements => 'الإعلانات';
@@ -606,22 +534,22 @@ class AppLocalizationsAr extends AppLocalizations {
   String get recentActivity => 'النشاط الأخير';
 
   @override
-  String get approvedRequest => 'طلب تمت الموافقة عليه';
+  String get approvedRequest => 'تمت الموافقة على الطلب';
 
   @override
   String get missingDocs => 'مستندات ناقصة';
 
   @override
-  String get monthPerformance => 'أداء الشهر';
+  String get monthPerformance => 'الأداء الشهري';
 
   @override
-  String get completedRequests => 'الطلبات المكتملة';
+  String get completedRequests => 'الطلبات المنجزة';
 
   @override
   String get avgTime => 'متوسط الوقت';
 
   @override
-  String get satisfaction => 'الرضا';
+  String get satisfaction => 'نسبة الرضا';
 
   @override
   String get chooseHowToContinue => 'اختر طريقة المتابعة';
@@ -633,26 +561,237 @@ class AppLocalizationsAr extends AppLocalizations {
   String get continueAsAdmin => 'المتابعة كمسؤول';
 
   @override
-  String get chooseProfileImage => 'اختيار صورة شخصية';
+  String get loginFailed => 'فشل تسجيل الدخول';
 
   @override
-  String get changeProfileImage => 'تغيير الصورة';
+
+  String get violations => 'المخالفات';
 
   @override
-  String get removeProfileImage => 'إزالة الصورة';
+  String get departments => 'إدارة الأقسام';
 
   @override
-  String get notAvailable => 'غير متوفر';
+  String get profile => 'الملف الشخصي';
 
   @override
-  String get loggingOut => 'جاري تسجيل الخروج...';
+  String get announcementsManagement => 'إدارة الإعلانات';
 
   @override
-  String get arabicLanguage => 'العربية';
+  String get newAnnouncement => 'إعلان جديد';
 
   @override
-  String get englishLanguage => 'الإنجليزية';
+  String get createAnnouncement => 'إنشاء إعلان جديد';
 
   @override
-  String get frenchLanguage => 'الفرنسية';
+  String get publishAnnouncement => 'نشر الإعلان';
+
+  @override
+  String get titleAr => 'العنوان (عربي)';
+
+  @override
+  String get titleEn => 'العنوان (English)';
+
+  @override
+  String get contentAr => 'المحتوى (عربي)';
+
+  @override
+  String get contentEn => 'المحتوى (English)';
+
+  @override
+  String get enterTitleAr => 'أدخل العنوان';
+
+  @override
+  String get enterTitleEn => 'Enter title';
+
+  @override
+  String get enterContentAr => 'أدخل المحتوى';
+
+  @override
+  String get enterContentEn => 'Enter content';
+
+  @override
+  String get published => 'منشور';
+
+  @override
+  String get sampleTitle => 'ساعات العمل الجديدة';
+
+  @override
+  String get sampleDescription => 'الإثنين إلى الجمعة 8 صباحاً - 2 ظهراً';
+
+  @override
+  String get addViolation => 'إضافة مخالفة';
+
+  @override
+  String get search => 'بحث...';
+
+  @override
+  String get all => 'الكل';
+
+  @override
+  String get engineering => 'الهندسة';
+
+  @override
+  String get finance => 'المالية';
+
+  @override
+  String get police => 'الشرطة';
+
+  @override
+  String get titleArabic => 'العنوان (عربي)';
+
+  @override
+  String get titleEnglish => 'العنوان (English)';
+
+  @override
+  String get contentArabic => 'المحتوى (عربي)';
+
+  @override
+  String get contentEnglish => 'المحتوى (English)';
+
+  @override
+  String get price => 'السعر';
+
+  @override
+  String get publish => 'نشر';
+
+  @override
+  String get createViolation => 'إنشاء مخالفة';
+
+  @override
+  String get name => 'الاسم';
+
+  @override
+  String get enterName => 'أدخل الاسم';
+
+  @override
+  String get citizenName => 'اسم المواطن';
+
+  @override
+  String get enterCitizenName => 'أدخل اسم المواطن';
+
+  @override
+  String get description => 'الوصف';
+
+  @override
+  String get enterDescription => 'أدخل الوصف';
+
+  @override
+  String get location => 'الموقع';
+
+  @override
+  String get enterLocation => 'أدخل الموقع';
+
+  @override
+  String get date => 'التاريخ';
+
+  @override
+  String get selectDate => 'اختر التاريخ';
+
+  @override
+  String get category => 'القسم';
+
+  @override
+  String get amount => 'المبلغ';
+
+  @override
+  String get enterAmount => 'أدخل المبلغ';
+
+  @override
+  String get create => 'إنشاء';
+
+  @override
+  String get newViolation => 'مخالفة جديدة';
+
+  @override
+  String get newDepartment => 'قسم جديد';
+
+  @override
+  String get addDepartment => 'إضافة قسم جديد';
+
+  @override
+  String get departmentName => 'اسم القسم';
+
+  @override
+  String get isFixed => 'قسم ثابت';
+
+  @override
+  String get fixed => 'ثابت';
+
+  @override
+  String get notFixed => 'غير ثابت';
+
+  @override
+  String get addDepartmentButton => 'إضافة القسم';
+
+  @override
+  String get department => 'القسم';
+
+  String get firstNameLabel => 'الاسم الأول';
+
+  @override
+  String get firstNameHint => 'أدخل الاسم الأول';
+
+  @override
+  String get lastNameLabel => 'اسم العائلة';
+
+  @override
+  String get lastNameHint => 'أدخل اسم العائلة';
+
+  @override
+  String get firstNameTooShort => 'الاسم الأول قصير جدًا';
+
+  @override
+  String get lastNameTooShort => 'اسم العائلة قصير جدًا';
+
+  @override
+  String get usernameInvalidChars => 'استخدم فقط أحرفًا أو أرقامًا أو نقطة أو شرطة سفلية';
+
+  @override
+  String get missingRegistrationData => 'لم يتم العثور على بيانات التسجيل. يرجى التسجيل من جديد.';
+
+  @override
+  String get missingUserIdVerifyAgain => 'رقم المستخدم غير موجود. يرجى تأكيد الرمز من جديد.';
+
+  @override
+  String get missingOwnerProjectLinkId => 'معرّف المشروع غير موجود. يرجى التسجيل من جديد.';
+
+  @override
+  String get verificationUserIdMissing => 'تم التحقق بنجاح لكن رقم المستخدم غير موجود.';
+
+  @override
+  String get municipalityProfileTitle => 'إكمال ملف البلدية';
+
+  @override
+  String get municipalityProfileSubtitle => 'أضف المعلومات المطلوبة من البلدية.';
+
+  @override
+  String get completeMunicipalityProfileButton => 'حفظ ومتابعة';
+
+  @override
+  String get municipalityProfileSaved => 'تم حفظ ملف البلدية بنجاح';
+
+  @override
+  String get municipalityProfileSaveFailed => 'فشل حفظ ملف البلدية';
+
+  @override
+  String get loadingMunicipalitiesFailed => 'فشل تحميل البلديات';
+
+  @override
+  String get noMunicipalitiesFound => 'لا توجد بلديات';
+
+  @override
+  String get phoneInvalid => 'رقم الهاتف يجب أن يحتوي على 8 إلى 15 رقمًا';
+
+  @override
+  String get addressTooShort => 'العنوان قصير جدًا';
+
+  @override
+  String get missingBuild4allToken => 'رمز تسجيل الدخول غير موجود. يرجى تسجيل الدخول من جديد.';
+
+  @override
+  String get missingBuild4allUser => 'بيانات المستخدم غير موجودة. يرجى تسجيل الدخول من جديد.';
+
+  @override
+  String get missingMunicipalityId => 'معرّف البلدية غير موجود';
+
 }

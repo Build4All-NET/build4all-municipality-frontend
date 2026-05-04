@@ -1,7 +1,14 @@
 // lib/features/citizen/services/presentation/screens/new_request_screen.dart
 
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:baladiyati/common/widgets/app_toast.dart';
+import 'package:baladiyati/features/citizen/services/data/models/request_submission.dart';
+import 'package:baladiyati/features/citizen/services/data/services/request_service.dart';
+import 'package:baladiyati/features/citizen/services/data/services/file_upload_service.dart';
 import 'services_by_category_screen.dart';
 
 class NewRequestScreen extends StatefulWidget {
@@ -17,8 +24,17 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
   final _titleCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
   final _locationCtrl = TextEditingController();
+
+  final _requestService = RequestService();
+  final _fileUploadService = FileUploadService();
+  final _imagePicker = ImagePicker();
+
   bool _isLoading = false;
-  int _fileCount = 0;
+  bool _isUploading = false;
+
+  // Store files with their names for display
+  final List<File> _selectedFiles = [];
+  final List<String> _selectedFileNames = [];
 
   @override
   void dispose() {
@@ -28,20 +44,222 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
     super.dispose();
   }
 
-  Future<void> _submit() async {
-    if (!_formKey.currentState!.validate()) return;
-    setState(() => _isLoading = true);
-    await Future.delayed(const Duration(seconds: 1));
-    if (!mounted) return;
-    setState(() => _isLoading = false);
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(AppLocalizations.of(context)!.requestSubmitted),
-        backgroundColor: Colors.green,
+  // ── Pick files bottom sheet ───────────────────────────────────────────────
+  Future<void> _pickFiles() async {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              // ── Camera ──────────────────────────────────────────────────
+              ListTile(
+                leading: const Icon(Icons.camera_alt_outlined,
+                    color: Colors.blue),
+                title: const Text('Take Photo'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final picked = await _imagePicker.pickImage(
+                    source: ImageSource.camera,
+                    imageQuality: 80,
+                  );
+                  if (picked != null) {
+                    setState(() {
+                      _selectedFiles.add(File(picked.path));
+                      _selectedFileNames
+                          .add(picked.name);
+                    });
+                  }
+                },
+              ),
+              // ── Gallery ─────────────────────────────────────────────────
+              ListTile(
+                leading: const Icon(Icons.photo_library_outlined,
+                    color: Colors.green),
+                title: const Text('Choose Images from Gallery'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final picked =
+                      await _imagePicker.pickMultiImage(imageQuality: 80);
+                  if (picked.isNotEmpty) {
+                    setState(() {
+                      for (final xf in picked) {
+                        _selectedFiles.add(File(xf.path));
+                        _selectedFileNames.add(xf.name);
+                      }
+                    });
+                  }
+                },
+              ),
+              // ── PDF / Document ───────────────────────────────────────────
+              ListTile(
+                leading: const Icon(Icons.picture_as_pdf_outlined,
+                    color: Colors.red),
+                title: const Text('Choose PDF or Document'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final result = await FilePicker.platform.pickFiles(
+                    allowMultiple: true,
+                    type: FileType.custom,
+                    allowedExtensions: [
+                      'pdf',
+                      'doc',
+                      'docx',
+                      'jpg',
+                      'jpeg',
+                      'png',
+                    ],
+                  );
+                  if (result != null && result.files.isNotEmpty) {
+                    setState(() {
+                      for (final pf in result.files) {
+                        if (pf.path != null) {
+                          _selectedFiles.add(File(pf.path!));
+                          _selectedFileNames
+                              .add(pf.name);
+                        }
+                      }
+                    });
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
       ),
     );
-    Navigator.pop(context);
-    Navigator.pop(context);
+  }
+
+  void _removeFile(int index) {
+    setState(() {
+      _selectedFiles.removeAt(index);
+      _selectedFileNames.removeAt(index);
+    });
+  }
+
+  // ── Get icon by file extension ────────────────────────────────────────────
+  Widget _fileIcon(String fileName) {
+    final ext = fileName.split('.').last.toLowerCase();
+    if (ext == 'pdf') {
+      return const Icon(Icons.picture_as_pdf, color: Colors.red, size: 36);
+    } else if (['doc', 'docx'].contains(ext)) {
+      return const Icon(Icons.description, color: Colors.blue, size: 36);
+    } else {
+      // Image — show thumbnail
+      final idx = _selectedFileNames.indexOf(fileName);
+      if (idx >= 0 && idx < _selectedFiles.length) {
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(6),
+          child: Image.file(
+            _selectedFiles[idx],
+            width: 60,
+            height: 60,
+            fit: BoxFit.cover,
+          ),
+        );
+      }
+      return const Icon(Icons.insert_drive_file,
+          color: Colors.grey, size: 36);
+    }
+  }
+
+  // ── Submit ────────────────────────────────────────────────────────────────
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => _isLoading = true);
+
+    try {
+      // Step 1: Upload files if any
+      List<String> uploadedUrls = [];
+      if (_selectedFiles.isNotEmpty) {
+        setState(() => _isUploading = true);
+        uploadedUrls =
+            await _fileUploadService.uploadFiles(_selectedFiles);
+        setState(() => _isUploading = false);
+      }
+
+      // Step 2: Submit request with file URLs
+      await _requestService.submitRequest(
+        serviceId: widget.service.id,
+        submission: RequestSubmission(
+          title: _titleCtrl.text.trim(),
+          description: _descCtrl.text.trim(),
+          addressText: _locationCtrl.text.trim().isEmpty
+              ? null
+              : _locationCtrl.text.trim(),
+          attachmentUrls: uploadedUrls.isEmpty ? null : uploadedUrls,
+        ),
+      );
+
+      if (!mounted) return;
+
+      // Step 3: Success dialog
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Icon(Icons.check_circle,
+                  color: Colors.green, size: 72),
+              const SizedBox(height: 16),
+              const Text(
+                'تم تقديم الطلب بنجاح!',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                'سيتم مراجعة طلبك من قبل البلدية',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                    fontSize: 13, color: Colors.grey.shade600),
+              ),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.green,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () {
+                    Navigator.popUntil(
+                        context, (route) => route.isFirst);
+                  },
+                  child: const Text('حسناً',
+                      style: TextStyle(
+                          color: Colors.white, fontSize: 16)),
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    } catch (e) {
+      if (!mounted) return;
+      setState(() => _isUploading = false);
+      AppToast.show(
+        context,
+        message: e.toString().replaceAll('Exception:', '').trim(),
+        type: AppToastType.error,
+      );
+    } finally {
+      if (mounted) setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -54,11 +272,10 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
       body: SafeArea(
         child: Column(
           children: [
-            // ── Header ──────────────────────────────────────
+            // ── Header ───────────────────────────────────────
             Container(
               color: Colors.white,
-              padding:
-                  const EdgeInsets.fromLTRB(8, 12, 16, 12),
+              padding: const EdgeInsets.fromLTRB(8, 12, 16, 12),
               child: Row(
                 children: [
                   IconButton(
@@ -122,10 +339,8 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                       _card(
                         title: l10n.requestDetails,
                         child: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            // Title
                             _fieldLabel(l10n.titleLabel),
                             const SizedBox(height: 6),
                             TextFormField(
@@ -134,8 +349,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                               decoration: InputDecoration(
                                 hintText: l10n.titleHint,
                                 filled: true,
-                                fillColor:
-                                    const Color(0xFFF3F4F6),
+                                fillColor: const Color(0xFFF3F4F6),
                                 border: OutlineInputBorder(
                                   borderRadius:
                                       BorderRadius.circular(10),
@@ -149,7 +363,6 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                             ),
                             const SizedBox(height: 12),
 
-                            // Description
                             _fieldLabel(l10n.descriptionLabel),
                             const SizedBox(height: 6),
                             TextFormField(
@@ -159,8 +372,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                               decoration: InputDecoration(
                                 hintText: l10n.descriptionHint,
                                 filled: true,
-                                fillColor:
-                                    const Color(0xFFF3F4F6),
+                                fillColor: const Color(0xFFF3F4F6),
                                 border: OutlineInputBorder(
                                   borderRadius:
                                       BorderRadius.circular(10),
@@ -174,7 +386,6 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                             ),
                             const SizedBox(height: 12),
 
-                            // Location
                             _fieldLabel(l10n.locationLabel),
                             const SizedBox(height: 6),
                             TextFormField(
@@ -186,8 +397,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                                     Icons.location_on_outlined,
                                     color: Colors.grey),
                                 filled: true,
-                                fillColor:
-                                    const Color(0xFFF3F4F6),
+                                fillColor: const Color(0xFFF3F4F6),
                                 border: OutlineInputBorder(
                                   borderRadius:
                                       BorderRadius.circular(10),
@@ -204,8 +414,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                       _card(
                         title: l10n.requiredAttachments,
                         child: Column(
-                          crossAxisAlignment:
-                              CrossAxisAlignment.end,
+                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
                             // Required docs list
                             ...s.requiredDocs.map((doc) => Padding(
@@ -228,20 +437,69 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                                 )),
                             const SizedBox(height: 12),
 
+                            // Selected files preview
+                            if (_selectedFiles.isNotEmpty) ...[
+                              ListView.builder(
+                                shrinkWrap: true,
+                                physics:
+                                    const NeverScrollableScrollPhysics(),
+                                itemCount: _selectedFiles.length,
+                                itemBuilder: (_, i) => Container(
+                                  margin: const EdgeInsets.only(
+                                      bottom: 8),
+                                  padding: const EdgeInsets.all(10),
+                                  decoration: BoxDecoration(
+                                    color:
+                                        const Color(0xFFF3F4F6),
+                                    borderRadius:
+                                        BorderRadius.circular(10),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      // Remove button
+                                      GestureDetector(
+                                        onTap: () => _removeFile(i),
+                                        child: const Icon(
+                                            Icons.close,
+                                            color: Colors.red,
+                                            size: 20),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      // File name
+                                      Expanded(
+                                        child: Text(
+                                          _selectedFileNames[i],
+                                          style: const TextStyle(
+                                              fontSize: 12),
+                                          overflow:
+                                              TextOverflow.ellipsis,
+                                          textAlign: TextAlign.right,
+                                        ),
+                                      ),
+                                      const SizedBox(width: 8),
+                                      // File icon/thumbnail
+                                      SizedBox(
+                                        width: 60,
+                                        height: 60,
+                                        child: _fileIcon(
+                                            _selectedFileNames[i]),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                            ],
+
                             // Upload area
                             GestureDetector(
-                              onTap: () {
-                                // TODO: File picker
-                                setState(() => _fileCount++);
-                              },
+                              onTap: _isLoading ? null : _pickFiles,
                               child: Container(
                                 width: double.infinity,
                                 padding: const EdgeInsets.all(20),
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                    color: Colors.grey.shade300,
-                                    style: BorderStyle.solid,
-                                  ),
+                                      color: Colors.grey.shade300),
                                   borderRadius:
                                       BorderRadius.circular(12),
                                 ),
@@ -252,42 +510,66 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                                           MainAxisAlignment.center,
                                       children: const [
                                         Icon(Icons.upload_outlined,
-                                            size: 32,
+                                            size: 28,
                                             color: Colors.grey),
                                         SizedBox(width: 8),
-                                        Icon(Icons.camera_alt_outlined,
-                                            size: 32,
+                                        Icon(
+                                            Icons.camera_alt_outlined,
+                                            size: 28,
+                                            color: Colors.grey),
+                                        SizedBox(width: 8),
+                                        Icon(
+                                            Icons
+                                                .picture_as_pdf_outlined,
+                                            size: 28,
                                             color: Colors.grey),
                                       ],
                                     ),
                                     const SizedBox(height: 8),
                                     Text(
-                                      l10n.tapToUpload,
-                                      style: const TextStyle(
-                                          fontWeight:
-                                              FontWeight.w500),
+                                      _selectedFiles.isEmpty
+                                          ? l10n.tapToUpload
+                                          : '${_selectedFiles.length} ${l10n.filesSelected}',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        color: _selectedFiles.isEmpty
+                                            ? Colors.black87
+                                            : Colors.green,
+                                      ),
                                     ),
                                     const SizedBox(height: 4),
-                                    Text(
-                                      l10n.pdfOrImages,
-                                      style: const TextStyle(
+                                    const Text(
+                                      'Photos, PDF or Word files',
+                                      style: TextStyle(
                                           fontSize: 11,
                                           color: Colors.grey),
                                     ),
-                                    if (_fileCount > 0) ...[
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        '$_fileCount ${l10n.filesSelected}',
-                                        style: const TextStyle(
-                                            color: Colors.green,
-                                            fontWeight:
-                                                FontWeight.w500),
-                                      ),
-                                    ],
                                   ],
                                 ),
                               ),
                             ),
+
+                            // Uploading indicator
+                            if (_isUploading) ...[
+                              const SizedBox(height: 12),
+                              const Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text('Uploading files...',
+                                      style: TextStyle(
+                                          color: Colors.grey,
+                                          fontSize: 13)),
+                                ],
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -299,24 +581,19 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                         height: 52,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                const Color(0xFF1E3A5F),
+                            backgroundColor: const Color(0xFF1E3A5F),
                             foregroundColor: Colors.white,
                             shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(14),
+                              borderRadius: BorderRadius.circular(14),
                             ),
                           ),
-                          onPressed:
-                              _isLoading ? null : _submit,
+                          onPressed: _isLoading ? null : _submit,
                           child: _isLoading
                               ? const CircularProgressIndicator(
                                   color: Colors.white)
-                              : Text(
-                                  l10n.submitRequest,
+                              : Text(l10n.submitRequest,
                                   style: const TextStyle(
-                                      fontSize: 16),
-                                ),
+                                      fontSize: 16)),
                         ),
                       ),
                       const SizedBox(height: 20),
@@ -376,8 +653,6 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
       style: const TextStyle(
           fontSize: 13, fontWeight: FontWeight.w500));
 
-  String _fmt(int n) => n
-      .toString()
-      .replaceAllMapped(
-          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+  String _fmt(int n) => n.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
 }

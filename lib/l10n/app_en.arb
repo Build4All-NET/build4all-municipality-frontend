@@ -118,7 +118,7 @@
   "awaitingPayment": "Awaiting Payment",
   "completed": "Completed",
   "quickActions": "Quick Actions",
-  "newRequest": "New Request",
+  "newRequest": "New request received",
   "serviceCategories": "Service Categories",
   "viewAll": "View All",
   "recentRequests": "Recent Requests",
@@ -189,7 +189,7 @@
   "filesSelected": "file(s) selected",
   "submitRequest": "Submit Request",
   "requestSubmitted": "Request submitted successfully",
-
+  
   "authUsernameTaken": "Username is already taken",
   "authEmailAlreadyExists": "This email is already registered",
   "authPhoneAlreadyExists": "This phone number is already registered",
@@ -197,7 +197,6 @@
   "authWrongPassword": "Incorrect password",
   "authInvalidCredentials": "Invalid login credentials",
   "authAccountInactive": "Account is inactive",
-  "authErrorGeneric": "Something went wrong. Please try again",
 
   "httpValidationError": "Some fields are invalid",
   "httpConflict": "Request conflict occurred",
@@ -205,14 +204,16 @@
   "httpForbidden": "You do not have permission",
   "httpNotFound": "Resource not found",
   "httpServerError": "Server error occurred",
-
   "networkNoInternet": "No internet connection",
   "networkTimeout": "Connection timed out",
   "networkError": "Network error occurred",
 
+  "authErrorGeneric": "Something went wrong. Please try again",
+
   "connection_offline": "You are offline",
   "connection_reconnecting": "Reconnecting...",
   "connection_issue": "Connection issue",
+
 
   "dashboard": "Dashboard",
   "inProgress": "In Progress",
@@ -230,33 +231,43 @@
   "completedRequests": "Completed Requests",
   "avgTime": "Average Time",
   "satisfaction": "Satisfaction",
+  "days": "days",
+
 
   "chooseHowToContinue": "Choose how to continue",
-  "continueAsCitizen": "Continue as Citizen",
-  "continueAsAdmin": "Continue as Admin",
+"continueAsCitizen": "Continue as Citizen",
+"continueAsAdmin": "Continue as Admin",
+"loginFailed": "Login failed",
+"firstNameLabel": "First name",
+  "firstNameHint": "Enter your first name",
+  "lastNameLabel": "Last name",
+  "lastNameHint": "Enter your last name",
+  "firstNameTooShort": "First name is too short",
+  "lastNameTooShort": "Last name is too short",
+  "usernameInvalidChars": "Use only letters, numbers, dot, or underscore",
+  "missingRegistrationData": "No saved registration data found. Please register again.",
+  "missingUserIdVerifyAgain": "Missing user id. Please verify your code again.",
+  "missingOwnerProjectLinkId": "Missing owner project link id. Please register again.",
+  "verificationUserIdMissing": "Verification succeeded but user id was missing.",
+  "municipalityProfileTitle": "Complete municipality profile",
+  "municipalityProfileSubtitle": "Add the information required by your municipality.",
+  "phoneLabel": "Phone",
+  "phoneHint": "Enter your phone number",
+  "addressLabel": "Address",
+  "addressHint": "Enter your address",
+  "municipalityLabel": "Municipality",
+  "selectMunicipality": "Select municipality",
+  "selectMunicipalityWarning": "Please select a municipality",
+  "completeMunicipalityProfileButton": "Save and continue",
+  "municipalityProfileSaved": "Municipality profile saved successfully",
+  "municipalityProfileSaveFailed": "Failed to save municipality profile",
+  "loadingMunicipalitiesFailed": "Failed to load municipalities",
+  "noMunicipalitiesFound": "No municipalities found",
+  "phoneInvalid": "Phone number must contain 8 to 15 digits",
+  "addressTooShort": "Address is too short",
+  "missingBuild4allToken": "Missing login token. Please login again.",
+  "missingBuild4allUser": "Missing user data. Please login again.",
+  "missingMunicipalityId": "Missing municipality id"
 
-  "chooseProfileImage": "Choose profile image",
-  "changeProfileImage": "Change profile image",
-  "removeProfileImage": "Remove image",
 
-  "notAvailable": "Not available",
-  "@notAvailable": {
-    "description": "Shown when a value is not available"
-  },
-  "loggingOut": "Logging out...",
-  "@loggingOut": {
-    "description": "Shown while the user is logging out"
-  },
-  "arabicLanguage": "Arabic",
-  "@arabicLanguage": {
-    "description": "Arabic language label"
-  },
-  "englishLanguage": "English",
-  "@englishLanguage": {
-    "description": "English language label"
-  },
-  "frenchLanguage": "French",
-  "@frenchLanguage": {
-    "description": "French language label"
-  }
 }

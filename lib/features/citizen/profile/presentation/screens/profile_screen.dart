@@ -200,7 +200,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await AdminTokenStore().clear();
       await JwtStore.clear();
 
-      // Your SessionRoleStore does not have clear().
       await SessionRoleStore().saveRole('');
 
       DioClient.setAuthToken('');
@@ -310,9 +309,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ],
                       ),
                     ),
-
                     SizedBox(height: card.padding * 0.75),
-
                     TextButton(
                       onPressed: () => _pickImageInDialog(dialogSetState),
                       child: Text(
@@ -322,7 +319,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         style: TextStyle(color: colors.primary),
                       ),
                     ),
-
                     if (profile.profilePictureUrl != null ||
                         _selectedImage != null)
                       TextButton(
@@ -332,34 +328,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           style: TextStyle(color: colors.error),
                         ),
                       ),
-
                     SizedBox(height: card.padding),
-
                     _editField(
                       context: context,
                       label: l10n.firstNameLabel,
                       controller: _firstNameCtrl,
                     ),
-
                     SizedBox(height: card.padding),
-
                     _editField(
                       context: context,
                       label: l10n.lastNameLabel,
                       controller: _lastNameCtrl,
                     ),
-
                     SizedBox(height: card.padding),
-
                     _editField(
                       context: context,
                       label: l10n.usernameLabel,
                       controller: _usernameCtrl,
                       isLtr: true,
                     ),
-
                     SizedBox(height: card.padding),
-
                     _editField(
                       context: context,
                       label: l10n.emailLabel,
@@ -367,9 +355,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       isLtr: true,
                       keyboardType: TextInputType.emailAddress,
                     ),
-
                     SizedBox(height: card.padding),
-
                     _editField(
                       context: context,
                       label: l10n.phoneLabel,
@@ -377,9 +363,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       isLtr: true,
                       keyboardType: TextInputType.phone,
                     ),
-
                     SizedBox(height: card.padding),
-
                     _editField(
                       context: context,
                       label: l10n.addressLabel,

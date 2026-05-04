@@ -163,47 +163,17 @@ abstract class AppLocalizations {
   /// **'user@example.com'**
   String get emailHint;
 
-  /// No description provided for @passwordHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Password'**
-  String get passwordHint;
-
-  /// No description provided for @passwordInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Password must be at least 6 characters'**
-  String get passwordInfo;
-
   /// No description provided for @loginButton.
   ///
   /// In en, this message translates to:
   /// **'Login'**
   String get loginButton;
 
-  /// No description provided for @loginFailed.
-  ///
-  /// In en, this message translates to:
-  /// **'Login failed'**
-  String get loginFailed;
-
   /// No description provided for @sendCodeButton.
   ///
   /// In en, this message translates to:
   /// **'Send Code'**
   String get sendCodeButton;
-
-  /// No description provided for @sendCode.
-  ///
-  /// In en, this message translates to:
-  /// **'Send Code'**
-  String get sendCode;
-
-  /// No description provided for @forgotPassword.
-  ///
-  /// In en, this message translates to:
-  /// **'Forgot password?'**
-  String get forgotPassword;
 
   /// No description provided for @noAccount.
   ///
@@ -216,18 +186,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Register now'**
   String get registerNow;
-
-  /// No description provided for @alreadyHaveAccount.
-  ///
-  /// In en, this message translates to:
-  /// **'Already have an account?'**
-  String get alreadyHaveAccount;
-
-  /// No description provided for @loginNow.
-  ///
-  /// In en, this message translates to:
-  /// **'Login'**
-  String get loginNow;
 
   /// No description provided for @registerTitle.
   ///
@@ -253,76 +211,16 @@ abstract class AppLocalizations {
   /// **'Ahmad Khalil'**
   String get fullNameHint;
 
-  /// No description provided for @firstNameLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'First name'**
-  String get firstNameLabel;
-
-  /// No description provided for @firstNameHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter your first name'**
-  String get firstNameHint;
-
-  /// No description provided for @lastNameLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Last name'**
-  String get lastNameLabel;
-
-  /// No description provided for @lastNameHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter your last name'**
-  String get lastNameHint;
-
-  /// No description provided for @firstNameTooShort.
-  ///
-  /// In en, this message translates to:
-  /// **'First name is too short'**
-  String get firstNameTooShort;
-
-  /// No description provided for @lastNameTooShort.
-  ///
-  /// In en, this message translates to:
-  /// **'Last name is too short'**
-  String get lastNameTooShort;
-
-  /// No description provided for @usernameLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Username'**
-  String get usernameLabel;
-
-  /// No description provided for @usernameHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter your username'**
-  String get usernameHint;
-
-  /// No description provided for @usernameTooShort.
-  ///
-  /// In en, this message translates to:
-  /// **'Username is too short'**
-  String get usernameTooShort;
-
-  /// No description provided for @usernameInvalidChars.
-  ///
-  /// In en, this message translates to:
-  /// **'Use only letters, numbers, dot, or underscore'**
-  String get usernameInvalidChars;
-
   /// No description provided for @phoneLabel.
   ///
   /// In en, this message translates to:
-  /// **'Phone'**
+  /// **'Phone Number'**
   String get phoneLabel;
 
   /// No description provided for @phoneHint.
   ///
   /// In en, this message translates to:
-  /// **'Enter your phone number'**
+  /// **'+961'**
   String get phoneHint;
 
   /// No description provided for @registerButton.
@@ -330,6 +228,18 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Create Account'**
   String get registerButton;
+
+  /// No description provided for @alreadyHaveAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'Already have an account?'**
+  String get alreadyHaveAccount;
+
+  /// No description provided for @loginNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Login'**
+  String get loginNow;
 
   /// No description provided for @fieldRequired.
   ///
@@ -348,18 +258,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password must be at least 6 characters'**
   String get passwordTooShort;
-
-  /// No description provided for @gmailOnly.
-  ///
-  /// In en, this message translates to:
-  /// **'Gmail only allowed'**
-  String get gmailOnly;
-
-  /// No description provided for @eightDigits.
-  ///
-  /// In en, this message translates to:
-  /// **'Must be 8 digits'**
-  String get eightDigits;
 
   /// No description provided for @copyright.
   ///
@@ -415,6 +313,36 @@ abstract class AppLocalizations {
   /// **'Email'**
   String get emailMethod;
 
+  /// No description provided for @selectMunicipality.
+  ///
+  /// In en, this message translates to:
+  /// **'Select Municipality'**
+  String get selectMunicipality;
+
+  /// No description provided for @municipalityLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Municipality'**
+  String get municipalityLabel;
+
+  /// No description provided for @passwordHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Password'**
+  String get passwordHint;
+
+  /// No description provided for @passwordInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Password must be at least 6 characters'**
+  String get passwordInfo;
+
+  /// No description provided for @sendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Send Code'**
+  String get sendCode;
+
   /// No description provided for @info.
   ///
   /// In en, this message translates to:
@@ -451,12 +379,6 @@ abstract class AppLocalizations {
   /// **'Enter the full code'**
   String get enterFullCode;
 
-  /// No description provided for @verificationUserIdMissing.
-  ///
-  /// In en, this message translates to:
-  /// **'Verification succeeded but user id was missing.'**
-  String get verificationUserIdMissing;
-
   /// No description provided for @completeProfileTitle.
   ///
   /// In en, this message translates to:
@@ -468,6 +390,36 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Complete your info to access services'**
   String get completeProfileSubtitle;
+
+  /// No description provided for @usernameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Username'**
+  String get usernameLabel;
+
+  /// No description provided for @usernameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your username'**
+  String get usernameHint;
+
+  /// No description provided for @usernameTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Username is too short'**
+  String get usernameTooShort;
+
+  /// No description provided for @addressLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get addressLabel;
+
+  /// No description provided for @addressHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Beirut, Lebanon'**
+  String get addressHint;
 
   /// No description provided for @completeProfileButton.
   ///
@@ -481,125 +433,35 @@ abstract class AppLocalizations {
   /// **'Profile completed successfully!'**
   String get completeProfileSuccess;
 
-  /// No description provided for @missingRegistrationData.
-  ///
-  /// In en, this message translates to:
-  /// **'No saved registration data found. Please register again.'**
-  String get missingRegistrationData;
-
-  /// No description provided for @missingUserIdVerifyAgain.
-  ///
-  /// In en, this message translates to:
-  /// **'Missing user id. Please verify your code again.'**
-  String get missingUserIdVerifyAgain;
-
-  /// No description provided for @missingOwnerProjectLinkId.
-  ///
-  /// In en, this message translates to:
-  /// **'Missing owner project link id. Please register again.'**
-  String get missingOwnerProjectLinkId;
-
-  /// No description provided for @municipalityProfileTitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Complete municipality profile'**
-  String get municipalityProfileTitle;
-
-  /// No description provided for @municipalityProfileSubtitle.
-  ///
-  /// In en, this message translates to:
-  /// **'Add the information required by your municipality.'**
-  String get municipalityProfileSubtitle;
-
-  /// No description provided for @municipalityLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Municipality'**
-  String get municipalityLabel;
-
-  /// No description provided for @selectMunicipality.
-  ///
-  /// In en, this message translates to:
-  /// **'Select municipality'**
-  String get selectMunicipality;
-
   /// No description provided for @selectMunicipalityWarning.
   ///
   /// In en, this message translates to:
   /// **'Please select a municipality'**
   String get selectMunicipalityWarning;
 
-  /// No description provided for @completeMunicipalityProfileButton.
+  /// No description provided for @forgotPassword.
   ///
   /// In en, this message translates to:
-  /// **'Save and continue'**
-  String get completeMunicipalityProfileButton;
+  /// **'Forgot password?'**
+  String get forgotPassword;
 
-  /// No description provided for @municipalityProfileSaved.
+  /// No description provided for @selectLanguage.
   ///
   /// In en, this message translates to:
-  /// **'Municipality profile saved successfully'**
-  String get municipalityProfileSaved;
+  /// **'Select Language'**
+  String get selectLanguage;
 
-  /// No description provided for @municipalityProfileSaveFailed.
+  /// No description provided for @gmailOnly.
   ///
   /// In en, this message translates to:
-  /// **'Failed to save municipality profile'**
-  String get municipalityProfileSaveFailed;
+  /// **'Gmail only allowed'**
+  String get gmailOnly;
 
-  /// No description provided for @loadingMunicipalitiesFailed.
+  /// No description provided for @eightDigits.
   ///
   /// In en, this message translates to:
-  /// **'Failed to load municipalities'**
-  String get loadingMunicipalitiesFailed;
-
-  /// No description provided for @noMunicipalitiesFound.
-  ///
-  /// In en, this message translates to:
-  /// **'No municipalities found'**
-  String get noMunicipalitiesFound;
-
-  /// No description provided for @missingMunicipalityId.
-  ///
-  /// In en, this message translates to:
-  /// **'Missing municipality id'**
-  String get missingMunicipalityId;
-
-  /// No description provided for @addressLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Address'**
-  String get addressLabel;
-
-  /// No description provided for @addressHint.
-  ///
-  /// In en, this message translates to:
-  /// **'Enter your address'**
-  String get addressHint;
-
-  /// No description provided for @addressTooShort.
-  ///
-  /// In en, this message translates to:
-  /// **'Address is too short'**
-  String get addressTooShort;
-
-  /// No description provided for @phoneInvalid.
-  ///
-  /// In en, this message translates to:
-  /// **'Phone number must contain 8 to 15 digits'**
-  String get phoneInvalid;
-
-  /// No description provided for @missingBuild4allToken.
-  ///
-  /// In en, this message translates to:
-  /// **'Missing login token. Please login again.'**
-  String get missingBuild4allToken;
-
-  /// No description provided for @missingBuild4allUser.
-  ///
-  /// In en, this message translates to:
-  /// **'Missing user data. Please login again.'**
-  String get missingBuild4allUser;
+  /// **'Must be 8 digits'**
+  String get eightDigits;
 
   /// No description provided for @resetPasswordTitle.
   ///
@@ -648,12 +510,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Password is required'**
   String get passwordRequired;
-
-  /// No description provided for @selectLanguage.
-  ///
-  /// In en, this message translates to:
-  /// **'Select Language'**
-  String get selectLanguage;
 
   /// No description provided for @navHome.
   ///
@@ -718,7 +574,7 @@ abstract class AppLocalizations {
   /// No description provided for @newRequest.
   ///
   /// In en, this message translates to:
-  /// **'New Request'**
+  /// **'New request received'**
   String get newRequest;
 
   /// No description provided for @serviceCategories.
@@ -778,7 +634,7 @@ abstract class AppLocalizations {
   /// No description provided for @selectCategory.
   ///
   /// In en, this message translates to:
-  /// **'Select a category to view available services'**
+  /// **'Select category'**
   String get selectCategory;
 
   /// No description provided for @serviceCount.
@@ -786,54 +642,6 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'services'**
   String get serviceCount;
-
-  /// No description provided for @searchInServices.
-  ///
-  /// In en, this message translates to:
-  /// **'Search services...'**
-  String get searchInServices;
-
-  /// No description provided for @noServices.
-  ///
-  /// In en, this message translates to:
-  /// **'No services available'**
-  String get noServices;
-
-  /// No description provided for @requiresInspection.
-  ///
-  /// In en, this message translates to:
-  /// **'Inspection Required'**
-  String get requiresInspection;
-
-  /// No description provided for @days.
-  ///
-  /// In en, this message translates to:
-  /// **'days'**
-  String get days;
-
-  /// No description provided for @free.
-  ///
-  /// In en, this message translates to:
-  /// **'Free'**
-  String get free;
-
-  /// No description provided for @serviceInfo.
-  ///
-  /// In en, this message translates to:
-  /// **'Service Information'**
-  String get serviceInfo;
-
-  /// No description provided for @feeLabel.
-  ///
-  /// In en, this message translates to:
-  /// **'Fee:'**
-  String get feeLabel;
-
-  /// No description provided for @processingTime.
-  ///
-  /// In en, this message translates to:
-  /// **'Processing Time:'**
-  String get processingTime;
 
   /// No description provided for @myAccount.
   ///
@@ -1039,6 +847,54 @@ abstract class AppLocalizations {
   /// **'Amount Due'**
   String get amountDue;
 
+  /// No description provided for @searchInServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Search services...'**
+  String get searchInServices;
+
+  /// No description provided for @noServices.
+  ///
+  /// In en, this message translates to:
+  /// **'No services available'**
+  String get noServices;
+
+  /// No description provided for @requiresInspection.
+  ///
+  /// In en, this message translates to:
+  /// **'Inspection Required'**
+  String get requiresInspection;
+
+  /// No description provided for @days.
+  ///
+  /// In en, this message translates to:
+  /// **'days'**
+  String get days;
+
+  /// No description provided for @free.
+  ///
+  /// In en, this message translates to:
+  /// **'Free'**
+  String get free;
+
+  /// No description provided for @serviceInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Service Information'**
+  String get serviceInfo;
+
+  /// No description provided for @feeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Fee:'**
+  String get feeLabel;
+
+  /// No description provided for @processingTime.
+  ///
+  /// In en, this message translates to:
+  /// **'Processing Time:'**
+  String get processingTime;
+
   /// No description provided for @requestDetails.
   ///
   /// In en, this message translates to:
@@ -1153,12 +1009,6 @@ abstract class AppLocalizations {
   /// **'Account is inactive'**
   String get authAccountInactive;
 
-  /// No description provided for @authErrorGeneric.
-  ///
-  /// In en, this message translates to:
-  /// **'Something went wrong. Please try again'**
-  String get authErrorGeneric;
-
   /// No description provided for @httpValidationError.
   ///
   /// In en, this message translates to:
@@ -1212,6 +1062,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Network error occurred'**
   String get networkError;
+
+  /// No description provided for @authErrorGeneric.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again'**
+  String get authErrorGeneric;
 
   /// No description provided for @connection_offline.
   ///
@@ -1345,53 +1201,475 @@ abstract class AppLocalizations {
   /// **'Continue as Admin'**
   String get continueAsAdmin;
 
-  /// No description provided for @chooseProfileImage.
+  /// No description provided for @loginFailed.
   ///
   /// In en, this message translates to:
-  /// **'Choose profile image'**
-  String get chooseProfileImage;
+  /// **'Login failed'**
+  String get loginFailed;
 
-  /// No description provided for @changeProfileImage.
-  ///
-  /// In en, this message translates to:
-  /// **'Change profile image'**
-  String get changeProfileImage;
 
-  /// No description provided for @removeProfileImage.
+  /// No description provided for @violations.
   ///
   /// In en, this message translates to:
-  /// **'Remove image'**
-  String get removeProfileImage;
+  /// **'Violations'**
+  String get violations;
 
-  /// Shown when a value is not available
+  /// No description provided for @departments.
   ///
   /// In en, this message translates to:
-  /// **'Not available'**
-  String get notAvailable;
+  /// **'Departments Management'**
+  String get departments;
 
-  /// Shown while the user is logging out
+  /// No description provided for @profile.
   ///
   /// In en, this message translates to:
-  /// **'Logging out...'**
-  String get loggingOut;
+  /// **'Profile'**
+  String get profile;
 
-  /// Arabic language label
+  /// No description provided for @announcementsManagement.
   ///
   /// In en, this message translates to:
-  /// **'Arabic'**
-  String get arabicLanguage;
+  /// **'Announcements Management'**
+  String get announcementsManagement;
 
-  /// English language label
+  /// No description provided for @newAnnouncement.
   ///
   /// In en, this message translates to:
-  /// **'English'**
-  String get englishLanguage;
+  /// **'New Announcement'**
+  String get newAnnouncement;
 
-  /// French language label
+  /// No description provided for @createAnnouncement.
   ///
   /// In en, this message translates to:
-  /// **'French'**
-  String get frenchLanguage;
+  /// **'Create New Announcement'**
+  String get createAnnouncement;
+
+  /// No description provided for @publishAnnouncement.
+  ///
+  /// In en, this message translates to:
+  /// **'Publish Announcement'**
+  String get publishAnnouncement;
+
+  /// No description provided for @titleAr.
+  ///
+  /// In en, this message translates to:
+  /// **'Title (Arabic)'**
+  String get titleAr;
+
+  /// No description provided for @titleEn.
+  ///
+  /// In en, this message translates to:
+  /// **'Title (English)'**
+  String get titleEn;
+
+  /// No description provided for @contentAr.
+  ///
+  /// In en, this message translates to:
+  /// **'Content (Arabic)'**
+  String get contentAr;
+
+  /// No description provided for @contentEn.
+  ///
+  /// In en, this message translates to:
+  /// **'Content (English)'**
+  String get contentEn;
+
+  /// No description provided for @enterTitleAr.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter title'**
+  String get enterTitleAr;
+
+  /// No description provided for @enterTitleEn.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter title'**
+  String get enterTitleEn;
+
+  /// No description provided for @enterContentAr.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter content'**
+  String get enterContentAr;
+
+  /// No description provided for @enterContentEn.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter content'**
+  String get enterContentEn;
+
+  /// No description provided for @published.
+  ///
+  /// In en, this message translates to:
+  /// **'Published'**
+  String get published;
+
+  /// No description provided for @sampleTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Working hours update'**
+  String get sampleTitle;
+
+  /// No description provided for @sampleDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Monday to Friday 8AM - 2PM'**
+  String get sampleDescription;
+
+  /// No description provided for @addViolation.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Violation'**
+  String get addViolation;
+
+  /// No description provided for @search.
+  ///
+  /// In en, this message translates to:
+  /// **'Search...'**
+  String get search;
+
+  /// No description provided for @all.
+  ///
+  /// In en, this message translates to:
+  /// **'All'**
+  String get all;
+
+  /// No description provided for @engineering.
+  ///
+  /// In en, this message translates to:
+  /// **'Engineering'**
+  String get engineering;
+
+  /// No description provided for @finance.
+  ///
+  /// In en, this message translates to:
+  /// **'Finance'**
+  String get finance;
+
+  /// No description provided for @police.
+  ///
+  /// In en, this message translates to:
+  /// **'Police'**
+  String get police;
+
+  /// No description provided for @titleArabic.
+  ///
+  /// In en, this message translates to:
+  /// **'Title (Arabic)'**
+  String get titleArabic;
+
+  /// No description provided for @titleEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'Title (English)'**
+  String get titleEnglish;
+
+  /// No description provided for @contentArabic.
+  ///
+  /// In en, this message translates to:
+  /// **'Content (Arabic)'**
+  String get contentArabic;
+
+  /// No description provided for @contentEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'Content (English)'**
+  String get contentEnglish;
+
+  /// No description provided for @price.
+  ///
+  /// In en, this message translates to:
+  /// **'Price'**
+  String get price;
+
+  /// No description provided for @publish.
+  ///
+  /// In en, this message translates to:
+  /// **'Publish'**
+  String get publish;
+
+  /// No description provided for @createViolation.
+  ///
+  /// In en, this message translates to:
+  /// **'Create Violation'**
+  String get createViolation;
+
+  /// No description provided for @name.
+  ///
+  /// In en, this message translates to:
+  /// **'Name'**
+  String get name;
+
+  /// No description provided for @enterName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter name'**
+  String get enterName;
+
+  /// No description provided for @citizenName.
+  ///
+  /// In en, this message translates to:
+  /// **'Citizen Name'**
+  String get citizenName;
+
+  /// No description provided for @enterCitizenName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter citizen name'**
+  String get enterCitizenName;
+
+  /// No description provided for @description.
+  ///
+  /// In en, this message translates to:
+  /// **'Description'**
+  String get description;
+
+  /// No description provided for @enterDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter description'**
+  String get enterDescription;
+
+  /// No description provided for @location.
+  ///
+  /// In en, this message translates to:
+  /// **'Location'**
+  String get location;
+
+  /// No description provided for @enterLocation.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter location'**
+  String get enterLocation;
+
+  /// No description provided for @date.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
+  String get date;
+
+  /// No description provided for @selectDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Select date'**
+  String get selectDate;
+
+  /// No description provided for @category.
+  ///
+  /// In en, this message translates to:
+  /// **'Category'**
+  String get category;
+
+  /// No description provided for @amount.
+  ///
+  /// In en, this message translates to:
+  /// **'Amount'**
+  String get amount;
+
+  /// No description provided for @enterAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter amount'**
+  String get enterAmount;
+
+  /// No description provided for @create.
+  ///
+  /// In en, this message translates to:
+  /// **'Create'**
+  String get create;
+
+  /// No description provided for @newViolation.
+  ///
+  /// In en, this message translates to:
+  /// **'New Violation'**
+  String get newViolation;
+
+  /// No description provided for @newDepartment.
+  ///
+  /// In en, this message translates to:
+  /// **'New Department'**
+  String get newDepartment;
+
+  /// No description provided for @addDepartment.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Department'**
+  String get addDepartment;
+
+  /// No description provided for @departmentName.
+  ///
+  /// In en, this message translates to:
+  /// **'Department Name'**
+  String get departmentName;
+
+  /// No description provided for @isFixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed Department'**
+  String get isFixed;
+
+  /// No description provided for @fixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Fixed'**
+  String get fixed;
+
+  /// No description provided for @notFixed.
+  ///
+  /// In en, this message translates to:
+  /// **'Not Fixed'**
+  String get notFixed;
+
+  /// No description provided for @addDepartmentButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Add Department'**
+  String get addDepartmentButton;
+
+  /// No description provided for @department.
+  ///
+  /// In en, this message translates to:
+  /// **'Department'**
+  String get department;
+
+  /// No description provided for @firstNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'First name'**
+  String get firstNameLabel;
+
+  /// No description provided for @firstNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your first name'**
+  String get firstNameHint;
+
+  /// No description provided for @lastNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Last name'**
+  String get lastNameLabel;
+
+  /// No description provided for @lastNameHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter your last name'**
+  String get lastNameHint;
+
+  /// No description provided for @firstNameTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'First name is too short'**
+  String get firstNameTooShort;
+
+  /// No description provided for @lastNameTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Last name is too short'**
+  String get lastNameTooShort;
+
+  /// No description provided for @usernameInvalidChars.
+  ///
+  /// In en, this message translates to:
+  /// **'Use only letters, numbers, dot, or underscore'**
+  String get usernameInvalidChars;
+
+  /// No description provided for @missingRegistrationData.
+  ///
+  /// In en, this message translates to:
+  /// **'No saved registration data found. Please register again.'**
+  String get missingRegistrationData;
+
+  /// No description provided for @missingUserIdVerifyAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing user id. Please verify your code again.'**
+  String get missingUserIdVerifyAgain;
+
+  /// No description provided for @missingOwnerProjectLinkId.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing owner project link id. Please register again.'**
+  String get missingOwnerProjectLinkId;
+
+  /// No description provided for @verificationUserIdMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Verification succeeded but user id was missing.'**
+  String get verificationUserIdMissing;
+
+  /// No description provided for @municipalityProfileTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete municipality profile'**
+  String get municipalityProfileTitle;
+
+  /// No description provided for @municipalityProfileSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Add the information required by your municipality.'**
+  String get municipalityProfileSubtitle;
+
+  /// No description provided for @completeMunicipalityProfileButton.
+  ///
+  /// In en, this message translates to:
+  /// **'Save and continue'**
+  String get completeMunicipalityProfileButton;
+
+  /// No description provided for @municipalityProfileSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Municipality profile saved successfully'**
+  String get municipalityProfileSaved;
+
+  /// No description provided for @municipalityProfileSaveFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to save municipality profile'**
+  String get municipalityProfileSaveFailed;
+
+  /// No description provided for @loadingMunicipalitiesFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load municipalities'**
+  String get loadingMunicipalitiesFailed;
+
+  /// No description provided for @noMunicipalitiesFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No municipalities found'**
+  String get noMunicipalitiesFound;
+
+  /// No description provided for @phoneInvalid.
+  ///
+  /// In en, this message translates to:
+  /// **'Phone number must contain 8 to 15 digits'**
+  String get phoneInvalid;
+
+  /// No description provided for @addressTooShort.
+  ///
+  /// In en, this message translates to:
+  /// **'Address is too short'**
+  String get addressTooShort;
+
+  /// No description provided for @missingBuild4allToken.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing login token. Please login again.'**
+  String get missingBuild4allToken;
+
+  /// No description provided for @missingBuild4allUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing user data. Please login again.'**
+  String get missingBuild4allUser;
+
+  /// No description provided for @missingMunicipalityId.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing municipality id'**
+  String get missingMunicipalityId;
+
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

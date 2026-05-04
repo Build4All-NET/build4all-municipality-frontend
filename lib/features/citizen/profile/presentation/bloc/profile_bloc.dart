@@ -4,9 +4,7 @@ import 'package:baladiyati/features/citizen/profile/domain/usecase/get_profile_u
 import 'package:baladiyati/features/citizen/profile/domain/usecase/update_profile_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-
 import '../../data/services/profile_api_service.dart';
-
 import 'profile_event.dart';
 import 'profile_state.dart';
 
