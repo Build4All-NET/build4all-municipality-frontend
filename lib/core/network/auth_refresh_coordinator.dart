@@ -1,17 +1,19 @@
 import 'dart:async';
 
-import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
-import 'package:dio/dio.dart';
+import 'package:baladiyati/core/exceptions/app_exception.dart';
+import 'package:baladiyati/core/exceptions/auth_exception.dart';
 import 'package:baladiyati/core/network/globals.dart' as g;
 import 'package:baladiyati/core/utils/jwt_utils.dart';
+import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
+import 'package:dio/dio.dart';
 
 class AuthRefreshCoordinator {
   AuthRefreshCoordinator._();
 
   static final AuthRefreshCoordinator instance = AuthRefreshCoordinator._();
 
-  final AuthTokenStore _userStore =  AuthTokenStore();
+  final AuthTokenStore _userStore = AuthTokenStore();
   final AdminTokenStore _adminStore = const AdminTokenStore();
 
   Completer<String>? _userRefreshing;
@@ -32,118 +34,252 @@ class AuthRefreshCoordinator {
   }
 
   String _stripBearer(String? token) {
-    final v = (token ?? '').trim();
-    if (v.toLowerCase().startsWith('bearer ')) {
-      return v.substring(7).trim();
+    final value = (token ?? '').trim();
+
+    if (value.toLowerCase().startsWith('bearer ')) {
+      return value.substring(7).trim();
     }
-    return v;
+
+    return value;
+  }
+
+  Map<String, dynamic> _readPayload(dynamic data) {
+    if (data is Map) {
+      return Map<String, dynamic>.from(data);
+    }
+
+    return <String, dynamic>{};
+  }
+
+  AuthException _mapRefreshDioError(
+    DioException e, {
+    required int? status,
+    required Map<String, dynamic> payload,
+  }) {
+    final code = (payload['code'] ?? '').toString().trim();
+    final message = (payload['message'] ?? payload['error'] ?? '')
+        .toString()
+        .trim();
+
+    if (status == 401 || status == 403) {
+      return AuthException(
+        message.isEmpty ? 'Session expired. Please login again.' : message,
+        code: code.isEmpty ? 'BAD_REFRESH' : code,
+        original: e,
+      );
+    }
+
+    return AuthException(
+      message.isEmpty ? 'Refresh failed.' : message,
+      code: code.isEmpty ? 'BAD_REFRESH' : code,
+      original: e,
+    );
   }
 
   bool shouldClearAfterRefreshFailure(Object e) {
-    if (e is DioException) {
-      final s = e.response?.statusCode ?? 0;
-      if (s == 401) return true;
+    if (e is AuthException) {
+      final code = (e.code ?? '').trim().toUpperCase();
+
+      return code == 'NO_USER_REFRESH' ||
+          code == 'NO_ADMIN_REFRESH' ||
+          code == 'BAD_REFRESH' ||
+          code == 'BAD_REFRESH_RESPONSE' ||
+          code == 'SESSION_EXPIRED';
     }
 
-    final msg = e.toString().toUpperCase();
-    return msg.contains('NO_USER_REFRESH') ||
-        msg.contains('NO_ADMIN_REFRESH') ||
-        msg.contains('BAD_REFRESH') ||
-        msg.contains('BAD_REFRESH_RESPONSE');
+    if (e is DioException) {
+      final status = e.response?.statusCode ?? 0;
+      return status == 401 || status == 403;
+    }
+
+    if (e is AppException) {
+      final code = (e.code ?? '').trim().toUpperCase();
+
+      return code == 'NO_USER_REFRESH' ||
+          code == 'NO_ADMIN_REFRESH' ||
+          code == 'BAD_REFRESH' ||
+          code == 'BAD_REFRESH_RESPONSE' ||
+          code == 'SESSION_EXPIRED';
+    }
+
+    final text = e.toString().toUpperCase();
+
+    return text.contains('NO_USER_REFRESH') ||
+        text.contains('NO_ADMIN_REFRESH') ||
+        text.contains('BAD_REFRESH') ||
+        text.contains('BAD_REFRESH_RESPONSE') ||
+        text.contains('SESSION_EXPIRED');
   }
 
   Future<String> refreshUser({String? tenantId}) async {
-    if (_userRefreshing != null) return _userRefreshing!.future;
+    if (_userRefreshing != null) {
+      return _userRefreshing!.future;
+    }
 
     final completer = Completer<String>();
     _userRefreshing = completer;
 
     try {
       final refresh = (await _userStore.getRefreshToken())?.trim() ?? '';
-      if (refresh.isEmpty) throw Exception('NO_USER_REFRESH');
 
-      final res = await _plain().post(
+      if (refresh.isEmpty) {
+        throw AuthException(
+          'No refresh token available.',
+          code: 'NO_USER_REFRESH',
+        );
+      }
+
+      final response = await _plain().post(
         '/api/auth/refresh',
-        data: {'refreshToken': refresh},
+        data: {
+          'refreshToken': refresh,
+        },
       );
 
-      final data = (res.data is Map)
-          ? Map<String, dynamic>.from(res.data as Map)
-          : <String, dynamic>{};
+      final data = _readPayload(response.data);
 
-      final newAccess = (data['token'] ?? '').toString().trim();
-      final newRefresh = (data['refreshToken'] ?? '').toString().trim();
+      final newAccess = (data['token'] ??
+              data['accessToken'] ??
+              data['jwt'] ??
+              data['access_token'] ??
+              '')
+          .toString()
+          .trim();
+
+      final newRefresh = (data['refreshToken'] ??
+              data['refresh_token'] ??
+              '')
+          .toString()
+          .trim();
 
       if (newAccess.isEmpty || newRefresh.isEmpty) {
-        throw Exception('BAD_REFRESH_RESPONSE');
+        throw AuthException(
+          'Invalid refresh response.',
+          code: 'BAD_REFRESH_RESPONSE',
+        );
       }
-await _userStore.saveToken(
-  token: newAccess,
-  refreshToken: newRefresh,
-  tenantId: tenantId,
-  wasInactive: false,
-);
-      // await _userStore.saveToken(
-      //   token: newAccess,
-      //   wasInactive: false,
-      //   refreshToken: newRefresh,
-      //   tenantId: tenantId,
-      // );
 
-      g.setAuthToken(newAccess);
+      await _userStore.saveToken(
+        token: _stripBearer(newAccess),
+        refreshToken: newRefresh,
+        tenantId: tenantId,
+        wasInactive: false,
+      );
 
-      completer.complete(newAccess);
-      return newAccess;
+      g.setAuthToken(_stripBearer(newAccess));
+
+      completer.complete(_stripBearer(newAccess));
+      return _stripBearer(newAccess);
+    } on DioException catch (e, st) {
+      final mapped = _mapRefreshDioError(
+        e,
+        status: e.response?.statusCode,
+        payload: _readPayload(e.response?.data),
+      );
+
+      completer.completeError(mapped, st);
+      throw mapped;
     } catch (e, st) {
-      completer.completeError(e, st);
-      rethrow;
+      if (e is AppException) {
+        completer.completeError(e, st);
+        rethrow;
+      }
+
+      final wrapped = AppException(
+        'Refresh failed.',
+        original: e,
+      );
+
+      completer.completeError(wrapped, st);
+      throw wrapped;
     } finally {
       _userRefreshing = null;
     }
   }
 
   Future<String> refreshAdmin({String? tenantId}) async {
-    if (_adminRefreshing != null) return _adminRefreshing!.future;
+    if (_adminRefreshing != null) {
+      return _adminRefreshing!.future;
+    }
 
     final completer = Completer<String>();
     _adminRefreshing = completer;
 
     try {
       final refresh = (await _adminStore.getRefreshToken())?.trim() ?? '';
-      if (refresh.isEmpty) throw Exception('NO_ADMIN_REFRESH');
 
-      final res = await _plain().post(
+      if (refresh.isEmpty) {
+        throw AuthException(
+          'No refresh token available.',
+          code: 'NO_ADMIN_REFRESH',
+        );
+      }
+
+      final response = await _plain().post(
         '/api/auth/refresh',
-        data: {'refreshToken': refresh},
+        data: {
+          'refreshToken': refresh,
+        },
       );
 
-      final data = (res.data is Map)
-          ? Map<String, dynamic>.from(res.data as Map)
-          : <String, dynamic>{};
+      final data = _readPayload(response.data);
 
-      final newAccess = (data['token'] ?? '').toString().trim();
-      final newRefresh = (data['refreshToken'] ?? '').toString().trim();
+      final newAccess = (data['token'] ??
+              data['accessToken'] ??
+              data['jwt'] ??
+              data['access_token'] ??
+              '')
+          .toString()
+          .trim();
+
+      final newRefresh = (data['refreshToken'] ??
+              data['refresh_token'] ??
+              '')
+          .toString()
+          .trim();
 
       if (newAccess.isEmpty || newRefresh.isEmpty) {
-        throw Exception('BAD_REFRESH_RESPONSE');
+        throw AuthException(
+          'Invalid refresh response.',
+          code: 'BAD_REFRESH_RESPONSE',
+        );
       }
 
       final role = (await _adminStore.getRole()) ?? '';
 
       await _adminStore.save(
-        token: newAccess,
+        token: _stripBearer(newAccess),
         role: role,
         refreshToken: newRefresh,
         tenantId: tenantId,
       );
 
-      g.setAuthToken(newAccess);
+      g.setAuthToken(_stripBearer(newAccess));
 
-      completer.complete(newAccess);
-      return newAccess;
+      completer.complete(_stripBearer(newAccess));
+      return _stripBearer(newAccess);
+    } on DioException catch (e, st) {
+      final mapped = _mapRefreshDioError(
+        e,
+        status: e.response?.statusCode,
+        payload: _readPayload(e.response?.data),
+      );
+
+      completer.completeError(mapped, st);
+      throw mapped;
     } catch (e, st) {
-      completer.completeError(e, st);
-      rethrow;
+      if (e is AppException) {
+        completer.completeError(e, st);
+        rethrow;
+      }
+
+      final wrapped = AppException(
+        'Refresh failed.',
+        original: e,
+      );
+
+      completer.completeError(wrapped, st);
+      throw wrapped;
     } finally {
       _adminRefreshing = null;
     }
@@ -157,17 +293,22 @@ await _userStore.saveToken(
     if (userWasInactive) return null;
 
     final refresh = (await _userStore.getRefreshToken())?.trim() ?? '';
+
     if (refresh.isEmpty) return null;
 
     final raw = _stripBearer(tokenStored);
+
     if (raw.isNotEmpty && !JwtUtils.isExpired(raw)) {
       return raw;
     }
 
     try {
       return await refreshUser(tenantId: tenantId);
-    } catch (_) {
-      await _userStore.clearToken();
+    } catch (e) {
+      if (shouldClearAfterRefreshFailure(e)) {
+        await _userStore.clearToken();
+      }
+
       return null;
     }
   }
@@ -177,17 +318,22 @@ await _userStore.saveToken(
     String? tenantId,
   }) async {
     final refresh = (await _adminStore.getRefreshToken())?.trim() ?? '';
+
     if (refresh.isEmpty) return null;
 
     final raw = _stripBearer(tokenStored);
+
     if (raw.isNotEmpty && !JwtUtils.isExpired(raw)) {
       return raw;
     }
 
     try {
       return await refreshAdmin(tenantId: tenantId);
-    } catch (_) {
-      await _adminStore.clear();
+    } catch (e) {
+      if (shouldClearAfterRefreshFailure(e)) {
+        await _adminStore.clear();
+      }
+
       return null;
     }
   }

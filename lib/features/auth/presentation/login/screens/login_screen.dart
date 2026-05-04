@@ -8,13 +8,13 @@ import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
 import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
 import 'package:baladiyati/features/auth/data/services/session_role_store.dart';
-import 'package:baladiyati/features/auth/data/services/auth_api_service.dart';
 import 'package:baladiyati/features/auth/domain/facade/dual_login_orchestrator.dart';
 import 'package:baladiyati/features/auth/presentation/municipality_profile/screens/municipality_profile_setup_screen.dart';
 import 'package:baladiyati/features/auth/presentation/register/screens/user_register_screen.dart';
 import 'package:baladiyati/features/citizen/home/presentation/screens/home_screen.dart';
 import 'package:baladiyati/features/forgotpassword/presentation/screens/reset_password_page.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -59,6 +59,16 @@ class _LoginScreenState extends State<LoginScreen> {
     return e.toString().replaceAll('Exception:', '').trim();
   }
 
+  String _bearer(String token) {
+    final clean = token.trim();
+
+    if (clean.toLowerCase().startsWith('bearer ')) {
+      return clean;
+    }
+
+    return 'Bearer $clean';
+  }
+
   Map<String, dynamic> _extractUserMap(DualLoginResult dual) {
     final data = dual.userData;
 
@@ -86,7 +96,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return 'municipality_profile_completed_${ownerProjectLinkId}_$userId';
   }
 
-  Future<bool> _isMunicipalityProfileCompleted({
+  Future<bool> _isMunicipalityProfileCompletedLocal({
     required int ownerProjectLinkId,
     required int userId,
   }) async {
@@ -105,6 +115,48 @@ class _LoginScreenState extends State<LoginScreen> {
         false;
   }
 
+  Future<void> _markMunicipalityProfileCompletedLocal({
+    required int ownerProjectLinkId,
+    required int userId,
+  }) async {
+    if (ownerProjectLinkId <= 0 || userId <= 0) return;
+
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setBool(
+      _municipalityProfileCompletedKey(
+        ownerProjectLinkId: ownerProjectLinkId,
+        userId: userId,
+      ),
+      true,
+    );
+  }
+
+  Future<bool> _hasMunicipalityProfileOnBackend({
+    required String token,
+  }) async {
+    try {
+      final response = await DioClient.muni.get(
+        '/users/profile',
+        options: Options(
+          headers: {
+            'Authorization': _bearer(token),
+          },
+        ),
+      );
+
+      return response.statusCode == 200;
+    } on DioException catch (e) {
+      final status = e.response?.statusCode ?? 0;
+
+      if (status == 404) {
+        return false;
+      }
+
+      rethrow;
+    }
+  }
+
   Future<void> _saveCitizenSession({
     required DualLoginResult dual,
     required Map<String, dynamic> userMap,
@@ -121,12 +173,15 @@ class _LoginScreenState extends State<LoginScreen> {
 
     await SessionRoleStore().saveRole('CITIZEN');
 
+debugPrint('LOGIN userToken exists = ${dual.userToken != null && dual.userToken!.isNotEmpty}');
+debugPrint('LOGIN refreshToken exists = ${dual.userRefreshToken != null && dual.userRefreshToken!.isNotEmpty}');
     await AuthTokenStore().saveToken(
       token: token,
       refreshToken: dual.userRefreshToken,
       tenantId: ownerProjectLinkId.toString(),
       userJson: userMap,
     );
+    await AuthTokenStore().debugDump();
 
     DioClient.setAuthToken(token);
   }
@@ -143,10 +198,29 @@ class _LoginScreenState extends State<LoginScreen> {
       userMap: userMap,
     );
 
-    final completed = await _isMunicipalityProfileCompleted(
+    final completedLocal = await _isMunicipalityProfileCompletedLocal(
       ownerProjectLinkId: ownerProjectLinkId,
       userId: userId,
     );
+
+    bool completedRemote = false;
+
+    try {
+      completedRemote = await _hasMunicipalityProfileOnBackend(
+        token: dual.userToken!,
+      );
+    } catch (_) {
+      completedRemote = completedLocal;
+    }
+
+    final completed = completedLocal || completedRemote;
+
+    if (completedRemote) {
+      await _markMunicipalityProfileCompletedLocal(
+        ownerProjectLinkId: ownerProjectLinkId,
+        userId: userId,
+      );
+    }
 
     if (!mounted) return;
 
@@ -291,9 +365,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: cs.onSurface,
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
                 ListTile(
                   leading: Icon(Icons.person, color: cs.primary),
                   title: Text(
@@ -328,7 +400,6 @@ class _LoginScreenState extends State<LoginScreen> {
                     }
                   },
                 ),
-
                 ListTile(
                   leading: Icon(Icons.admin_panel_settings, color: cs.primary),
                   title: Text(
@@ -410,9 +481,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 8),
-
                         Center(
                           child: Text(
                             l10n.loginSubtitle,
@@ -422,9 +491,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 24),
-
                         Container(
                           height: 50,
                           decoration: BoxDecoration(
@@ -450,9 +517,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ],
                           ),
                         ),
-
                         const SizedBox(height: 20),
-
                         AppTextField(
                           controller: _emailCtrl,
                           label: l10n.emailLabel,
@@ -470,9 +535,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             return null;
                           },
                         ),
-
                         const SizedBox(height: 16),
-
                         AppTextField(
                           controller: _passwordCtrl,
                           label: l10n.passwordLabel,
@@ -505,7 +568,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             return null;
                           },
                         ),
-
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
@@ -529,7 +591,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                           ),
                         ),
-
                         PrimaryButton(
                           label: l10n.loginButton,
                           isLoading: _isLoading,
@@ -538,9 +599,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             _onLoginPressed(context);
                           },
                         ),
-
                         const SizedBox(height: 20),
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

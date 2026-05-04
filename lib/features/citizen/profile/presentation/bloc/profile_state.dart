@@ -1,5 +1,3 @@
-// lib/features/profile/presentation/bloc/profile_state.dart
-
 import '../../domain/entities/profile_entity.dart';
 
 class ProfileState {
