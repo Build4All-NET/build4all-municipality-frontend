@@ -1,21 +1,25 @@
-// lib/features/profile/presentation/bloc/profile_event.dart
-
 abstract class ProfileEvent {}
 
-// Load profile
 class ProfileLoadRequested extends ProfileEvent {}
 
-// Update profile
 class ProfileUpdateSubmitted extends ProfileEvent {
-  final String? fullName;
-  final String? phone;
-  final String? address;
-  final String? username;
+  final String firstName;
+  final String lastName;
+  final String username;
+  final String email;
+  final String phone;
+  final String address;
+  final String? profileImagePath;
+  final bool imageRemoved;
 
   ProfileUpdateSubmitted({
-    this.fullName,
-    this.phone,
-    this.address,
-    this.username,
+    required this.firstName,
+    required this.lastName,
+    required this.username,
+    required this.email,
+    required this.phone,
+    required this.address,
+    this.profileImagePath,
+    this.imageRemoved = false,
   });
 }

@@ -62,9 +62,6 @@ class _HomeScreenState extends State<HomeScreen> {
           const ServicesScreen(),
           const RequestsScreen(),
           const PaymentsScreen(),
-
-          // ProfileScreen needs ProfileBloc because it calls:
-          // context.read<ProfileBloc>() in initState.
           BlocProvider(
             create: (_) => ProfileBloc(),
             child: const ProfileScreen(),

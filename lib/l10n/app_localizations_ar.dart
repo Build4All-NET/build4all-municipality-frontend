@@ -69,7 +69,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get phoneLabel => 'رقم الهاتف';
 
   @override
-  String get phoneHint => '+961';
+  String get phoneHint => 'أدخل رقم الهاتف';
 
   @override
   String get registerButton => 'إنشاء الحساب';
@@ -168,7 +168,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get addressLabel => 'العنوان';
 
   @override
-  String get addressHint => 'بيروت، لبنان';
+  String get addressHint => 'أدخل العنوان';
 
   @override
   String get completeProfileButton => 'إكمال الملف الشخصي';
@@ -564,6 +564,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get loginFailed => 'فشل تسجيل الدخول';
 
   @override
+
   String get violations => 'المخالفات';
 
   @override
@@ -772,4 +773,72 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get accountant => 'محاسب';
+  String get firstNameLabel => 'الاسم الأول';
+
+  @override
+  String get firstNameHint => 'أدخل الاسم الأول';
+
+  @override
+  String get lastNameLabel => 'اسم العائلة';
+
+  @override
+  String get lastNameHint => 'أدخل اسم العائلة';
+
+  @override
+  String get firstNameTooShort => 'الاسم الأول قصير جدًا';
+
+  @override
+  String get lastNameTooShort => 'اسم العائلة قصير جدًا';
+
+  @override
+  String get usernameInvalidChars => 'استخدم فقط أحرفًا أو أرقامًا أو نقطة أو شرطة سفلية';
+
+  @override
+  String get missingRegistrationData => 'لم يتم العثور على بيانات التسجيل. يرجى التسجيل من جديد.';
+
+  @override
+  String get missingUserIdVerifyAgain => 'رقم المستخدم غير موجود. يرجى تأكيد الرمز من جديد.';
+
+  @override
+  String get missingOwnerProjectLinkId => 'معرّف المشروع غير موجود. يرجى التسجيل من جديد.';
+
+  @override
+  String get verificationUserIdMissing => 'تم التحقق بنجاح لكن رقم المستخدم غير موجود.';
+
+  @override
+  String get municipalityProfileTitle => 'إكمال ملف البلدية';
+
+  @override
+  String get municipalityProfileSubtitle => 'أضف المعلومات المطلوبة من البلدية.';
+
+  @override
+  String get completeMunicipalityProfileButton => 'حفظ ومتابعة';
+
+  @override
+  String get municipalityProfileSaved => 'تم حفظ ملف البلدية بنجاح';
+
+  @override
+  String get municipalityProfileSaveFailed => 'فشل حفظ ملف البلدية';
+
+  @override
+  String get loadingMunicipalitiesFailed => 'فشل تحميل البلديات';
+
+  @override
+  String get noMunicipalitiesFound => 'لا توجد بلديات';
+
+  @override
+  String get phoneInvalid => 'رقم الهاتف يجب أن يحتوي على 8 إلى 15 رقمًا';
+
+  @override
+  String get addressTooShort => 'العنوان قصير جدًا';
+
+  @override
+  String get missingBuild4allToken => 'رمز تسجيل الدخول غير موجود. يرجى تسجيل الدخول من جديد.';
+
+  @override
+  String get missingBuild4allUser => 'بيانات المستخدم غير موجودة. يرجى تسجيل الدخول من جديد.';
+
+  @override
+  String get missingMunicipalityId => 'معرّف البلدية غير موجود';
+
 }

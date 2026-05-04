@@ -516,7 +516,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get needReview => 'À vérifier';
 
   @override
-  String get completedToday => 'Complétées aujourd’hui';
+  String get completedToday => 'Complétées aujourd\'hui';
 
   @override
   String get services => 'Services';
@@ -564,6 +564,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get loginFailed => 'Échec de la connexion';
 
   @override
+
   String get violations => 'Infractions';
 
   @override
@@ -772,4 +773,73 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get accountant => 'Comptable';
+
+  String get firstNameLabel => 'Prénom';
+
+  @override
+  String get firstNameHint => 'Entrez votre prénom';
+
+  @override
+  String get lastNameLabel => 'Nom';
+
+  @override
+  String get lastNameHint => 'Entrez votre nom';
+
+  @override
+  String get firstNameTooShort => 'Le prénom est trop court';
+
+  @override
+  String get lastNameTooShort => 'Le nom est trop court';
+
+  @override
+  String get usernameInvalidChars => 'Utilisez uniquement des lettres, chiffres, points ou underscores';
+
+  @override
+  String get missingRegistrationData => 'Aucune donnée d\'inscription trouvée. Veuillez vous inscrire à nouveau.';
+
+  @override
+  String get missingUserIdVerifyAgain => 'Identifiant utilisateur manquant. Veuillez vérifier le code à nouveau.';
+
+  @override
+  String get missingOwnerProjectLinkId => 'Identifiant du projet manquant. Veuillez vous inscrire à nouveau.';
+
+  @override
+  String get verificationUserIdMissing => 'La vérification a réussi mais l\'identifiant utilisateur est manquant.';
+
+  @override
+  String get municipalityProfileTitle => 'Compléter le profil municipal';
+
+  @override
+  String get municipalityProfileSubtitle => 'Ajoutez les informations requises par votre municipalité.';
+
+  @override
+  String get completeMunicipalityProfileButton => 'Enregistrer et continuer';
+
+  @override
+  String get municipalityProfileSaved => 'Profil municipal enregistré avec succès';
+
+  @override
+  String get municipalityProfileSaveFailed => 'Échec de l\'enregistrement du profil municipal';
+
+  @override
+  String get loadingMunicipalitiesFailed => 'Échec du chargement des municipalités';
+
+  @override
+  String get noMunicipalitiesFound => 'Aucune municipalité trouvée';
+
+  @override
+  String get phoneInvalid => 'Le numéro doit contenir entre 8 et 15 chiffres';
+
+  @override
+  String get addressTooShort => 'L\'adresse est trop courte';
+
+  @override
+  String get missingBuild4allToken => 'Token de connexion manquant. Veuillez vous reconnecter.';
+
+  @override
+  String get missingBuild4allUser => 'Données utilisateur manquantes. Veuillez vous reconnecter.';
+
+  @override
+  String get missingMunicipalityId => 'Identifiant de municipalité manquant';
+
 }

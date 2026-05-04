@@ -1,38 +1,61 @@
-// lib/core/network/interceptors/refresh_token_interceptor.dart
-
 import 'dart:convert';
 
 import 'package:baladiyati/core/network/auth_refresh_coordinator.dart';
 import 'package:baladiyati/core/network/globals.dart' as g;
 import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
-import 'package:baladiyati/features/auth/data/services/session_role_store.dart';
 import 'package:dio/dio.dart';
 
 class RefreshTokenInterceptor extends Interceptor {
   final AuthTokenStore _userStore = AuthTokenStore();
   final AdminTokenStore _adminStore = const AdminTokenStore();
   final AuthRefreshCoordinator _refresh = AuthRefreshCoordinator.instance;
-  final SessionRoleStore _roleStore = SessionRoleStore();
 
-  bool _isAuthCall(RequestOptions o) {
-    final p = o.path;
-    return p.contains('/api/auth/refresh') ||
-        p.contains('/api/auth/logout') ||
-        p.contains('/api/auth/user/login') ||
-        p.contains('/api/auth/user/login-phone') ||
-        p.contains('/api/auth/admin/login') ||
-        p.contains('/api/auth/admin/login/front') ||
-        p.contains('/api/auth/manager/login') ||
-        p.contains('/api/auth/superadmin/login');
+  bool _isAuthCall(RequestOptions options) {
+    final path = options.path;
+
+    return path.contains('/api/auth/refresh') ||
+        path.contains('/api/auth/logout') ||
+        path.contains('/api/auth/user/login') ||
+        path.contains('/api/auth/user/login-phone') ||
+        path.contains('/api/auth/admin/login') ||
+        path.contains('/api/auth/admin/login/front') ||
+        path.contains('/api/auth/manager/login') ||
+        path.contains('/api/auth/superadmin/login') ||
+        path.contains('/auth/refresh') ||
+        path.contains('/auth/logout') ||
+        path.contains('/auth/user/login') ||
+        path.contains('/auth/admin/login');
   }
 
-  String _normalizeToken(String token) {
-    final t = token.trim();
-    if (t.toLowerCase().startsWith('bearer ')) {
-      return t.substring(7).trim();
+  String _rawTokenFromAuthHeader(String auth) {
+    final value = auth.trim();
+
+    if (value.toLowerCase().startsWith('bearer ')) {
+      return value.substring(7).trim();
     }
-    return t;
+
+    return value;
+  }
+
+  String? _roleFromJwt(String rawJwt) {
+    try {
+      if (rawJwt.trim().isEmpty) return null;
+
+      final parts = rawJwt.split('.');
+
+      if (parts.length < 2) return null;
+
+      final payload = base64Url.normalize(parts[1]);
+      final decoded = utf8.decode(base64Url.decode(payload));
+      final map = jsonDecode(decoded);
+
+      if (map is! Map) return null;
+
+      return map['role']?.toString().toUpperCase().trim();
+    } catch (_) {
+      return null;
+    }
   }
 
   bool _isAdminRole(String? role) {
@@ -45,32 +68,6 @@ class RefreshTokenInterceptor extends Interceptor {
         role == 'STAFF';
   }
 
-  // 🔥 ADD AUTH HEADER BEFORE REQUEST
-  @override
-  Future<void> onRequest(
-    RequestOptions options,
-    RequestInterceptorHandler handler,
-  ) async {
-    try {
-      final role = await _roleStore.getRole();
-
-      String? token;
-
-      if (_isAdminRole(role)) {
-        token = await _adminStore.getToken();
-      } else {
-        token = await _userStore.getToken();
-      }
-
-      if (token != null && token.isNotEmpty) {
-        options.headers['Authorization'] = 'Bearer ${_normalizeToken(token)}';
-      }
-    } catch (_) {}
-
-    handler.next(options);
-  }
-
-  // 🔁 HANDLE 401 → REFRESH
   @override
   Future<void> onError(
     DioException err,
@@ -79,30 +76,44 @@ class RefreshTokenInterceptor extends Interceptor {
     final status = err.response?.statusCode ?? 0;
     final req = err.requestOptions;
 
-    // ❌ ignore non-401 or auth endpoints
+    // Refresh only for 401.
     if (status != 401 || _isAuthCall(req)) {
       return handler.next(err);
     }
 
-    // ❌ avoid infinite loop
+    // Avoid infinite retry loop.
     if (req.extra['__retried'] == true) {
       return handler.next(err);
     }
 
+    // If request had no auth token, refresh makes no sense.
+    final authHeader = (req.headers['Authorization'] ?? '').toString().trim();
+    final globalAuth = g.readAuthToken().trim();
+
+    final hadAuth = authHeader.isNotEmpty || globalAuth.isNotEmpty;
+
+    if (!hadAuth) {
+      return handler.next(err);
+    }
+
+    final raw = _rawTokenFromAuthHeader(
+      authHeader.isNotEmpty ? authHeader : globalAuth,
+    );
+
+    final role = _roleFromJwt(raw);
+    final isAdmin = _isAdminRole(role);
+
     try {
-      final role = await _roleStore.getRole();
-      final isAdmin = _isAdminRole(role);
+      final tenantId = g.ownerProjectLinkId;
 
-      late final String newToken;
-
-      if (isAdmin) {
-        newToken = await _refresh.refreshAdmin();
-      } else {
-        newToken = await _refresh.refreshUser();
-      }
+      final newToken = isAdmin
+          ? await _refresh.refreshAdmin(tenantId: tenantId)
+          : await _refresh.refreshUser(tenantId: tenantId);
 
       req.headers['Authorization'] =
-          'Bearer ${_normalizeToken(newToken)}';
+          newToken.toLowerCase().startsWith('bearer ')
+              ? newToken
+              : 'Bearer $newToken';
 
       req.extra['__retried'] = true;
 
@@ -113,12 +124,10 @@ class RefreshTokenInterceptor extends Interceptor {
       final shouldClear = _refresh.shouldClearAfterRefreshFailure(e);
 
       if (shouldClear) {
-        final role = await _roleStore.getRole();
-
-        if (_isAdminRole(role)) {
+        if (isAdmin) {
           await _adminStore.clear();
         } else {
-          await _userStore.clear();
+          await _userStore.clearToken();
         }
 
         g.setAuthToken('');

@@ -1,37 +1,21 @@
+// lib/features/auth/presentation/complete_profile/screens/complete_profile_screen.dart
+
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:baladiyati/app/app_router.dart';
 import 'package:baladiyati/common/registration_step_cubit.dart';
+import 'package:baladiyati/common/widgets/app_text_field.dart';
+import 'package:baladiyati/common/widgets/app_toast.dart';
+import 'package:baladiyati/common/widgets/primary_button.dart';
+import 'package:baladiyati/core/config/app_sizes.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
+import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:baladiyati/l10n/app_localizations.dart';
-import 'package:baladiyati/features/auth/presentation/login/screens/login_screen.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../bloc/complete_profile_bloc.dart';
-import '../bloc/complete_profile_event.dart';
-import '../bloc/complete_profile_state.dart';
-import '../../../data/services/auth_api_service.dart';
-import '../../../../../../core/config/app_sizes.dart';
-import '../../../../../../common/widgets/primary_button.dart';
-import '../../../../../../common/widgets/app_toast.dart';
-import '../../../../../../common/widgets/app_text_field.dart';
-
-class _Municipality {
-  final int id;
-  final String nameAr;
-  final String nameEn;
-  final String nameFr;
-
-  const _Municipality({
-    required this.id,
-    required this.nameAr,
-    required this.nameEn,
-    required this.nameFr,
-  });
-}
 
 class CompleteProfileScreen extends StatefulWidget {
   const CompleteProfileScreen({super.key});
@@ -42,255 +26,360 @@ class CompleteProfileScreen extends StatefulWidget {
 
 class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final _formKey = GlobalKey<FormState>();
+
+  final _firstNameCtrl = TextEditingController();
+  final _lastNameCtrl = TextEditingController();
   final _usernameCtrl = TextEditingController();
-  final _addressCtrl = TextEditingController();
+
   final _authApi = AuthApi(DioClient.build);
+  final _imagePicker = ImagePicker();
 
-  final List<_Municipality> _municipalities = const [
-    _Municipality(
-        id: 1, nameAr: 'بلدية بيروت', nameEn: 'Beirut', nameFr: 'Beyrouth'),
-    _Municipality(
-        id: 2, nameAr: 'بلدية طرابلس', nameEn: 'Tripoli', nameFr: 'Tripoli'),
-    _Municipality(
-        id: 3, nameAr: 'بلدية صيدا', nameEn: 'Sidon', nameFr: 'Saïda'),
-    _Municipality(id: 4, nameAr: 'بلدية صور', nameEn: 'Tyre', nameFr: 'Tyr'),
-    _Municipality(
-        id: 5, nameAr: 'بلدية زحلة', nameEn: 'Zahle', nameFr: 'Zahlé'),
-    _Municipality(
-        id: 6, nameAr: 'بلدية جونية', nameEn: 'Jounieh', nameFr: 'Jounieh'),
-    _Municipality(
-        id: 7, nameAr: 'بلدية بعلبك', nameEn: 'Baalbek', nameFr: 'Baalbek'),
-    _Municipality(
-        id: 8, nameAr: 'بلدية النبطية', nameEn: 'Nabatieh', nameFr: 'Nabatiyé'),
-  ];
-
-  _Municipality? _selectedMunicipality;
+  File? _selectedImage;
+  bool _isLoading = false;
 
   @override
   void dispose() {
+    _firstNameCtrl.dispose();
+    _lastNameCtrl.dispose();
     _usernameCtrl.dispose();
-    _addressCtrl.dispose();
     super.dispose();
   }
 
   Future<Map<String, dynamic>?> _getFromPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     final data = prefs.getString('register_body');
-    if (data == null) return null;
-    return jsonDecode(data) as Map<String, dynamic>;
+
+    if (data == null || data.trim().isEmpty) {
+      return null;
+    }
+
+    return Map<String, dynamic>.from(jsonDecode(data) as Map);
   }
 
-  Future<void> _onSubmit(BuildContext context, AppLocalizations l10n) async {
+  Future<void> _saveToPrefs(Map<String, dynamic> body) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('register_body', jsonEncode(body));
+  }
+
+  String _cleanError(Object e) {
+    return e.toString().replaceAll('Exception:', '').trim();
+  }
+
+  Future<void> _pickImage() async {
+    if (_isLoading) return;
+
+    final picked = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+      maxWidth: 900,
+      maxHeight: 900,
+    );
+
+    if (picked == null) return;
+
+    setState(() {
+      _selectedImage = File(picked.path);
+    });
+  }
+
+  Future<void> _onSubmit(AppLocalizations l10n) async {
+    if (_isLoading) return;
     if (!_formKey.currentState!.validate()) return;
 
-    if (_selectedMunicipality == null) {
-      AppToast.show(
-        context,
-        message: l10n.selectMunicipalityWarning,
-        type: AppToastType.error,
-      );
-      return;
-    }
+    setState(() => _isLoading = true);
 
     try {
       final body = await _getFromPrefs();
 
       if (body == null) {
-        AppToast.show(
-          context,
-          message: 'No saved registration data found',
-          type: AppToastType.error,
-        );
-        return;
+        throw Exception(l10n.missingRegistrationData);
       }
 
-      print('${body['userId']} ${body['fullName']} ${body['lastname']} ${_usernameCtrl.text}');
+      final pendingId = (body['pendingId'] ?? body['userId'] ?? '').toString();
+      final ownerProjectLinkId = (body['ownerProjectLinkId'] ?? '').toString();
+
+      if (pendingId.isEmpty || pendingId == 'null') {
+        throw Exception(l10n.missingUserIdVerifyAgain);
+      }
+
+      if (ownerProjectLinkId.isEmpty || ownerProjectLinkId == 'null') {
+        throw Exception(l10n.missingOwnerProjectLinkId);
+      }
+
+      final firstName = _firstNameCtrl.text.trim();
+      final lastName = _lastNameCtrl.text.trim();
+      final username = _usernameCtrl.text.trim();
+
       await _authApi.ownerCompleteProfile(
-        pendingId: body['userId'].toString(),
-        firstName: body['fullName'].toString(),
-        lastName: body['lastname'].toString(),
-        username: _usernameCtrl.text.trim(),
+        pendingId: pendingId,
+        firstName: firstName,
+        lastName: lastName,
+        username: username,
         isPublicProfile: false,
-        ownerProjectLinkId: body['ownerProjectLinkId'].toString(),
+        ownerProjectLinkId: ownerProjectLinkId,
+        profileImagePath: _selectedImage?.path,
       );
 
-      if (!context.mounted) return;
+      final updatedBody = {
+        ...body,
+        'firstName': firstName,
+        'lastName': lastName,
+        'username': username,
+        'profileImagePath': _selectedImage?.path,
+        'build4allProfileCompleted': true,
+      };
 
-      context.read<CompleteProfileBloc>().add(
-            CompleteProfileSubmitted(
-              username: _usernameCtrl.text.trim(),
-              address: _addressCtrl.text.trim(),
-            ),
-          );
+      await _saveToPrefs(updatedBody);
+
+      if (!mounted) return;
+
+      setState(() => _isLoading = false);
 
       context.read<RegistrationStepCubit>().nextStep();
 
-      AppRouter.goToWelcome(context);
+      AppToast.show(
+        context,
+        message: l10n.completeProfileSuccess,
+        type: AppToastType.success,
+      );
+
+      AppRouter.goToLogin(context);
     } catch (e) {
-      if (!context.mounted) return;
+      if (!mounted) return;
+
+      setState(() => _isLoading = false);
 
       AppToast.show(
         context,
-        message: 'Error: $e',
+        message: _cleanError(e),
         type: AppToastType.error,
       );
     }
   }
 
-  String _getMunicipalityName(_Municipality m, AppLocalizations l10n) {
-    if (l10n.localeName == 'ar') return m.nameAr;
-    if (l10n.localeName == 'fr') return m.nameFr;
-    return m.nameEn;
-  }
-
   @override
   Widget build(BuildContext context) {
-    return BlocProvider(
-      create: (_) => CompleteProfileBloc(authApi: AuthApiService()),
-      child: Builder(
-        builder: (context) {
-          return BlocConsumer<CompleteProfileBloc, CompleteProfileState>(
-            listener: (context, state) {
-              final l10n = AppLocalizations.of(context)!;
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
 
-              if (state.isSuccess) {
-                AppToast.show(
-                  context,
-                  message: l10n.completeProfileSuccess,
-                  type: AppToastType.success,
-                );
-
-                Future.delayed(const Duration(milliseconds: 500), () {
-                  if (!mounted) return;
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(builder: (_) => const LoginScreen()),
-                    (_) => false,
-                  );
-                });
-              }
-
-              if (state.errorMessage != null) {
-                AppToast.show(
-                  context,
-                  message: state.errorMessage!,
-                  type: AppToastType.error,
-                );
-              }
-            },
-            builder: (context, state) {
-              final l10n = AppLocalizations.of(context)!;
-              final theme = Theme.of(context);
-              final cs = theme.colorScheme;
-
-              return Scaffold(
-                backgroundColor: cs.background,
-                body: SafeArea(
-                  child: Column(
-                    children: [
-                      _buildHeader(context),
-                      Expanded(
-                        child: SingleChildScrollView(
-                          padding: const EdgeInsets.all(AppSizes.paddingLarge),
-                          child: Container(
-                            padding:
-                                const EdgeInsets.all(AppSizes.paddingLarge),
-                            decoration: BoxDecoration(
-                              color: cs.surface,
-                              borderRadius:
-                                  BorderRadius.circular(AppSizes.radiusLarge),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: cs.onSurface.withOpacity(0.07),
-                                  blurRadius: 20,
-                                  offset: const Offset(0, 4),
-                                ),
-                              ],
-                            ),
-                            child: Form(
-                              key: _formKey,
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.end,
-                                children: [
-                                  Center(
-                                    child: Text(
-                                      l10n.completeProfileTitle,
-                                      style:
-                                          theme.textTheme.titleLarge?.copyWith(
-                                        fontWeight: FontWeight.bold,
-                                        color: cs.onSurface,
-                                      ),
-                                    ),
-                                  ),
-                                  const SizedBox(height: 28),
-                                  AppTextField(
-                                    controller: _usernameCtrl,
-                                    label: l10n.usernameLabel,
-                                    hint: l10n.usernameHint,
-                                    icon: Icons.person_outline,
-                                    textAlign: TextAlign.right,
-                                    validator: (v) {
-                                      if (v == null || v.trim().isEmpty) {
-                                        return l10n.fieldRequired;
-                                      }
-                                      if (v.trim().length < 3) {
-                                        return l10n.usernameTooShort;
-                                      }
-                                      return null;
-                                    },
-                                  ),
-                                  const SizedBox(height: 16),
-                                  AppTextField(
-                                    controller: _addressCtrl,
-                                    label: l10n.addressLabel,
-                                    hint:
-                                        'Lebanon, Beirut, Building 5, Main Street',
-                                    icon: Icons.location_on_outlined,
-                                    textAlign: TextAlign.right,
-                                    validator: (v) {
-                                      if (v == null || v.trim().isEmpty) {
-                                        return l10n.fieldRequired;
-                                      }
-
-                                      final value = v.trim();
-
-                                      if (value.length < 10) {
-                                        return 'Address is too short';
-                                      }
-
-                                      if (!RegExp(r'^[a-zA-Z0-9 ,.\-]+$')
-                                          .hasMatch(value)) {
-                                        return 'Use only English letters, numbers, commas and dots';
-                                      }
-
-                                      if (value.split(',').length < 4) {
-                                        return 'Format: Country, City, Building, Street';
-                                      }
-
-                                      return null;
-                                    },
-                                  ),
-                                  const SizedBox(height: 16),
-                                  _municipalityDropdown(context, l10n),
-                                  const SizedBox(height: 28),
-                                  PrimaryButton(
-                                    label: l10n.completeProfileButton,
-                                    isLoading: state.isLoading,
-                                    onPressed: () => _onSubmit(context, l10n),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
+    return Scaffold(
+      backgroundColor: cs.background,
+      body: SafeArea(
+        child: Column(
+          children: [
+            _buildHeader(context),
+            Expanded(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(AppSizes.paddingLarge),
+                child: Container(
+                  padding: const EdgeInsets.all(AppSizes.paddingLarge),
+                  decoration: BoxDecoration(
+                    color: cs.surface,
+                    borderRadius: BorderRadius.circular(AppSizes.radiusLarge),
+                    boxShadow: [
+                      BoxShadow(
+                        color: cs.onSurface.withOpacity(0.07),
+                        blurRadius: 20,
+                        offset: const Offset(0, 4),
                       ),
                     ],
                   ),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Center(
+                          child: Text(
+                            l10n.completeProfileTitle,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: cs.onSurface,
+                            ),
+                          ),
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        _buildImagePicker(context),
+
+                        const SizedBox(height: 24),
+
+                        AppTextField(
+                          controller: _firstNameCtrl,
+                          label: l10n.firstNameLabel,
+                          hint: l10n.firstNameHint,
+                          icon: Icons.badge_outlined,
+                          textAlign: TextAlign.left,
+                          validator: (v) {
+                            final value = v?.trim() ?? '';
+
+                            if (value.isEmpty) {
+                              return l10n.fieldRequired;
+                            }
+
+                            if (value.length < 2) {
+                              return l10n.firstNameTooShort;
+                            }
+
+                            return null;
+                          },
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        AppTextField(
+                          controller: _lastNameCtrl,
+                          label: l10n.lastNameLabel,
+                          hint: l10n.lastNameHint,
+                          icon: Icons.badge_outlined,
+                          textAlign: TextAlign.left,
+                          validator: (v) {
+                            final value = v?.trim() ?? '';
+
+                            if (value.isEmpty) {
+                              return l10n.fieldRequired;
+                            }
+
+                            if (value.length < 2) {
+                              return l10n.lastNameTooShort;
+                            }
+
+                            return null;
+                          },
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        AppTextField(
+                          controller: _usernameCtrl,
+                          label: l10n.usernameLabel,
+                          hint: l10n.usernameHint,
+                          icon: Icons.person_outline,
+                          textAlign: TextAlign.left,
+                          validator: (v) {
+                            final value = v?.trim() ?? '';
+
+                            if (value.isEmpty) {
+                              return l10n.fieldRequired;
+                            }
+
+                            if (value.length < 3) {
+                              return l10n.usernameTooShort;
+                            }
+
+                            final usernameRegex = RegExp(r'^[a-zA-Z0-9_\.]+$');
+
+                            if (!usernameRegex.hasMatch(value)) {
+                              return l10n.usernameInvalidChars;
+                            }
+
+                            return null;
+                          },
+                        ),
+
+                        const SizedBox(height: 28),
+
+                        PrimaryButton(
+                          label: l10n.completeProfileButton,
+                          isLoading: _isLoading,
+                          onPressed: () {
+                            if (_isLoading) return;
+                            _onSubmit(l10n);
+                          },
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              );
-            },
-          );
-        },
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildImagePicker(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
+    return Center(
+      child: Column(
+        children: [
+          GestureDetector(
+            onTap: _isLoading ? null : _pickImage,
+            child: Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                CircleAvatar(
+                  radius: 52,
+                  backgroundColor: cs.primary.withOpacity(0.10),
+                  backgroundImage:
+                      _selectedImage != null ? FileImage(_selectedImage!) : null,
+                  child: _selectedImage == null
+                      ? Icon(
+                          Icons.person_outline,
+                          color: cs.primary,
+                          size: 46,
+                        )
+                      : null,
+                ),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: cs.primary,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: cs.surface,
+                      width: 2,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.camera_alt_outlined,
+                    size: 18,
+                    color: cs.onPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          TextButton(
+            onPressed: _isLoading ? null : _pickImage,
+            child: Text(
+              _selectedImage == null
+                  ? l10n.chooseProfileImage
+                  : l10n.changeProfileImage,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: cs.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+
+          if (_selectedImage != null)
+            TextButton(
+              onPressed: _isLoading
+                  ? null
+                  : () {
+                      setState(() {
+                        _selectedImage = null;
+                      });
+                    },
+              child: Text(
+                l10n.removeProfileImage,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: cs.error,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
@@ -309,8 +398,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           GestureDetector(
-            onTap: () => Navigator.pop(context),
-            child: Icon(Icons.arrow_back_ios_new, color: cs.onSurface),
+            onTap: _isLoading ? null : () => Navigator.pop(context),
+            child: Icon(
+              Icons.arrow_back_ios_new,
+              color: cs.onSurface,
+            ),
           ),
           Text(
             l10n.appTitle,
@@ -321,59 +413,6 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           ),
         ],
       ),
-    );
-  }
-
-  Widget _municipalityDropdown(BuildContext context, AppLocalizations l10n) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          l10n.municipalityLabel,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: cs.onSurface,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 8),
-        DropdownButtonFormField<_Municipality>(
-          value: _selectedMunicipality,
-          isExpanded: true,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: cs.surface,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
-            ),
-          ),
-          hint: Text(
-            l10n.selectMunicipality,
-            style: theme.textTheme.bodyMedium?.copyWith(color: cs.outline),
-          ),
-          dropdownColor: cs.surface,
-          items: _municipalities
-              .map(
-                (m) => DropdownMenuItem(
-                  value: m,
-                  child: Text(
-                    _getMunicipalityName(m, l10n),
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: cs.onSurface,
-                    ),
-                  ),
-                ),
-              )
-              .toList(),
-          onChanged: (val) => setState(() => _selectedMunicipality = val),
-          validator: (val) {
-            if (val == null) return l10n.selectMunicipalityWarning;
-            return null;
-          },
-        ),
-      ],
     );
   }
 }

@@ -9,12 +9,11 @@ import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/common/widgets/primary_button.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
-import 'package:flutter/material.dart';
+import 'package:baladiyati/features/auth/data/services/auth_api_service.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-
-import '../../../../../features/auth/data/services/auth_api_service.dart';
 
 class UserVerifyCodeScreen extends StatefulWidget {
   final String email;
@@ -31,14 +30,19 @@ class UserVerifyCodeScreen extends StatefulWidget {
   });
 
   @override
-  State<UserVerifyCodeScreen> createState() => _OtpScreenState();
+  State<UserVerifyCodeScreen> createState() => _UserVerifyCodeScreenState();
 }
 
-class _OtpScreenState extends State<UserVerifyCodeScreen> {
-  final List<TextEditingController> _controllers =
-      List.generate(6, (_) => TextEditingController());
+class _UserVerifyCodeScreenState extends State<UserVerifyCodeScreen> {
+  final List<TextEditingController> _controllers = List.generate(
+    6,
+    (_) => TextEditingController(),
+  );
 
-  final List<FocusNode> _focusNodes = List.generate(6, (_) => FocusNode());
+  final List<FocusNode> _focusNodes = List.generate(
+    6,
+    (_) => FocusNode(),
+  );
 
   final _authApi = AuthApi(DioClient.build);
 
@@ -57,8 +61,55 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
     super.dispose();
   }
 
+  Future<void> _saveVerifiedUserToPrefs({
+    required int userId,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    final existing = prefs.getString('register_body');
+
+    final Map<String, dynamic> oldBody = existing != null
+        ? Map<String, dynamic>.from(jsonDecode(existing) as Map)
+        : <String, dynamic>{};
+
+    final body = {
+      ...oldBody,
+      'email': widget.email,
+      'sharedReference': widget.sharedReference,
+      'ownerProjectLinkId': widget.ownerProjectLinkId,
+      'otpVerified': true,
+
+      // Keep both keys because different screens/services may use either one.
+      'userId': userId,
+      'pendingId': userId,
+    };
+
+    await prefs.setString('register_body', jsonEncode(body));
+  }
+
+  int? _extractUserId(dynamic responseData) {
+    if (responseData is! Map) return null;
+
+    final user = responseData['user'];
+
+    if (user is Map && user['id'] != null) {
+      return int.tryParse(user['id'].toString());
+    }
+
+    if (responseData['id'] != null) {
+      return int.tryParse(responseData['id'].toString());
+    }
+
+    if (responseData['userId'] != null) {
+      return int.tryParse(responseData['userId'].toString());
+    }
+
+    return null;
+  }
+
   Future<void> _verify(AppLocalizations l10n) async {
-    final code = _controllers.map((c) => c.text).join();
+    if (_isLoading) return;
+
+    final code = _controllers.map((controller) => controller.text.trim()).join();
 
     if (code.length < 6) {
       AppToast.show(
@@ -77,28 +128,18 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
         code: code,
       );
 
-      final int? id = response.data['user']['id'];
+      final userId = _extractUserId(response.data);
 
-      final prefs = await SharedPreferences.getInstance();
-      final existing = prefs.getString('register_body');
+      if (userId == null || userId <= 0) {
+       throw Exception(l10n.verificationUserIdMissing);
+      }
 
-      Map<String, dynamic> body =
-          existing != null ? jsonDecode(existing) : {};
-
-      body = {
-        ...body,
-        'email': widget.email,
-        'sharedReference': widget.sharedReference,
-        'ownerProjectLinkId': widget.ownerProjectLinkId,
-        'otpVerified': true,
-        'userId': id,
-      };
-
-      await prefs.setString('register_body', jsonEncode(body));
+      await _saveVerifiedUserToPrefs(userId: userId);
 
       if (!mounted) return;
 
       setState(() => _isLoading = false);
+
       context.read<RegistrationStepCubit>().nextStep();
 
       AppToast.show(
@@ -120,6 +161,17 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
         message: msg,
         type: AppToastType.error,
       );
+    }
+  }
+
+  void _handleOtpChanged(String value, int index) {
+    if (value.isNotEmpty && index < 5) {
+      _focusNodes[index + 1].requestFocus();
+      return;
+    }
+
+    if (value.isEmpty && index > 0) {
+      _focusNodes[index - 1].requestFocus();
     }
   }
 
@@ -209,6 +261,7 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
                                 textAlign: TextAlign.center,
                                 maxLength: 1,
                                 keyboardType: TextInputType.number,
+                                enabled: !_isLoading,
                                 decoration: InputDecoration(
                                   counterText: '',
                                   enabledBorder: OutlineInputBorder(
@@ -224,13 +277,15 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
                                       width: 2,
                                     ),
                                   ),
+                                  disabledBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(10),
+                                    borderSide: BorderSide(
+                                      color: cs.outline.withOpacity(0.20),
+                                    ),
+                                  ),
                                 ),
                                 onChanged: (value) {
-                                  if (value.isNotEmpty && index < 5) {
-                                    _focusNodes[index + 1].requestFocus();
-                                  } else if (value.isEmpty && index > 0) {
-                                    _focusNodes[index - 1].requestFocus();
-                                  }
+                                  _handleOtpChanged(value, index);
                                 },
                               ),
                             );
@@ -243,7 +298,10 @@ class _OtpScreenState extends State<UserVerifyCodeScreen> {
                       PrimaryButton(
                         label: l10n.verifyButton,
                         isLoading: _isLoading,
-                        onPressed: () => _verify(l10n),
+                        onPressed: () {
+                          if (_isLoading) return;
+                          _verify(l10n);
+                        },
                       ),
                     ],
                   ),
