@@ -248,12 +248,8 @@
   "fixed": "Fixe",
   "notFixed": "Non fixe",
   "addDepartmentButton": "Ajouter le département",
-  "department": "Département"
+  "department": "Département",
 
-
-
-
-}
 
   "continueAsCitizen": "Continuer comme citoyen",
   "continueAsAdmin": "Continuer comme administrateur",

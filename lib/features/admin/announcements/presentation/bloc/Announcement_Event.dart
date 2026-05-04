@@ -9,3 +9,19 @@ class CreateAnnouncementEvent extends AnnouncementEvent {
 
   CreateAnnouncementEvent(this.announcement);
 }
+
+class UpdateAnnouncementEvent extends AnnouncementEvent {
+  final int id;
+  final Announcement announcement;
+
+  UpdateAnnouncementEvent({
+    required this.id,
+    required this.announcement,
+  });
+}
+
+class DeleteAnnouncementEvent extends AnnouncementEvent {
+  final int id;
+
+  DeleteAnnouncementEvent(this.id);
+}
