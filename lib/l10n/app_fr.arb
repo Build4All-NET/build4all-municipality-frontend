@@ -300,6 +300,14 @@
   "notFixed": "Non fixe",
   "addDepartmentButton": "Ajouter le département",
   "department": "Département",
+<<<<<<< feature/admin-announcements-violations
+
+
+  "continueAsCitizen": "Continuer comme citoyen",
+  "continueAsAdmin": "Continuer comme administrateur",
+  "loginFailed": "Échec de la connexion",
+  "firstNameLabel": "Prénom",
+=======
   
   "edit": "Modifier",
   "delete": "Supprimer",
@@ -328,6 +336,7 @@
 
 
  "firstNameLabel": "Prénom",
+>>>>>>> main
   "firstNameHint": "Entrez votre prénom",
   "lastNameLabel": "Nom",
   "lastNameHint": "Entrez votre nom",

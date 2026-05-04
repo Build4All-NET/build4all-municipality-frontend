@@ -1,35 +1,41 @@
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/admin/violations/data/model/ViolationModel.dart';
+import 'package:dio/dio.dart';
 
 class ViolationApiService {
-  final dio = DioClient.muni;
+  final Dio dio;
 
-  /// ✅ CREATE
-  Future<void> createViolation(ViolationModel violation) async {
-    try {
-      final response = await dio.post(
-        "/admin/violations/create",
-        data: violation.toJson(),
-      );
+  ViolationApiService({Dio? dio}) : dio = dio ?? DioClient.muni;
 
-      print("SUCCESS: ${response.data}");
-    } catch (e) {
-      print("ERROR API: $e");
-      rethrow;
+  Future<List<ViolationModel>> getAllViolations() async {
+    final response = await dio.get('/api/violations/all');
+
+    final data = response.data;
+
+    if (data is! List) {
+      throw Exception('Invalid violations response');
     }
+
+    return data
+        .map((e) => ViolationModel.fromJson(Map<String, dynamic>.from(e)))
+        .toList();
   }
 
-  /// ✅ GET ALL
-  Future<List<ViolationModel>> getAllViolations() async {
-    try {
-      final response = await dio.get("/admin/violations/all");
+  Future<void> createViolation(ViolationModel violation) async {
+    await dio.post(
+      '/api/admin/violations/create',
+      data: violation.toJson(),
+    );
+  }
 
-      return (response.data as List)
-          .map((e) => ViolationModel.fromJson(e))
-          .toList();
-    } catch (e) {
-      print("ERROR GET: $e");
-      rethrow;
-    }
+  Future<void> updateViolation(int id, ViolationModel violation) async {
+    await dio.put(
+      '/api/admin/violations/$id',
+      data: violation.toJson(),
+    );
+  }
+
+  Future<void> deleteViolation(int id) async {
+    await dio.delete('/api/admin/violations/$id');
   }
 }

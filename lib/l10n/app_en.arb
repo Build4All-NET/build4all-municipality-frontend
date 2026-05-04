@@ -302,7 +302,7 @@
   "notFixed": "Not Fixed",
   "addDepartmentButton": "Add Department",
   "department": "Department",
-  
+
   "edit": "Edit",
   "delete": "Delete",
   "update": "Update",
@@ -324,8 +324,7 @@
   "employee": "Employee",
   "police": "Police Officer",
   "engineer": "Engineer",
-  "accountant": "Accountant"
-
+  "accountant": "Accountant",
 
 
 

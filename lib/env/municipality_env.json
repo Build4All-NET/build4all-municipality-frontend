@@ -1,7 +1,12 @@
 {
 
+<<<<<<< feature/admin-announcements-violations
+    "API_BASE_URL": "http://192.168.1.8:8090",
+    "OVERRIDE_BASE_URL": "http://192.168.1.8:8093",
+=======
     "API_BASE_URL": "http://192.168.0.117:8081",
     "OVERRIDE_BASE_URL": "http://192.168.0.117:8091",
+>>>>>>> main
 
     "API_BASE_URL": "http://192.168.1.7:8081",
     "OVERRIDE_BASE_URL": "http://192.168.1.7:8093",

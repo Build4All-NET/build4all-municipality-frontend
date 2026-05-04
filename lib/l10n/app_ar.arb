@@ -299,6 +299,8 @@
   "notFixed": "غير ثابت",
   "addDepartmentButton": "إضافة القسم",
   "department": "القسم",
+<<<<<<< feature/admin-announcements-violations
+=======
   
   "edit": "تعديل",
   "delete": "حذف",
@@ -325,6 +327,7 @@
 
 
 
+>>>>>>> main
 
 
 
