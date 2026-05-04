@@ -33,7 +33,10 @@ dependencies:
 
   # UI
   cupertino_icons: ^1.0.2
-  image_picker: ^1.0.4  # <--- Added here
+
+  # File Upload ← NEW
+  image_picker: ^1.0.4
+  file_picker: ^8.0.0
 
 dev_dependencies:
   flutter_test:
@@ -52,6 +55,7 @@ flutter_native_splash:
   image: assets/branding/logo.png
   android: true
   ios: true
+
   android_12:
     color: "#FFFFFF"
     image: assets/branding/logo.png
