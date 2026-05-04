@@ -1,10 +1,13 @@
 // lib/features/citizen/services/presentation/screens/new_request_screen.dart
 
+import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/features/citizen/services/data/models/request_submission.dart';
 import 'package:baladiyati/features/citizen/services/data/services/request_service.dart';
+import 'package:baladiyati/features/citizen/services/data/services/file_upload_service.dart';
 import 'services_by_category_screen.dart';
 
 class NewRequestScreen extends StatefulWidget {
@@ -22,9 +25,12 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
   final _locationCtrl = TextEditingController();
 
   final _requestService = RequestService();
+  final _fileUploadService = FileUploadService();
+  final _imagePicker = ImagePicker();
 
   bool _isLoading = false;
-  int _fileCount = 0;
+  bool _isUploading = false;
+  List<File> _selectedFiles = [];
 
   @override
   void dispose() {
@@ -34,13 +40,75 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
     super.dispose();
   }
 
+  // ── Pick files (images or any file) ──────────────────────────────────────
+  Future<void> _pickFiles() async {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.camera_alt_outlined),
+              title: const Text('Take Photo'),
+              onTap: () async {
+                Navigator.pop(context);
+                final picked = await _imagePicker.pickImage(
+                  source: ImageSource.camera,
+                  imageQuality: 80,
+                );
+                if (picked != null) {
+                  setState(() => _selectedFiles.add(File(picked.path)));
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.photo_library_outlined),
+              title: const Text('Choose from Gallery'),
+              onTap: () async {
+                Navigator.pop(context);
+                final picked = await _imagePicker.pickMultiImage(
+                  imageQuality: 80,
+                );
+                if (picked.isNotEmpty) {
+                  setState(() {
+                    _selectedFiles.addAll(
+                      picked.map((xf) => File(xf.path)),
+                    );
+                  });
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _removeFile(int index) {
+    setState(() => _selectedFiles.removeAt(index));
+  }
+
+  // ── Submit: upload files first, then submit request ───────────────────────
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
     try {
-      await _requestService.submitRequest(
+      // ── Step 1: Upload files if any ───────────────────────────────────────
+      List<String> uploadedUrls = [];
+      if (_selectedFiles.isNotEmpty) {
+        setState(() => _isUploading = true);
+        uploadedUrls = await _fileUploadService.uploadFiles(_selectedFiles);
+        setState(() => _isUploading = false);
+      }
+
+      // ── Step 2: Submit request with file URLs ─────────────────────────────
+         await _requestService.submitRequest(
         serviceId: widget.service.id,
         submission: RequestSubmission(
           title: _titleCtrl.text.trim(),
@@ -48,12 +116,15 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
           addressText: _locationCtrl.text.trim().isEmpty
               ? null
               : _locationCtrl.text.trim(),
+          attachmentUrls: uploadedUrls.isEmpty ? null : uploadedUrls, // ← changed from attachments
         ),
       );
 
+
+
       if (!mounted) return;
 
-      // ── Green success dialog ──────────────────────────────────────────────
+      // ── Step 3: Show success dialog ───────────────────────────────────────
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -110,10 +181,9 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
           ),
         ),
       );
-      // ─────────────────────────────────────────────────────────────────────
     } catch (e) {
       if (!mounted) return;
-
+      setState(() => _isUploading = false);
       AppToast.show(
         context,
         message: e.toString().replaceAll('Exception:', '').trim(),
@@ -273,6 +343,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
+                            // Required docs list
                             ...s.requiredDocs.map((doc) => Padding(
                                   padding:
                                       const EdgeInsets.only(bottom: 4),
@@ -293,9 +364,59 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                                 )),
                             const SizedBox(height: 12),
 
+                            // Selected files preview
+                            if (_selectedFiles.isNotEmpty) ...[
+                              SizedBox(
+                                height: 80,
+                                child: ListView.builder(
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: _selectedFiles.length,
+                                  itemBuilder: (_, i) => Stack(
+                                    children: [
+                                      Container(
+                                        margin: const EdgeInsets.only(
+                                            right: 8),
+                                        width: 80,
+                                        height: 80,
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(8),
+                                          image: DecorationImage(
+                                            image: FileImage(
+                                                _selectedFiles[i]),
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        top: 0,
+                                        right: 8,
+                                        child: GestureDetector(
+                                          onTap: () => _removeFile(i),
+                                          child: Container(
+                                            decoration:
+                                                const BoxDecoration(
+                                              color: Colors.red,
+                                              shape: BoxShape.circle,
+                                            ),
+                                            child: const Icon(
+                                              Icons.close,
+                                              color: Colors.white,
+                                              size: 16,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 12),
+                            ],
+
+                            // Upload area
                             GestureDetector(
-                              onTap: () =>
-                                  setState(() => _fileCount++),
+                              onTap: _isLoading ? null : _pickFiles,
                               child: Container(
                                 width: double.infinity,
                                 padding: const EdgeInsets.all(20),
@@ -322,29 +443,47 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                                       ],
                                     ),
                                     const SizedBox(height: 8),
-                                    Text(l10n.tapToUpload,
-                                        style: const TextStyle(
-                                            fontWeight:
-                                                FontWeight.w500)),
+                                    Text(
+                                      _selectedFiles.isEmpty
+                                          ? l10n.tapToUpload
+                                          : '${_selectedFiles.length} ${l10n.filesSelected}',
+                                      style: TextStyle(
+                                        fontWeight: FontWeight.w500,
+                                        color: _selectedFiles.isEmpty
+                                            ? Colors.black
+                                            : Colors.green,
+                                      ),
+                                    ),
                                     const SizedBox(height: 4),
                                     Text(l10n.pdfOrImages,
                                         style: const TextStyle(
                                             fontSize: 11,
                                             color: Colors.grey)),
-                                    if (_fileCount > 0) ...[
-                                      const SizedBox(height: 8),
-                                      Text(
-                                        '$_fileCount ${l10n.filesSelected}',
-                                        style: const TextStyle(
-                                            color: Colors.green,
-                                            fontWeight:
-                                                FontWeight.w500),
-                                      ),
-                                    ],
                                   ],
                                 ),
                               ),
                             ),
+
+                            // Uploading indicator
+                            if (_isUploading) ...[
+                              const SizedBox(height: 12),
+                              const Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 16,
+                                    height: 16,
+                                    child: CircularProgressIndicator(
+                                        strokeWidth: 2),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text('Uploading files...',
+                                      style: TextStyle(
+                                          color: Colors.grey)),
+                                ],
+                              ),
+                            ],
                           ],
                         ),
                       ),

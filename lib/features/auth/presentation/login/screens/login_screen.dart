@@ -61,17 +61,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Map<String, dynamic> _extractUserMap(DualLoginResult dual) {
     final data = dual.userData;
-
-    if (data == null) {
-      return <String, dynamic>{};
-    }
-
+    if (data == null) return <String, dynamic>{};
     final user = data['user'];
-
-    if (user is Map) {
-      return Map<String, dynamic>.from(user);
-    }
-
+    if (user is Map) return Map<String, dynamic>.from(user);
     return <String, dynamic>{};
   }
 
@@ -79,75 +71,36 @@ class _LoginScreenState extends State<LoginScreen> {
     return int.tryParse(userMap['id']?.toString() ?? '') ?? 0;
   }
 
-  String _municipalityProfileCompletedKey({
-    required int ownerProjectLinkId,
-    required int userId,
-  }) {
+  String _municipalityProfileCompletedKey({required int ownerProjectLinkId, required int userId}) {
     return 'municipality_profile_completed_${ownerProjectLinkId}_$userId';
   }
 
-  Future<bool> _isMunicipalityProfileCompleted({
-    required int ownerProjectLinkId,
-    required int userId,
-  }) async {
-    if (ownerProjectLinkId <= 0 || userId <= 0) {
-      return false;
-    }
-
+  Future<bool> _isMunicipalityProfileCompleted({required int ownerProjectLinkId, required int userId}) async {
+    if (ownerProjectLinkId <= 0 || userId <= 0) return false;
     final prefs = await SharedPreferences.getInstance();
-
-    return prefs.getBool(
-          _municipalityProfileCompletedKey(
-            ownerProjectLinkId: ownerProjectLinkId,
-            userId: userId,
-          ),
-        ) ??
-        false;
+    return prefs.getBool(_municipalityProfileCompletedKey(ownerProjectLinkId: ownerProjectLinkId, userId: userId)) ?? false;
   }
 
-  Future<void> _saveCitizenSession({
-    required DualLoginResult dual,
-    required Map<String, dynamic> userMap,
-  }) async {
+  Future<void> _saveCitizenSession({required DualLoginResult dual, required Map<String, dynamic> userMap}) async {
     final token = dual.userToken;
-
-    if (token == null || token.trim().isEmpty) {
-      throw Exception('Missing user token.');
-    }
-
+    if (token == null || token.trim().isEmpty) throw Exception('Missing user token.');
     await AdminTokenStore().clear();
-
     await JwtStore.save(token);
-
     await SessionRoleStore().saveRole('CITIZEN');
-
     await AuthTokenStore().saveToken(
       token: token,
       refreshToken: dual.userRefreshToken,
       tenantId: ownerProjectLinkId.toString(),
       userJson: userMap,
     );
-
     DioClient.setAuthToken(token);
   }
 
-  Future<void> _goAfterCitizenLogin({
-    required DualLoginResult dual,
-    required String email,
-  }) async {
+  Future<void> _goAfterCitizenLogin({required DualLoginResult dual, required String email}) async {
     final userMap = _extractUserMap(dual);
     final userId = _extractUserId(userMap);
-
-    await _saveCitizenSession(
-      dual: dual,
-      userMap: userMap,
-    );
-
-    final completed = await _isMunicipalityProfileCompleted(
-      ownerProjectLinkId: ownerProjectLinkId,
-      userId: userId,
-    );
-
+    await _saveCitizenSession(dual: dual, userMap: userMap);
+    final completed = await _isMunicipalityProfileCompleted(ownerProjectLinkId: ownerProjectLinkId, userId: userId);
     if (!mounted) return;
 
     if (!completed) {
@@ -173,66 +126,42 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
+  // FIX: Fixed the misplaced try-catch and routing logic here
   Future<void> _goAfterAdminLogin(DualLoginResult dual) async {
-    if (dual.admin == null) {
-      throw Exception('Missing admin login data.');
+    try {
+      if (dual.admin == null) throw Exception('Missing admin login data.');
+
+      await AuthTokenStore().clear();
+      await JwtStore.clear();
+      await SessionRoleStore().saveRole(dual.admin!.role);
+
+      await AdminTokenStore().save(
+        token: dual.admin!.token,
+        role: dual.admin!.role,
+        refreshToken: dual.admin!.refreshToken,
+        tenantId: ownerProjectLinkId.toString(),
+      );
+
+      if (!mounted) return;
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (_) => DashboardPage()),
+        (_) => false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+      AppToast.show(context, message: _cleanError(e), type: AppToastType.error);
     }
-
-    await AuthTokenStore().clear();
-    await JwtStore.clear();
-
-    await SessionRoleStore().saveRole(dual.admin!.role);
-
-    await AdminTokenStore().save(
-      token: dual.admin!.token,
-      role: dual.admin!.role,
-      refreshToken: dual.admin!.refreshToken,
-      tenantId: ownerProjectLinkId.toString(),
-    );
-
-
-    // ✅ ADMIN ONLY
-    if (dual.adminOk) {
-  await JwtStore.clear(); 
-
-  await AdminTokenStore().save(
-    token: dual.admin!.token,
-    role: dual.admin!.role,
-    refreshToken: dual.admin!.refreshToken,
-    tenantId: ownerProjectLinkId.toString(),
-  );
-
-  Navigator.pushAndRemoveUntil(
-    context,
-    MaterialPageRoute(
-      builder: (_) =>  DashboardPage(),
-    ),
-    (_) => false,
-  );
-  return;
-}
-  } catch (e) {
-
-    if (!mounted) return;
-
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const AdminDashboardPlaceholderScreen(),
-      ),
-      (_) => false,
-    );
   }
 
   Future<void> _onLoginPressed(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
-
     if (_isLoading) return;
     if (!_formKey.currentState!.validate()) return;
 
     final email = _emailCtrl.text.trim();
     final password = _passwordCtrl.text.trim();
-
     setState(() => _isLoading = true);
 
     try {
@@ -248,11 +177,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (!mounted) return;
 
       if (dual.none) {
-        AppToast.show(
-          context,
-          message: dual.error ?? l10n.loginFailed,
-          type: AppToastType.error,
-        );
+        AppToast.show(context, message: dual.error ?? l10n.loginFailed, type: AppToastType.error);
         return;
       }
 
@@ -263,10 +188,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       if (dual.userOk) {
-        await _goAfterCitizenLogin(
-          dual: dual,
-          email: email,
-        );
+        await _goAfterCitizenLogin(dual: dual, email: email);
         return;
       }
 
@@ -276,16 +198,9 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     } catch (e) {
       if (!mounted) return;
-
-      AppToast.show(
-        context,
-        message: _cleanError(e),
-        type: AppToastType.error,
-      );
+      AppToast.show(context, message: _cleanError(e), type: AppToastType.error);
     } finally {
-      if (mounted) {
-        setState(() => _isLoading = false);
-      }
+      if (mounted) setState(() => _isLoading = false);
     }
   }
 
@@ -297,9 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: cs.surface,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
+      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(20))),
       builder: (_) {
         return SafeArea(
           child: Padding(
@@ -309,100 +222,38 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 Text(
                   l10n.chooseHowToContinue,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: cs.onSurface,
-                  ),
+                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold, color: cs.onSurface),
                 ),
-
                 const SizedBox(height: 20),
-
                 ListTile(
                   leading: Icon(Icons.person, color: cs.primary),
-                  title: Text(
-                    l10n.continueAsCitizen,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: cs.onSurface,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
+                  title: Text(l10n.continueAsCitizen, style: theme.textTheme.bodyMedium?.copyWith(color: cs.onSurface, fontWeight: FontWeight.w600)),
                   onTap: () async {
                     Navigator.pop(context);
-
                     setState(() => _isLoading = true);
-
                     try {
-                      await _goAfterCitizenLogin(
-                        dual: dual,
-                        email: _emailCtrl.text.trim(),
-                      );
+                      await _goAfterCitizenLogin(dual: dual, email: _emailCtrl.text.trim());
                     } catch (e) {
                       if (!mounted) return;
-
-                      AppToast.show(
-                        context,
-                        message: _cleanError(e),
-                        type: AppToastType.error,
-                      );
+                      AppToast.show(context, message: _cleanError(e), type: AppToastType.error);
                     } finally {
-                      if (mounted) {
-                        setState(() => _isLoading = false);
-                      }
+                      if (mounted) setState(() => _isLoading = false);
                     }
                   },
                 ),
-
-                onTap: () async {
-                  Navigator.pop(context);
-
-                 await AuthTokenStore().clear();
-await JwtStore.clear();
-await SessionRoleStore().saveRole(dual.admin!.role);
-
-await AdminTokenStore().save(
-  token: dual.admin!.token,
-  role: dual.admin!.role,
-  refreshToken: dual.admin!.refreshToken,
-  tenantId: ownerProjectLinkId.toString(),
-);
-
-                  if (!mounted) return;
-
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) =>  DashboardPage(),
-
-
                 ListTile(
                   leading: Icon(Icons.admin_panel_settings, color: cs.primary),
-                  title: Text(
-                    l10n.continueAsAdmin,
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: cs.onSurface,
-                      fontWeight: FontWeight.w600,
-
-                    ),
-                  ),
+                  title: Text(l10n.continueAsAdmin, style: theme.textTheme.bodyMedium?.copyWith(color: cs.onSurface, fontWeight: FontWeight.w600)),
                   onTap: () async {
                     Navigator.pop(context);
-
                     setState(() => _isLoading = true);
-
                     try {
                       await _goAfterAdminLogin(dual);
                     } catch (e) {
                       if (!mounted) return;
-
-                      AppToast.show(
-                        context,
-                        message: _cleanError(e),
-                        type: AppToastType.error,
-                      );
+                      AppToast.show(context, message: _cleanError(e), type: AppToastType.error);
                     } finally {
-                      if (mounted) {
-                        setState(() => _isLoading = false);
-                      }
+                      if (mounted) setState(() => _isLoading = false);
                     }
                   },
                 ),
@@ -416,12 +267,11 @@ await AdminTokenStore().save(
 
   @override
   Widget build(BuildContext context) {
+    // ... Keeping your build method as is since it was mostly correct ...
     final l10n = AppLocalizations.of(context)!;
-
     final themeState = context.watch<ThemeCubit>().state;
     final colors = themeState.tokens.colors;
     final card = themeState.tokens.card;
-
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
@@ -433,72 +283,30 @@ await AdminTokenStore().save(
             const SizedBox(height: 20),
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSizes.paddingLarge,
-                ),
+                padding: const EdgeInsets.symmetric(horizontal: AppSizes.paddingLarge),
                 child: Container(
                   padding: EdgeInsets.all(card.padding),
-                  decoration: BoxDecoration(
-                    color: colors.surface,
-                    borderRadius: BorderRadius.circular(card.radius),
-                  ),
+                  decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(card.radius)),
                   child: Form(
                     key: _formKey,
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Center(
-                          child: Text(
-                            l10n.loginTitle,
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: cs.onSurface,
-                            ),
-                          ),
-                        ),
-
+                        Center(child: Text(l10n.loginTitle, style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold, color: cs.onSurface))),
                         const SizedBox(height: 8),
-
-                        Center(
-                          child: Text(
-                            l10n.loginSubtitle,
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: cs.outline,
-                            ),
-                          ),
-                        ),
-
+                        Center(child: Text(l10n.loginSubtitle, textAlign: TextAlign.center, style: theme.textTheme.bodySmall?.copyWith(color: cs.outline))),
                         const SizedBox(height: 24),
-
                         Container(
                           height: 50,
-                          decoration: BoxDecoration(
-                            color: cs.surfaceVariant,
-                            borderRadius: BorderRadius.circular(14),
-                          ),
+                          decoration: BoxDecoration(color: cs.surfaceVariant, borderRadius: BorderRadius.circular(14)),
                           child: Row(
                             children: [
-                              _roleTab(
-                                context,
-                                l10n.employee,
-                                Icons.badge_outlined,
-                                !isCitizen,
-                                () => setState(() => isCitizen = false),
-                              ),
-                              _roleTab(
-                                context,
-                                l10n.citizen,
-                                Icons.person_outline,
-                                isCitizen,
-                                () => setState(() => isCitizen = true),
-                              ),
+                              _roleTab(context, l10n.employee, Icons.badge_outlined, !isCitizen, () => setState(() => isCitizen = false)),
+                              _roleTab(context, l10n.citizen, Icons.person_outline, isCitizen, () => setState(() => isCitizen = true)),
                             ],
                           ),
                         ),
-
                         const SizedBox(height: 20),
-
                         AppTextField(
                           controller: _emailCtrl,
                           label: l10n.emailLabel,
@@ -506,19 +314,9 @@ await AdminTokenStore().save(
                           icon: Icons.email_outlined,
                           keyboardType: TextInputType.emailAddress,
                           textAlign: TextAlign.left,
-                          validator: (v) {
-                            final value = v?.trim() ?? '';
-
-                            if (value.isEmpty) {
-                              return l10n.fieldRequired;
-                            }
-
-                            return null;
-                          },
+                          validator: (v) => (v?.trim().isEmpty ?? true) ? l10n.fieldRequired : null,
                         ),
-
                         const SizedBox(height: 16),
-
                         AppTextField(
                           controller: _passwordCtrl,
                           label: l10n.passwordLabel,
@@ -527,96 +325,32 @@ await AdminTokenStore().save(
                           obscureText: _obscurePassword,
                           textAlign: TextAlign.left,
                           suffixIcon: IconButton(
-                            onPressed: _isLoading
-                                ? null
-                                : () {
-                                    setState(() {
-                                      _obscurePassword = !_obscurePassword;
-                                    });
-                                  },
-                            icon: Icon(
-                              _obscurePassword
-                                  ? Icons.visibility_off_outlined
-                                  : Icons.visibility_outlined,
-                              color: cs.primary,
-                            ),
+                            onPressed: _isLoading ? null : () => setState(() => _obscurePassword = !_obscurePassword),
+                            icon: Icon(_obscurePassword ? Icons.visibility_off_outlined : Icons.visibility_outlined, color: cs.primary),
                           ),
-                          validator: (v) {
-                            final value = v?.trim() ?? '';
-
-                            if (value.isEmpty) {
-                              return l10n.fieldRequired;
-                            }
-
-                            return null;
-                          },
+                          validator: (v) => (v?.trim().isEmpty ?? true) ? l10n.fieldRequired : null,
                         ),
-
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
-                            onPressed: _isLoading
-                                ? null
-                                : () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) =>
-                                            const ResetPasswordPage(),
-                                      ),
-                                    );
-                                  },
-                            child: Text(
-                              l10n.forgotPassword,
-                              style: TextStyle(
-                                color: cs.primary,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
+                            onPressed: _isLoading ? null : () => Navigator.push(context, MaterialPageRoute(builder: (_) => const ResetPasswordPage())),
+                            child: Text(l10n.forgotPassword, style: TextStyle(color: cs.primary, fontWeight: FontWeight.w600)),
                           ),
                         ),
-
                         PrimaryButton(
                           label: l10n.loginButton,
                           isLoading: _isLoading,
-                          onPressed: () {
-                            if (_isLoading) return;
-                            _onLoginPressed(context);
-                          },
+                          onPressed: () => _onLoginPressed(context),
                         ),
-
                         const SizedBox(height: 20),
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(
-                              l10n.noAccount,
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                color: cs.onSurface,
-                              ),
-                            ),
+                            Text(l10n.noAccount, style: theme.textTheme.bodyMedium?.copyWith(color: cs.onSurface)),
                             const SizedBox(width: 4),
                             GestureDetector(
-                              onTap: _isLoading
-                                  ? null
-                                  : () {
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) =>
-                                              const UserRegisterScreen(),
-                                        ),
-                                      );
-                                    },
-                              child: Text(
-                                l10n.registerNow,
-                                style: TextStyle(
-                                  color: cs.primary,
-                                  fontWeight: FontWeight.bold,
-                                  decoration: TextDecoration.underline,
-                                ),
-                              ),
+                              onTap: _isLoading ? null : () => Navigator.push(context, MaterialPageRoute(builder: (_) => const UserRegisterScreen())),
+                              child: Text(l10n.registerNow, style: TextStyle(color: cs.primary, fontWeight: FontWeight.bold, decoration: TextDecoration.underline)),
                             ),
                           ],
                         ),
@@ -632,15 +366,8 @@ await AdminTokenStore().save(
     );
   }
 
-  Widget _roleTab(
-    BuildContext context,
-    String label,
-    IconData icon,
-    bool selected,
-    VoidCallback onTap,
-  ) {
+  Widget _roleTab(BuildContext context, String label, IconData icon, bool selected, VoidCallback onTap) {
     final cs = Theme.of(context).colorScheme;
-
     return Expanded(
       child: GestureDetector(
         onTap: _isLoading ? null : onTap,
@@ -648,25 +375,13 @@ await AdminTokenStore().save(
           duration: const Duration(milliseconds: 200),
           margin: const EdgeInsets.all(4),
           padding: const EdgeInsets.symmetric(vertical: 12),
-          decoration: BoxDecoration(
-            color: selected ? cs.primary : cs.surface,
-            borderRadius: BorderRadius.circular(12),
-          ),
+          decoration: BoxDecoration(color: selected ? cs.primary : cs.surface, borderRadius: BorderRadius.circular(12)),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Icon(
-                icon,
-                color: selected ? cs.onPrimary : cs.onSurface,
-              ),
+              Icon(icon, color: selected ? cs.onPrimary : cs.onSurface),
               const SizedBox(width: 6),
-              Text(
-                label,
-                style: TextStyle(
-                  color: selected ? cs.onPrimary : cs.onSurface,
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+              Text(label, style: TextStyle(color: selected ? cs.onPrimary : cs.onSurface, fontWeight: FontWeight.bold)),
             ],
           ),
         ),
