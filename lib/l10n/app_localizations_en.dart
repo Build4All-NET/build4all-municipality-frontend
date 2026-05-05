@@ -129,7 +129,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get fieldRequired => 'This field is required';
 
   @override
-  String get invalidEmail => 'Please enter a valid email';
+  String get invalidEmail => 'Enter a valid email address';
 
   @override
   String get passwordTooShort => 'Password must be at least 6 characters';
@@ -360,7 +360,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get noServices => 'No services available';
 
   @override
-  String get requiresInspection => 'Inspection Required';
+  String get requiresInspection => 'Requires Inspection';
 
   @override
   String get days => 'days';
@@ -807,7 +807,9 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmDelete => 'Confirm Delete';
 
   @override
-  String get deleteDepartmentConfirm => 'Are you sure you want to delete this department?';
+  String deleteDepartmentConfirm(Object name) {
+    return 'Are you sure you want to delete $name?';
+  }
 
   @override
   String get noData => 'No data';
@@ -828,10 +830,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get add => 'Add';
 
   @override
-  String get selectDepartment => 'Select Department';
+  String get selectDepartment => 'Please select a department';
 
   @override
-  String get selectRole => 'Select Role';
+  String get selectRole => 'Please select a role';
 
   @override
   String get role => 'Role';
@@ -868,4 +870,185 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get allDepartments => 'All Departments';
+
+  @override
+  String get editViolation => 'Edit Violation';
+
+  @override
+  String get saveChanges => 'Save Changes';
+
+  @override
+  String get departmentId => 'Department ID';
+
+  @override
+  String get enterDepartmentId => 'Example: 1';
+
+  @override
+  String get pleaseSelectDate => 'Please select a date';
+
+  @override
+  String get invalidAmount => 'Enter a valid amount';
+
+  @override
+  String get invalidDepartmentId => 'Enter a valid department ID';
+
+  @override
+  String get missingViolationId => 'Missing violation ID';
+
+  @override
+  String get characters3To25 => 'Must be 3 to 25 characters';
+
+  @override
+  String get violationSaved => 'Violation saved successfully';
+
+  @override
+  String get violationCreateHint => 'Fill the violation details below';
+
+  @override
+  String get violationEditHint => 'Update the violation details below';
+
+  @override
+  String get editAnnouncement => 'Edit Announcement';
+
+  @override
+  String get announcementSaved => 'Announcement saved successfully';
+
+  @override
+  String get announcementDeleted => 'Announcement deleted successfully';
+
+  @override
+  String get announcementCreateHint => 'Write a clear announcement for citizens';
+
+  @override
+  String get announcementEditHint => 'Update the announcement information';
+
+  @override
+  String get deleteAnnouncementConfirm => 'Are you sure you want to delete this announcement?';
+
+  @override
+  String get missingAnnouncementId => 'Missing announcement ID';
+
+  @override
+  String get titleMinLength => 'Title must be at least 3 characters';
+
+  @override
+  String get contentMinLength => 'Content must be at least 5 characters';
+
+  @override
+  String get announcementTitle => 'Announcement title';
+
+  @override
+  String get announcementContent => 'Announcement content';
+
+  @override
+  String get enterAnnouncementTitle => 'Enter announcement title';
+
+  @override
+  String get enterAnnouncementContent => 'Enter announcement content';
+
+  @override
+  String get noAnnouncements => 'No announcements yet';
+
+  @override
+  String get noAnnouncementsHint => 'Create your first announcement to notify citizens.';
+
+  @override
+  String shownOfTotal(Object shown, Object total) {
+    return 'Shown $shown of $total';
+  }
+
+  @override
+  String get moduleUnavailable => 'This module is not available yet';
+
+  @override
+  String get openModuleFailed => 'Failed to open module';
+
+  @override
+  String get adminDashboardSubtitle => 'Municipality administration panel';
+
+  @override
+  String get departmentCreated => 'Department created successfully';
+
+  @override
+  String get departmentUpdated => 'Department updated successfully';
+
+  @override
+  String get departmentDeleted => 'Department deleted successfully';
+
+  @override
+  String get editDepartment => 'Edit Department';
+
+  @override
+  String get manageDepartments => 'Manage municipality departments';
+
+  @override
+  String get noDepartmentsHint => 'No departments available yet.';
+
+  @override
+  String get manageServices => 'Manage municipality services';
+
+  @override
+  String get noServicesHint => 'No services available yet.';
+
+  @override
+  String deleteServiceConfirm(Object name) {
+    return 'Are you sure you want to delete $name?';
+  }
+
+  @override
+  String get serviceCreated => 'Service created successfully';
+
+  @override
+  String get serviceUpdated => 'Service updated successfully';
+
+  @override
+  String get serviceDeleted => 'Service deleted successfully';
+
+  @override
+  String get deleteRequested => 'Delete request sent';
+
+  @override
+  String get municipalityId => 'Municipality ID';
+
+  @override
+  String get descriptionAr => 'Arabic Description';
+
+  @override
+  String get descriptionEn => 'English Description';
+
+  @override
+  String get slaDays => 'SLA Days';
+
+  @override
+  String get hasFees => 'Has Fees';
+
+  @override
+  String get active => 'Active';
+
+  @override
+  String get inactive => 'Inactive';
+
+  @override
+  String get invalidNumber => 'Enter a valid number';
+
+  @override
+  String get loadingDepartments => 'Loading departments...';
+
+  @override
+  String get filtered => 'Filtered';
+
+  @override
+  String get manageEmployees => 'Manage municipality employees';
+
+  @override
+  String get noEmployeesHint => 'No employees available yet.';
+
+  @override
+  String get employeeCreated => 'Employee created successfully';
+
+  @override
+  String get noRolesHint => 'No roles available yet.';
+
+  @override
+  String get inboxComingSoon => 'Inbox is not available yet';
 }

@@ -3,7 +3,10 @@ import 'package:baladiyati/features/admin/manage_service/Domain/Repository/Servi
 
 class CreateService {
   final ServiceRepository repo;
+
   CreateService(this.repo);
 
-  Future<void> call(ServiceModel s) => repo.create(s);
+  Future<void> call(ServiceModel service) {
+    return repo.create(service);
+  }
 }

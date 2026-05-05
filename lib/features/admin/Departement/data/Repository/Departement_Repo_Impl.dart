@@ -3,7 +3,6 @@ import 'package:baladiyati/features/admin/Departement/data/Service/Departement_A
 import 'package:baladiyati/features/admin/Departement/domain/Entities/Departement.dart';
 import 'package:baladiyati/features/admin/Departement/domain/Repository/Departement_Repository.dart';
 
-
 class DepartmentRepositoryImpl implements DepartmentRepository {
   final DepartmentApiService api;
 

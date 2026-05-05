@@ -3,7 +3,10 @@ import 'package:baladiyati/features/admin/manage_service/Domain/Repository/Servi
 
 class GetServices {
   final ServiceRepository repo;
+
   GetServices(this.repo);
 
-  Future<List<ServiceModel>> call() => repo.getAll();
+  Future<List<ServiceModel>> call() {
+    return repo.getAll();
+  }
 }

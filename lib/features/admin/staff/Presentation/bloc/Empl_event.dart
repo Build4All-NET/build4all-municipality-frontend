@@ -9,3 +9,9 @@ class AddEmployee extends EmployeeEvent {
 
   AddEmployee(this.employee);
 }
+
+class SearchEmployees extends EmployeeEvent {
+  final String query;
+
+  SearchEmployees(this.query);
+}

@@ -1,9 +1,12 @@
 import 'package:baladiyati/features/admin/manage_service/Data/model/service_Model.dart';
-import 'package:baladiyati/features/admin/manage_service/presentation/bloc/Service_event.dart';
+import 'package:baladiyati/features/admin/manage_service/Domain/Repository/Service_repo.dart';
 
-class UpdateServiceEvent extends ServiceEvent {
-  final int id;
-  final ServiceModel service;
+class UpdateService {
+  final ServiceRepository repo;
 
-  UpdateServiceEvent(this.id, this.service);
+  UpdateService(this.repo);
+
+  Future<void> call(int id, ServiceModel service) {
+    return repo.update(id, service);
+  }
 }

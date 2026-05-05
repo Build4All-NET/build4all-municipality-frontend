@@ -15,13 +15,14 @@ class DepartmentModel {
 
   factory DepartmentModel.fromJson(Map<String, dynamic> json) {
     return DepartmentModel(
-      id: json['id'],
-      name: json['name'],
-      description: json['description'],
-      isFixed: json['isFixed'],
+      id: _toInt(json['id']),
+      name: (json['name'] ?? '').toString(),
+      description: (json['description'] ?? '').toString(),
+      isFixed: _toBool(json['isFixed']),
     );
   }
- factory DepartmentModel.fromEntity(Department entity) {
+
+  factory DepartmentModel.fromEntity(Department entity) {
     return DepartmentModel(
       id: entity.id,
       name: entity.name,
@@ -29,6 +30,7 @@ class DepartmentModel {
       isFixed: entity.isFixed,
     );
   }
+
   Department toEntity() {
     return Department(
       id: id,
@@ -40,9 +42,24 @@ class DepartmentModel {
 
   Map<String, dynamic> toJson() {
     return {
-      "name": name,
-      "description": description,
-      "isFixed": isFixed,
+      'name': name,
+      'description': description,
+      'isFixed': isFixed,
     };
+  }
+
+  static int _toInt(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '') ?? 0;
+  }
+
+  static bool _toBool(dynamic value) {
+    if (value is bool) return value;
+    if (value is num) return value == 1;
+
+    final text = value?.toString().toLowerCase().trim();
+
+    return text == 'true' || text == '1' || text == 'yes';
   }
 }

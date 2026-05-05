@@ -340,7 +340,7 @@ abstract class AppLocalizations {
   /// No description provided for @invalidEmail.
   ///
   /// In en, this message translates to:
-  /// **'Please enter a valid email'**
+  /// **'Enter a valid email address'**
   String get invalidEmail;
 
   /// No description provided for @passwordTooShort.
@@ -802,7 +802,7 @@ abstract class AppLocalizations {
   /// No description provided for @requiresInspection.
   ///
   /// In en, this message translates to:
-  /// **'Inspection Required'**
+  /// **'Requires Inspection'**
   String get requiresInspection;
 
   /// No description provided for @days.
@@ -1696,8 +1696,8 @@ abstract class AppLocalizations {
   /// No description provided for @deleteDepartmentConfirm.
   ///
   /// In en, this message translates to:
-  /// **'Are you sure you want to delete this department?'**
-  String get deleteDepartmentConfirm;
+  /// **'Are you sure you want to delete {name}?'**
+  String deleteDepartmentConfirm(Object name);
 
   /// No description provided for @noData.
   ///
@@ -1738,13 +1738,13 @@ abstract class AppLocalizations {
   /// No description provided for @selectDepartment.
   ///
   /// In en, this message translates to:
-  /// **'Select Department'**
+  /// **'Please select a department'**
   String get selectDepartment;
 
   /// No description provided for @selectRole.
   ///
   /// In en, this message translates to:
-  /// **'Select Role'**
+  /// **'Please select a role'**
   String get selectRole;
 
   /// No description provided for @role.
@@ -1818,6 +1818,360 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All Departments'**
   String get allDepartments;
+
+  /// No description provided for @editViolation.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Violation'**
+  String get editViolation;
+
+  /// No description provided for @saveChanges.
+  ///
+  /// In en, this message translates to:
+  /// **'Save Changes'**
+  String get saveChanges;
+
+  /// No description provided for @departmentId.
+  ///
+  /// In en, this message translates to:
+  /// **'Department ID'**
+  String get departmentId;
+
+  /// No description provided for @enterDepartmentId.
+  ///
+  /// In en, this message translates to:
+  /// **'Example: 1'**
+  String get enterDepartmentId;
+
+  /// No description provided for @pleaseSelectDate.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a date'**
+  String get pleaseSelectDate;
+
+  /// No description provided for @invalidAmount.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid amount'**
+  String get invalidAmount;
+
+  /// No description provided for @invalidDepartmentId.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid department ID'**
+  String get invalidDepartmentId;
+
+  /// No description provided for @missingViolationId.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing violation ID'**
+  String get missingViolationId;
+
+  /// No description provided for @characters3To25.
+  ///
+  /// In en, this message translates to:
+  /// **'Must be 3 to 25 characters'**
+  String get characters3To25;
+
+  /// No description provided for @violationSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Violation saved successfully'**
+  String get violationSaved;
+
+  /// No description provided for @violationCreateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Fill the violation details below'**
+  String get violationCreateHint;
+
+  /// No description provided for @violationEditHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Update the violation details below'**
+  String get violationEditHint;
+
+  /// No description provided for @editAnnouncement.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Announcement'**
+  String get editAnnouncement;
+
+  /// No description provided for @announcementSaved.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcement saved successfully'**
+  String get announcementSaved;
+
+  /// No description provided for @announcementDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcement deleted successfully'**
+  String get announcementDeleted;
+
+  /// No description provided for @announcementCreateHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Write a clear announcement for citizens'**
+  String get announcementCreateHint;
+
+  /// No description provided for @announcementEditHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Update the announcement information'**
+  String get announcementEditHint;
+
+  /// No description provided for @deleteAnnouncementConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete this announcement?'**
+  String get deleteAnnouncementConfirm;
+
+  /// No description provided for @missingAnnouncementId.
+  ///
+  /// In en, this message translates to:
+  /// **'Missing announcement ID'**
+  String get missingAnnouncementId;
+
+  /// No description provided for @titleMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Title must be at least 3 characters'**
+  String get titleMinLength;
+
+  /// No description provided for @contentMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Content must be at least 5 characters'**
+  String get contentMinLength;
+
+  /// No description provided for @announcementTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcement title'**
+  String get announcementTitle;
+
+  /// No description provided for @announcementContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Announcement content'**
+  String get announcementContent;
+
+  /// No description provided for @enterAnnouncementTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter announcement title'**
+  String get enterAnnouncementTitle;
+
+  /// No description provided for @enterAnnouncementContent.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter announcement content'**
+  String get enterAnnouncementContent;
+
+  /// No description provided for @noAnnouncements.
+  ///
+  /// In en, this message translates to:
+  /// **'No announcements yet'**
+  String get noAnnouncements;
+
+  /// No description provided for @noAnnouncementsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Create your first announcement to notify citizens.'**
+  String get noAnnouncementsHint;
+
+  /// No description provided for @shownOfTotal.
+  ///
+  /// In en, this message translates to:
+  /// **'Shown {shown} of {total}'**
+  String shownOfTotal(Object shown, Object total);
+
+  /// No description provided for @moduleUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'This module is not available yet'**
+  String get moduleUnavailable;
+
+  /// No description provided for @openModuleFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to open module'**
+  String get openModuleFailed;
+
+  /// No description provided for @adminDashboardSubtitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Municipality administration panel'**
+  String get adminDashboardSubtitle;
+
+  /// No description provided for @departmentCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Department created successfully'**
+  String get departmentCreated;
+
+  /// No description provided for @departmentUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Department updated successfully'**
+  String get departmentUpdated;
+
+  /// No description provided for @departmentDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Department deleted successfully'**
+  String get departmentDeleted;
+
+  /// No description provided for @editDepartment.
+  ///
+  /// In en, this message translates to:
+  /// **'Edit Department'**
+  String get editDepartment;
+
+  /// No description provided for @manageDepartments.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage municipality departments'**
+  String get manageDepartments;
+
+  /// No description provided for @noDepartmentsHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No departments available yet.'**
+  String get noDepartmentsHint;
+
+  /// No description provided for @manageServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage municipality services'**
+  String get manageServices;
+
+  /// No description provided for @noServicesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No services available yet.'**
+  String get noServicesHint;
+
+  /// No description provided for @deleteServiceConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to delete {name}?'**
+  String deleteServiceConfirm(Object name);
+
+  /// No description provided for @serviceCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Service created successfully'**
+  String get serviceCreated;
+
+  /// No description provided for @serviceUpdated.
+  ///
+  /// In en, this message translates to:
+  /// **'Service updated successfully'**
+  String get serviceUpdated;
+
+  /// No description provided for @serviceDeleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Service deleted successfully'**
+  String get serviceDeleted;
+
+  /// No description provided for @deleteRequested.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete request sent'**
+  String get deleteRequested;
+
+  /// No description provided for @municipalityId.
+  ///
+  /// In en, this message translates to:
+  /// **'Municipality ID'**
+  String get municipalityId;
+
+  /// No description provided for @descriptionAr.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic Description'**
+  String get descriptionAr;
+
+  /// No description provided for @descriptionEn.
+  ///
+  /// In en, this message translates to:
+  /// **'English Description'**
+  String get descriptionEn;
+
+  /// No description provided for @slaDays.
+  ///
+  /// In en, this message translates to:
+  /// **'SLA Days'**
+  String get slaDays;
+
+  /// No description provided for @hasFees.
+  ///
+  /// In en, this message translates to:
+  /// **'Has Fees'**
+  String get hasFees;
+
+  /// No description provided for @active.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
+  String get active;
+
+  /// No description provided for @inactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Inactive'**
+  String get inactive;
+
+  /// No description provided for @invalidNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter a valid number'**
+  String get invalidNumber;
+
+  /// No description provided for @loadingDepartments.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading departments...'**
+  String get loadingDepartments;
+
+  /// No description provided for @filtered.
+  ///
+  /// In en, this message translates to:
+  /// **'Filtered'**
+  String get filtered;
+
+  /// No description provided for @manageEmployees.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage municipality employees'**
+  String get manageEmployees;
+
+  /// No description provided for @noEmployeesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No employees available yet.'**
+  String get noEmployeesHint;
+
+  /// No description provided for @employeeCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Employee created successfully'**
+  String get employeeCreated;
+
+  /// No description provided for @noRolesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No roles available yet.'**
+  String get noRolesHint;
+
+  /// No description provided for @inboxComingSoon.
+  ///
+  /// In en, this message translates to:
+  /// **'Inbox is not available yet'**
+  String get inboxComingSoon;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

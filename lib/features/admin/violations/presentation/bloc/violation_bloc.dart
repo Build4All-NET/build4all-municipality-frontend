@@ -1,3 +1,4 @@
+import 'package:baladiyati/core/utils/error_message.dart';
 import 'package:baladiyati/features/admin/violations/domain/Usecase/AddViolation.dart';
 import 'package:baladiyati/features/admin/violations/domain/Usecase/DeleteViolation.dart';
 import 'package:baladiyati/features/admin/violations/domain/Usecase/Getviolation.dart';
@@ -34,7 +35,7 @@ class ViolationBloc extends Bloc<ViolationEvent, ViolationState> {
       final list = await getViolations();
       emit(ViolationLoaded(list));
     } catch (e) {
-      emit(ViolationError(e.toString()));
+      emit(ViolationError(errorMessage(e)));
     }
   }
 
@@ -49,7 +50,7 @@ class ViolationBloc extends Bloc<ViolationEvent, ViolationState> {
       final list = await getViolations();
       emit(ViolationLoaded(list));
     } catch (e) {
-      emit(ViolationError(e.toString()));
+      emit(ViolationError(errorMessage(e)));
     }
   }
 
@@ -64,7 +65,7 @@ class ViolationBloc extends Bloc<ViolationEvent, ViolationState> {
       final list = await getViolations();
       emit(ViolationLoaded(list));
     } catch (e) {
-      emit(ViolationError(e.toString()));
+      emit(ViolationError(errorMessage(e)));
     }
   }
 
@@ -79,7 +80,7 @@ class ViolationBloc extends Bloc<ViolationEvent, ViolationState> {
       final list = await getViolations();
       emit(ViolationLoaded(list));
     } catch (e) {
-      emit(ViolationError(e.toString()));
+      emit(ViolationError(errorMessage(e)));
     }
   }
 }

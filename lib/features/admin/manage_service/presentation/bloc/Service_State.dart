@@ -1,15 +1,55 @@
 import 'package:baladiyati/features/admin/manage_service/Data/model/service_Model.dart';
 
-abstract class ServiceState {}
+class ServiceState {
+  final List<ServiceModel> allServices;
+  final List<ServiceModel> visibleServices;
+  final bool loading;
+  final bool actionLoading;
+  final String? error;
+  final String query;
+  final int? selectedDepartmentId;
 
-class ServiceLoading extends ServiceState {}
+  const ServiceState({
+    required this.allServices,
+    required this.visibleServices,
+    required this.loading,
+    required this.actionLoading,
+    this.error,
+    required this.query,
+    this.selectedDepartmentId,
+  });
 
-class ServiceLoaded extends ServiceState {
-  final List<ServiceModel> services;
-  ServiceLoaded(this.services);
-}
+  factory ServiceState.initial() {
+    return const ServiceState(
+      allServices: [],
+      visibleServices: [],
+      loading: false,
+      actionLoading: false,
+      query: '',
+    );
+  }
 
-class ServiceError extends ServiceState {
-  final String message;
-  ServiceError(this.message);
+  ServiceState copyWith({
+    List<ServiceModel>? allServices,
+    List<ServiceModel>? visibleServices,
+    bool? loading,
+    bool? actionLoading,
+    String? error,
+    bool clearError = false,
+    String? query,
+    int? selectedDepartmentId,
+    bool clearSelectedDepartmentId = false,
+  }) {
+    return ServiceState(
+      allServices: allServices ?? this.allServices,
+      visibleServices: visibleServices ?? this.visibleServices,
+      loading: loading ?? this.loading,
+      actionLoading: actionLoading ?? this.actionLoading,
+      error: clearError ? null : error ?? this.error,
+      query: query ?? this.query,
+      selectedDepartmentId: clearSelectedDepartmentId
+          ? null
+          : selectedDepartmentId ?? this.selectedDepartmentId,
+    );
+  }
 }

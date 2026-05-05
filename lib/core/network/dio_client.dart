@@ -1,6 +1,8 @@
 import 'package:baladiyati/core/config/env.dart';
 import 'package:baladiyati/core/network/globals.dart' as globals;
+import 'package:baladiyati/core/network/interceptors/app_error_interceptor.dart';
 import 'package:baladiyati/core/network/interceptors/auth_body_injector.dart';
+import 'package:baladiyati/core/network/interceptors/network_error_interceptor.dart';
 import 'package:baladiyati/core/network/interceptors/refresh_token_interceptor.dart';
 import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:dio/dio.dart';
@@ -100,49 +102,53 @@ class DioClient {
     }
   }
 
-  static void _attachCommonInterceptors(Dio dio) {
-    dio.interceptors.clear();
+ static void _attachCommonInterceptors(Dio dio) {
+  dio.interceptors.clear();
 
-    dio.interceptors.add(
-      InterceptorsWrapper(
-        onRequest: (options, handler) async {
-          // If request already has Authorization, keep it.
-          final hasRequestAuth =
-              options.headers['Authorization']?.toString().trim().isNotEmpty ??
-                  false;
+  dio.interceptors.add(
+    InterceptorsWrapper(
+      onRequest: (options, handler) async {
+        final hasRequestAuth =
+            options.headers['Authorization']?.toString().trim().isNotEmpty ??
+                false;
 
-          // If Dio global headers have Authorization, attach it to request.
-          final globalAuth =
-              dio.options.headers['Authorization']?.toString().trim();
+        final globalAuth =
+            dio.options.headers['Authorization']?.toString().trim();
 
-          if (!hasRequestAuth && globalAuth != null && globalAuth.isNotEmpty) {
-            options.headers['Authorization'] = globalAuth;
-          }
+        if (!hasRequestAuth && globalAuth != null && globalAuth.isNotEmpty) {
+          options.headers['Authorization'] = globalAuth;
+        }
 
-          debugPrint('DIO REQUEST => ${options.method} ${options.uri}');
-          debugPrint(
-            'DIO AUTH HEADER => ${options.headers['Authorization'] != null ? 'YES' : 'NO'}',
-          );
+        debugPrint('DIO REQUEST => ${options.method} ${options.uri}');
+        debugPrint(
+          'DIO AUTH HEADER => ${options.headers['Authorization'] != null ? 'YES' : 'NO'}',
+        );
 
-          return handler.next(options);
-        },
-      ),
-    );
+        return handler.next(options);
+      },
+    ),
+  );
 
-    dio.interceptors.add(RefreshTokenInterceptor());
-    dio.interceptors.add(OwnerInjector());
+  dio.interceptors.add(RefreshTokenInterceptor());
+  dio.interceptors.add(OwnerInjector());
 
-    dio.interceptors.add(
-      LogInterceptor(
-        request: true,
-        requestHeader: true,
-        requestBody: true,
-        responseBody: true,
-        responseHeader: false,
-        error: true,
-      ),
-    );
-  }
+
+  dio.interceptors.add(NetworkErrorInterceptor());
+
+
+  dio.interceptors.add(AppErrorInterceptor());
+
+  dio.interceptors.add(
+    LogInterceptor(
+      request: true,
+      requestHeader: true,
+      requestBody: true,
+      responseBody: true,
+      responseHeader: false,
+      error: true,
+    ),
+  );
+}
 
   static String _asBearer(String token) {
     final clean = token.trim();

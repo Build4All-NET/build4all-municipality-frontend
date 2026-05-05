@@ -1,3 +1,4 @@
+import 'package:baladiyati/core/utils/error_message.dart';
 import 'package:baladiyati/features/admin/announcements/domain/Usecases/Create_Announcement.dart';
 import 'package:baladiyati/features/admin/announcements/domain/Usecases/Delete_Announcement.dart';
 import 'package:baladiyati/features/admin/announcements/domain/Usecases/Get_Announcement.dart';
@@ -34,7 +35,7 @@ class AnnouncementBloc extends Bloc<AnnouncementEvent, AnnouncementState> {
       final list = await getAnnouncements();
       emit(AnnouncementLoaded(list));
     } catch (e) {
-      emit(AnnouncementError(e.toString()));
+      emit(AnnouncementError(errorMessage(e)));
     }
   }
 
@@ -49,7 +50,7 @@ class AnnouncementBloc extends Bloc<AnnouncementEvent, AnnouncementState> {
       final list = await getAnnouncements();
       emit(AnnouncementLoaded(list));
     } catch (e) {
-      emit(AnnouncementError(e.toString()));
+      emit(AnnouncementError(errorMessage(e)));
     }
   }
 
@@ -64,7 +65,7 @@ class AnnouncementBloc extends Bloc<AnnouncementEvent, AnnouncementState> {
       final list = await getAnnouncements();
       emit(AnnouncementLoaded(list));
     } catch (e) {
-      emit(AnnouncementError(e.toString()));
+      emit(AnnouncementError(errorMessage(e)));
     }
   }
 
@@ -79,7 +80,7 @@ class AnnouncementBloc extends Bloc<AnnouncementEvent, AnnouncementState> {
       final list = await getAnnouncements();
       emit(AnnouncementLoaded(list));
     } catch (e) {
-      emit(AnnouncementError(e.toString()));
+      emit(AnnouncementError(errorMessage(e)));
     }
   }
 }

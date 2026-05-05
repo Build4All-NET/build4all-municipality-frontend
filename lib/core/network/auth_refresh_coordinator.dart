@@ -129,13 +129,13 @@ class AuthRefreshCoordinator {
         );
       }
 
-      final response = await _plain().post(
-        '/api/auth/refresh',
-        data: {
-          'refreshToken': refresh,
-        },
-      );
-
+     final response = await _plain().post(
+  '/api/auth/admin/refresh',
+  data: {
+    'refreshToken': refresh,
+    'ownerProjectLinkId': tenantId,
+  },
+);
       final data = _readPayload(response.data);
 
       final newAccess = (data['token'] ??

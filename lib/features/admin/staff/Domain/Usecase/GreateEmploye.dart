@@ -6,7 +6,7 @@ class CreateEmployee {
 
   CreateEmployee(this.repository);
 
-  Future<void> call(Employee employee) async {
-    return await repository.createEmployee(employee);
+  Future<void> call(Employee employee) {
+    return repository.createEmployee(employee);
   }
 }

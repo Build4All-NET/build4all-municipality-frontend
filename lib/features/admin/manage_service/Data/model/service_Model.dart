@@ -29,34 +29,86 @@ class ServiceModel {
 
   factory ServiceModel.fromJson(Map<String, dynamic> json) {
     return ServiceModel(
-      id: json['id'] ?? 0,
-      municipalityId: json['municipalityId'] ?? 0,
-      departmentId: json['departmentId'] ?? 0,
-      nameAr: json['nameAr'] ?? '',
-      nameEn: json['nameEn'] ?? '',
-      descriptionAr: json['descriptionAr'] ?? '',
-      descriptionEn: json['descriptionEn'] ?? '',
-      slaDays: json['slaDays'] ?? 0,
-      requiresInspection: json['requiresInspection'] ?? false,
-      hasFees: json['hasFees'] ?? false,
-      feeAmount: (json['feeAmount'] ?? 0).toDouble(),
-      isActive: json['isActive'] ?? false,
+      id: _toInt(json['id']),
+      municipalityId: _toInt(json['municipalityId'] ?? json['municipality']?['id']),
+      departmentId: _toInt(json['departmentId'] ?? json['department']?['id']),
+      nameAr: (json['nameAr'] ?? '').toString(),
+      nameEn: (json['nameEn'] ?? '').toString(),
+      descriptionAr: (json['descriptionAr'] ?? '').toString(),
+      descriptionEn: (json['descriptionEn'] ?? '').toString(),
+      slaDays: _toInt(json['slaDays']),
+      requiresInspection: _toBool(json['requiresInspection']),
+      hasFees: _toBool(json['hasFees']),
+      feeAmount: _toDouble(json['feeAmount']),
+      isActive: _toBool(json['isActive']),
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      "municipalityId": municipalityId,
-      "departmentId": departmentId,
-      "nameAr": nameAr,
-      "nameEn": nameEn,
-      "descriptionAr": descriptionAr,
-      "descriptionEn": descriptionEn,
-      "slaDays": slaDays,
-      "requiresInspection": requiresInspection,
-      "hasFees": hasFees,
-      "feeAmount": feeAmount,
-      "isActive": isActive,
+      'municipalityId': municipalityId,
+      'departmentId': departmentId,
+      'nameAr': nameAr,
+      'nameEn': nameEn,
+      'descriptionAr': descriptionAr,
+      'descriptionEn': descriptionEn,
+      'slaDays': slaDays,
+      'requiresInspection': requiresInspection,
+      'hasFees': hasFees,
+      'feeAmount': feeAmount,
+      'isActive': isActive,
     };
+  }
+
+  ServiceModel copyWith({
+    int? id,
+    int? municipalityId,
+    int? departmentId,
+    String? nameAr,
+    String? nameEn,
+    String? descriptionAr,
+    String? descriptionEn,
+    int? slaDays,
+    bool? requiresInspection,
+    bool? hasFees,
+    double? feeAmount,
+    bool? isActive,
+  }) {
+    return ServiceModel(
+      id: id ?? this.id,
+      municipalityId: municipalityId ?? this.municipalityId,
+      departmentId: departmentId ?? this.departmentId,
+      nameAr: nameAr ?? this.nameAr,
+      nameEn: nameEn ?? this.nameEn,
+      descriptionAr: descriptionAr ?? this.descriptionAr,
+      descriptionEn: descriptionEn ?? this.descriptionEn,
+      slaDays: slaDays ?? this.slaDays,
+      requiresInspection: requiresInspection ?? this.requiresInspection,
+      hasFees: hasFees ?? this.hasFees,
+      feeAmount: feeAmount ?? this.feeAmount,
+      isActive: isActive ?? this.isActive,
+    );
+  }
+
+  static int _toInt(dynamic value) {
+    if (value is int) return value;
+    if (value is num) return value.toInt();
+    return int.tryParse(value?.toString() ?? '') ?? 0;
+  }
+
+  static double _toDouble(dynamic value) {
+    if (value is double) return value;
+    if (value is int) return value.toDouble();
+    if (value is num) return value.toDouble();
+    return double.tryParse(value?.toString() ?? '') ?? 0;
+  }
+
+  static bool _toBool(dynamic value) {
+    if (value is bool) return value;
+    if (value is num) return value == 1;
+
+    final text = value?.toString().toLowerCase().trim();
+
+    return text == 'true' || text == '1' || text == 'yes';
   }
 }

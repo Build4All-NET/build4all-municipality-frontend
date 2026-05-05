@@ -22,6 +22,7 @@ class CreateAnnouncementPage extends StatefulWidget {
 
 class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
   final _formKey = GlobalKey<FormState>();
+
   late final TextEditingController _titleController;
   late final TextEditingController _contentController;
 
@@ -47,23 +48,63 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
     super.dispose();
   }
 
-  void _submit() {
-    if (!_formKey.currentState!.validate()) return;
+  void _showMessage(String message, {bool isError = false}) {
+    final colors = Theme.of(context).colorScheme;
 
-    setState(() => _submitted = true);
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor: isError ? colors.error : null,
+      ),
+    );
+  }
+
+  String? _validateTitle(String? value) {
+    final loc = AppLocalizations.of(context)!;
+    final text = value?.trim() ?? '';
+
+    if (text.isEmpty) return loc.fieldRequired;
+
+    if (text.length < 3) return loc.titleMinLength;
+
+    return null;
+  }
+
+  String? _validateContent(String? value) {
+    final loc = AppLocalizations.of(context)!;
+    final text = value?.trim() ?? '';
+
+    if (text.isEmpty) return loc.fieldRequired;
+
+    if (text.length < 5) return loc.contentMinLength;
+
+    return null;
+  }
+
+  void _submit() {
+    final loc = AppLocalizations.of(context)!;
+
+    FocusScope.of(context).unfocus();
+
+    if (!_formKey.currentState!.validate()) return;
 
     final announcement = Announcement(
       title: _titleController.text.trim(),
       content: _contentController.text.trim(),
     );
 
+    setState(() {
+      _submitted = true;
+    });
+
     if (widget.isEdit) {
-      final id = widget.announcement!.id;
+      final id = widget.announcement?.id;
 
       if (id == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Missing announcement ID')),
-        );
+        setState(() {
+          _submitted = false;
+        });
+        _showMessage(loc.missingAnnouncementId, isError: true);
         return;
       }
 
@@ -83,24 +124,30 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
 
     return BlocListener<AnnouncementBloc, AnnouncementState>(
       listener: (context, state) {
-        if (_submitted && state is AnnouncementLoaded) {
+        if (!_submitted) return;
+
+        if (state is AnnouncementLoaded) {
+          _showMessage(loc.announcementSaved);
           Navigator.pop(context);
         }
 
-        if (_submitted && state is AnnouncementError) {
-          setState(() => _submitted = false);
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(state.message)),
-          );
+        if (state is AnnouncementError) {
+          setState(() {
+            _submitted = false;
+          });
+          _showMessage(state.message, isError: true);
         }
       },
       child: Scaffold(
+        backgroundColor: theme.scaffoldBackgroundColor,
         appBar: AppBar(
           title: Text(
-            widget.isEdit ? loc.editInfo : loc.createAnnouncement,
+            widget.isEdit ? loc.editAnnouncement : loc.createAnnouncement,
           ),
         ),
         body: BlocBuilder<AnnouncementBloc, AnnouncementState>(
@@ -108,86 +155,67 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
             final isLoading = _submitted && state is AnnouncementLoading;
 
             return SingleChildScrollView(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
               child: Form(
                 key: _formKey,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(loc.titleEn),
-                    const SizedBox(height: 5),
-                    TextFormField(
+                    _FormHeader(
+                      title: widget.isEdit
+                          ? loc.editAnnouncement
+                          : loc.createAnnouncement,
+                      subtitle: widget.isEdit
+                          ? loc.announcementEditHint
+                          : loc.announcementCreateHint,
+                    ),
+
+                    const SizedBox(height: 16),
+
+                    _InputField(
+                      label: loc.announcementTitle,
+                      hint: loc.enterAnnouncementTitle,
                       controller: _titleController,
-                      textInputAction: TextInputAction.next,
-                      decoration: InputDecoration(
-                        hintText: loc.enterTitleEn,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                      validator: (value) {
-                        final text = value?.trim() ?? '';
-
-                        if (text.isEmpty) {
-                          return loc.enterTitleEn;
-                        }
-
-                        if (text.length < 3) {
-                          return 'Title must be at least 3 characters';
-                        }
-
-                        return null;
-                      },
+                      icon: Icons.title_outlined,
+                      validator: _validateTitle,
+                      enabled: !isLoading,
                     ),
-                    const SizedBox(height: 15),
-                    Text(loc.contentEn),
-                    const SizedBox(height: 5),
-                    TextFormField(
+
+                    _InputField(
+                      label: loc.announcementContent,
+                      hint: loc.enterAnnouncementContent,
                       controller: _contentController,
-                      minLines: 4,
-                      maxLines: 8,
-                      decoration: InputDecoration(
-                        hintText: loc.enterContentEn,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(15),
-                        ),
-                      ),
-                      validator: (value) {
-                        final text = value?.trim() ?? '';
-
-                        if (text.isEmpty) {
-                          return loc.enterContentEn;
-                        }
-
-                        if (text.length < 5) {
-                          return 'Content must be at least 5 characters';
-                        }
-
-                        return null;
-                      },
+                      icon: Icons.article_outlined,
+                      minLines: 5,
+                      maxLines: 9,
+                      validator: _validateContent,
+                      enabled: !isLoading,
                     ),
-                    const SizedBox(height: 24),
+
+                    const SizedBox(height: 20),
+
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton.icon(
+                        onPressed: isLoading ? null : _submit,
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 15),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                        ),
                         icon: isLoading
-                            ? const SizedBox(
+                            ? SizedBox(
                                 width: 18,
                                 height: 18,
                                 child: CircularProgressIndicator(
                                   strokeWidth: 2,
-                                  color: Colors.white,
+                                  color: colors.onPrimary,
                                 ),
                               )
-                            : const Icon(Icons.send),
+                            : const Icon(Icons.campaign_outlined),
                         label: Text(
                           widget.isEdit ? loc.save : loc.publishAnnouncement,
                         ),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF2F5DA9),
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                        ),
-                        onPressed: isLoading ? null : _submit,
                       ),
                     ),
                   ],
@@ -195,6 +223,122 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
               ),
             );
           },
+        ),
+      ),
+    );
+  }
+}
+
+class _FormHeader extends StatelessWidget {
+  final String title;
+  final String subtitle;
+
+  const _FormHeader({
+    required this.title,
+    required this.subtitle,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.primary.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: colors.primary.withOpacity(0.18),
+        ),
+      ),
+      child: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: colors.primary.withOpacity(0.14),
+            child: Icon(
+              Icons.campaign_outlined,
+              color: colors.primary,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+                const SizedBox(height: 3),
+                Text(
+                  subtitle,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colors.onSurface.withOpacity(0.66),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _InputField extends StatelessWidget {
+  final String label;
+  final String hint;
+  final TextEditingController controller;
+  final IconData icon;
+  final String? Function(String?) validator;
+  final int minLines;
+  final int maxLines;
+  final bool enabled;
+
+  const _InputField({
+    required this.label,
+    required this.hint,
+    required this.controller,
+    required this.icon,
+    required this.validator,
+    this.minLines = 1,
+    this.maxLines = 1,
+    this.enabled = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextFormField(
+        controller: controller,
+        minLines: minLines,
+        maxLines: maxLines,
+        enabled: enabled,
+        validator: validator,
+        textInputAction:
+            maxLines > 1 ? TextInputAction.newline : TextInputAction.next,
+        decoration: InputDecoration(
+          labelText: label,
+          hintText: hint,
+          prefixIcon: Icon(icon),
+          filled: true,
+          fillColor: colors.surface,
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          enabledBorder: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(16),
+            borderSide: BorderSide(
+              color: colors.outline.withOpacity(0.22),
+            ),
+          ),
         ),
       ),
     );

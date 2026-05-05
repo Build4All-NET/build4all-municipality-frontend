@@ -1,3 +1,5 @@
+import 'package:baladiyati/common/widgets/app_toast.dart';
+import 'package:baladiyati/common/widgets/primary_button.dart';
 import 'package:baladiyati/features/admin/Departement/domain/Entities/Departement.dart';
 import 'package:baladiyati/features/admin/Departement/presentation/cubit/Departement_cubit.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
@@ -21,6 +23,8 @@ class _AddDepartmentDialogState extends State<AddDepartmentDialog> {
 
   late final TextEditingController nameController;
   late final TextEditingController descriptionController;
+
+  bool _submitting = false;
 
   bool get isEdit => widget.department != null;
 
@@ -54,7 +58,13 @@ class _AddDepartmentDialogState extends State<AddDepartmentDialog> {
   }
 
   Future<void> _submit() async {
+    final loc = AppLocalizations.of(context)!;
+
     if (!_formKey.currentState!.validate()) return;
+
+    setState(() {
+      _submitting = true;
+    });
 
     final cubit = context.read<DepartmentCubit>();
 
@@ -65,15 +75,25 @@ class _AddDepartmentDialogState extends State<AddDepartmentDialog> {
       isFixed: widget.department?.isFixed ?? false,
     );
 
-    if (isEdit) {
-      await cubit.update(department);
-    } else {
-      await cubit.add(department);
-    }
+    final ok = isEdit
+        ? await cubit.update(department)
+        : await cubit.add(department);
 
     if (!mounted) return;
 
-    Navigator.pop(context);
+    setState(() {
+      _submitting = false;
+    });
+
+    if (ok) {
+      AppToast.show(
+        context,
+        message: isEdit ? loc.departmentUpdated : loc.departmentCreated,
+        type: AppToastType.success,
+      );
+
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -130,6 +150,12 @@ class _AddDepartmentDialogState extends State<AddDepartmentDialog> {
                   ),
                 ),
               ),
+              const SizedBox(height: 18),
+              PrimaryButton(
+                label: isEdit ? loc.save : loc.add,
+                isLoading: _submitting,
+                onPressed: _submit,
+              ),
             ],
           ),
         ),
@@ -137,13 +163,8 @@ class _AddDepartmentDialogState extends State<AddDepartmentDialog> {
       actionsPadding: const EdgeInsets.fromLTRB(16, 0, 16, 14),
       actions: [
         TextButton(
-          onPressed: () => Navigator.pop(context),
+          onPressed: _submitting ? null : () => Navigator.pop(context),
           child: Text(loc.cancel),
-        ),
-        ElevatedButton.icon(
-          onPressed: _submit,
-          icon: Icon(isEdit ? Icons.save_outlined : Icons.add),
-          label: Text(isEdit ? loc.save : loc.add),
         ),
       ],
     );

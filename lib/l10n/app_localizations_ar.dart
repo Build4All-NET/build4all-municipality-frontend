@@ -129,7 +129,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get fieldRequired => 'هذا الحقل مطلوب';
 
   @override
-  String get invalidEmail => 'يرجى إدخال بريد إلكتروني صالح';
+  String get invalidEmail => 'أدخل بريدًا إلكترونيًا صالحًا';
 
   @override
   String get passwordTooShort => 'يجب أن تكون كلمة المرور 6 أحرف على الأقل';
@@ -807,7 +807,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get confirmDelete => 'تأكيد الحذف';
 
   @override
-  String get deleteDepartmentConfirm => 'هل تريد حذف هذا القسم؟';
+  String deleteDepartmentConfirm(Object name) {
+    return 'هل أنت متأكد أنك تريد حذف $name؟';
+  }
 
   @override
   String get noData => 'لا يوجد بيانات';
@@ -828,13 +830,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get add => 'إضافة';
 
   @override
-  String get selectDepartment => 'اختر القسم';
+  String get selectDepartment => 'يرجى اختيار القسم';
 
   @override
-  String get selectRole => 'اختر الدور';
+  String get selectRole => 'يرجى اختيار الدور';
 
   @override
-  String get role => 'الصلاحية';
+  String get role => 'الدور';
 
   @override
   String get engineer => 'مهندس';
@@ -868,4 +870,185 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get allDepartments => 'كل الأقسام';
+
+  @override
+  String get editViolation => 'تعديل المخالفة';
+
+  @override
+  String get saveChanges => 'حفظ التعديلات';
+
+  @override
+  String get departmentId => 'رقم القسم';
+
+  @override
+  String get enterDepartmentId => 'مثال: 1';
+
+  @override
+  String get pleaseSelectDate => 'يرجى اختيار التاريخ';
+
+  @override
+  String get invalidAmount => 'أدخل مبلغًا صالحًا';
+
+  @override
+  String get invalidDepartmentId => 'أدخل رقم قسم صالحًا';
+
+  @override
+  String get missingViolationId => 'رقم المخالفة غير موجود';
+
+  @override
+  String get characters3To25 => 'يجب أن يكون بين 3 و25 حرفًا';
+
+  @override
+  String get violationSaved => 'تم حفظ المخالفة بنجاح';
+
+  @override
+  String get violationCreateHint => 'املأ تفاصيل المخالفة أدناه';
+
+  @override
+  String get violationEditHint => 'عدّل تفاصيل المخالفة أدناه';
+
+  @override
+  String get editAnnouncement => 'تعديل الإعلان';
+
+  @override
+  String get announcementSaved => 'تم حفظ الإعلان بنجاح';
+
+  @override
+  String get announcementDeleted => 'تم حذف الإعلان بنجاح';
+
+  @override
+  String get announcementCreateHint => 'اكتب إعلانًا واضحًا للمواطنين';
+
+  @override
+  String get announcementEditHint => 'عدّل معلومات الإعلان';
+
+  @override
+  String get deleteAnnouncementConfirm => 'هل أنت متأكد أنك تريد حذف هذا الإعلان؟';
+
+  @override
+  String get missingAnnouncementId => 'رقم الإعلان غير موجود';
+
+  @override
+  String get titleMinLength => 'يجب أن يكون العنوان 3 أحرف على الأقل';
+
+  @override
+  String get contentMinLength => 'يجب أن يكون المحتوى 5 أحرف على الأقل';
+
+  @override
+  String get announcementTitle => 'عنوان الإعلان';
+
+  @override
+  String get announcementContent => 'محتوى الإعلان';
+
+  @override
+  String get enterAnnouncementTitle => 'أدخل عنوان الإعلان';
+
+  @override
+  String get enterAnnouncementContent => 'أدخل محتوى الإعلان';
+
+  @override
+  String get noAnnouncements => 'لا توجد إعلانات بعد';
+
+  @override
+  String get noAnnouncementsHint => 'أنشئ أول إعلان لإبلاغ المواطنين.';
+
+  @override
+  String shownOfTotal(Object shown, Object total) {
+    return 'المعروض $shown من أصل $total';
+  }
+
+  @override
+  String get moduleUnavailable => 'هذه الوحدة غير متاحة حالياً';
+
+  @override
+  String get openModuleFailed => 'فشل فتح القسم';
+
+  @override
+  String get adminDashboardSubtitle => 'لوحة إدارة البلدية';
+
+  @override
+  String get departmentCreated => 'تم إنشاء القسم بنجاح';
+
+  @override
+  String get departmentUpdated => 'تم تعديل القسم بنجاح';
+
+  @override
+  String get departmentDeleted => 'تم حذف القسم بنجاح';
+
+  @override
+  String get editDepartment => 'تعديل القسم';
+
+  @override
+  String get manageDepartments => 'إدارة أقسام البلدية';
+
+  @override
+  String get noDepartmentsHint => 'لا توجد أقسام بعد.';
+
+  @override
+  String get manageServices => 'إدارة خدمات البلدية';
+
+  @override
+  String get noServicesHint => 'لا توجد خدمات بعد.';
+
+  @override
+  String deleteServiceConfirm(Object name) {
+    return 'هل أنت متأكد أنك تريد حذف $name؟';
+  }
+
+  @override
+  String get serviceCreated => 'تم إنشاء الخدمة بنجاح';
+
+  @override
+  String get serviceUpdated => 'تم تعديل الخدمة بنجاح';
+
+  @override
+  String get serviceDeleted => 'تم حذف الخدمة بنجاح';
+
+  @override
+  String get deleteRequested => 'تم إرسال طلب الحذف';
+
+  @override
+  String get municipalityId => 'رقم البلدية';
+
+  @override
+  String get descriptionAr => 'الوصف بالعربية';
+
+  @override
+  String get descriptionEn => 'الوصف بالإنجليزية';
+
+  @override
+  String get slaDays => 'مدة الإنجاز بالأيام';
+
+  @override
+  String get hasFees => 'يتضمن رسومًا';
+
+  @override
+  String get active => 'نشط';
+
+  @override
+  String get inactive => 'غير نشط';
+
+  @override
+  String get invalidNumber => 'أدخل رقمًا صالحًا';
+
+  @override
+  String get loadingDepartments => 'جاري تحميل الأقسام...';
+
+  @override
+  String get filtered => 'تمت التصفية';
+
+  @override
+  String get manageEmployees => 'إدارة موظفي البلدية';
+
+  @override
+  String get noEmployeesHint => 'لا يوجد موظفون بعد.';
+
+  @override
+  String get employeeCreated => 'تم إنشاء الموظف بنجاح';
+
+  @override
+  String get noRolesHint => 'لا توجد أدوار بعد.';
+
+  @override
+  String get inboxComingSoon => 'البريد الوارد قادم قريبًا';
 }

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:baladiyati/core/network/auth_refresh_coordinator.dart';
+import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/core/network/globals.dart' as g;
 import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
@@ -77,9 +78,9 @@ class RefreshTokenInterceptor extends Interceptor {
     final req = err.requestOptions;
 
     // Refresh only for 401.
-    if (status != 401 || _isAuthCall(req)) {
-      return handler.next(err);
-    }
+    if ((status != 401 && status != 403) || _isAuthCall(req)) {
+  return handler.next(err);
+}
 
     // Avoid infinite retry loop.
     if (req.extra['__retried'] == true) {
@@ -106,9 +107,12 @@ class RefreshTokenInterceptor extends Interceptor {
     try {
       final tenantId = g.ownerProjectLinkId;
 
+
       final newToken = isAdmin
           ? await _refresh.refreshAdmin(tenantId: tenantId)
           : await _refresh.refreshUser(tenantId: tenantId);
+
+          DioClient.setAuthToken(newToken);
 
       req.headers['Authorization'] =
           newToken.toLowerCase().startsWith('bearer ')

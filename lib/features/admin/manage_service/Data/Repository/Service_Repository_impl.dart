@@ -8,14 +8,22 @@ class ServiceRepositoryImpl implements ServiceRepository {
   ServiceRepositoryImpl(this.api);
 
   @override
-  Future<List<ServiceModel>> getAll() => api.getDepartments();
+  Future<List<ServiceModel>> getAll() {
+    return api.getServices();
+  }
 
   @override
-  Future<void> create(ServiceModel s) => api.create(s);
+  Future<void> create(ServiceModel service) {
+    return api.create(service);
+  }
 
   @override
-  Future<void> delete(int id) => api.delete(id);
+  Future<void> update(int id, ServiceModel service) {
+    return api.update(id, service);
+  }
 
   @override
-  Future<void> update(int id, ServiceModel s) => api.update(id, s);
+  Future<void> delete(int id) {
+    return api.delete(id);
+  }
 }

@@ -367,7 +367,91 @@
   "cancel": "إلغاء",
   "save": "حفظ",
   "pleaseSelectDepartment": "يرجى اختيار القسم",
-  "allDepartments": "كل الأقسام"
-
-
+  "allDepartments": "كل الأقسام",
+  "editViolation": "تعديل المخالفة",
+"saveChanges": "حفظ التعديلات",
+"departmentId": "رقم القسم",
+"enterDepartmentId": "مثال: 1",
+"pleaseSelectDate": "يرجى اختيار التاريخ",
+"invalidAmount": "أدخل مبلغًا صالحًا",
+"invalidDepartmentId": "أدخل رقم قسم صالحًا",
+"missingViolationId": "رقم المخالفة غير موجود",
+"characters3To25": "يجب أن يكون بين 3 و25 حرفًا",
+"violationSaved": "تم حفظ المخالفة بنجاح",
+"violationCreateHint": "املأ تفاصيل المخالفة أدناه",
+"violationEditHint": "عدّل تفاصيل المخالفة أدناه",
+"editAnnouncement": "تعديل الإعلان",
+"announcementSaved": "تم حفظ الإعلان بنجاح",
+"announcementDeleted": "تم حذف الإعلان بنجاح",
+"announcementCreateHint": "اكتب إعلانًا واضحًا للمواطنين",
+"announcementEditHint": "عدّل معلومات الإعلان",
+"deleteAnnouncementConfirm": "هل أنت متأكد أنك تريد حذف هذا الإعلان؟",
+"missingAnnouncementId": "رقم الإعلان غير موجود",
+"titleMinLength": "يجب أن يكون العنوان 3 أحرف على الأقل",
+"contentMinLength": "يجب أن يكون المحتوى 5 أحرف على الأقل",
+"announcementTitle": "عنوان الإعلان",
+"announcementContent": "محتوى الإعلان",
+"enterAnnouncementTitle": "أدخل عنوان الإعلان",
+"enterAnnouncementContent": "أدخل محتوى الإعلان",
+"noAnnouncements": "لا توجد إعلانات بعد",
+"noAnnouncementsHint": "أنشئ أول إعلان لإبلاغ المواطنين.",
+"shownOfTotal": "المعروض {shown} من أصل {total}",
+"@shownOfTotal": {
+  "placeholders": {
+    "shown": {},
+    "total": {}
+  }
+},
+"moduleUnavailable": "هذه الوحدة غير متاحة حالياً",
+"openModuleFailed": "فشل فتح القسم",
+"adminDashboardSubtitle": "لوحة إدارة البلدية",
+"departmentCreated": "تم إنشاء القسم بنجاح",
+"departmentUpdated": "تم تعديل القسم بنجاح",
+"departmentDeleted": "تم حذف القسم بنجاح",
+"editDepartment": "تعديل القسم",
+"newDepartment": "قسم جديد",
+"manageDepartments": "إدارة أقسام البلدية",
+"noDepartmentsHint": "لا توجد أقسام بعد.",
+"deleteDepartmentConfirm": "هل أنت متأكد أنك تريد حذف {name}؟",
+"@deleteDepartmentConfirm": {
+  "placeholders": {
+    "name": {}
+  }
+},
+"fixed": "ثابت",
+"allDepartments": "كل الأقسام",
+"all": "الكل",
+"manageServices": "إدارة خدمات البلدية",
+"noServicesHint": "لا توجد خدمات بعد.",
+"deleteServiceConfirm": "هل أنت متأكد أنك تريد حذف {name}؟",
+"@deleteServiceConfirm": {
+  "placeholders": {
+    "name": {}
+  }
+},
+"serviceCreated": "تم إنشاء الخدمة بنجاح",
+"serviceUpdated": "تم تعديل الخدمة بنجاح",
+"serviceDeleted": "تم حذف الخدمة بنجاح",
+"deleteRequested": "تم إرسال طلب الحذف",
+"municipalityId": "رقم البلدية",
+"departmentId": "رقم القسم",
+"descriptionAr": "الوصف بالعربية",
+"descriptionEn": "الوصف بالإنجليزية",
+"slaDays": "مدة الإنجاز بالأيام",
+"requiresInspection": "يتطلب كشفًا",
+"hasFees": "يتضمن رسومًا",
+"active": "نشط",
+"inactive": "غير نشط",
+"invalidNumber": "أدخل رقمًا صالحًا"
+,"selectDepartment": "يرجى اختيار القسم",
+"loadingDepartments": "جاري تحميل الأقسام...",
+"filtered": "تمت التصفية",
+"manageEmployees": "إدارة موظفي البلدية",
+"noEmployeesHint": "لا يوجد موظفون بعد.",
+"employeeCreated": "تم إنشاء الموظف بنجاح",
+"noRolesHint": "لا توجد أدوار بعد.",
+"role": "الدور",
+"selectRole": "يرجى اختيار الدور",
+"invalidEmail": "أدخل بريدًا إلكترونيًا صالحًا",
+"inboxComingSoon": "البريد الوارد قادم قريبًا"
 }

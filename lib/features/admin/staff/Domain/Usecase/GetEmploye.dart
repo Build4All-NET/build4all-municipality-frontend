@@ -6,7 +6,7 @@ class GetEmployees {
 
   GetEmployees(this.repository);
 
-  Future<List<Employee>> call() async {
-    return await repository.getEmployees();
+  Future<List<Employee>> call() {
+    return repository.getEmployees();
   }
 }

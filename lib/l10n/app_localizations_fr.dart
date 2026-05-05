@@ -129,7 +129,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get fieldRequired => 'Ce champ est obligatoire';
 
   @override
-  String get invalidEmail => 'Veuillez saisir une adresse e-mail valide';
+  String get invalidEmail => 'Saisissez une adresse e-mail valide';
 
   @override
   String get passwordTooShort => 'Le mot de passe doit contenir au moins 6 caractères';
@@ -360,7 +360,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noServices => 'Aucun service disponible';
 
   @override
-  String get requiresInspection => 'Inspection requise';
+  String get requiresInspection => 'Nécessite une inspection';
 
   @override
   String get days => 'jours';
@@ -807,7 +807,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get confirmDelete => 'Confirmer la suppression';
 
   @override
-  String get deleteDepartmentConfirm => 'Voulez-vous supprimer ce département ?';
+  String deleteDepartmentConfirm(Object name) {
+    return 'Voulez-vous vraiment supprimer $name ?';
+  }
 
   @override
   String get noData => 'Aucune donnée';
@@ -828,10 +830,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get add => 'Ajouter';
 
   @override
-  String get selectDepartment => 'Choisir département';
+  String get selectDepartment => 'Veuillez sélectionner un département';
 
   @override
-  String get selectRole => 'Choisir rôle';
+  String get selectRole => 'Veuillez sélectionner un rôle';
 
   @override
   String get role => 'Rôle';
@@ -868,4 +870,185 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get allDepartments => 'Tous les départements';
+
+  @override
+  String get editViolation => 'Modifier l’infraction';
+
+  @override
+  String get saveChanges => 'Enregistrer les modifications';
+
+  @override
+  String get departmentId => 'ID du département';
+
+  @override
+  String get enterDepartmentId => 'Exemple : 1';
+
+  @override
+  String get pleaseSelectDate => 'Veuillez sélectionner une date';
+
+  @override
+  String get invalidAmount => 'Saisissez un montant valide';
+
+  @override
+  String get invalidDepartmentId => 'Saisissez un ID de département valide';
+
+  @override
+  String get missingViolationId => 'ID de l’infraction manquant';
+
+  @override
+  String get characters3To25 => 'Doit contenir entre 3 et 25 caractères';
+
+  @override
+  String get violationSaved => 'Infraction enregistrée avec succès';
+
+  @override
+  String get violationCreateHint => 'Remplissez les détails de l’infraction ci-dessous';
+
+  @override
+  String get violationEditHint => 'Modifiez les détails de l’infraction ci-dessous';
+
+  @override
+  String get editAnnouncement => 'Modifier l’annonce';
+
+  @override
+  String get announcementSaved => 'Annonce enregistrée avec succès';
+
+  @override
+  String get announcementDeleted => 'Annonce supprimée avec succès';
+
+  @override
+  String get announcementCreateHint => 'Rédigez une annonce claire pour les citoyens';
+
+  @override
+  String get announcementEditHint => 'Modifiez les informations de l’annonce';
+
+  @override
+  String get deleteAnnouncementConfirm => 'Voulez-vous vraiment supprimer cette annonce ?';
+
+  @override
+  String get missingAnnouncementId => 'ID de l’annonce manquant';
+
+  @override
+  String get titleMinLength => 'Le titre doit contenir au moins 3 caractères';
+
+  @override
+  String get contentMinLength => 'Le contenu doit contenir au moins 5 caractères';
+
+  @override
+  String get announcementTitle => 'Titre de l’annonce';
+
+  @override
+  String get announcementContent => 'Contenu de l’annonce';
+
+  @override
+  String get enterAnnouncementTitle => 'Entrez le titre de l’annonce';
+
+  @override
+  String get enterAnnouncementContent => 'Entrez le contenu de l’annonce';
+
+  @override
+  String get noAnnouncements => 'Aucune annonce pour le moment';
+
+  @override
+  String get noAnnouncementsHint => 'Créez votre première annonce pour informer les citoyens.';
+
+  @override
+  String shownOfTotal(Object shown, Object total) {
+    return '$shown affiché(s) sur $total';
+  }
+
+  @override
+  String get moduleUnavailable => 'Ce module n’est pas encore disponible';
+
+  @override
+  String get openModuleFailed => 'Impossible d’ouvrir le module';
+
+  @override
+  String get adminDashboardSubtitle => 'Panneau d’administration municipale';
+
+  @override
+  String get departmentCreated => 'Département créé avec succès';
+
+  @override
+  String get departmentUpdated => 'Département modifié avec succès';
+
+  @override
+  String get departmentDeleted => 'Département supprimé avec succès';
+
+  @override
+  String get editDepartment => 'Modifier le département';
+
+  @override
+  String get manageDepartments => 'Gérer les départements municipaux';
+
+  @override
+  String get noDepartmentsHint => 'Aucun département disponible pour le moment.';
+
+  @override
+  String get manageServices => 'Gérer les services municipaux';
+
+  @override
+  String get noServicesHint => 'Aucun service disponible pour le moment.';
+
+  @override
+  String deleteServiceConfirm(Object name) {
+    return 'Voulez-vous vraiment supprimer $name ?';
+  }
+
+  @override
+  String get serviceCreated => 'Service créé avec succès';
+
+  @override
+  String get serviceUpdated => 'Service modifié avec succès';
+
+  @override
+  String get serviceDeleted => 'Service supprimé avec succès';
+
+  @override
+  String get deleteRequested => 'Demande de suppression envoyée';
+
+  @override
+  String get municipalityId => 'ID de la municipalité';
+
+  @override
+  String get descriptionAr => 'Description en arabe';
+
+  @override
+  String get descriptionEn => 'Description en anglais';
+
+  @override
+  String get slaDays => 'Délai SLA en jours';
+
+  @override
+  String get hasFees => 'Avec frais';
+
+  @override
+  String get active => 'Actif';
+
+  @override
+  String get inactive => 'Inactif';
+
+  @override
+  String get invalidNumber => 'Saisissez un nombre valide';
+
+  @override
+  String get loadingDepartments => 'Chargement des départements...';
+
+  @override
+  String get filtered => 'Filtré';
+
+  @override
+  String get manageEmployees => 'Gérer les employés municipaux';
+
+  @override
+  String get noEmployeesHint => 'Aucun employé disponible pour le moment.';
+
+  @override
+  String get employeeCreated => 'Employé créé avec succès';
+
+  @override
+  String get noRolesHint => 'Aucun rôle disponible pour le moment.';
+
+  @override
+  String get inboxComingSoon => 'La boîte de réception sera bientôt disponible';
 }
