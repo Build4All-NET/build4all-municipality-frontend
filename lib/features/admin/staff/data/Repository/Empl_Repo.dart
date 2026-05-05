@@ -3,7 +3,6 @@ import 'package:baladiyati/features/admin/staff/Domain/Repository/Employe_Repo.d
 import 'package:baladiyati/features/admin/staff/data/Model/EmployeModel.dart';
 import 'package:baladiyati/features/admin/staff/data/Service/Employe_Api_Service.dart';
 
-
 class EmployeeRepositoryImpl implements EmployeeRepository {
   final EmployeeApiService api;
 
@@ -11,12 +10,14 @@ class EmployeeRepositoryImpl implements EmployeeRepository {
 
   @override
   Future<List<Employee>> getEmployees() async {
-    return await api.getEmployees();
+    final result = await api.getEmployees();
+    return result.map((e) => e.toEntity()).toList();
   }
 
   @override
   Future<void> createEmployee(Employee employee) async {
     final model = EmployeeModel(
+      id: employee.id,
       name: employee.name,
       email: employee.email,
       phone: employee.phone,

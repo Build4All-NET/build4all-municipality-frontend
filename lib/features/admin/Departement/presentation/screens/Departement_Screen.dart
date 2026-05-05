@@ -1,12 +1,9 @@
-import 'package:baladiyati/core/network/dio_client.dart';
-import 'package:baladiyati/features/admin/Departement/data/Model/Departement_model.dart';
-import 'package:baladiyati/features/admin/Departement/data/Service/Departement_Api_Service.dart';
+import 'package:baladiyati/features/admin/Departement/presentation/bloc/Departement_State.dart';
 import 'package:baladiyati/features/admin/Departement/presentation/cubit/Departement_cubit.dart';
-import 'package:baladiyati/features/admin/Departement/presentation/screens/Add_Depart_screen.dart';
-import 'package:baladiyati/l10n/app_localizations.dart';
-import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import '../../domain/Entities/Departement.dart';
+import 'package:baladiyati/l10n/app_localizations.dart';
 
 class DepartmentsScreen extends StatelessWidget {
   const DepartmentsScreen({super.key});
@@ -15,81 +12,86 @@ class DepartmentsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
 
-    return BlocProvider(
-      create: (_) => DepartmentCubit(
-        DepartmentApiService(DioClient.muni)
-      )..load(), // ✅ هون مكانها الصحيح
+    return BlocBuilder<DepartmentCubit, DepartmentState>(
+      builder: (context, state) {
+        final cubit = context.read<DepartmentCubit>();
 
-      child: Scaffold(
-        appBar: AppBar(title: Text(loc.departments)),
+        return Scaffold(
+          appBar: AppBar(
+            title: Text(loc.departments),
+          ),
 
-        body: BlocBuilder<DepartmentCubit, List<DepartmentModel>>(
-          builder: (context, state) {
-            if (state.isEmpty) {
-              return Center(child: Text(loc.noData));
-            }
+          body: Column(
+            children: [
 
-            return ListView.builder(
-              itemCount: state.length,
-              itemBuilder: (_, i) {
-                final dep = state[i];
+              // 🔽 DROPDOWN FILTER
+              DropdownButton<int?>(
+                value: state.selectedId,
+                hint: Text(loc.allDepartments),
 
-                return ListTile(
-                  title: Text(dep.name),
-                  subtitle: Text(dep.description),
-
-                  trailing: PopupMenuButton(
-                    onSelected: (value) {
-                      final cubit = context.read<DepartmentCubit>();
-
-                      if (value == 'edit') {
-                        showDialog(
-                          context: context,
-                          builder: (_) {
-                            return BlocProvider.value(
-                              value: cubit,
-                              child: AddDepartmentDialog(
-                                department: dep,
-                              ),
-                            );
-                          },
-                        );
-                      }
-
-                      if (value == 'delete') {
-                        cubit.delete(dep.id);
-                      }
-                    },
-                    itemBuilder: (_) => const [
-                      PopupMenuItem(value: 'edit', child: Text("Edit")),
-                      PopupMenuItem(value: 'delete', child: Text("Delete")),
-                    ],
+                items: [
+                  DropdownMenuItem(
+                    value: null,
+                    child: Text(loc.all), // "الكل"
                   ),
-                );
-              },
-            );
-          },
-        ),
 
-        floatingActionButton: Builder(
-          builder: (context) {
-            return FloatingActionButton(
-              onPressed: () {
-                showDialog(
-                  context: context,
-                  builder: (_) {
-                    return BlocProvider.value(
-                      value: context.read<DepartmentCubit>(),
-                      child: const AddDepartmentDialog(),
+                  ...state.departments.map((d) {
+                    return DropdownMenuItem(
+                      value: d.id,
+                      child: Text(d.name),
                     );
-                  },
-                );
-              },
-              child: const Icon(Icons.add),
-            );
-          },
-        ),
-      ),
+                  }).toList(),
+                ],
+
+                onChanged: (value) {
+                  cubit.filterByDepartment(value);
+                },
+              ),
+
+              // 📋 LIST
+              Expanded(
+                child: state.loading
+                    ? Center(child: CircularProgressIndicator())
+                    : state.filtered.isEmpty
+                        ? Center(child: Text(loc.noData))
+                        : ListView.builder(
+                            itemCount: state.filtered.length,
+                            itemBuilder: (context, i) {
+                              final dep = state.filtered[i];
+
+                              return ListTile(
+                                title: Text(dep.name),
+                                subtitle: Text(dep.description),
+
+                                trailing: PopupMenuButton(
+                                  onSelected: (value) {
+                                    if (value == "delete") {
+                                      cubit.delete(dep.id);
+                                    }
+                                  },
+
+                                  itemBuilder: (_) => [
+                                    PopupMenuItem(
+                                      value: "delete",
+                                      child: Text(loc.delete),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+              ),
+            ],
+          ),
+
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              // open add dialog
+            },
+            child: Icon(Icons.add),
+          ),
+        );
+      },
     );
   }
 }

@@ -1,20 +1,29 @@
-import 'package:baladiyati/features/admin/Departement/domain/Entities/Departement.dart';
+import '../../domain/Entities/Departement.dart';
 
-
-abstract class DepartmentState {}
-
-class DepartmentInitial extends DepartmentState {}
-
-class DepartmentLoading extends DepartmentState {}
-
-class DepartmentLoaded extends DepartmentState {
+class DepartmentState {
   final List<Department> departments;
+  final List<Department> filtered;
+  final bool loading;
+  final int? selectedId;
 
-  DepartmentLoaded(this.departments);
-}
+  DepartmentState({
+    required this.departments,
+    required this.filtered,
+    required this.loading,
+    this.selectedId,
+  });
 
-class DepartmentError extends DepartmentState {
-  final String message;
-
-  DepartmentError(this.message);
+  DepartmentState copyWith({
+    List<Department>? departments,
+    List<Department>? filtered,
+    bool? loading,
+    int? selectedId,
+  }) {
+    return DepartmentState(
+      departments: departments ?? this.departments,
+      filtered: filtered ?? this.filtered,
+      loading: loading ?? this.loading,
+      selectedId: selectedId ?? this.selectedId,
+    );
+  }
 }

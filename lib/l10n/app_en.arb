@@ -326,9 +326,6 @@
   "engineer": "Engineer",
   "accountant": "Accountant",
 
-
-
-"firstNameLabel": "First name",
   "firstNameHint": "Enter your first name",
   "lastNameLabel": "Last name",
   "lastNameHint": "Enter your last name",
@@ -357,7 +354,23 @@
   "addressTooShort": "Address is too short",
   "missingBuild4allToken": "Missing login token. Please login again.",
   "missingBuild4allUser": "Missing user data. Please login again.",
-  "missingMunicipalityId": "Missing municipality id"
+  "missingMunicipalityId": "Missing municipality id",
+
+  "chooseProfileImage": "Choose profile image",
+  "changeProfileImage": "Change profile image",
+  "removeProfileImage": "Remove profile image",
+  
+  "addService": "Add Service",
+  "editService": "Edit Service",
+  "nameAr": "Arabic Name",
+  "nameEn": "English Name",
+  "price": "Price",
+  "department": "Department",
+  "cancel": "Cancel",
+  "save": "Save",
+  "pleaseSelectDepartment": "Please select department",
+  "allDepartments": "All Departments"
+
 
 
 

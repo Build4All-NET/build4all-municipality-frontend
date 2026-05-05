@@ -1,35 +1,46 @@
-import '../../domain/entities/service.dart';
+class ServiceModel {
+  final int id;
+  final int municipalityId;
+  final int departmentId;
+  final String nameAr;
+  final String nameEn;
+  final String descriptionAr;
+  final String descriptionEn;
+  final int slaDays;
+  final bool requiresInspection;
+  final bool hasFees;
+  final double feeAmount;
+  final bool isActive;
 
-class ServiceModel extends Service {
   ServiceModel({
-     required super.id,
-    required super.municipalityId,
-    required super.departmentId,
-    required super.nameAr,
-    required super.nameEn,
-    required super.descriptionAr,
-    required super.descriptionEn,
-    required super.slaDays,
-    required super.requiresInspection,
-    required super.hasFees,
-    required super.feeAmount,
-    required super.isActive,
+    required this.id,
+    required this.municipalityId,
+    required this.departmentId,
+    required this.nameAr,
+    required this.nameEn,
+    required this.descriptionAr,
+    required this.descriptionEn,
+    required this.slaDays,
+    required this.requiresInspection,
+    required this.hasFees,
+    required this.feeAmount,
+    required this.isActive,
   });
 
   factory ServiceModel.fromJson(Map<String, dynamic> json) {
     return ServiceModel(
-      id: json['id'],
-      municipalityId: json['municipalityId'],
-      departmentId: json['departmentId'],
-      nameAr: json['nameAr'],
-      nameEn: json['nameEn'],
-      descriptionAr: json['descriptionAr'],
-      descriptionEn: json['descriptionEn'],
-      slaDays: json['slaDays'],
-      requiresInspection: json['requiresInspection'],
-      hasFees: json['hasFees'],
-      feeAmount: (json['feeAmount'] as num).toDouble(),
-      isActive: json['isActive'],
+      id: json['id'] ?? 0,
+      municipalityId: json['municipalityId'] ?? 0,
+      departmentId: json['departmentId'] ?? 0,
+      nameAr: json['nameAr'] ?? '',
+      nameEn: json['nameEn'] ?? '',
+      descriptionAr: json['descriptionAr'] ?? '',
+      descriptionEn: json['descriptionEn'] ?? '',
+      slaDays: json['slaDays'] ?? 0,
+      requiresInspection: json['requiresInspection'] ?? false,
+      hasFees: json['hasFees'] ?? false,
+      feeAmount: (json['feeAmount'] ?? 0).toDouble(),
+      isActive: json['isActive'] ?? false,
     );
   }
 

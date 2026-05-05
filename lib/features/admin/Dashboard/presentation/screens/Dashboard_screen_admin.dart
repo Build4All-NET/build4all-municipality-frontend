@@ -120,9 +120,9 @@ class DashboardPage extends StatelessWidget {
                           loc.services,
                           Icons.description,
                           Colors.green,
-                          onTap: () {
-                            Navigator.pushNamed(context, "/services");
-                          },
+                        onTap: () {
+  AppRouter.goToServices(context);
+},
                         ),
 
                         _actionCard(

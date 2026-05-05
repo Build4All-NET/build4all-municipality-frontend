@@ -1,11 +1,11 @@
-import 'package:baladiyati/features/admin/Departement/data/Model/Departement_model.dart';
+import 'package:baladiyati/features/admin/Departement/domain/Entities/Departement.dart';
 import 'package:baladiyati/features/admin/Departement/presentation/cubit/Departement_cubit.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AddDepartmentDialog extends StatefulWidget {
-  final DepartmentModel? department;
+  final Department? department;
 
   const AddDepartmentDialog({super.key, this.department});
 
@@ -37,6 +37,7 @@ class _AddDepartmentDialogState extends State<AddDepartmentDialog> {
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    final cubit = context.read<DepartmentCubit>();
 
     return AlertDialog(
       title: Text(
@@ -72,22 +73,20 @@ class _AddDepartmentDialogState extends State<AddDepartmentDialog> {
 
         ElevatedButton(
           onPressed: () {
-            if (name.text.isEmpty || description.text.isEmpty) return;
+            if (name.text.trim().isEmpty ||
+                description.text.trim().isEmpty) return;
 
-            final model = DepartmentModel(
-              id: widget.department?.id ??
-                  DateTime.now().millisecondsSinceEpoch,
-              name: name.text,
-              description: description.text,
+            final department = Department(
+              id: widget.department?.id ?? 0,
+              name: name.text.trim(),
+              description: description.text.trim(),
               isFixed: widget.department?.isFixed ?? false,
             );
 
-            final cubit = context.read<DepartmentCubit>();
-
             if (widget.department == null) {
-              cubit.add(model);
+              cubit.add(department);
             } else {
-              cubit.update(model);
+              cubit.update(department);
             }
 
             Navigator.pop(context);

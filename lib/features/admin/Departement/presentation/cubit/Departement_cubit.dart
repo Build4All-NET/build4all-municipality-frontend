@@ -1,31 +1,69 @@
-import 'package:baladiyati/features/admin/Departement/data/Model/Departement_model.dart';
-import 'package:baladiyati/features/admin/Departement/data/Service/Departement_Api_Service.dart';
+import 'package:baladiyati/features/admin/Departement/domain/Usecases/Add_departement.dart';
+import 'package:baladiyati/features/admin/Departement/domain/Usecases/Delete_departement.dart';
+import 'package:baladiyati/features/admin/Departement/domain/Usecases/Get_Departement.dart';
+import 'package:baladiyati/features/admin/Departement/domain/Usecases/Update_Departement.dart';
+import 'package:baladiyati/features/admin/Departement/presentation/bloc/Departement_State.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class DepartmentCubit extends Cubit<List<DepartmentModel>> {
-  final DepartmentApiService api;
+import '../../domain/Entities/Departement.dart';
 
-  DepartmentCubit(this.api) : super([]);
+class DepartmentCubit extends Cubit<DepartmentState> {
+  final GetDepartments getDepartments;
+  final AddDepartment addDepartment;
+  final DeleteDepartment deleteDepartment;
+  final UpdateDepartment updateDepartment;
 
-  Future<void> load() async {
-    final data = await api.getAll();
-      print("🔥 DEPARTMENTS FROM API: $data");
+  DepartmentCubit(
+    this.getDepartments,
+    this.addDepartment,
+    this.deleteDepartment,
+    this.updateDepartment,
+  ) : super(
+          DepartmentState(
+            departments: [],
+            filtered: [],
+            loading: false,
+          ),
+        );
 
-    emit(data);
+  Future<void> fetchDepartments() async {
+    emit(state.copyWith(loading: true));
+
+    final data = await getDepartments();
+
+    emit(state.copyWith(
+      loading: false,
+      departments: data,
+      filtered: data,
+    ));
+  }
+
+  void filterByDepartment(int? id) {
+    if (id == null) {
+      emit(state.copyWith(filtered: state.departments, selectedId: null));
+      return;
+    }
+
+    final filtered = state.departments.where((e) => e.id == id).toList();
+
+    emit(state.copyWith(
+      filtered: filtered,
+      selectedId: id,
+    ));
   }
 
   Future<void> delete(int id) async {
-    await api.delete(id);
-    await load();
+    await deleteDepartment(id);
+    fetchDepartments();
   }
 
-  Future<void> add(DepartmentModel model) async {
-    await api.add(model);
-    await load(); // refresh list
+  Future<void> add(Department dep) async {
+    await addDepartment(dep);
+    fetchDepartments();
   }
 
-  Future<void> update(DepartmentModel model) async {
-    await api.update(model.id, model);
-    await load(); // refresh list
+  Future<void> update(Department dep) async {
+    await updateDepartment(dep);
+    fetchDepartments();
   }
 }
