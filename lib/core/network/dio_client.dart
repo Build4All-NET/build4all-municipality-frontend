@@ -2,7 +2,9 @@ import 'package:baladiyati/core/config/env.dart';
 import 'package:baladiyati/core/network/globals.dart' as globals;
 import 'package:baladiyati/core/network/interceptors/auth_body_injector.dart';
 import 'package:baladiyati/core/network/interceptors/refresh_token_interceptor.dart';
+import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 class DioClient {
   static late Dio municipalityDio;
@@ -12,10 +14,10 @@ class DioClient {
     final build4allBaseUrl = _withApiSuffix(Env.apiBaseUrl);
     final municipalityBaseUrl = _cleanBaseUrl(Env.overrideBaseUrl);
 
-    print('BUILD4ALL_BASE_URL = $build4allBaseUrl');
-    print('MUNICIPALITY_BASE_URL = $municipalityBaseUrl');
-    print('OWNER_PROJECT_LINK_ID = ${Env.ownerProjectLinkId}');
-    print('PROJECT_ID = ${Env.projectId}');
+    debugPrint('BUILD4ALL_BASE_URL = $build4allBaseUrl');
+    debugPrint('MUNICIPALITY_BASE_URL = $municipalityBaseUrl');
+    debugPrint('OWNER_PROJECT_LINK_ID = ${Env.ownerProjectLinkId}');
+    debugPrint('PROJECT_ID = ${Env.projectId}');
 
     build4allDio = Dio(
       BaseOptions(
@@ -48,36 +50,84 @@ class DioClient {
 
     // Legacy compatibility: old code using globals.dio() will use Build4All by default.
     globals.makeDefaultDio(build4allBaseUrl);
+
+    // Restore admin token after app restart if it exists.
+    await _restoreAdminTokenIfAvailable();
   }
 
   static Dio get build => build4allDio;
 
   static Dio get muni => municipalityDio;
 
- static void setAuthToken(String? token) {
-  globals.setAuthToken(token);
+  static void setAuthToken(String? token) {
+    globals.setAuthToken(token);
 
-  final raw = (token ?? '').trim();
+    final raw = (token ?? '').trim();
 
-  if (raw.isEmpty) {
-    build4allDio.options.headers.remove('Authorization');
-    municipalityDio.options.headers.remove('Authorization');
-    return;
+    if (raw.isEmpty) {
+      if (_isInitialized()) {
+        build4allDio.options.headers.remove('Authorization');
+        municipalityDio.options.headers.remove('Authorization');
+      }
+
+      return;
+    }
+
+    final bearer = _asBearer(raw);
+
+    build4allDio.options.headers['Authorization'] = bearer;
+    municipalityDio.options.headers['Authorization'] = bearer;
+
+    debugPrint('DioClient.setAuthToken => token attached to build + muni');
   }
 
-  final bearer = raw.toLowerCase().startsWith('bearer ')
-      ? raw
-      : 'Bearer $raw';
-
-  build4allDio.options.headers['Authorization'] = bearer;
-  municipalityDio.options.headers['Authorization'] = bearer;
-}
   static void clearAuthToken() {
     setAuthToken(null);
   }
 
+  static Future<void> _restoreAdminTokenIfAvailable() async {
+    try {
+      final token = await AdminTokenStore().getToken();
+
+      if (token != null && token.trim().isNotEmpty) {
+        setAuthToken(token);
+        debugPrint('DioClient.init => restored admin token');
+      } else {
+        debugPrint('DioClient.init => no admin token found');
+      }
+    } catch (e) {
+      debugPrint('DioClient.init => failed to restore admin token: $e');
+    }
+  }
+
   static void _attachCommonInterceptors(Dio dio) {
     dio.interceptors.clear();
+
+    dio.interceptors.add(
+      InterceptorsWrapper(
+        onRequest: (options, handler) async {
+          // If request already has Authorization, keep it.
+          final hasRequestAuth =
+              options.headers['Authorization']?.toString().trim().isNotEmpty ??
+                  false;
+
+          // If Dio global headers have Authorization, attach it to request.
+          final globalAuth =
+              dio.options.headers['Authorization']?.toString().trim();
+
+          if (!hasRequestAuth && globalAuth != null && globalAuth.isNotEmpty) {
+            options.headers['Authorization'] = globalAuth;
+          }
+
+          debugPrint('DIO REQUEST => ${options.method} ${options.uri}');
+          debugPrint(
+            'DIO AUTH HEADER => ${options.headers['Authorization'] != null ? 'YES' : 'NO'}',
+          );
+
+          return handler.next(options);
+        },
+      ),
+    );
 
     dio.interceptors.add(RefreshTokenInterceptor());
     dio.interceptors.add(OwnerInjector());
@@ -85,13 +135,33 @@ class DioClient {
     dio.interceptors.add(
       LogInterceptor(
         request: true,
+        requestHeader: true,
         requestBody: true,
         responseBody: true,
-        error: true,
-        requestHeader: false,
         responseHeader: false,
+        error: true,
       ),
     );
+  }
+
+  static String _asBearer(String token) {
+    final clean = token.trim();
+
+    if (clean.toLowerCase().startsWith('bearer ')) {
+      return clean;
+    }
+
+    return 'Bearer $clean';
+  }
+
+  static bool _isInitialized() {
+    try {
+      build4allDio;
+      municipalityDio;
+      return true;
+    } catch (_) {
+      return false;
+    }
   }
 
   static String _cleanBaseUrl(String rawUrl) {

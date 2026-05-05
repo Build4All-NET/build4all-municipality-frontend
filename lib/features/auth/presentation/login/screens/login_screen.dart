@@ -264,6 +264,7 @@ class _LoginScreenState extends State<LoginScreen> {
         refreshToken: dual.admin!.refreshToken,
         tenantId: ownerProjectLinkId.toString(),
       );
+      DioClient.setAuthToken(dual.admin!.token);
 
       if (!mounted) {
         return;

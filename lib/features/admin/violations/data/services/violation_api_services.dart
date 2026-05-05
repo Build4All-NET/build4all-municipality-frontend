@@ -8,7 +8,7 @@ class ViolationApiService {
   ViolationApiService({Dio? dio}) : dio = dio ?? DioClient.muni;
 
   Future<List<ViolationModel>> getAllViolations() async {
-    final response = await dio.get('/api/violations/all');
+    final response = await dio.get('/api/admin/violations/all');
 
     final data = response.data;
 
