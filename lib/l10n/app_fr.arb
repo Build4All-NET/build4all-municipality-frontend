@@ -300,14 +300,11 @@
   "notFixed": "Non fixe",
   "addDepartmentButton": "Ajouter le département",
   "department": "Département",
-<<<<<<< feature/admin-announcements-violations
 
 
   "continueAsCitizen": "Continuer comme citoyen",
   "continueAsAdmin": "Continuer comme administrateur",
   "loginFailed": "Échec de la connexion",
-  "firstNameLabel": "Prénom",
-=======
   
   "edit": "Modifier",
   "delete": "Supprimer",
@@ -331,12 +328,10 @@
   "employee": "Employé",
   "police": "Agent de police",
   "engineer": "Ingénieur",
-  "accountant": "Comptable"
+  "accountant": "Comptable",
 
 
 
- "firstNameLabel": "Prénom",
->>>>>>> main
   "firstNameHint": "Entrez votre prénom",
   "lastNameLabel": "Nom",
   "lastNameHint": "Entrez votre nom",
@@ -365,7 +360,23 @@
   "addressTooShort": "L’adresse est trop courte",
   "missingBuild4allToken": "Token de connexion manquant. Veuillez vous reconnecter.",
   "missingBuild4allUser": "Données utilisateur manquantes. Veuillez vous reconnecter.",
-  "missingMunicipalityId": "Identifiant de municipalité manquant"
+  "missingMunicipalityId": "Identifiant de municipalité manquant",
+
+  "chooseProfileImage": "Choisir une image de profil",
+  "changeProfileImage": "Modifier l'image de profil",
+  "removeProfileImage": "Supprimer l'image de profil",
+  
+  "addService": "Ajouter un service",
+  "editService": "Modifier le service",
+  "nameAr": "Nom en arabe",
+  "nameEn": "Nom en anglais",
+  "price": "Prix",
+  "department": "Département",
+  "cancel": "Annuler",
+  "save": "Enregistrer",
+  "pleaseSelectDepartment": "Veuillez sélectionner un département",
+  "allDepartments": "Tous les départements"
+
 
 }
 

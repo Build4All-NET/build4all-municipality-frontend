@@ -1,13 +1,11 @@
-import 'package:baladiyati/features/admin/manage_service/domain/entities/service.dart';
+import 'package:baladiyati/features/admin/manage_service/Data/model/service_Model.dart';
 
 abstract class ServiceState {}
-
-class ServiceInitial extends ServiceState {}
 
 class ServiceLoading extends ServiceState {}
 
 class ServiceLoaded extends ServiceState {
-  final List<Service> services;
+  final List<ServiceModel> services;
   ServiceLoaded(this.services);
 }
 

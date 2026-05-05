@@ -3,14 +3,17 @@
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/admin/Departement/data/Repository/Departement_Repo_Impl.dart';
 import 'package:baladiyati/features/admin/Departement/data/Service/Departement_Api_Service.dart';
+import 'package:baladiyati/features/admin/Departement/domain/Usecases/Add_departement.dart';
+import 'package:baladiyati/features/admin/Departement/domain/Usecases/Delete_departement.dart';
 import 'package:baladiyati/features/admin/Departement/domain/Usecases/Get_Departement.dart';
+import 'package:baladiyati/features/admin/Departement/domain/Usecases/Update_Departement.dart';
 import 'package:baladiyati/features/admin/Departement/presentation/bloc/Departement_Event.dart';
-import 'package:baladiyati/features/admin/Departement/presentation/bloc/Departement_bloc.dart';
 import 'package:baladiyati/features/admin/Departement/presentation/cubit/Departement_cubit.dart';
 import 'package:baladiyati/features/admin/Departement/presentation/screens/Add_Depart_screen.dart';
 import 'package:baladiyati/features/admin/Departement/presentation/screens/Departement_Screen.dart';
 import 'package:baladiyati/features/admin/Role/Presenatation/cubit/role_cubit.dart';
 import 'package:baladiyati/features/admin/Role/data/service/Role_Api_Service.dart';
+import 'package:baladiyati/features/admin/manage_service/presentation/screens/Service_screen.dart';
 import 'package:baladiyati/features/admin/staff/Domain/Usecase/GetEmploye.dart';
 import 'package:baladiyati/features/admin/staff/Domain/Usecase/GreateEmploye.dart';
 import 'package:baladiyati/features/admin/staff/Presentation/bloc/Empl_bloc.dart';
@@ -21,7 +24,9 @@ import 'package:baladiyati/features/admin/staff/data/Service/Employe_Api_Service
 import 'package:baladiyati/features/admin/violations/data/Repository/violation_Repository_impl.dart';
 import 'package:baladiyati/features/admin/violations/data/services/violation_api_services.dart';
 import 'package:baladiyati/features/admin/violations/domain/Usecase/AddViolation.dart';
+import 'package:baladiyati/features/admin/violations/domain/Usecase/DeleteViolation.dart';
 import 'package:baladiyati/features/admin/violations/domain/Usecase/Getviolation.dart';
+import 'package:baladiyati/features/admin/violations/domain/Usecase/UpdateViolation.dart';
 import 'package:baladiyati/features/admin/violations/presentation/bloc/violation_bloc.dart';
 import 'package:baladiyati/features/admin/violations/presentation/screens/violationpage.dart';
 import 'package:baladiyati/features/citizen/profile/presentation/bloc/profile_bloc.dart';
@@ -147,54 +152,61 @@ class AppRouter {
     );
   }
   static void goToViolations(BuildContext context) {
-  final repo = ViolationRepositoryImpl(ViolationApiService());
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => RepositoryProvider(
+          create: (_) => ViolationRepositoryImpl(ViolationApiService()),
+          child: BlocProvider(
+            create: (context) {
+              final repo = context.read<ViolationRepositoryImpl>();
 
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => BlocProvider(
-        create: (_) => ViolationBloc(
-          AddViolation(repo),
-          GetViolations(repo),
+              return ViolationBloc(
+                addViolation: AddViolation(repo),
+                getViolations: GetViolations(repo),
+                updateViolation: UpdateViolation(repo),
+                deleteViolation: DeleteViolation(repo)
+              );
+            },
+            child: const ViolationsPage(),
+          ),
         ),
-        child: const ViolationsPage(),
       ),
-    ),
-  );
-}
+    );
+  }
 static void goToDepartments(BuildContext context) {
   final repo = DepartmentRepositoryImpl(
     DepartmentApiService(DioClient.muni),
   );
 
   final getDepartments = GetDepartments(repo);
+  final addDepartment = AddDepartment(repo);
+  final deleteDepartment = DeleteDepartment(repo);
+  final updateDepartment = UpdateDepartment(repo);
 
   Navigator.push(
     context,
     MaterialPageRoute(
-      builder: (_) {
-        final bloc = DepartmentBloc(getDepartments);
-
-        bloc.add(LoadDepartments()); // ✔️ هون صح
-
-        return BlocProvider(
-          create: (_) => bloc,
-          child: const DepartmentsScreen(),
-        );
-      },
+      builder: (_) => BlocProvider(
+        create: (_) => DepartmentCubit(
+          getDepartments,
+          addDepartment,
+          deleteDepartment,
+          updateDepartment,
+        )..fetchDepartments(), // ✔️ صح مش load
+        child: const DepartmentsScreen(),
+      ),
     ),
   );
 }
  // ================= EMPLOYEES =================
  
 static void goToEmployees(BuildContext context) {
-
   final employeeRepo = EmployeeRepositoryImpl(
     EmployeeApiService(DioClient.muni),
   );
 
   final roleApi = RoleApiService(DioClient.muni);
-
   final departmentApi = DepartmentApiService(DioClient.muni);
 
   Navigator.push(
@@ -203,7 +215,6 @@ static void goToEmployees(BuildContext context) {
       builder: (_) => MultiBlocProvider(
         providers: [
 
-          // ================= EMPLOYEE BLOC =================
           BlocProvider(
             create: (_) => EmployeeBloc(
               GetEmployees(employeeRepo),
@@ -211,19 +222,45 @@ static void goToEmployees(BuildContext context) {
             )..add(LoadEmployees()),
           ),
 
-          // ================= ROLE CUBIT =================
           BlocProvider(
             create: (_) => RoleCubit(roleApi)..load(),
           ),
 
-          // ================= DEPARTMENT CUBIT =================
           BlocProvider(
-            create: (_) => DepartmentCubit(departmentApi)..load(),
+            create: (_) => DepartmentCubit(
+  GetDepartments(
+    DepartmentRepositoryImpl(
+      DepartmentApiService(DioClient.muni),
+    ),
+  ),
+  AddDepartment(
+    DepartmentRepositoryImpl(
+      DepartmentApiService(DioClient.muni),
+    ),
+  ),
+  DeleteDepartment(
+    DepartmentRepositoryImpl(
+      DepartmentApiService(DioClient.muni),
+    ),
+  ),
+  UpdateDepartment(
+    DepartmentRepositoryImpl(
+      DepartmentApiService(DioClient.muni),
+    ),
+  ),
+)..fetchDepartments()
           ),
         ],
-
-        child: EmployeesScreen(),
+        child: const EmployeesScreen(),
       ),
+    ),
+  );
+}
+static void goToServices(BuildContext context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) =>  ServicesScreen(),
     ),
   );
 }

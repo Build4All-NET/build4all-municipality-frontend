@@ -39,4 +39,14 @@ class EmployeeModel extends Employee {
       "depId": depId,
     };
   }
+  Employee toEntity() {
+  return Employee(
+    id: id,
+    name: name,
+    email: email,
+    phone: phone,
+    roleId: roleId,
+    depId: depId,
+  );
+}
 }

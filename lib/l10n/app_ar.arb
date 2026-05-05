@@ -299,8 +299,7 @@
   "notFixed": "غير ثابت",
   "addDepartmentButton": "إضافة القسم",
   "department": "القسم",
-<<<<<<< feature/admin-announcements-violations
-=======
+
   
   "edit": "تعديل",
   "delete": "حذف",
@@ -323,16 +322,7 @@
   "employee": "موظف",
   "police": "شرطي",
   "engineer": "مهندس",
-  "accountant": "محاسب"
-
-
-
->>>>>>> main
-
-
-
-
- "firstNameLabel": "الاسم الأول",
+  "accountant": "محاسب",
   "firstNameHint": "أدخل الاسم الأول",
   "lastNameLabel": "اسم العائلة",
   "lastNameHint": "أدخل اسم العائلة",
@@ -361,7 +351,23 @@
   "addressTooShort": "العنوان قصير جدًا",
   "missingBuild4allToken": "رمز تسجيل الدخول غير موجود. يرجى تسجيل الدخول من جديد.",
   "missingBuild4allUser": "بيانات المستخدم غير موجودة. يرجى تسجيل الدخول من جديد.",
-  "missingMunicipalityId": "معرّف البلدية غير موجود"
+  "missingMunicipalityId": "معرّف البلدية غير موجود",
+
+
+  "chooseProfileImage": "اختيار صورة الملف الشخصي",
+  "changeProfileImage": "تغيير صورة الملف الشخصي",
+  "removeProfileImage": "إزالة صورة الملف الشخصي",
+  
+  "addService": "إضافة خدمة",
+  "editService": "تعديل الخدمة",
+  "nameAr": "الاسم بالعربية",
+  "nameEn": "الاسم بالإنجليزية",
+  "price": "السعر",
+  "department": "القسم",
+  "cancel": "إلغاء",
+  "save": "حفظ",
+  "pleaseSelectDepartment": "يرجى اختيار القسم",
+  "allDepartments": "كل الأقسام"
 
 
 }

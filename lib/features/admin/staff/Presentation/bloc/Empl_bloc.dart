@@ -4,7 +4,6 @@ import 'package:baladiyati/features/admin/staff/Presentation/bloc/Empl_State.dar
 import 'package:baladiyati/features/admin/staff/Presentation/bloc/Empl_event.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-
 class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
   final GetEmployees getEmployees;
   final CreateEmployee createEmployee;
@@ -14,6 +13,7 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
 
     on<LoadEmployees>((event, emit) async {
       emit(EmployeeLoading());
+
       try {
         final employees = await getEmployees();
         emit(EmployeeLoaded(employees));
@@ -25,7 +25,7 @@ class EmployeeBloc extends Bloc<EmployeeEvent, EmployeeState> {
     on<AddEmployee>((event, emit) async {
       try {
         await createEmployee(event.employee);
-        add(LoadEmployees()); // refresh list
+        add(LoadEmployees());
       } catch (e) {
         emit(EmployeeError(e.toString()));
       }

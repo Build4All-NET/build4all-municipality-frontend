@@ -1,9 +1,8 @@
-import '../entities/service.dart';
+import 'package:baladiyati/features/admin/manage_service/Data/model/service_Model.dart';
 
 abstract class ServiceRepository {
-  Future<List<Service>> getServices();
-  Future<void> createService(Service service);
-  Future<void> deleteService(int id);
-  
-  Future<void> updateService(int id, Service service);
+  Future<List<ServiceModel>> getAll();
+  Future<void> create(ServiceModel s);
+  Future<void> delete(int id);
+  Future<void> update(int id, ServiceModel s);
 }

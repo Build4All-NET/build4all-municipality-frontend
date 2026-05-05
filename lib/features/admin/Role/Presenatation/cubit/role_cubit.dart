@@ -1,20 +1,20 @@
-import 'package:baladiyati/features/admin/Role/data/model/RoleModel.dart';
+import 'package:baladiyati/features/admin/Role/Presenatation/cubit/Role_state.dart';
 import 'package:baladiyati/features/admin/Role/data/service/Role_Api_Service.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class RoleCubit extends Cubit<List<RoleModel>> {
+class RoleCubit extends Cubit<RoleState> {
   final RoleApiService api;
 
-  RoleCubit(this.api) : super([]);
+  RoleCubit(this.api) : super(RoleState.initial());
 
   Future<void> load() async {
-    try {
-      final data = await api.getAll();
+    emit(state.copyWith(loading: true));
 
-      emit(data.map((e) => RoleModel.fromJson(e)).toList());
+    try {
+      final roles = await api.getRoles(); // ✔️ صح
+      emit(state.copyWith(roles: roles, loading: false));
     } catch (e) {
-      print("❌ RoleCubit error: $e");
-      emit([]); // مهم حتى ما يعلق الـ UI
+      emit(state.copyWith(loading: false));
     }
   }
 }

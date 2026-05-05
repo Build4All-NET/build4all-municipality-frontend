@@ -1,72 +1,44 @@
+import 'package:baladiyati/features/admin/manage_service/Data/model/service_Model.dart';
 import 'package:baladiyati/features/admin/manage_service/Domain/usecases/Create_service.dart';
 import 'package:baladiyati/features/admin/manage_service/Domain/usecases/Get_service.dart';
-import 'package:baladiyati/features/admin/manage_service/Domain/usecases/delete_service.dart';
-import 'package:baladiyati/features/admin/manage_service/Domain/usecases/update_service.dart';
+import 'package:baladiyati/features/admin/manage_service/presentation/bloc/Service_State.dart';
+import 'package:baladiyati/features/admin/manage_service/presentation/bloc/Service_event.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'Service_event.dart';
-import 'Service_State.dart';
 
 class ServiceBloc extends Bloc<ServiceEvent, ServiceState> {
   final GetServices getServices;
-  final AddService addService;
-  final DeleteService deleteService;
-  final UpdateService updateService;
+  final CreateService createService;
 
-  ServiceBloc(
-    this.getServices,
-    this.addService,
-    this.deleteService,
-    this.updateService,
-  ) : super(ServiceInitial()) {
+  List<ServiceModel> allServices = [];
 
-    // ✅ LOAD
+  ServiceBloc(this.getServices, this.createService)
+      : super(ServiceLoading()) {
+
     on<LoadServices>((event, emit) async {
       emit(ServiceLoading());
       try {
-        final data = await getServices();
-        emit(ServiceLoaded(data));
+        allServices = await getServices();
+        emit(ServiceLoaded(allServices));
       } catch (e) {
         emit(ServiceError(e.toString()));
       }
     });
 
-    // ✅ CREATE
-    on<AddServiceEvent>((event, emit) async {
-      try {
-        await addService(event.service);
-        add(LoadServices());
-      } catch (e) {
-        emit(ServiceError(e.toString()));
+    on<FilterServices>((event, emit) {
+      if (event.departmentId == null) {
+        emit(ServiceLoaded(allServices));
+      } else {
+        final filtered = allServices
+            .where((s) => s.departmentId == event.departmentId)
+            .toList();
+
+        emit(ServiceLoaded(filtered));
       }
     });
 
-    // ✅ UPDATE
-   on<UpdateServiceEvent>((event, emit) async {
-  emit(ServiceLoading());
-  try {
-    await updateService(event.id, event.service);
-    add(LoadServices());
-  } catch (e) {
-    emit(ServiceError(e.toString()));
-  }
-});
-
-    // ✅ DELETE (optimized local update)
-    on<DeleteServiceEvent>((event, emit) async {
-      try {
-        await deleteService(event.id);
-
-        final currentState = state;
-        if (currentState is ServiceLoaded) {
-          final updatedList = currentState.services
-              .where((s) => s.id != event.id)
-              .toList();
-
-          emit(ServiceLoaded(updatedList));
-        }
-      } catch (e) {
-        emit(ServiceError(e.toString()));
-      }
+    on<AddService>((event, emit) async {
+      await createService(event.service);
+      add(LoadServices());
     });
   }
 }
