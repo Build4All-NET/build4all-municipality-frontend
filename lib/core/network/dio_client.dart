@@ -7,6 +7,8 @@ import 'package:baladiyati/core/network/interceptors/refresh_token_interceptor.d
 import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
+import 'package:baladiyati/core/config/jwt_store.dart';
+import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
 
 class DioClient {
   static late Dio municipalityDio;
@@ -54,7 +56,7 @@ class DioClient {
     globals.makeDefaultDio(build4allBaseUrl);
 
     // Restore admin token after app restart if it exists.
-    await _restoreAdminTokenIfAvailable();
+  await _restoreSavedTokenIfAvailable();
   }
 
   static Dio get build => build4allDio;
@@ -87,20 +89,34 @@ class DioClient {
     setAuthToken(null);
   }
 
-  static Future<void> _restoreAdminTokenIfAvailable() async {
-    try {
-      final token = await AdminTokenStore().getToken();
+ static Future<void> _restoreSavedTokenIfAvailable() async {
+  try {
+    final adminStore = AdminTokenStore();
+    final userStore = AuthTokenStore();
 
-      if (token != null && token.trim().isNotEmpty) {
-        setAuthToken(token);
-        debugPrint('DioClient.init => restored admin token');
-      } else {
-        debugPrint('DioClient.init => no admin token found');
-      }
-    } catch (e) {
-      debugPrint('DioClient.init => failed to restore admin token: $e');
+    final adminToken = await adminStore.getToken();
+
+    if (adminToken != null && adminToken.trim().isNotEmpty) {
+      setAuthToken(adminToken);
+      debugPrint('DioClient.init => restored admin token');
+      return;
     }
+
+    final userToken = await userStore.getToken();
+
+    if (userToken != null && userToken.trim().isNotEmpty) {
+      setAuthToken(userToken);
+      await JwtStore.save(userToken);
+
+      debugPrint('DioClient.init => restored citizen token');
+      return;
+    }
+
+    debugPrint('DioClient.init => no saved token found');
+  } catch (e) {
+    debugPrint('DioClient.init => failed to restore saved token: $e');
   }
+}
 
  static void _attachCommonInterceptors(Dio dio) {
   dio.interceptors.clear();
@@ -129,7 +145,7 @@ class DioClient {
     ),
   );
 
-  dio.interceptors.add(RefreshTokenInterceptor());
+  dio.interceptors.add(RefreshTokenInterceptor(dio));
   dio.interceptors.add(OwnerInjector());
 
 

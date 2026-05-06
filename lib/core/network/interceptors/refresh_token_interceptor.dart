@@ -8,25 +8,28 @@ import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
 import 'package:dio/dio.dart';
 
 class RefreshTokenInterceptor extends Interceptor {
+  RefreshTokenInterceptor(this._dio);
+
+  final Dio _dio;
+
   final AuthTokenStore _userStore = AuthTokenStore();
   final AdminTokenStore _adminStore = const AdminTokenStore();
   final AuthRefreshCoordinator _refresh = AuthRefreshCoordinator.instance;
 
   bool _isAuthCall(RequestOptions options) {
-    final path = options.path;
+    final path = options.path.toLowerCase();
 
-    return path.contains('/api/auth/refresh') ||
-        path.contains('/api/auth/logout') ||
-        path.contains('/api/auth/user/login') ||
-        path.contains('/api/auth/user/login-phone') ||
-        path.contains('/api/auth/admin/login') ||
-        path.contains('/api/auth/admin/login/front') ||
-        path.contains('/api/auth/manager/login') ||
-        path.contains('/api/auth/superadmin/login') ||
-        path.contains('/auth/refresh') ||
+    return path.contains('/auth/refresh') ||
         path.contains('/auth/logout') ||
         path.contains('/auth/user/login') ||
-        path.contains('/auth/admin/login');
+        path.contains('/auth/user/login-phone') ||
+        path.contains('/auth/admin/login') ||
+        path.contains('/auth/admin/login/front') ||
+        path.contains('/auth/manager/login') ||
+        path.contains('/auth/superadmin/login') ||
+        path.contains('/send-verification') ||
+        path.contains('/verify-email-code') ||
+        path.contains('/verify-phone-code');
   }
 
   String _rawTokenFromAuthHeader(String auth) {
@@ -41,17 +44,23 @@ class RefreshTokenInterceptor extends Interceptor {
 
   String? _roleFromJwt(String rawJwt) {
     try {
-      if (rawJwt.trim().isEmpty) return null;
+      if (rawJwt.trim().isEmpty) {
+        return null;
+      }
 
       final parts = rawJwt.split('.');
 
-      if (parts.length < 2) return null;
+      if (parts.length < 2) {
+        return null;
+      }
 
       final payload = base64Url.normalize(parts[1]);
       final decoded = utf8.decode(base64Url.decode(payload));
       final map = jsonDecode(decoded);
 
-      if (map is! Map) return null;
+      if (map is! Map) {
+        return null;
+      }
 
       return map['role']?.toString().toUpperCase().trim();
     } catch (_) {
@@ -60,7 +69,9 @@ class RefreshTokenInterceptor extends Interceptor {
   }
 
   bool _isAdminRole(String? role) {
-    if (role == null) return false;
+    if (role == null) {
+      return false;
+    }
 
     return role == 'OWNER' ||
         role == 'SUPER_ADMIN' ||
@@ -77,17 +88,17 @@ class RefreshTokenInterceptor extends Interceptor {
     final status = err.response?.statusCode ?? 0;
     final req = err.requestOptions;
 
-    // Refresh only for 401.
-    if ((status != 401 && status != 403) || _isAuthCall(req)) {
-  return handler.next(err);
-}
+    // Refresh only on 401.
+    // 403 usually means permission denied, not expired token.
+    if (status != 401 || _isAuthCall(req)) {
+      return handler.next(err);
+    }
 
     // Avoid infinite retry loop.
     if (req.extra['__retried'] == true) {
       return handler.next(err);
     }
 
-    // If request had no auth token, refresh makes no sense.
     final authHeader = (req.headers['Authorization'] ?? '').toString().trim();
     final globalAuth = g.readAuthToken().trim();
 
@@ -107,12 +118,11 @@ class RefreshTokenInterceptor extends Interceptor {
     try {
       final tenantId = g.ownerProjectLinkId;
 
-
       final newToken = isAdmin
           ? await _refresh.refreshAdmin(tenantId: tenantId)
           : await _refresh.refreshUser(tenantId: tenantId);
 
-          DioClient.setAuthToken(newToken);
+      DioClient.setAuthToken(newToken);
 
       req.headers['Authorization'] =
           newToken.toLowerCase().startsWith('bearer ')
@@ -121,7 +131,11 @@ class RefreshTokenInterceptor extends Interceptor {
 
       req.extra['__retried'] = true;
 
-      final response = await g.dio().fetch(req);
+      // IMPORTANT:
+      // Retry with the SAME Dio that failed.
+      // Municipality failed request retries on municipalityDio.
+      // Build4All failed request retries on build4allDio.
+      final response = await _dio.fetch<dynamic>(req);
 
       return handler.resolve(response);
     } catch (e) {
@@ -131,10 +145,11 @@ class RefreshTokenInterceptor extends Interceptor {
         if (isAdmin) {
           await _adminStore.clear();
         } else {
-          await _userStore.clearToken();
+          await _userStore.clear();
         }
 
         g.setAuthToken('');
+        DioClient.clearAuthToken();
       }
 
       return handler.next(err);

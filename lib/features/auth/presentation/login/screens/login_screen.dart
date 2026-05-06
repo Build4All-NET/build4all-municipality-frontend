@@ -160,28 +160,33 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _saveCitizenSession({
-    required DualLoginResult dual,
-    required Map<String, dynamic> userMap,
-  }) async {
-    final token = dual.userToken;
+  required DualLoginResult dual,
+  required Map<String, dynamic> userMap,
+}) async {
+  final token = dual.userToken;
+  final refreshToken = dual.userRefreshToken;
 
-    if (token == null || token.trim().isEmpty) {
-      throw Exception('Missing user token.');
-    }
-
-    await AdminTokenStore().clear();
-    await JwtStore.save(token);
-    await SessionRoleStore().saveRole('CITIZEN');
-
-    await AuthTokenStore().saveToken(
-      token: token,
-      refreshToken: dual.userRefreshToken,
-      tenantId: ownerProjectLinkId.toString(),
-      userJson: userMap,
-    );
-
-    DioClient.setAuthToken(token);
+  if (token == null || token.trim().isEmpty) {
+    throw Exception('Missing user token.');
   }
+
+  if (refreshToken == null || refreshToken.trim().isEmpty) {
+    throw Exception('Missing refresh token from Build4All login response.');
+  }
+
+  await AdminTokenStore().clear();
+  await JwtStore.save(token);
+  await SessionRoleStore().saveRole('CITIZEN');
+
+  await AuthTokenStore().saveToken(
+    token: token,
+    refreshToken: refreshToken,
+    tenantId: ownerProjectLinkId.toString(),
+    userJson: userMap,
+  );
+
+  DioClient.setAuthToken(token);
+}
 
   Future<void> _goAfterCitizenLogin({
     required DualLoginResult dual,

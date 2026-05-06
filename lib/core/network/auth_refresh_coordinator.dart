@@ -22,13 +22,14 @@ class AuthRefreshCoordinator {
   Dio _plain() {
     return Dio(
       BaseOptions(
-        baseUrl: g.appServerRoot,
+        baseUrl: g.appServerRoot, // example: http://x.x.x.x:8081/api
         headers: const {
           'Content-Type': 'application/json',
           'Accept': 'application/json',
         },
         connectTimeout: const Duration(seconds: 30),
         receiveTimeout: const Duration(seconds: 60),
+        sendTimeout: const Duration(seconds: 30),
       ),
     );
   }
@@ -57,6 +58,7 @@ class AuthRefreshCoordinator {
     required Map<String, dynamic> payload,
   }) {
     final code = (payload['code'] ?? '').toString().trim();
+
     final message = (payload['message'] ?? payload['error'] ?? '')
         .toString()
         .trim();
@@ -129,13 +131,16 @@ class AuthRefreshCoordinator {
         );
       }
 
-     final response = await _plain().post(
-  '/api/auth/admin/refresh',
-  data: {
-    'refreshToken': refresh,
-    'ownerProjectLinkId': tenantId,
-  },
-);
+      // IMPORTANT:
+      // g.appServerRoot already contains /api.
+      // So the endpoint here must be /auth/refresh, NOT /api/auth/refresh.
+      final response = await _plain().post(
+        '/auth/refresh',
+        data: {
+          'refreshToken': refresh,
+        },
+      );
+
       final data = _readPayload(response.data);
 
       final newAccess = (data['token'] ??
@@ -159,17 +164,19 @@ class AuthRefreshCoordinator {
         );
       }
 
+      final cleanAccess = _stripBearer(newAccess);
+
       await _userStore.saveToken(
-        token: _stripBearer(newAccess),
+        token: cleanAccess,
         refreshToken: newRefresh,
         tenantId: tenantId,
         wasInactive: false,
       );
 
-      g.setAuthToken(_stripBearer(newAccess));
+      g.setAuthToken(cleanAccess);
 
-      completer.complete(_stripBearer(newAccess));
-      return _stripBearer(newAccess);
+      completer.complete(cleanAccess);
+      return cleanAccess;
     } on DioException catch (e, st) {
       final mapped = _mapRefreshDioError(
         e,
@@ -215,8 +222,9 @@ class AuthRefreshCoordinator {
         );
       }
 
+      // Same Build4All refresh endpoint for admin/owner tokens.
       final response = await _plain().post(
-        '/api/auth/refresh',
+        '/auth/refresh',
         data: {
           'refreshToken': refresh,
         },
@@ -245,19 +253,20 @@ class AuthRefreshCoordinator {
         );
       }
 
+      final cleanAccess = _stripBearer(newAccess);
       final role = (await _adminStore.getRole()) ?? '';
 
       await _adminStore.save(
-        token: _stripBearer(newAccess),
+        token: cleanAccess,
         role: role,
         refreshToken: newRefresh,
         tenantId: tenantId,
       );
 
-      g.setAuthToken(_stripBearer(newAccess));
+      g.setAuthToken(cleanAccess);
 
-      completer.complete(_stripBearer(newAccess));
-      return _stripBearer(newAccess);
+      completer.complete(cleanAccess);
+      return cleanAccess;
     } on DioException catch (e, st) {
       final mapped = _mapRefreshDioError(
         e,
@@ -290,23 +299,28 @@ class AuthRefreshCoordinator {
     required bool userWasInactive,
     String? tenantId,
   }) async {
-    if (userWasInactive) return null;
-
-    final refresh = (await _userStore.getRefreshToken())?.trim() ?? '';
-
-    if (refresh.isEmpty) return null;
+    if (userWasInactive) {
+      return null;
+    }
 
     final raw = _stripBearer(tokenStored);
 
+    // If access token still valid, use it directly.
     if (raw.isNotEmpty && !JwtUtils.isExpired(raw)) {
       return raw;
+    }
+
+    final refresh = (await _userStore.getRefreshToken())?.trim() ?? '';
+
+    if (refresh.isEmpty) {
+      return null;
     }
 
     try {
       return await refreshUser(tenantId: tenantId);
     } catch (e) {
       if (shouldClearAfterRefreshFailure(e)) {
-        await _userStore.clearToken();
+        await _userStore.clear();
       }
 
       return null;
@@ -317,14 +331,17 @@ class AuthRefreshCoordinator {
     required String? tokenStored,
     String? tenantId,
   }) async {
-    final refresh = (await _adminStore.getRefreshToken())?.trim() ?? '';
-
-    if (refresh.isEmpty) return null;
-
     final raw = _stripBearer(tokenStored);
 
+    // If access token still valid, use it directly.
     if (raw.isNotEmpty && !JwtUtils.isExpired(raw)) {
       return raw;
+    }
+
+    final refresh = (await _adminStore.getRefreshToken())?.trim() ?? '';
+
+    if (refresh.isEmpty) {
+      return null;
     }
 
     try {

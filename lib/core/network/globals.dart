@@ -138,7 +138,7 @@ void makeDefaultDio(String baseUrl) {
   d.interceptors.clear();
 
   // ✅ First: refresh interceptor (it retries with new tokens)
-  d.interceptors.add(RefreshTokenInterceptor());
+ d.interceptors.add(RefreshTokenInterceptor(d));
 
   // ✅ Then: inject ownerProjectLinkId / attach mode etc.
   d.interceptors.add(OwnerInjector());

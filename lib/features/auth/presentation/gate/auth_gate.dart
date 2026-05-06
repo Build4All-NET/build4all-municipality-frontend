@@ -1,13 +1,13 @@
-// lib/features/auth/presentation/gate/auth_gate.dart
-
-import 'package:baladiyati/features/admin/Dashboard/presentation/screens/Dashboard_screen_admin.dart';
-import 'package:flutter/material.dart';
-
+import 'package:baladiyati/core/config/env.dart';
 import 'package:baladiyati/core/config/jwt_store.dart';
+import 'package:baladiyati/core/network/auth_refresh_coordinator.dart';
+import 'package:baladiyati/core/network/dio_client.dart';
+import 'package:baladiyati/features/admin/Dashboard/presentation/screens/Dashboard_screen_admin.dart';
 import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
-import 'package:baladiyati/features/welcome/presentation/screens/welcome_screen.dart';
+import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
 import 'package:baladiyati/features/citizen/home/presentation/screens/home_screen.dart';
-
+import 'package:baladiyati/features/welcome/presentation/screens/welcome_screen.dart';
+import 'package:flutter/material.dart';
 
 class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
@@ -19,6 +19,9 @@ class AuthGate extends StatefulWidget {
 class _AuthGateState extends State<AuthGate> {
   late final Future<Widget> _startScreenFuture;
 
+  final AuthRefreshCoordinator _refreshCoordinator =
+      AuthRefreshCoordinator.instance;
+
   @override
   void initState() {
     super.initState();
@@ -27,20 +30,53 @@ class _AuthGateState extends State<AuthGate> {
 
   Future<Widget> _resolveStartScreen() async {
     final adminStore = AdminTokenStore();
+    final userStore = AuthTokenStore();
 
-    // 1. Admin has priority if admin token exists.
-    final adminToken = await adminStore.getToken();
-    if (adminToken != null && adminToken.trim().isNotEmpty) {
-      return  DashboardPage();
+    final tenantId = Env.ownerProjectLinkId;
+
+    // 1. Admin/owner session has priority.
+    final adminTokenStored = await adminStore.getToken();
+
+    if (adminTokenStored != null && adminTokenStored.trim().isNotEmpty) {
+      final validAdminToken = await _refreshCoordinator.refreshAdminIfNeeded(
+        tokenStored: adminTokenStored,
+        tenantId: tenantId,
+      );
+
+      if (validAdminToken != null && validAdminToken.trim().isNotEmpty) {
+        DioClient.setAuthToken(validAdminToken);
+        return DashboardPage();
+      }
+
+      await adminStore.clear();
     }
 
-    // 2. Then check normal citizen/user token.
-    final userToken = await JwtStore.getToken();
-    if (userToken != null && userToken.trim().isNotEmpty) {
-      return const HomeScreen();
+    // 2. Citizen/user session.
+    final userTokenStored = await userStore.getToken();
+    final userWasInactive = await userStore.getWasInactive();
+
+    if (userTokenStored != null && userTokenStored.trim().isNotEmpty) {
+      final validUserToken = await _refreshCoordinator.refreshUserIfNeeded(
+        tokenStored: userTokenStored,
+        userWasInactive: userWasInactive,
+        tenantId: tenantId,
+      );
+
+      if (validUserToken != null && validUserToken.trim().isNotEmpty) {
+        DioClient.setAuthToken(validUserToken);
+
+        // Keep old JwtStore compatible with screens still reading it.
+        await JwtStore.save(validUserToken);
+
+        return const HomeScreen();
+      }
+
+      await userStore.clear();
+      await JwtStore.clear();
     }
 
-    // 3. No session found.
+    // 3. No valid session.
+    DioClient.clearAuthToken();
     return const WelcomeScreen();
   }
 
