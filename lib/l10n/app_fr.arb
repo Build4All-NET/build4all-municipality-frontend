@@ -461,7 +461,10 @@
 "role": "Rôle",
 "selectRole": "Veuillez sélectionner un rôle",
 "invalidEmail": "Saisissez une adresse e-mail valide",
-"inboxComingSoon": "La boîte de réception sera bientôt disponible"
+"inboxComingSoon": "La boîte de réception sera bientôt disponible",
+"accountInfo": "Informations du compte",
+"municipalityInfo": "Informations municipales",
+"municipalityStatus": "Statut municipal"
 
 
 }

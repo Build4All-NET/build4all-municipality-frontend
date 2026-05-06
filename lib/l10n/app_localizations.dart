@@ -2172,6 +2172,24 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Inbox is not available yet'**
   String get inboxComingSoon;
+
+  /// No description provided for @accountInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Account Info'**
+  String get accountInfo;
+
+  /// No description provided for @municipalityInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Municipality Info'**
+  String get municipalityInfo;
+
+  /// No description provided for @municipalityStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Municipality Status'**
+  String get municipalityStatus;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

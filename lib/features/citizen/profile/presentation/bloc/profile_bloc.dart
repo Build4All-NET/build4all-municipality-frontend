@@ -1,10 +1,11 @@
+import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/features/citizen/profile/data/repository/profile_repository_impl.dart';
+import 'package:baladiyati/features/citizen/profile/data/services/profile_api_service.dart';
 import 'package:baladiyati/features/citizen/profile/domain/repository/profile_repository.dart';
 import 'package:baladiyati/features/citizen/profile/domain/usecase/get_profile_usecase.dart';
 import 'package:baladiyati/features/citizen/profile/domain/usecase/update_profile_usecase.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-import '../../data/services/profile_api_service.dart';
 import 'profile_event.dart';
 import 'profile_state.dart';
 
@@ -29,6 +30,18 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         super(const ProfileState()) {
     on<ProfileLoadRequested>(_onLoadRequested);
     on<ProfileUpdateSubmitted>(_onUpdateSubmitted);
+  }
+
+  String _cleanError(Object e) {
+    if (e is AppException) {
+      return e.message;
+    }
+
+    return e
+        .toString()
+        .replaceAll('Exception:', '')
+        .replaceAll('AppException:', '')
+        .trim();
   }
 
   Future<void> _onLoadRequested(
@@ -57,7 +70,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
       emit(
         state.copyWith(
           isLoading: false,
-          errorMessage: e.toString().replaceAll('Exception:', '').trim(),
+          errorMessage: _cleanError(e),
         ),
       );
     }
@@ -100,7 +113,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         state.copyWith(
           isUpdating: false,
           isUpdateSuccess: false,
-          errorMessage: e.toString().replaceAll('Exception:', '').trim(),
+          errorMessage: _cleanError(e),
         ),
       );
     }

@@ -1051,4 +1051,13 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get inboxComingSoon => 'Inbox is not available yet';
+
+  @override
+  String get accountInfo => 'Account Info';
+
+  @override
+  String get municipalityInfo => 'Municipality Info';
+
+  @override
+  String get municipalityStatus => 'Municipality Status';
 }

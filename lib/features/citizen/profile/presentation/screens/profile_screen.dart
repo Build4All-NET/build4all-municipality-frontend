@@ -1,8 +1,10 @@
-// lib/features/citizen/profile/presentation/screens/profile_screen.dart
-
 import 'dart:io';
 
 import 'package:baladiyati/app/app_router.dart';
+import 'package:baladiyati/common/widgets/app_text_field.dart';
+import 'package:baladiyati/common/widgets/app_toast.dart';
+import 'package:baladiyati/common/widgets/primary_button.dart';
+import 'package:baladiyati/common/widgets/private_profile_avatar.dart';
 import 'package:baladiyati/core/config/jwt_store.dart';
 import 'package:baladiyati/core/l10n/locale_cubit.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
@@ -63,7 +65,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   void _fillControllers(ProfileEntity profile) {
-    if (_lastLoadedProfileId == profile.build4allId) return;
+    if (_lastLoadedProfileId == profile.build4allId) {
+      return;
+    }
 
     _firstNameCtrl.text = profile.firstName;
     _lastNameCtrl.text = profile.lastName;
@@ -75,21 +79,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
     _lastLoadedProfileId = profile.build4allId;
   }
 
-  String _notAvailable() {
-    return '---';
+  String _dash() => '---';
+
+  String _safeValue(String? value) {
+    final clean = value?.trim() ?? '';
+    return clean.isEmpty || clean == 'null' ? _dash() : clean;
   }
 
-  String _municipalityLabel(ProfileEntity? profile, AppLocalizations l10n) {
+  String _municipalityLabel(ProfileEntity? profile) {
     final name = profile?.municipalityName?.trim();
 
-    if (name != null && name.isNotEmpty) return name;
-
-    final id = profile?.municipalityId;
-    if (id != null && id > 0) {
-      return '${l10n.municipalityLabel} #$id';
+    if (name != null && name.isNotEmpty && name != 'null') {
+      return name;
     }
 
-    return _notAvailable();
+    return _dash();
   }
 
   String _languageName(String code) {
@@ -103,56 +107,40 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  String? _resolveProfileImageUrl(String? rawUrl) {
-    if (rawUrl == null || rawUrl.trim().isEmpty) return null;
+  String _fallbackText(ProfileEntity? profile) {
+    final fullName = profile?.fullName.trim() ?? '';
 
-    final url = rawUrl.trim();
-
-    if (url.startsWith('http://') || url.startsWith('https://')) {
-      return url;
+    if (fullName.isNotEmpty) {
+      return fullName;
     }
 
-    if (!url.startsWith('/')) return url;
+    final username = profile?.username.trim() ?? '';
 
-    final base = DioClient.build.options.baseUrl;
-
-    final root = base.endsWith('/api')
-        ? base.substring(0, base.length - 4)
-        : base.replaceFirst(RegExp(r'/api/?$'), '');
-
-    return '$root$url';
-  }
-
-  ImageProvider? _profileImageProvider(ProfileEntity? profile) {
-    if (_selectedImage != null) {
-      return FileImage(_selectedImage!);
-    }
-
-    if (_imageRemoved) {
-      return null;
-    }
-
-    final url = _resolveProfileImageUrl(profile?.profilePictureUrl);
-
-    if (url == null || url.isEmpty) return null;
-
-    return NetworkImage(url);
-  }
-
-  String _initials(ProfileEntity? profile) {
-    final name = profile?.fullName.trim() ?? '';
-
-    if (name.isNotEmpty) {
-      return name.characters.first.toUpperCase();
+    if (username.isNotEmpty) {
+      return username;
     }
 
     final email = profile?.email.trim() ?? '';
 
     if (email.isNotEmpty) {
-      return email.characters.first.toUpperCase();
+      return email;
     }
 
     return '?';
+  }
+
+  String? _profileImage(ProfileEntity? profile) {
+    if (_imageRemoved) {
+      return null;
+    }
+
+    final image = profile?.profilePictureUrl?.trim();
+
+    if (image == null || image.isEmpty || image == 'null') {
+      return null;
+    }
+
+    return image;
   }
 
   Future<void> _pickImageInDialog(
@@ -165,7 +153,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       maxHeight: 900,
     );
 
-    if (picked == null) return;
+    if (picked == null) {
+      return;
+    }
 
     dialogSetState(() {
       _selectedImage = File(picked.path);
@@ -187,7 +177,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> _logout(BuildContext context) async {
-    if (_isLoggingOut) return;
+    if (_isLoggingOut) {
+      return;
+    }
 
     final authBloc = context.read<AuthBloc>();
 
@@ -199,10 +191,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await AuthTokenStore().clearToken();
       await AdminTokenStore().clear();
       await JwtStore.clear();
-
       await SessionRoleStore().saveRole('');
 
-      DioClient.setAuthToken('');
+      DioClient.clearAuthToken();
 
       final prefs = await SharedPreferences.getInstance();
 
@@ -216,11 +207,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
       await prefs.remove('build4allUserId');
       await prefs.remove('currentUserId');
 
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       AppRouter.goToWelcome(context);
     } catch (_) {
-      if (!mounted) return;
+      if (!mounted) {
+        return;
+      }
 
       AppRouter.goToWelcome(context);
     } finally {
@@ -236,7 +231,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     ProfileState state,
   ) {
     final profile = state.profile;
-    if (profile == null) return;
+
+    if (profile == null) {
+      return;
+    }
 
     _selectedImage = null;
     _imageRemoved = false;
@@ -244,17 +242,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final tokens = context.read<ThemeCubit>().state.tokens;
     final colors = tokens.colors;
     final card = tokens.card;
-    final button = tokens.button;
 
     showDialog(
       context: context,
       builder: (dialogContext) {
         return StatefulBuilder(
           builder: (dialogContext, dialogSetState) {
-            final imageProvider = _profileImageProvider(profile);
-
             return AlertDialog(
               backgroundColor: colors.surface,
+              insetPadding: const EdgeInsets.symmetric(
+                horizontal: 18,
+                vertical: 24,
+              ),
               shape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(card.radius),
               ),
@@ -264,6 +263,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 style: TextStyle(
                   color: colors.label,
                   fontWeight: FontWeight.w700,
+                  fontSize: 18,
                 ),
               ),
               content: SingleChildScrollView(
@@ -272,41 +272,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   children: [
                     GestureDetector(
                       onTap: () => _pickImageInDialog(dialogSetState),
-                      child: Stack(
-                        alignment: Alignment.bottomRight,
-                        children: [
-                          CircleAvatar(
-                            radius: 44,
-                            backgroundColor: colors.primary.withOpacity(0.12),
-                            backgroundImage: imageProvider,
-                            child: imageProvider == null
-                                ? Text(
-                                    _initials(profile),
-                                    style: TextStyle(
-                                      fontSize: 30,
-                                      color: colors.primary,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  )
-                                : null,
-                          ),
-                          Container(
-                            padding: EdgeInsets.all(card.padding * 0.55),
-                            decoration: BoxDecoration(
-                              color: colors.primary,
-                              shape: BoxShape.circle,
-                              border: Border.all(
-                                color: colors.surface,
-                                width: 2,
-                              ),
-                            ),
-                            child: Icon(
-                              Icons.camera_alt_outlined,
-                              size: 17,
-                              color: colors.onPrimary,
+                      child: PrivateProfileAvatar(
+                        imageUrl: _profileImage(profile),
+                        localImage: _selectedImage,
+                        fallbackText: _fallbackText(profile),
+                        radius: 44,
+                        backgroundColor: colors.primary.withOpacity(0.12),
+                        textColor: colors.primary,
+                        badge: Container(
+                          padding: EdgeInsets.all(card.padding * 0.55),
+                          decoration: BoxDecoration(
+                            color: colors.primary,
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: colors.surface,
+                              width: 2,
                             ),
                           ),
-                        ],
+                          child: Icon(
+                            Icons.camera_alt_outlined,
+                            size: 17,
+                            color: colors.onPrimary,
+                          ),
+                        ),
                       ),
                     ),
                     SizedBox(height: card.padding * 0.75),
@@ -319,7 +307,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         style: TextStyle(color: colors.primary),
                       ),
                     ),
-                    if (profile.profilePictureUrl != null ||
+                    if ((_profileImage(profile) != null) ||
                         _selectedImage != null)
                       TextButton(
                         onPressed: () => _removeImageInDialog(dialogSetState),
@@ -329,48 +317,61 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         ),
                       ),
                     SizedBox(height: card.padding),
-                    _editField(
-                      context: context,
-                      label: l10n.firstNameLabel,
+                    AppTextField(
                       controller: _firstNameCtrl,
+                      label: l10n.firstNameLabel,
+                      hint: l10n.firstNameLabel,
+                      icon: Icons.person_outline,
+                      textAlign: TextAlign.right,
                     ),
                     SizedBox(height: card.padding),
-                    _editField(
-                      context: context,
-                      label: l10n.lastNameLabel,
+                    AppTextField(
                       controller: _lastNameCtrl,
+                      label: l10n.lastNameLabel,
+                      hint: l10n.lastNameLabel,
+                      icon: Icons.person_outline,
+                      textAlign: TextAlign.right,
                     ),
                     SizedBox(height: card.padding),
-                    _editField(
-                      context: context,
-                      label: l10n.usernameLabel,
+                    AppTextField(
                       controller: _usernameCtrl,
-                      isLtr: true,
+                      label: l10n.usernameLabel,
+                      hint: l10n.usernameLabel,
+                      icon: Icons.alternate_email,
+                      textAlign: TextAlign.left,
                     ),
                     SizedBox(height: card.padding),
-                    _editField(
-                      context: context,
-                      label: l10n.emailLabel,
+                    AppTextField(
                       controller: _emailCtrl,
-                      isLtr: true,
+                      label: l10n.emailLabel,
+                      hint: l10n.emailLabel,
+                      icon: Icons.email_outlined,
                       keyboardType: TextInputType.emailAddress,
+                      textAlign: TextAlign.left,
                     ),
                     SizedBox(height: card.padding),
-                    _editField(
-                      context: context,
-                      label: l10n.phoneLabel,
+                    AppTextField(
                       controller: _phoneCtrl,
-                      isLtr: true,
+                      label: l10n.phoneLabel,
+                      hint: l10n.phoneLabel,
+                      icon: Icons.phone_outlined,
                       keyboardType: TextInputType.phone,
+                      textAlign: TextAlign.left,
                     ),
                     SizedBox(height: card.padding),
-                    _editField(
-                      context: context,
-                      label: l10n.addressLabel,
+                    AppTextField(
                       controller: _addressCtrl,
+                      label: l10n.addressLabel,
+                      hint: l10n.addressLabel,
+                      icon: Icons.location_on_outlined,
+                      textAlign: TextAlign.right,
                     ),
                   ],
                 ),
+              ),
+              actionsPadding: EdgeInsets.symmetric(
+                horizontal: card.padding,
+                vertical: card.padding * 0.75,
               ),
               actions: [
                 TextButton(
@@ -384,9 +385,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: colors.primary,
                     foregroundColor: colors.onPrimary,
-                    minimumSize: Size(90, button.height),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(button.radius),
+                      borderRadius: BorderRadius.circular(card.radius),
                     ),
                   ),
                   onPressed: state.isUpdating
@@ -417,65 +417,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _editField({
-    required BuildContext context,
-    required String label,
-    required TextEditingController controller,
-    bool isLtr = false,
-    TextInputType? keyboardType,
-  }) {
-    final tokens = context.watch<ThemeCubit>().state.tokens;
-    final colors = tokens.colors;
-    final card = tokens.card;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: colors.body,
-          ),
-        ),
-        SizedBox(height: card.padding * 0.35),
-        TextField(
-          controller: controller,
-          keyboardType: keyboardType,
-          textAlign: isLtr ? TextAlign.left : TextAlign.right,
-          textDirection: isLtr ? TextDirection.ltr : TextDirection.rtl,
-          style: TextStyle(
-            color: colors.label,
-            fontSize: 14,
-          ),
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: colors.background,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(card.radius),
-              borderSide: BorderSide(color: colors.border.withOpacity(0.35)),
-            ),
-            enabledBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(card.radius),
-              borderSide: BorderSide(color: colors.border.withOpacity(0.35)),
-            ),
-            focusedBorder: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(card.radius),
-              borderSide: BorderSide(
-                color: colors.primary,
-                width: 1.4,
-              ),
-            ),
-            contentPadding: EdgeInsets.symmetric(
-              horizontal: card.padding,
-              vertical: card.padding * 0.75,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
@@ -499,27 +440,25 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _lastLoadedProfileId = null;
           _fillControllers(state.profile!);
 
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(l10n.changesSaved),
-              backgroundColor: colors.success,
-            ),
+          AppToast.show(
+            context,
+            message: l10n.changesSaved,
+            type: AppToastType.success,
           );
         }
 
-        if (state.errorMessage != null &&
-            state.errorMessage!.trim().isNotEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(state.errorMessage!),
-              backgroundColor: colors.error,
-            ),
+        final error = state.errorMessage?.trim();
+
+        if (error != null && error.isNotEmpty) {
+          AppToast.show(
+            context,
+            message: error,
+            type: AppToastType.error,
           );
         }
       },
       builder: (context, state) {
         final profile = state.profile;
-        final imageProvider = _profileImageProvider(profile);
 
         return Scaffold(
           backgroundColor: colors.background,
@@ -540,14 +479,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           context: context,
                           l10n: l10n,
                           profile: profile,
-                          imageProvider: imageProvider,
                         ),
                         Padding(
                           padding: EdgeInsets.all(card.padding),
                           child: Column(
                             children: [
-                              SizedBox(height: card.padding * 0.5),
-                              _buildInfoCard(
+                              SizedBox(height: card.padding * 0.7),
+                              _buildProfileTabs(
                                 context: context,
                                 l10n: l10n,
                                 profile: profile,
@@ -584,7 +522,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required BuildContext context,
     required AppLocalizations l10n,
     required ProfileEntity? profile,
-    required ImageProvider? imageProvider,
   }) {
     final tokens = context.watch<ThemeCubit>().state.tokens;
     final colors = tokens.colors;
@@ -598,15 +535,15 @@ class _ProfileScreenState extends State<ProfileScreen> {
           end: Alignment.bottomRight,
           colors: [
             colors.primary,
-            colors.primary.withOpacity(0.75),
+            colors.primary.withOpacity(0.76),
           ],
         ),
       ),
       padding: EdgeInsets.fromLTRB(
-        card.padding * 1.6,
-        card.padding * 4.5,
-        card.padding * 1.6,
-        card.padding * 3,
+        card.padding * 1.4,
+        card.padding * 4.2,
+        card.padding * 1.4,
+        card.padding * 2.4,
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
@@ -615,69 +552,58 @@ class _ProfileScreenState extends State<ProfileScreen> {
             l10n.myAccount,
             style: TextStyle(
               color: colors.onPrimary,
-              fontSize: 24,
+              fontSize: 23,
               fontWeight: FontWeight.bold,
             ),
           ),
-          SizedBox(height: card.padding * 1.6),
+          SizedBox(height: card.padding * 1.5),
           Row(
-            mainAxisAlignment: MainAxisAlignment.end,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      profile?.fullName ?? _notAvailable(),
+                    _responsiveText(
+                      text: profile?.fullName ?? _dash(),
+                      color: colors.onPrimary,
+                      maxFontSize: 20,
+                      minFontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      maxLines: 2,
                       textAlign: TextAlign.right,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: colors.onPrimary,
-                        fontSize: 20,
-                        fontWeight: FontWeight.bold,
-                      ),
                     ),
-                    SizedBox(height: card.padding * 0.35),
-                    Text(
-                      _municipalityLabel(profile, l10n),
-                      textAlign: TextAlign.right,
+                    SizedBox(height: card.padding * 0.4),
+                    _responsiveText(
+                      text: _municipalityLabel(profile),
+                      color: colors.onPrimary.withOpacity(0.78),
+                      maxFontSize: 13,
+                      minFontSize: 10,
                       maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
-                        color: colors.onPrimary.withOpacity(0.75),
-                        fontSize: 13,
-                      ),
+                      textAlign: TextAlign.right,
                     ),
                     if (profile?.username.isNotEmpty == true) ...[
                       SizedBox(height: card.padding * 0.35),
-                      Text(
-                        '@${profile!.username}',
+                      _responsiveText(
+                        text: '@${profile!.username}',
+                        color: colors.onPrimary.withOpacity(0.78),
+                        maxFontSize: 12,
+                        minFontSize: 9,
+                        maxLines: 1,
                         textAlign: TextAlign.right,
-                        style: TextStyle(
-                          color: colors.onPrimary.withOpacity(0.75),
-                          fontSize: 12,
-                        ),
                       ),
                     ],
                   ],
                 ),
               ),
               SizedBox(width: card.padding),
-              CircleAvatar(
-                radius: 38,
+              PrivateProfileAvatar(
+                imageUrl: _profileImage(profile),
+                localImage: null,
+                fallbackText: _fallbackText(profile),
+                radius: 39,
                 backgroundColor: colors.onPrimary.withOpacity(0.20),
-                backgroundImage: imageProvider,
-                child: imageProvider == null
-                    ? Text(
-                        _initials(profile),
-                        style: TextStyle(
-                          color: colors.onPrimary,
-                          fontSize: 32,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      )
-                    : null,
+                textColor: colors.onPrimary,
               ),
             ],
           ),
@@ -686,7 +612,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildInfoCard({
+  Widget _buildProfileTabs({
     required BuildContext context,
     required AppLocalizations l10n,
     required ProfileEntity? profile,
@@ -712,52 +638,148 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ]
             : null,
       ),
-      child: Column(
-        children: [
-          _infoRow(
-            context: context,
-            icon: Icons.person_outline,
-            label: l10n.usernameLabel,
-            value: profile?.username.isNotEmpty == true
-                ? profile!.username
-                : _notAvailable(),
-          ),
-          _divider(context),
-          _infoRow(
-            context: context,
-            icon: Icons.phone_outlined,
-            label: l10n.phoneLabel,
-            value: profile?.phone.isNotEmpty == true
-                ? profile!.phone
-                : _notAvailable(),
-          ),
-          _divider(context),
-          _infoRow(
-            context: context,
-            icon: Icons.email_outlined,
-            label: l10n.emailLabel,
-            value: profile?.email.isNotEmpty == true
-                ? profile!.email
-                : _notAvailable(),
-          ),
-          _divider(context),
-          _infoRow(
-            context: context,
-            icon: Icons.location_on_outlined,
-            label: l10n.addressLabel,
-            value: profile?.address.isNotEmpty == true
-                ? profile!.address
-                : _notAvailable(),
-          ),
-          _divider(context),
-          _infoRow(
-            context: context,
-            icon: Icons.apartment_outlined,
-            label: l10n.municipalityLabel,
-            value: _municipalityLabel(profile, l10n),
-          ),
-        ],
+      child: DefaultTabController(
+        length: 2,
+        child: Column(
+          children: [
+            Padding(
+              padding: EdgeInsets.all(card.padding * 0.55),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: colors.background,
+                  borderRadius: BorderRadius.circular(card.radius),
+                ),
+                child: TabBar(
+                  labelColor: colors.onPrimary,
+                  unselectedLabelColor: colors.body,
+                  indicatorSize: TabBarIndicatorSize.tab,
+                  indicator: BoxDecoration(
+                    color: colors.primary,
+                    borderRadius: BorderRadius.circular(card.radius),
+                  ),
+                  dividerColor: Colors.transparent,
+                  labelStyle: const TextStyle(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w700,
+                  ),
+                  unselectedLabelStyle: const TextStyle(
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
+                  tabs: [
+                    Tab(text: l10n.accountInfo),
+                    Tab(text: l10n.municipalityInfo),
+                  ],
+                ),
+              ),
+            ),
+            SizedBox(
+              height: 390,
+              child: TabBarView(
+                children: [
+                  _buildAccountInfoTab(
+                    context: context,
+                    l10n: l10n,
+                    profile: profile,
+                  ),
+                  _buildMunicipalityInfoTab(
+                    context: context,
+                    l10n: l10n,
+                    profile: profile,
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
+    );
+  }
+
+  Widget _buildAccountInfoTab({
+    required BuildContext context,
+    required AppLocalizations l10n,
+    required ProfileEntity? profile,
+  }) {
+    return ListView(
+      padding: EdgeInsets.zero,
+      physics: const NeverScrollableScrollPhysics(),
+      children: [
+        _infoRow(
+          context: context,
+          icon: Icons.person_outline,
+          label: l10n.fullNameLabel,
+          value: _safeValue(profile?.fullName),
+        ),
+        _divider(context),
+        _infoRow(
+          context: context,
+          icon: Icons.alternate_email,
+          label: l10n.usernameLabel,
+          value: _safeValue(profile?.username),
+        ),
+        _divider(context),
+        _infoRow(
+          context: context,
+          icon: Icons.email_outlined,
+          label: l10n.emailLabel,
+          value: _safeValue(profile?.email),
+        ),
+        _divider(context),
+        _infoRow(
+          context: context,
+          icon: Icons.verified_user_outlined,
+          label: 'Status',
+          value: _safeValue(profile?.coreStatus),
+        ),
+        _divider(context),
+        _infoRow(
+          context: context,
+          icon: Icons.visibility_outlined,
+          label: 'Visibility',
+          value: profile?.isPublicProfile == true ? 'Public' : 'Private',
+        ),
+      ],
+    );
+  }
+
+  Widget _buildMunicipalityInfoTab({
+    required BuildContext context,
+    required AppLocalizations l10n,
+    required ProfileEntity? profile,
+  }) {
+    return ListView(
+      padding: EdgeInsets.zero,
+      physics: const NeverScrollableScrollPhysics(),
+      children: [
+        _infoRow(
+          context: context,
+          icon: Icons.account_balance_outlined,
+          label: l10n.municipalityLabel,
+          value: _municipalityLabel(profile),
+        ),
+        _divider(context),
+        _infoRow(
+          context: context,
+          icon: Icons.phone_outlined,
+          label: l10n.phoneLabel,
+          value: _safeValue(profile?.phone),
+        ),
+        _divider(context),
+        _infoRow(
+          context: context,
+          icon: Icons.location_on_outlined,
+          label: l10n.addressLabel,
+          value: _safeValue(profile?.address),
+        ),
+        _divider(context),
+        _infoRow(
+          context: context,
+          icon: Icons.badge_outlined,
+          label: l10n.municipalityStatus,
+          value: _safeValue(profile?.municipalityStatus),
+        ),
+      ],
     );
   }
 
@@ -766,31 +788,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     required AppLocalizations l10n,
     required ProfileState state,
   }) {
-    final tokens = context.watch<ThemeCubit>().state.tokens;
-    final colors = tokens.colors;
-    final card = tokens.card;
-    final button = tokens.button;
+    final colors = context.watch<ThemeCubit>().state.tokens.colors;
 
-    return SizedBox(
-      width: double.infinity,
-      child: state.isUpdating
-          ? Center(child: CircularProgressIndicator(color: colors.primary))
-          : OutlinedButton.icon(
-              style: OutlinedButton.styleFrom(
-                foregroundColor: colors.primary,
-                side: BorderSide(color: colors.primary),
-                padding: EdgeInsets.symmetric(vertical: card.padding),
-                minimumSize: Size.fromHeight(button.height),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(button.radius),
-                ),
-              ),
-              onPressed: state.profile == null
-                  ? null
-                  : () => _showEditDialog(context, l10n, state),
-              icon: const Icon(Icons.edit_outlined),
-              label: Text(l10n.editInfo),
-            ),
+    return PrimaryButton(
+      label: l10n.editInfo,
+      isLoading: state.isUpdating,
+      backgroundColor: colors.primary,
+      textColor: colors.onPrimary,
+      onPressed: () {
+        if (state.profile == null) {
+          return;
+        }
+
+        _showEditDialog(context, l10n, state);
+      },
     );
   }
 
@@ -835,16 +846,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
           );
         },
         leading: Icon(Icons.language, color: colors.muted),
-        title: Text(
-          l10n.selectLanguage,
-          style: TextStyle(color: colors.label),
+        title: _responsiveText(
+          text: l10n.selectLanguage,
+          color: colors.label,
+          maxFontSize: 14,
+          minFontSize: 11,
+          fontWeight: FontWeight.w600,
         ),
         trailing: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(
-              _languageName(currentLang),
-              style: TextStyle(color: colors.body),
+            _responsiveText(
+              text: _languageName(currentLang),
+              color: colors.body,
+              maxFontSize: 13,
+              minFontSize: 10,
             ),
             Icon(Icons.chevron_left, color: colors.muted),
           ],
@@ -854,34 +870,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildLogoutButton(BuildContext context, AppLocalizations l10n) {
-    final tokens = context.watch<ThemeCubit>().state.tokens;
-    final colors = tokens.colors;
-    final button = tokens.button;
+    final colors = context.watch<ThemeCubit>().state.tokens.colors;
 
-    return SizedBox(
-      width: double.infinity,
-      child: ElevatedButton.icon(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: colors.danger,
-          foregroundColor: colors.onPrimary,
-          minimumSize: Size.fromHeight(button.height),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(button.radius),
-          ),
-        ),
-        onPressed: _isLoggingOut ? null : () => _logout(context),
-        icon: _isLoggingOut
-            ? SizedBox(
-                width: 18,
-                height: 18,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: colors.onPrimary,
-                ),
-              )
-            : const Icon(Icons.logout),
-        label: Text(_isLoggingOut ? '...' : l10n.logout),
-      ),
+    return PrimaryButton(
+      label: _isLoggingOut ? '...' : l10n.logout,
+      isLoading: _isLoggingOut,
+      backgroundColor: colors.danger,
+      textColor: colors.onPrimary,
+      onPressed: () => _logout(context),
     );
   }
 
@@ -890,9 +886,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
     return Divider(
       height: 1,
-      indent: 16,
-      endIndent: 16,
-      color: colors.border.withOpacity(0.18),
+      indent: 18,
+      endIndent: 18,
+      color: colors.border.withOpacity(0.16),
     );
   }
 
@@ -909,41 +905,92 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Padding(
       padding: EdgeInsets.symmetric(
         horizontal: card.padding,
-        vertical: card.padding,
+        vertical: card.padding * 0.9,
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Icon(icon, color: colors.muted, size: 20),
-          const Spacer(),
-          Flexible(
+          Container(
+            width: 34,
+            height: 34,
+            decoration: BoxDecoration(
+              color: colors.primary.withOpacity(0.09),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(icon, color: colors.primary, size: 19),
+          ),
+          SizedBox(width: card.padding * 0.8),
+          Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
-                Text(
-                  label,
+                _responsiveText(
+                  text: label,
+                  color: colors.body,
+                  maxFontSize: 11,
+                  minFontSize: 9,
+                  maxLines: 1,
                   textAlign: TextAlign.right,
-                  style: TextStyle(
-                    fontSize: 11,
-                    color: colors.body,
-                  ),
                 ),
                 SizedBox(height: card.padding * 0.25),
-                Text(
-                  value,
-                  textAlign: TextAlign.right,
-                  overflow: TextOverflow.ellipsis,
+                _responsiveText(
+                  text: value,
+                  color: colors.label,
+                  maxFontSize: 14,
+                  minFontSize: 10,
+                  fontWeight: FontWeight.w700,
                   maxLines: 2,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                    color: colors.label,
-                  ),
+                  textAlign: TextAlign.right,
                 ),
               ],
             ),
           ),
         ],
       ),
+    );
+  }
+
+  Widget _responsiveText({
+    required String text,
+    required Color color,
+    double maxFontSize = 14,
+    double minFontSize = 10,
+    int maxLines = 1,
+    FontWeight fontWeight = FontWeight.normal,
+    TextAlign textAlign = TextAlign.start,
+  }) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final length = text.characters.length;
+
+        double fontSize = maxFontSize;
+
+        if (length > 35) {
+          fontSize = maxFontSize - 3;
+        } else if (length > 24) {
+          fontSize = maxFontSize - 2;
+        } else if (length > 16) {
+          fontSize = maxFontSize - 1;
+        }
+
+        if (fontSize < minFontSize) {
+          fontSize = minFontSize;
+        }
+
+        return Text(
+          text,
+          textAlign: textAlign,
+          maxLines: maxLines,
+          overflow: TextOverflow.ellipsis,
+          softWrap: true,
+          style: TextStyle(
+            color: color,
+            fontSize: fontSize,
+            fontWeight: fontWeight,
+            height: 1.25,
+          ),
+        );
+      },
     );
   }
 }

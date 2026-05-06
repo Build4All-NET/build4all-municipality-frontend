@@ -453,5 +453,8 @@
 "role": "الدور",
 "selectRole": "يرجى اختيار الدور",
 "invalidEmail": "أدخل بريدًا إلكترونيًا صالحًا",
-"inboxComingSoon": "البريد الوارد قادم قريبًا"
+"inboxComingSoon": "البريد الوارد قادم قريبًا",
+"accountInfo": "معلومات الحساب",
+"municipalityInfo": "معلومات البلدية",
+"municipalityStatus": "حالة الملف البلدي"
 }

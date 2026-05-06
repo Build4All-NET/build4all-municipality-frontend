@@ -456,7 +456,10 @@
 "role": "Role",
 "selectRole": "Please select a role",
 "invalidEmail": "Enter a valid email address",
-"inboxComingSoon": "Inbox is not available yet"
+"inboxComingSoon": "Inbox is not available yet",
+"accountInfo": "Account Info",
+"municipalityInfo": "Municipality Info",
+"municipalityStatus": "Municipality Status"
 
 
 

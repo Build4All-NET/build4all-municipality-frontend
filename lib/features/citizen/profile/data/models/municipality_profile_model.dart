@@ -22,6 +22,30 @@ class MunicipalityProfileModel {
   });
 
   factory MunicipalityProfileModel.fromJson(Map<String, dynamic> json) {
+    final municipality = json['municipality'];
+
+    int? resolvedMunicipalityId;
+    String? resolvedMunicipalityName;
+
+    if (municipality is Map) {
+      resolvedMunicipalityId = int.tryParse(
+        municipality['id']?.toString() ?? '',
+      );
+
+      resolvedMunicipalityName =
+          municipality['name']?.toString() ??
+          municipality['municipalityName']?.toString() ??
+          municipality['title']?.toString();
+    }
+
+    resolvedMunicipalityId ??= int.tryParse(
+      json['municipalityId']?.toString() ?? '',
+    );
+
+    resolvedMunicipalityName ??=
+        json['municipalityName']?.toString() ??
+        json['municipality_name']?.toString();
+
     return MunicipalityProfileModel(
       id: int.tryParse(json['id']?.toString() ?? '') ?? 0,
       build4allId: int.tryParse(json['build4allId']?.toString() ?? ''),
@@ -29,10 +53,11 @@ class MunicipalityProfileModel {
       phone: (json['phone'] ?? '').toString(),
       address: (json['address'] ?? '').toString(),
       status: json['status']?.toString(),
-      municipalityId: int.tryParse(json['municipalityId']?.toString() ?? ''),
-      municipalityName: json['municipalityName']?.toString(),
-      ownerProjectLinkId:
-          int.tryParse(json['ownerProjectLinkId']?.toString() ?? ''),
+      municipalityId: resolvedMunicipalityId,
+      municipalityName: resolvedMunicipalityName,
+      ownerProjectLinkId: int.tryParse(
+        json['ownerProjectLinkId']?.toString() ?? '',
+      ),
     );
   }
 }

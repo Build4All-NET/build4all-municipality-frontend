@@ -1051,4 +1051,13 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get inboxComingSoon => 'البريد الوارد قادم قريبًا';
+
+  @override
+  String get accountInfo => 'معلومات الحساب';
+
+  @override
+  String get municipalityInfo => 'معلومات البلدية';
+
+  @override
+  String get municipalityStatus => 'حالة الملف البلدي';
 }
