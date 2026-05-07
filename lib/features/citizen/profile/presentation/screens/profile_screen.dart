@@ -9,11 +9,10 @@ import 'package:baladiyati/core/config/jwt_store.dart';
 import 'package:baladiyati/core/l10n/locale_cubit.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/core/theme/theme_cubit.dart';
+import 'package:baladiyati/core/utils/error_message.dart';
 import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
 import 'package:baladiyati/features/auth/data/services/session_role_store.dart';
-import 'package:baladiyati/features/auth/presentation/login/bloc/auth_bloc.dart';
-import 'package:baladiyati/features/auth/presentation/login/bloc/auth_event.dart';
 import 'package:baladiyati/features/citizen/profile/domain/entities/profile_entity.dart';
 import 'package:baladiyati/features/citizen/profile/presentation/bloc/profile_bloc.dart';
 import 'package:baladiyati/features/citizen/profile/presentation/bloc/profile_event.dart';
@@ -22,7 +21,6 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -176,51 +174,51 @@ class _ProfileScreenState extends State<ProfileScreen> {
     setState(() {});
   }
 
-  Future<void> _logout(BuildContext context) async {
-    if (_isLoggingOut) {
-      return;
-    }
+  Future<void> _logout() async {
+    if (_isLoggingOut) return;
 
-    final authBloc = context.read<AuthBloc>();
+    final l10n = AppLocalizations.of(context)!;
 
-    setState(() => _isLoggingOut = true);
+    setState(() {
+      _isLoggingOut = true;
+    });
 
     try {
-      authBloc.add(AuthLoggedOut());
+      try {
+        await DioClient.build.post('/auth/logout');
+      } catch (_) {
+        // If backend logout fails, still clear local session.
+      }
 
-      await AuthTokenStore().clearToken();
-      await AdminTokenStore().clear();
+      await const AdminTokenStore().clear();
+      await AuthTokenStore().clear();
+      await SessionRoleStore().clearRole();
       await JwtStore.clear();
-      await SessionRoleStore().saveRole('');
 
       DioClient.clearAuthToken();
 
-      final prefs = await SharedPreferences.getInstance();
+      if (!mounted) return;
 
-      await prefs.remove('token');
-      await prefs.remove('accessToken');
-      await prefs.remove('authToken');
-      await prefs.remove('auth_token');
-      await prefs.remove('userToken');
-      await prefs.remove('build4allToken');
-      await prefs.remove('userId');
-      await prefs.remove('build4allUserId');
-      await prefs.remove('currentUserId');
+      AppToast.show(
+        context,
+        message: l10n.logout,
+        type: AppToastType.success,
+      );
 
-      if (!mounted) {
-        return;
-      }
+      AppRouter.goToLogin(context);
+    } catch (e) {
+      if (!mounted) return;
 
-      AppRouter.goToWelcome(context);
-    } catch (_) {
-      if (!mounted) {
-        return;
-      }
-
-      AppRouter.goToWelcome(context);
+      AppToast.show(
+        context,
+        message: errorMessage(e),
+        type: AppToastType.error,
+      );
     } finally {
       if (mounted) {
-        setState(() => _isLoggingOut = false);
+        setState(() {
+          _isLoggingOut = false;
+        });
       }
     }
   }
@@ -869,17 +867,20 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildLogoutButton(BuildContext context, AppLocalizations l10n) {
-    final colors = context.watch<ThemeCubit>().state.tokens.colors;
+ Widget _buildLogoutButton(BuildContext context, AppLocalizations l10n) {
+  final colors = context.watch<ThemeCubit>().state.tokens.colors;
 
-    return PrimaryButton(
-      label: _isLoggingOut ? '...' : l10n.logout,
-      isLoading: _isLoggingOut,
-      backgroundColor: colors.danger,
-      textColor: colors.onPrimary,
-      onPressed: () => _logout(context),
-    );
-  }
+  return PrimaryButton(
+    label: _isLoggingOut ? '...' : l10n.logout,
+    isLoading: _isLoggingOut,
+    backgroundColor: colors.danger,
+    textColor: colors.onPrimary,
+    onPressed: () {
+      if (_isLoggingOut) return;
+      _logout();
+    },
+  );
+}
 
   Widget _divider(BuildContext context) {
     final colors = context.watch<ThemeCubit>().state.tokens.colors;

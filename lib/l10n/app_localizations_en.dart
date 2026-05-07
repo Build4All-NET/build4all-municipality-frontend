@@ -1060,4 +1060,52 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get municipalityStatus => 'Municipality Status';
+
+  @override
+  String get adminProfileTitle => 'Owner Profile';
+
+  @override
+  String get accountInformation => 'Account information';
+
+  @override
+  String get notificationPreferences => 'Notification preferences';
+
+  @override
+  String get notifyItemUpdates => 'Item update notifications';
+
+  @override
+  String get notifyUserFeedback => 'User feedback notifications';
+
+  @override
+  String get changePassword => 'Change password';
+
+  @override
+  String get currentPassword => 'Current password';
+
+  @override
+  String get leaveBlankToKeepPassword => 'Leave password fields empty to keep the current password.';
+
+  @override
+  String get profileDetails => 'Profile details';
+
+  @override
+  String get profileUpdated => 'Profile updated successfully';
+
+  @override
+  String get createdAt => 'Created at';
+
+  @override
+  String get updatedAt => 'Updated at';
+
+  @override
+  String get saving => 'Saving...';
+
+  @override
+  String get firstName => 'First name';
+
+  @override
+  String get lastName => 'Last name';
+
+  @override
+  String get logoutSuccess => 'Logged out successfully';
 }

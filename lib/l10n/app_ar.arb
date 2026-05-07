@@ -456,5 +456,22 @@
 "inboxComingSoon": "البريد الوارد قادم قريبًا",
 "accountInfo": "معلومات الحساب",
 "municipalityInfo": "معلومات البلدية",
-"municipalityStatus": "حالة الملف البلدي"
+"municipalityStatus": "حالة الملف البلدي",
+"adminProfileTitle": "ملف المالك",
+"accountInformation": "معلومات الحساب",
+"notificationPreferences": "إعدادات الإشعارات",
+"notifyItemUpdates": "إشعارات تحديث العناصر",
+"notifyUserFeedback": "إشعارات ملاحظات المستخدمين",
+"changePassword": "تغيير كلمة المرور",
+"currentPassword": "كلمة المرور الحالية",
+"leaveBlankToKeepPassword": "اترك حقول كلمة المرور فارغة للاحتفاظ بكلمة المرور الحالية.",
+"profileDetails": "تفاصيل الملف",
+"profileUpdated": "تم تحديث الملف بنجاح",
+"role": "الدور",
+"createdAt": "تاريخ الإنشاء",
+"updatedAt": "تاريخ التحديث",
+"saving": "جارٍ الحفظ...",
+"firstName": "الاسم الأول",
+"lastName": "اسم العائلة",
+"logoutSuccess": "تم تسجيل الخروج بنجاح"
 }

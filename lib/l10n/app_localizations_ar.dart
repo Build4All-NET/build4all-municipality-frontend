@@ -1060,4 +1060,52 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get municipalityStatus => 'حالة الملف البلدي';
+
+  @override
+  String get adminProfileTitle => 'ملف المالك';
+
+  @override
+  String get accountInformation => 'معلومات الحساب';
+
+  @override
+  String get notificationPreferences => 'إعدادات الإشعارات';
+
+  @override
+  String get notifyItemUpdates => 'إشعارات تحديث العناصر';
+
+  @override
+  String get notifyUserFeedback => 'إشعارات ملاحظات المستخدمين';
+
+  @override
+  String get changePassword => 'تغيير كلمة المرور';
+
+  @override
+  String get currentPassword => 'كلمة المرور الحالية';
+
+  @override
+  String get leaveBlankToKeepPassword => 'اترك حقول كلمة المرور فارغة للاحتفاظ بكلمة المرور الحالية.';
+
+  @override
+  String get profileDetails => 'تفاصيل الملف';
+
+  @override
+  String get profileUpdated => 'تم تحديث الملف بنجاح';
+
+  @override
+  String get createdAt => 'تاريخ الإنشاء';
+
+  @override
+  String get updatedAt => 'تاريخ التحديث';
+
+  @override
+  String get saving => 'جارٍ الحفظ...';
+
+  @override
+  String get firstName => 'الاسم الأول';
+
+  @override
+  String get lastName => 'اسم العائلة';
+
+  @override
+  String get logoutSuccess => 'تم تسجيل الخروج بنجاح';
 }

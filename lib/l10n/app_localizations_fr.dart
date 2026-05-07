@@ -1060,4 +1060,52 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get municipalityStatus => 'Statut municipal';
+
+  @override
+  String get adminProfileTitle => 'Profil du propriétaire';
+
+  @override
+  String get accountInformation => 'Informations du compte';
+
+  @override
+  String get notificationPreferences => 'Préférences de notification';
+
+  @override
+  String get notifyItemUpdates => 'Notifications des mises à jour';
+
+  @override
+  String get notifyUserFeedback => 'Notifications des retours utilisateurs';
+
+  @override
+  String get changePassword => 'Changer le mot de passe';
+
+  @override
+  String get currentPassword => 'Mot de passe actuel';
+
+  @override
+  String get leaveBlankToKeepPassword => 'Laissez les champs de mot de passe vides pour conserver le mot de passe actuel.';
+
+  @override
+  String get profileDetails => 'Détails du profil';
+
+  @override
+  String get profileUpdated => 'Profil mis à jour avec succès';
+
+  @override
+  String get createdAt => 'Créé le';
+
+  @override
+  String get updatedAt => 'Mis à jour le';
+
+  @override
+  String get saving => 'Enregistrement...';
+
+  @override
+  String get firstName => 'Prénom';
+
+  @override
+  String get lastName => 'Nom';
+
+  @override
+  String get logoutSuccess => 'Déconnexion réussie';
 }
