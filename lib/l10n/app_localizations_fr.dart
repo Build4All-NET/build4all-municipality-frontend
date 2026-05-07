@@ -690,7 +690,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get addViolation => 'Ajouter une infraction';
 
   @override
-  String get search => 'Rechercher...';
+  String get search => 'Recherche...';
 
   @override
   String get all => 'Tous';
@@ -1062,6 +1062,25 @@ class AppLocalizationsFr extends AppLocalizations {
   String get municipalityStatus => 'Statut municipal';
 
   @override
+  String get requests => 'Demandes';
+
+  @override
+  String get status => 'Statut';
+
+  @override
+  String get approved => 'Approuvé';
+
+  @override
+  String get rejected => 'Rejeté';
+
+  @override
+  String get address => 'Adresse';
+
+  @override
+  String get approve => 'Approuver';
+
+  @override
+  String get reject => 'Rejeter';
   String get adminProfileTitle => 'Profil du propriétaire';
 
   @override

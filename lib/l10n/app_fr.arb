@@ -465,6 +465,21 @@
 "accountInfo": "Informations du compte",
 "municipalityInfo": "Informations municipales",
 "municipalityStatus": "Statut municipal",
+
+  "search": "Recherche...",
+  "requests": "Demandes",
+  "status": "Statut",
+  "approved": "Approuvé",
+  "rejected": "Rejeté",
+  "noData": "Aucune donnée",
+  "requestDetails": "Détails de la demande",
+  "address": "Adresse",
+  "approve": "Approuver",
+  "reject": "Rejeter"
+
+
+
+
 "adminProfileTitle": "Profil du propriétaire",
 "accountInformation": "Informations du compte",
 "notificationPreferences": "Préférences de notification",
