@@ -1,9 +1,12 @@
 // lib/app/app_router.dart
 
 import 'package:baladiyati/core/network/dio_client.dart';
-import 'package:baladiyati/features/admin/Requests/data/Repository/Request_Repo.dart';
+import 'package:baladiyati/features/admin/Requests/data/Repository/Request_Repo_Impl.dart';
+import 'package:baladiyati/features/admin/Requests/domain/Repository/Request_Repo.dart';
 import 'package:baladiyati/features/admin/Requests/data/Service/Req_Api_Service.dart';
 import 'package:baladiyati/features/admin/Requests/domain/usecases/Get_Request.dart';
+import 'package:baladiyati/features/admin/Requests/domain/usecases/UpdateRequestStatus.dart';
+import 'package:baladiyati/features/admin/Requests/domain/usecases/getAll_Req_Admin.dart';
 import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_Bloc.dart';
 import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_Event.dart';
 import 'package:baladiyati/features/admin/Requests/presentation/screens/Req_screen.dart';
@@ -320,7 +323,8 @@ static void goToRequests(BuildContext context) {
         providers: [
           BlocProvider(
             create: (_) => RequestBloc(
-              GetAllRequests(requestRepository),
+              getAllRequestsAdmin: GetAllRequestsAdmin(requestRepository),
+              updateRequestStatus: UpdateRequestStatus(requestRepository),
             )..add(LoadRequests()),
           ),
           BlocProvider(

@@ -234,18 +234,8 @@ void _openEmployees() {
 }
 
 void _openInbox() {
-
-  
-    final loc = AppLocalizations.of(context)!;
-
-    AppToast.show(
-      context,
-      message: loc.inboxComingSoon,
-      type: AppToastType.info,
-    );
-      AppRouter.goToRequests(context);
-
-  }
+  AppRouter.goToRequests(context);
+}
 
   @override
   Widget build(BuildContext context) {

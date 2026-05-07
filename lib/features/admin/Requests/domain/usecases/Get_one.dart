@@ -1,12 +1,12 @@
-import 'package:baladiyati/features/admin/Requests/domain/Repository/Request_Repo_Impl.dart';
+import 'package:baladiyati/features/admin/Requests/domain/Repository/Request_Repo.dart';
 import 'package:baladiyati/features/admin/Requests/domain/entities/request.dart';
 
-class GetRequest {
+class GetOneRequestAdmin {
   final RequestRepository repo;
 
-  GetRequest(this.repo);
+  GetOneRequestAdmin(this.repo);
 
   Future<RequestEntity> call(int id) {
-    return repo.getRequest(id);
+    return repo.getRequestAdmin(id);
   }
 }

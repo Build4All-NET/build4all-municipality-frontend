@@ -1,8 +1,6 @@
-
-
 import 'package:baladiyati/features/admin/Requests/data/Service/Req_Api_Service.dart';
 import 'package:baladiyati/features/admin/Requests/data/model/RequestModel.dart';
-import 'package:baladiyati/features/admin/Requests/domain/Repository/Request_Repo_Impl.dart';
+import 'package:baladiyati/features/admin/Requests/domain/Repository/Request_Repo.dart';
 import 'package:baladiyati/features/admin/Requests/domain/entities/request.dart';
 
 class RequestRepositoryImpl implements RequestRepository {
@@ -21,15 +19,15 @@ class RequestRepositoryImpl implements RequestRepository {
   }
 
   @override
-Future<List<RequestEntity>> getRequests({
-  int? departmentId,
-  String? status,
-}) async {
-  return api.getRequests(
-    departmentId: departmentId,
-    status: status,
-  );
-}
+  Future<List<RequestEntity>> getRequests({
+    int? departmentId,
+    String? status,
+  }) {
+    return api.getRequests(
+      departmentId: departmentId,
+      status: status,
+    );
+  }
 
   @override
   Future<RequestEntity> getRequest(int id) {
@@ -42,8 +40,19 @@ Future<List<RequestEntity>> getRequests({
   }
 
   @override
-  Future<List<RequestEntity>> getAllRequestsAdmin() {
-    return api.getAllRequestsAdmin();
+  Future<List<RequestEntity>> getAllRequestsAdmin({
+    int? departmentId,
+    String? status,
+  }) {
+    return api.getAllRequestsAdmin(
+      departmentId: departmentId,
+      status: status,
+    );
+  }
+
+  @override
+  Future<RequestEntity> getRequestAdmin(int id) {
+    return api.getRequestAdmin(id);
   }
 
   @override
