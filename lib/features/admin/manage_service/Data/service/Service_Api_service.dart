@@ -9,7 +9,7 @@ class ServiceApiService {
 
   Future<List<ServiceModel>> getServices() async {
     try {
-      final res = await dio.get('/api/services');
+      final res = await dio.get('/api/admin/services');
 
       final data = res.data;
 
@@ -29,7 +29,7 @@ class ServiceApiService {
   Future<void> create(ServiceModel model) async {
     try {
       await dio.post(
-        '/api/services',
+        '/api/admin/services',
         data: model.toJson(),
       );
     } on DioException {
@@ -54,7 +54,7 @@ class ServiceApiService {
   Future<void> update(int id, ServiceModel model) async {
     try {
       await dio.put(
-        '/api/services/$id',
+        '/api/admin/services/$id',
         data: model.toJson(),
       );
     } on DioException {
