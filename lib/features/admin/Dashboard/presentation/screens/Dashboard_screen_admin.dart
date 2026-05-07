@@ -233,7 +233,9 @@ void _openEmployees() {
   AppRouter.goToEmployees(context);
 }
 
-  void _openInbox() {
+void _openInbox() {
+
+  
     final loc = AppLocalizations.of(context)!;
 
     AppToast.show(
@@ -241,6 +243,8 @@ void _openEmployees() {
       message: loc.inboxComingSoon,
       type: AppToastType.info,
     );
+      AppRouter.goToRequests(context);
+
   }
 
   @override

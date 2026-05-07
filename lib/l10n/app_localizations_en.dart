@@ -480,7 +480,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get amountDue => 'Amount Due';
 
   @override
-  String get requestDetails => 'Request Details';
+  String get requestDetails => 'Request details';
 
   @override
   String get titleLabel => 'Title';
@@ -1060,4 +1060,25 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get municipalityStatus => 'Municipality Status';
+
+  @override
+  String get requests => 'Requests';
+
+  @override
+  String get status => 'Status';
+
+  @override
+  String get approved => 'Approved';
+
+  @override
+  String get rejected => 'Rejected';
+
+  @override
+  String get address => 'Address';
+
+  @override
+  String get approve => 'Approve';
+
+  @override
+  String get reject => 'Reject';
 }

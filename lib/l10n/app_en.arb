@@ -459,7 +459,21 @@
 "inboxComingSoon": "Inbox is not available yet",
 "accountInfo": "Account Info",
 "municipalityInfo": "Municipality Info",
-"municipalityStatus": "Municipality Status"
+"municipalityStatus": "Municipality Status",
+
+  "search": "Search...",
+  "requests": "Requests",
+  "status": "Status",
+  "approved": "Approved",
+  "rejected": "Rejected",
+  "noData": "No data",
+  "requestDetails": "Request details",
+  "address": "Address",
+  "approve": "Approve",
+  "reject": "Reject"
+
+
+
 
 
 

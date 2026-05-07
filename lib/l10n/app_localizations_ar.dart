@@ -1060,4 +1060,25 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get municipalityStatus => 'حالة الملف البلدي';
+
+  @override
+  String get requests => 'الطلبات';
+
+  @override
+  String get status => 'الحالة';
+
+  @override
+  String get approved => 'موافق';
+
+  @override
+  String get rejected => 'مرفوض';
+
+  @override
+  String get address => 'العنوان';
+
+  @override
+  String get approve => 'موافقة';
+
+  @override
+  String get reject => 'رفض';
 }

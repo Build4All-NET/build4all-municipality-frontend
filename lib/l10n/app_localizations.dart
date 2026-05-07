@@ -1042,7 +1042,7 @@ abstract class AppLocalizations {
   /// No description provided for @requestDetails.
   ///
   /// In en, this message translates to:
-  /// **'Request Details'**
+  /// **'Request details'**
   String get requestDetails;
 
   /// No description provided for @titleLabel.
@@ -2190,6 +2190,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Municipality Status'**
   String get municipalityStatus;
+
+  /// No description provided for @requests.
+  ///
+  /// In en, this message translates to:
+  /// **'Requests'**
+  String get requests;
+
+  /// No description provided for @status.
+  ///
+  /// In en, this message translates to:
+  /// **'Status'**
+  String get status;
+
+  /// No description provided for @approved.
+  ///
+  /// In en, this message translates to:
+  /// **'Approved'**
+  String get approved;
+
+  /// No description provided for @rejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get rejected;
+
+  /// No description provided for @address.
+  ///
+  /// In en, this message translates to:
+  /// **'Address'**
+  String get address;
+
+  /// No description provided for @approve.
+  ///
+  /// In en, this message translates to:
+  /// **'Approve'**
+  String get approve;
+
+  /// No description provided for @reject.
+  ///
+  /// In en, this message translates to:
+  /// **'Reject'**
+  String get reject;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
