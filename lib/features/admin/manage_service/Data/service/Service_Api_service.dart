@@ -42,7 +42,7 @@ class ServiceApiService {
 
   Future<void> delete(int id) async {
     try {
-      await dio.delete('/api/services/$id');
+      await dio.delete('/api/admin/services/$id');
     } on DioException {
       rethrow;
     } catch (e) {

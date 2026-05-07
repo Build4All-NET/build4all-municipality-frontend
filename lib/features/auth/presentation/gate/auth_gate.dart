@@ -5,7 +5,10 @@ import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/admin/Dashboard/presentation/screens/Dashboard_screen_admin.dart';
 import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
+import 'package:baladiyati/features/auth/data/services/session_role_store.dart';
 import 'package:baladiyati/features/citizen/home/presentation/screens/home_screen.dart';
+
+import 'package:baladiyati/features/staff/dashboard/presentation/screens/staff_dashboard_screen.dart';
 import 'package:baladiyati/features/welcome/presentation/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 
@@ -31,10 +34,11 @@ class _AuthGateState extends State<AuthGate> {
   Future<Widget> _resolveStartScreen() async {
     final adminStore = AdminTokenStore();
     final userStore = AuthTokenStore();
+    final roleStore = SessionRoleStore();
 
     final tenantId = Env.ownerProjectLinkId;
 
-    // 1. Admin/owner session has priority.
+    // 1. Owner/Admin session has priority.
     final adminTokenStored = await adminStore.getToken();
 
     if (adminTokenStored != null && adminTokenStored.trim().isNotEmpty) {
@@ -45,13 +49,15 @@ class _AuthGateState extends State<AuthGate> {
 
       if (validAdminToken != null && validAdminToken.trim().isNotEmpty) {
         DioClient.setAuthToken(validAdminToken);
+        await JwtStore.save(validAdminToken);
+
         return DashboardPage();
       }
 
       await adminStore.clear();
     }
 
-    // 2. Citizen/user session.
+    // 2. User session can be CITIZEN or STAFF.
     final userTokenStored = await userStore.getToken();
     final userWasInactive = await userStore.getWasInactive();
 
@@ -64,15 +70,20 @@ class _AuthGateState extends State<AuthGate> {
 
       if (validUserToken != null && validUserToken.trim().isNotEmpty) {
         DioClient.setAuthToken(validUserToken);
-
-        // Keep old JwtStore compatible with screens still reading it.
         await JwtStore.save(validUserToken);
+
+        final role = await roleStore.getRole();
+
+        if (role == 'STAFF') {
+          return const StaffDashboardScreen();
+        }
 
         return const HomeScreen();
       }
 
       await userStore.clear();
       await JwtStore.clear();
+      await roleStore.clearRole();
     }
 
     // 3. No valid session.

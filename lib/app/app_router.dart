@@ -18,6 +18,8 @@ import 'package:baladiyati/features/admin/profile/domain/usecases/get_admin_prof
 
 import 'package:baladiyati/features/admin/profile/presentation/cubit/admin_profile_cubit.dart';
 import 'package:baladiyati/features/admin/profile/presentation/screens/admin_profile_screen.dart';
+import 'package:baladiyati/features/staff/dashboard/presentation/screens/staff_dashboard_screen.dart';
+import 'package:baladiyati/features/staff/services/presentation/screens/staff_services_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -304,6 +306,27 @@ static void goToServices(BuildContext context) {
     ),
   );
 }
+
+static void goToStaffDashboard(BuildContext context) {
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const StaffDashboardScreen(),
+    ),
+    (_) => false,
+  );
+}
+
+static void goToStaffServices(BuildContext context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const StaffServicesScreen(),
+    ),
+  );
+}
+
+
 
   // ================= ADMIN: REQUESTS =================
 
