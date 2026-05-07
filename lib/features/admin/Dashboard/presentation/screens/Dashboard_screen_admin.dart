@@ -267,7 +267,7 @@ void _openInbox() {
           IconButton(
             tooltip: loc.profile,
             icon: const Icon(Icons.person_outline),
-            onPressed: () => AppRouter.goToProfile(context),
+           onPressed: () => AppRouter.goToAdminProfile(context),
           ),
           IconButton(
             tooltip: loc.logout,

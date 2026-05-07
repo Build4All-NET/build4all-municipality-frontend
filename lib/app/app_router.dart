@@ -9,6 +9,12 @@ import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_Event.d
 import 'package:baladiyati/features/admin/Requests/presentation/screens/Req_screen.dart';
 import 'package:baladiyati/features/admin/manage_service/Domain/usecases/Delete_service.dart';
 import 'package:baladiyati/features/admin/manage_service/Domain/usecases/update_service.dart';
+import 'package:baladiyati/features/admin/profile/data/repositories/admin_profile_repository_impl.dart';
+import 'package:baladiyati/features/admin/profile/data/services/admin_profile_api_service.dart';
+import 'package:baladiyati/features/admin/profile/domain/usecases/get_admin_profile_usecase.dart';
+
+import 'package:baladiyati/features/admin/profile/presentation/cubit/admin_profile_cubit.dart';
+import 'package:baladiyati/features/admin/profile/presentation/screens/admin_profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -237,6 +243,27 @@ static void goToServices(BuildContext context) {
   static void goToManageServices(BuildContext context) {
     goToServices(context);
   }
+
+ static void goToAdminProfile(BuildContext context) {
+  final repository = AdminProfileRepositoryImpl(
+    api: AdminProfileApiService(
+      dio: DioClient.build,
+    ),
+  );
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => BlocProvider(
+        create: (_) => AdminProfileCubit(
+          getAdminProfile: GetAdminProfileUseCase(repository),
+       
+        )..loadProfile(),
+        child: const AdminProfileScreen(),
+      ),
+    ),
+  );
+}
 
   // ================= ADMIN: EMPLOYEES =================
 
