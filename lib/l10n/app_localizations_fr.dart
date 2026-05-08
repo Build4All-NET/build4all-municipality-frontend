@@ -1081,6 +1081,8 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get reject => 'Rejeter';
+
+  @override
   String get adminProfileTitle => 'Profil du propriétaire';
 
   @override
@@ -1127,4 +1129,37 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get logoutSuccess => 'Déconnexion réussie';
+
+  @override
+  String get takePhoto => 'Prendre une photo';
+
+  @override
+  String get chooseImagesFromGallery => 'Choisir des images depuis la galerie';
+
+  @override
+  String get choosePdfOrDocument => 'Choisir un PDF ou un document';
+
+  @override
+  String get uploadingFiles => 'Téléversement des fichiers...';
+
+  @override
+  String get retry => 'Réessayer';
+
+  @override
+  String get statusDraft => 'Brouillon';
+
+  @override
+  String get statusInField => 'Sur le terrain';
+
+  @override
+  String get statusRejected => 'Rejeté';
+
+  @override
+  String get statusCancelled => 'Annulé';
+
+  @override
+  String get requestNumber => 'Numéro de demande';
+
+  @override
+  String get notAvailable => 'Non disponible';
 }

@@ -12,7 +12,12 @@ class AppTextField extends StatelessWidget {
   final TextAlign textAlign;
   final Widget? suffixIcon;
   final String? Function(String?)? validator;
+  final ValueChanged<String>? onChanged;
+  final VoidCallback? onTap;
+  final bool readOnly;
+  final bool enabled;
   final int maxLines;
+  final int? minLines;
 
   const AppTextField({
     super.key,
@@ -25,7 +30,12 @@ class AppTextField extends StatelessWidget {
     this.textAlign = TextAlign.start,
     this.suffixIcon,
     this.validator,
+    this.onChanged,
+    this.onTap,
+    this.readOnly = false,
+    this.enabled = true,
     this.maxLines = 1,
+    this.minLines,
   });
 
   @override
@@ -38,6 +48,7 @@ class AppTextField extends StatelessWidget {
       children: [
         Text(
           label,
+          textAlign: TextAlign.right,
           style: theme.textTheme.bodyMedium?.copyWith(
             color: cs.onSurface,
             fontWeight: FontWeight.w600,
@@ -50,10 +61,20 @@ class AppTextField extends StatelessWidget {
           keyboardType: keyboardType,
           textAlign: textAlign,
           maxLines: obscureText ? 1 : maxLines,
+          minLines: obscureText ? 1 : minLines,
           validator: validator,
+          onChanged: onChanged,
+          onTap: onTap,
+          readOnly: readOnly,
+          enabled: enabled,
           decoration: InputDecoration(
             hintText: hint,
-            prefixIcon: icon == null ? null : Icon(icon, color: cs.primary),
+            prefixIcon: icon == null
+                ? null
+                : Icon(
+                    icon,
+                    color: cs.primary,
+                  ),
             suffixIcon: suffixIcon,
           ),
         ),

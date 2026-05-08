@@ -496,7 +496,18 @@
 "saving": "Enregistrement...",
 "firstName": "Prénom",
 "lastName": "Nom",
-"logoutSuccess": "Déconnexion réussie"
+"logoutSuccess": "Déconnexion réussie",
+"takePhoto": "Prendre une photo",
+"chooseImagesFromGallery": "Choisir des images depuis la galerie",
+"choosePdfOrDocument": "Choisir un PDF ou un document",
+"uploadingFiles": "Téléversement des fichiers...",
+"retry": "Réessayer",
+"statusDraft": "Brouillon",
+"statusInField": "Sur le terrain",
+"statusRejected": "Rejeté",
+"statusCancelled": "Annulé",
+"requestNumber": "Numéro de demande",
+"notAvailable": "Non disponible"
 
 
 }

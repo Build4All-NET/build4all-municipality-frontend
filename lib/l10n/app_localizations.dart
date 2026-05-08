@@ -2232,6 +2232,7 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reject'**
   String get reject;
+
   /// No description provided for @adminProfileTitle.
   ///
   /// In en, this message translates to:
@@ -2327,6 +2328,72 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Logged out successfully'**
   String get logoutSuccess;
+
+  /// No description provided for @takePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take photo'**
+  String get takePhoto;
+
+  /// No description provided for @chooseImagesFromGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose images from gallery'**
+  String get chooseImagesFromGallery;
+
+  /// No description provided for @choosePdfOrDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose PDF or document'**
+  String get choosePdfOrDocument;
+
+  /// No description provided for @uploadingFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading files...'**
+  String get uploadingFiles;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Retry'**
+  String get retry;
+
+  /// No description provided for @statusDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft'**
+  String get statusDraft;
+
+  /// No description provided for @statusInField.
+  ///
+  /// In en, this message translates to:
+  /// **'In field'**
+  String get statusInField;
+
+  /// No description provided for @statusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get statusRejected;
+
+  /// No description provided for @statusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
+  String get statusCancelled;
+
+  /// No description provided for @requestNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Request number'**
+  String get requestNumber;
+
+  /// No description provided for @notAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Not available'**
+  String get notAvailable;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

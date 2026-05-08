@@ -490,7 +490,18 @@
 "saving": "Saving...",
 "firstName": "First name",
 "lastName": "Last name",
-"logoutSuccess": "Logged out successfully"
+"logoutSuccess": "Logged out successfully",
+"takePhoto": "Take photo",
+"chooseImagesFromGallery": "Choose images from gallery",
+"choosePdfOrDocument": "Choose PDF or document",
+"uploadingFiles": "Uploading files...",
+"retry": "Retry",
+"statusDraft": "Draft",
+"statusInField": "In field",
+"statusRejected": "Rejected",
+"statusCancelled": "Cancelled",
+"requestNumber": "Request number",
+"notAvailable": "Not available"
 
 
 
