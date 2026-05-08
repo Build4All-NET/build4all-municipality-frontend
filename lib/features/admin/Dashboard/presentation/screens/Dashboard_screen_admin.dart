@@ -233,15 +233,9 @@ void _openEmployees() {
   AppRouter.goToEmployees(context);
 }
 
-  void _openInbox() {
-    final loc = AppLocalizations.of(context)!;
-
-    AppToast.show(
-      context,
-      message: loc.inboxComingSoon,
-      type: AppToastType.info,
-    );
-  }
+void _openInbox() {
+  AppRouter.goToRequests(context);
+}
 
   @override
   Widget build(BuildContext context) {
@@ -263,7 +257,7 @@ void _openEmployees() {
           IconButton(
             tooltip: loc.profile,
             icon: const Icon(Icons.person_outline),
-            onPressed: () => AppRouter.goToProfile(context),
+           onPressed: () => AppRouter.goToAdminProfile(context),
           ),
           IconButton(
             tooltip: loc.logout,

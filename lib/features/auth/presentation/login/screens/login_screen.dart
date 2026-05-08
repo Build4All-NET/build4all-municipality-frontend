@@ -13,6 +13,7 @@ import 'package:baladiyati/features/auth/presentation/municipality_profile/scree
 import 'package:baladiyati/features/auth/presentation/register/screens/user_register_screen.dart';
 import 'package:baladiyati/features/citizen/home/presentation/screens/home_screen.dart';
 import 'package:baladiyati/features/forgotpassword/presentation/screens/reset_password_page.dart';
+import 'package:baladiyati/features/staff/dashboard/presentation/screens/staff_dashboard_screen.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -40,6 +41,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _obscurePassword = true;
   bool _isLoading = false;
+
+  // true = Citizen tab, false = Employee tab
   bool isCitizen = true;
 
   static int get ownerProjectLinkId {
@@ -159,45 +162,121 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<void> _saveCitizenSession({
-  required DualLoginResult dual,
-  required Map<String, dynamic> userMap,
+  Future<bool> _isStaffOnMunicipality({
+  required String token,
+  required String email,
 }) async {
-  final token = dual.userToken;
-  final refreshToken = dual.userRefreshToken;
+  try {
+    final response = await DioClient.muni.get(
+      '/users/my-access',
+      queryParameters: {
+        'email': email,
+      },
+      options: Options(
+        headers: {
+          'Authorization': _bearer(token),
+        },
+      ),
+    );
 
-  if (token == null || token.trim().isEmpty) {
-    throw Exception('Missing user token.');
-  }
+    final data = response.data;
 
-  if (refreshToken == null || refreshToken.trim().isEmpty) {
-    throw Exception('Missing refresh token from Build4All login response.');
-  }
+    if (data is Map) {
+      return data['isStaff'] == true;
+    }
+  } catch (_) {}
 
-  await AdminTokenStore().clear();
-  await JwtStore.save(token);
-  await SessionRoleStore().saveRole('CITIZEN');
-
-  await AuthTokenStore().saveToken(
-    token: token,
-    refreshToken: refreshToken,
-    tenantId: ownerProjectLinkId.toString(),
-    userJson: userMap,
-  );
-
-  DioClient.setAuthToken(token);
+  return false;
 }
 
-  Future<void> _goAfterCitizenLogin({
+  Future<void> _saveUserSession({
+    required DualLoginResult dual,
+    required Map<String, dynamic> userMap,
+    required String sessionRole,
+  }) async {
+    final token = dual.userToken;
+    final refreshToken = dual.userRefreshToken;
+
+    if (token == null || token.trim().isEmpty) {
+      throw Exception('Missing user token.');
+    }
+
+    if (refreshToken == null || refreshToken.trim().isEmpty) {
+      throw Exception('Missing refresh token from Build4All login response.');
+    }
+
+    await AdminTokenStore().clear();
+    await JwtStore.save(token);
+    await SessionRoleStore().saveRole(sessionRole);
+
+    await AuthTokenStore().saveToken(
+      token: token,
+      refreshToken: refreshToken,
+      tenantId: ownerProjectLinkId.toString(),
+      userJson: userMap,
+    );
+
+    DioClient.setAuthToken(token);
+  }
+
+  Future<void> _clearUserSession() async {
+    await AuthTokenStore().clear();
+    await JwtStore.clear();
+    await SessionRoleStore().clearRole();
+    DioClient.clearAuthToken();
+  }
+
+  Future<void> _goAfterUserLogin({
     required DualLoginResult dual,
     required String email,
   }) async {
     final userMap = _extractUserMap(dual);
     final userId = _extractUserId(userMap);
 
-    await _saveCitizenSession(
+    final wantsEmployee = !isCitizen;
+
+    if (wantsEmployee) {
+      final isStaff = await _isStaffOnMunicipality(
+        token: dual.userToken!, 
+        email: email,
+      );
+
+      if (!isStaff) {
+        await _clearUserSession();
+
+        if (!mounted) return;
+
+        AppToast.show(
+          context,
+          message: 'This account is not registered as a staff member.',
+          type: AppToastType.error,
+        );
+        return;
+      }
+
+      await _saveUserSession(
+        dual: dual,
+        userMap: userMap,
+        sessionRole: 'STAFF',
+      );
+
+      if (!mounted) return;
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const StaffDashboardScreen(),
+        ),
+        (_) => false,
+      );
+      return;
+    }
+
+    // Citizen tab: even if this user is also employee, keep citizen flow.
+    await _saveUserSession(
       dual: dual,
       userMap: userMap,
+      sessionRole: 'CITIZEN',
     );
 
     final completedLocal = await _isMunicipalityProfileCompletedLocal(
@@ -224,9 +303,7 @@ class _LoginScreenState extends State<LoginScreen> {
       );
     }
 
-    if (!mounted) {
-      return;
-    }
+    if (!mounted) return;
 
     if (!completed) {
       Navigator.pushAndRemoveUntil(
@@ -269,11 +346,10 @@ class _LoginScreenState extends State<LoginScreen> {
         refreshToken: dual.admin!.refreshToken,
         tenantId: ownerProjectLinkId.toString(),
       );
+
       DioClient.setAuthToken(dual.admin!.token);
 
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
 
       Navigator.pushAndRemoveUntil(
         context,
@@ -283,9 +359,7 @@ class _LoginScreenState extends State<LoginScreen> {
         (_) => false,
       );
     } catch (e) {
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
 
       AppToast.show(
         context,
@@ -298,13 +372,9 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _onLoginPressed(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
 
-    if (_isLoading) {
-      return;
-    }
+    if (_isLoading) return;
 
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
 
     final email = _emailCtrl.text.trim();
     final password = _passwordCtrl.text.trim();
@@ -321,15 +391,23 @@ class _LoginScreenState extends State<LoginScreen> {
         ownerProjectLinkId: ownerProjectLinkId,
       );
 
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
 
       if (dual.none) {
         AppToast.show(
           context,
           message: dual.error ?? l10n.loginFailed,
           type: AppToastType.error,
+        );
+        return;
+      }
+
+      // If Employee tab is selected, user path has priority.
+      // Admin/Owner login should not open from Employee tab unless admin only.
+      if (!isCitizen && dual.userOk) {
+        await _goAfterUserLogin(
+          dual: dual,
+          email: email,
         );
         return;
       }
@@ -341,7 +419,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       if (dual.userOk) {
-        await _goAfterCitizenLogin(
+        await _goAfterUserLogin(
           dual: dual,
           email: email,
         );
@@ -353,9 +431,7 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
     } catch (e) {
-      if (!mounted) {
-        return;
-      }
+      if (!mounted) return;
 
       AppToast.show(
         context,
@@ -411,17 +487,18 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   onTap: () async {
                     Navigator.pop(context);
-                    setState(() => _isLoading = true);
+                    setState(() {
+                      isCitizen = true;
+                      _isLoading = true;
+                    });
 
                     try {
-                      await _goAfterCitizenLogin(
+                      await _goAfterUserLogin(
                         dual: dual,
                         email: _emailCtrl.text.trim(),
                       );
                     } catch (e) {
-                      if (!mounted) {
-                        return;
-                      }
+                      if (!mounted) return;
 
                       AppToast.show(
                         context,
@@ -454,9 +531,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     try {
                       await _goAfterAdminLogin(dual);
                     } catch (e) {
-                      if (!mounted) {
-                        return;
-                      }
+                      if (!mounted) return;
 
                       AppToast.show(
                         context,
@@ -581,7 +656,8 @@ class _LoginScreenState extends State<LoginScreen> {
                                 ? null
                                 : () {
                                     setState(
-                                      () => _obscurePassword = !_obscurePassword,
+                                      () =>
+                                          _obscurePassword = !_obscurePassword,
                                     );
                                   },
                             icon: Icon(

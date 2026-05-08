@@ -464,7 +464,39 @@
 "inboxComingSoon": "La boîte de réception sera bientôt disponible",
 "accountInfo": "Informations du compte",
 "municipalityInfo": "Informations municipales",
-"municipalityStatus": "Statut municipal"
+"municipalityStatus": "Statut municipal",
+
+  "search": "Recherche...",
+  "requests": "Demandes",
+  "status": "Statut",
+  "approved": "Approuvé",
+  "rejected": "Rejeté",
+  "noData": "Aucune donnée",
+  "requestDetails": "Détails de la demande",
+  "address": "Adresse",
+  "approve": "Approuver",
+  "reject": "Rejeter",
+
+
+
+
+"adminProfileTitle": "Profil du propriétaire",
+"accountInformation": "Informations du compte",
+"notificationPreferences": "Préférences de notification",
+"notifyItemUpdates": "Notifications des mises à jour",
+"notifyUserFeedback": "Notifications des retours utilisateurs",
+"changePassword": "Changer le mot de passe",
+"currentPassword": "Mot de passe actuel",
+"leaveBlankToKeepPassword": "Laissez les champs de mot de passe vides pour conserver le mot de passe actuel.",
+"profileDetails": "Détails du profil",
+"profileUpdated": "Profil mis à jour avec succès",
+"role": "Rôle",
+"createdAt": "Créé le",
+"updatedAt": "Mis à jour le",
+"saving": "Enregistrement...",
+"firstName": "Prénom",
+"lastName": "Nom",
+"logoutSuccess": "Déconnexion réussie"
 
 
 }
