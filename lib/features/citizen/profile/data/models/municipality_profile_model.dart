@@ -31,8 +31,8 @@ class MunicipalityProfileModel {
       resolvedMunicipalityId = int.tryParse(
         municipality['id']?.toString() ?? '',
       );
-
       resolvedMunicipalityName =
+          municipality['nameAR']?.toString() ??
           municipality['name']?.toString() ??
           municipality['municipalityName']?.toString() ??
           municipality['title']?.toString();
@@ -43,6 +43,8 @@ class MunicipalityProfileModel {
     );
 
     resolvedMunicipalityName ??=
+        json['municipalityNameAR']?.toString() ??
+        json['municipalityNameEN']?.toString() ??
         json['municipalityName']?.toString() ??
         json['municipality_name']?.toString();
 

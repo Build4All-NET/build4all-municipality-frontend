@@ -1,7 +1,11 @@
 // lib/features/citizen/requests/presentation/screens/requests_screen.dart
 
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:baladiyati/features/citizen/requests/presentation/bloc/requests_bloc.dart';
+import 'package:baladiyati/features/citizen/requests/presentation/bloc/requests_state.dart';
+import 'package:baladiyati/features/citizen/requests/data/models/request_model.dart';
 import 'request_details_screen.dart';
 
 enum RequestStatus {
@@ -29,44 +33,6 @@ class RequestItem {
   });
 }
 
-final List<RequestItem> mockRequests = [
-  const RequestItem(
-    id: '1',
-    nameAr: 'براءة ذمة بلدية',
-    number: 'MC-2026-001',
-    status: RequestStatus.waitingPayment,
-    date: '١٧-٠٣-٢٠٢٦',
-  ),
-  const RequestItem(
-    id: '2',
-    nameAr: 'شكوى - إنارة شارع',
-    number: 'CP-2026-045',
-    status: RequestStatus.underReview,
-    date: '١٥-٠٣-٢٠٢٦',
-  ),
-  const RequestItem(
-    id: '3',
-    nameAr: 'ترخيص محل تجاري',
-    number: 'BL-2026-112',
-    status: RequestStatus.approved,
-    date: '١٠-٠٣-٢٠٢٦',
-  ),
-  const RequestItem(
-    id: '4',
-    nameAr: 'طلب رخصة بناء',
-    number: 'BP-2026-089',
-    status: RequestStatus.inField,
-    date: '٢٨-٠٢-٢٠٢٦',
-  ),
-  const RequestItem(
-    id: '5',
-    nameAr: 'طلب إفادة سكن',
-    number: 'HC-2026-067',
-    status: RequestStatus.delivered,
-    date: '٢٠-٠٢-٢٠٢٦',
-  ),
-];
-
 class RequestsScreen extends StatefulWidget {
   const RequestsScreen({super.key});
 
@@ -85,7 +51,36 @@ class _RequestsScreenState extends State<RequestsScreen> {
     super.dispose();
   }
 
-  List<RequestItem> get _filtered => mockRequests.where((r) {
+  RequestStatus _toEnum(String raw) {
+    switch (raw.toLowerCase()) {
+      case 'submitted':        return RequestStatus.submitted;
+      case 'under_review':
+      case 'underreview':
+      case 'review':           return RequestStatus.underReview;
+      case 'waiting_payment':
+      case 'waitingpayment':
+      case 'payment':          return RequestStatus.waitingPayment;
+      case 'approved':         return RequestStatus.approved;
+      case 'in_field':
+      case 'infield':
+      case 'field':            return RequestStatus.inField;
+      case 'delivered':
+      case 'completed':        return RequestStatus.delivered;
+      default:                 return RequestStatus.submitted;
+    }
+  }
+
+  List<RequestItem> _toItems(List<RequestModel> models) =>
+      models.map((r) => RequestItem(
+            id: r.id,
+            nameAr: r.nameAr,
+            number: r.number,
+            status: _toEnum(r.status),
+            date: r.date,
+          )).toList();
+
+  List<RequestItem> _filtered(List<RequestItem> items) =>
+      items.where((r) {
         final matchSearch = _query.isEmpty ||
             r.nameAr.contains(_query) ||
             r.number.toLowerCase().contains(_query.toLowerCase());
@@ -98,140 +93,154 @@ class _RequestsScreenState extends State<RequestsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return Scaffold(
-      backgroundColor: const Color(0xFFF3F4F6),
-      body: SafeArea(
-        child: Column(
-          children: [
-            // ── Header ──────────────────────────────────────
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    l10n.myRequests,
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E3A5F),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  // Search
-                  TextField(
-                    controller: _searchCtrl,
-                    textAlign: TextAlign.right,
-                    onChanged: (v) => setState(() => _query = v),
-                    decoration: InputDecoration(
-                      hintText: l10n.searchRequest,
-                      hintStyle: const TextStyle(color: Colors.grey),
-                      prefixIcon:
-                          const Icon(Icons.search, color: Colors.grey),
-                      filled: true,
-                      fillColor: const Color(0xFFF3F4F6),
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(12),
-                        borderSide: BorderSide.none,
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 12),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-                  // Filter dropdown
-                  Row(
+    return BlocBuilder<RequestsBloc, RequestsState>(
+      builder: (context, state) {
+        final items = _filtered(_toItems(state.requests));
+
+        return Scaffold(
+          backgroundColor: const Color(0xFFF3F4F6),
+          body: SafeArea(
+            child: Column(
+              children: [
+                Container(
+                  color: Colors.white,
+                  padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.end,
                     children: [
-                      const Icon(Icons.filter_list,
-                          color: Colors.grey, size: 18),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 12, vertical: 4),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFF3F4F6),
-                            borderRadius: BorderRadius.circular(10),
+                      Text(
+                        l10n.myRequests,
+                        style: const TextStyle(
+                          fontSize: 24,
+                          fontWeight: FontWeight.bold,
+                          color: Color(0xFF1E3A5F),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: _searchCtrl,
+                        textAlign: TextAlign.right,
+                        onChanged: (v) => setState(() => _query = v),
+                        decoration: InputDecoration(
+                          hintText: l10n.searchRequest,
+                          hintStyle: const TextStyle(color: Colors.grey),
+                          prefixIcon: const Icon(Icons.search,
+                              color: Colors.grey),
+                          filled: true,
+                          fillColor: const Color(0xFFF3F4F6),
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide.none,
                           ),
-                          child: DropdownButtonHideUnderline(
-                            child: DropdownButton<RequestStatus?>(
-                              value: _filterStatus,
-                              isExpanded: true,
-                              items: [
-                                DropdownMenuItem(
-                                  value: null,
-                                  child: Text(l10n.filterAll),
+                          contentPadding: const EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 12),
+                        ),
+                      ),
+                      const SizedBox(height: 10),
+                      Row(
+                        children: [
+                          const Icon(Icons.filter_list,
+                              color: Colors.grey, size: 18),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Container(
+                              padding: const EdgeInsets.symmetric(
+                                  horizontal: 12, vertical: 4),
+                              decoration: BoxDecoration(
+                                color: const Color(0xFFF3F4F6),
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: DropdownButtonHideUnderline(
+                                child: DropdownButton<RequestStatus?>(
+                                  value: _filterStatus,
+                                  isExpanded: true,
+                                  items: [
+                                    DropdownMenuItem(
+                                        value: null,
+                                        child: Text(l10n.filterAll)),
+                                    DropdownMenuItem(
+                                        value: RequestStatus.submitted,
+                                        child: Text(l10n.statusSubmitted)),
+                                    DropdownMenuItem(
+                                        value: RequestStatus.underReview,
+                                        child: Text(l10n.statusUnderReview)),
+                                    DropdownMenuItem(
+                                        value: RequestStatus.waitingPayment,
+                                        child: Text(l10n.statusWaitingPayment)),
+                                    DropdownMenuItem(
+                                        value: RequestStatus.approved,
+                                        child: Text(l10n.statusApproved)),
+                                    DropdownMenuItem(
+                                        value: RequestStatus.delivered,
+                                        child: Text(l10n.statusDelivered)),
+                                  ],
+                                  onChanged: (v) =>
+                                      setState(() => _filterStatus = v),
                                 ),
-                                DropdownMenuItem(
-                                  value: RequestStatus.submitted,
-                                  child: Text(l10n.statusSubmitted),
-                                ),
-                                DropdownMenuItem(
-                                  value: RequestStatus.underReview,
-                                  child: Text(l10n.statusUnderReview),
-                                ),
-                                DropdownMenuItem(
-                                  value: RequestStatus.waitingPayment,
-                                  child: Text(l10n.statusWaitingPayment),
-                                ),
-                                DropdownMenuItem(
-                                  value: RequestStatus.approved,
-                                  child: Text(l10n.statusApproved),
-                                ),
-                                DropdownMenuItem(
-                                  value: RequestStatus.delivered,
-                                  child: Text(l10n.statusDelivered),
-                                ),
-                              ],
-                              onChanged: (v) =>
-                                  setState(() => _filterStatus = v),
+                              ),
                             ),
                           ),
-                        ),
+                        ],
                       ),
                     ],
                   ),
-                ],
-              ),
-            ),
+                ),
 
-            // ── List ─────────────────────────────────────────
-            Expanded(
-              child: _filtered.isEmpty
-                  ? Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.description_outlined,
-                              size: 64, color: Colors.grey),
-                          const SizedBox(height: 12),
-                          Text(l10n.noRequests,
-                              style: const TextStyle(color: Colors.grey)),
-                        ],
-                      ),
-                    )
-                  : ListView.builder(
-                      padding: const EdgeInsets.all(16),
-                      itemCount: _filtered.length,
-                      itemBuilder: (_, i) {
-                        final r = _filtered[i];
-                        return _RequestCard(
-                          item: r,
-                          onTap: () => Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (_) =>
-                                  RequestDetailsScreen(request: r),
-                            ),
-                          ),
-                        );
-                      },
-                    ),
+                Expanded(
+                  child: state.isLoading
+                      ? const Center(child: CircularProgressIndicator())
+                      : state.errorMessage != null
+                          ? Center(
+                              child: Padding(
+                                padding: const EdgeInsets.all(24),
+                                child: Text(
+                                  state.errorMessage!,
+                                  style: const TextStyle(color: Colors.red),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ),
+                            )
+                          : items.isEmpty
+                              ? Center(
+                                  child: Column(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.center,
+                                    children: [
+                                      const Icon(
+                                          Icons.description_outlined,
+                                          size: 64,
+                                          color: Colors.grey),
+                                      const SizedBox(height: 12),
+                                      Text(l10n.noRequests,
+                                          style: const TextStyle(
+                                              color: Colors.grey)),
+                                    ],
+                                  ),
+                                )
+                              : ListView.builder(
+                                  padding: const EdgeInsets.all(16),
+                                  itemCount: items.length,
+                                  itemBuilder: (_, i) {
+                                    final r = items[i];
+                                    return _RequestCard(
+                                      item: r,
+                                      onTap: () => Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) =>
+                                              RequestDetailsScreen(
+                                                  request: r),
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                ),
+              ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 }
@@ -269,16 +278,13 @@ class _RequestCard extends StatelessWidget {
                 Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    Text(
-                      item.number,
-                      style: const TextStyle(
-                          fontSize: 11, color: Colors.grey),
-                    ),
-                    Text(
-                      item.nameAr,
-                      style: const TextStyle(
-                          fontSize: 15, fontWeight: FontWeight.w600),
-                    ),
+                    Text(item.number,
+                        style: const TextStyle(
+                            fontSize: 11, color: Colors.grey)),
+                    Text(item.nameAr,
+                        style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w600)),
                   ],
                 ),
               ],
@@ -286,8 +292,7 @@ class _RequestCard extends StatelessWidget {
             const SizedBox(height: 6),
             Text(
               'تاريخ التقديم: ${item.date}',
-              style:
-                  const TextStyle(fontSize: 11, color: Colors.grey),
+              style: const TextStyle(fontSize: 11, color: Colors.grey),
             ),
           ],
         ),
@@ -296,17 +301,15 @@ class _RequestCard extends StatelessWidget {
   }
 }
 
-// ── Shared status badge widget ────────────────────────────────
 class StatusBadgeWidget extends StatelessWidget {
   final RequestStatus status;
   const StatusBadgeWidget({super.key, required this.status});
 
   @override
   Widget build(BuildContext context) {
-    final config = _statusConfig(status);
+    final config = _config(status);
     return Container(
-      padding:
-          const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
         color: config.bg,
         borderRadius: BorderRadius.circular(20),
@@ -321,11 +324,11 @@ class StatusBadgeWidget extends StatelessWidget {
     );
   }
 
-  _StatusConfig _statusConfig(RequestStatus s) {
+  _StatusConfig _config(RequestStatus s) {
     switch (s) {
       case RequestStatus.submitted:
-        return _StatusConfig('مقدمة', const Color(0xFFE3F2FD),
-            const Color(0xFF1565C0));
+        return _StatusConfig('مقدمة',
+            const Color(0xFFE3F2FD), const Color(0xFF1565C0));
       case RequestStatus.underReview:
         return _StatusConfig('قيد التدقيق',
             const Color(0xFFFFFDE7), const Color(0xFFF9A825));
