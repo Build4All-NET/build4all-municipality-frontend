@@ -1081,6 +1081,8 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get reject => 'رفض';
+
+  @override
   String get adminProfileTitle => 'ملف المالك';
 
   @override
@@ -1127,4 +1129,37 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get logoutSuccess => 'تم تسجيل الخروج بنجاح';
+
+  @override
+  String get takePhoto => 'التقاط صورة';
+
+  @override
+  String get chooseImagesFromGallery => 'اختيار صور من المعرض';
+
+  @override
+  String get choosePdfOrDocument => 'اختيار PDF أو مستند';
+
+  @override
+  String get uploadingFiles => 'جاري رفع الملفات...';
+
+  @override
+  String get retry => 'إعادة المحاولة';
+
+  @override
+  String get statusDraft => 'مسودة';
+
+  @override
+  String get statusInField => 'قيد الكشف';
+
+  @override
+  String get statusRejected => 'مرفوض';
+
+  @override
+  String get statusCancelled => 'ملغى';
+
+  @override
+  String get requestNumber => 'رقم الطلب';
+
+  @override
+  String get notAvailable => 'غير متوفر';
 }

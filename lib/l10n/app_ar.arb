@@ -489,5 +489,16 @@
 "saving": "جارٍ الحفظ...",
 "firstName": "الاسم الأول",
 "lastName": "اسم العائلة",
-"logoutSuccess": "تم تسجيل الخروج بنجاح"
+"logoutSuccess": "تم تسجيل الخروج بنجاح",
+"takePhoto": "التقاط صورة",
+"chooseImagesFromGallery": "اختيار صور من المعرض",
+"choosePdfOrDocument": "اختيار PDF أو مستند",
+"uploadingFiles": "جاري رفع الملفات...",
+"retry": "إعادة المحاولة",
+"statusDraft": "مسودة",
+"statusInField": "قيد الكشف",
+"statusRejected": "مرفوض",
+"statusCancelled": "ملغى",
+"requestNumber": "رقم الطلب",
+"notAvailable": "غير متوفر"
 }

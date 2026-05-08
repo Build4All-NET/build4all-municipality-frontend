@@ -1,299 +1,269 @@
 // lib/features/citizen/requests/presentation/screens/request_details_screen.dart
 
-import 'package:flutter/material.dart';
+import 'package:baladiyati/common/widgets/primary_button.dart';
+import 'package:baladiyati/core/config/app_sizes.dart';
+import 'package:baladiyati/features/citizen/requests/data/models/request_model.dart';
+import 'package:baladiyati/features/citizen/requests/presentation/widgets/request_status_badge.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
-import 'requests_screen.dart';
-
-class _TimelineStep {
-  final RequestStatus status;
-  final String date;
-  final bool completed;
-  const _TimelineStep(
-      {required this.status, required this.date, required this.completed});
-}
+import 'package:flutter/material.dart';
 
 class RequestDetailsScreen extends StatelessWidget {
-  final RequestItem request;
-  const RequestDetailsScreen({super.key, required this.request});
+  final RequestModel request;
+
+  const RequestDetailsScreen({
+    super.key,
+    required this.request,
+  });
+
+  double _progressValue(CitizenRequestStatus status) {
+    switch (status) {
+      case CitizenRequestStatus.draft:
+        return 0.10;
+      case CitizenRequestStatus.submitted:
+        return 0.25;
+      case CitizenRequestStatus.underReview:
+        return 0.45;
+      case CitizenRequestStatus.inField:
+        return 0.60;
+      case CitizenRequestStatus.approved:
+        return 0.75;
+      case CitizenRequestStatus.waitingPayment:
+        return 0.85;
+      case CitizenRequestStatus.delivered:
+        return 1.00;
+      case CitizenRequestStatus.rejected:
+      case CitizenRequestStatus.cancelled:
+        return 1.00;
+    }
+  }
+
+  List<CitizenRequestStatus> _timelineStatuses() {
+    return const [
+      CitizenRequestStatus.submitted,
+      CitizenRequestStatus.underReview,
+      CitizenRequestStatus.inField,
+      CitizenRequestStatus.approved,
+      CitizenRequestStatus.waitingPayment,
+      CitizenRequestStatus.delivered,
+    ];
+  }
+
+  bool _isCompletedStep(
+    CitizenRequestStatus current,
+    CitizenRequestStatus step,
+  ) {
+    final order = _timelineStatuses();
+
+    if (current == CitizenRequestStatus.rejected ||
+        current == CitizenRequestStatus.cancelled) {
+      return false;
+    }
+
+    final currentIndex = order.indexOf(current);
+    final stepIndex = order.indexOf(step);
+
+    if (currentIndex == -1 || stepIndex == -1) {
+      return false;
+    }
+
+    return stepIndex <= currentIndex;
+  }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
     final l10n = AppLocalizations.of(context)!;
 
-    final timeline = [
-      _TimelineStep(
-          status: RequestStatus.submitted,
-          date: '١٧-٠٣-٢٠٢٦',
-          completed: true),
-      _TimelineStep(
-          status: RequestStatus.underReview,
-          date: '١٨-٠٣-٢٠٢٦',
-          completed: true),
-      _TimelineStep(
-          status: RequestStatus.approved,
-          date: '١٩-٠٣-٢٠٢٦',
-          completed: true),
-      _TimelineStep(
-          status: RequestStatus.waitingPayment,
-          date: '١٩-٠٣-٢٠٢٦',
-          completed: request.status == RequestStatus.waitingPayment ||
-              request.status == RequestStatus.delivered),
-      _TimelineStep(
-          status: RequestStatus.delivered,
-          date: '',
-          completed: request.status == RequestStatus.delivered),
-    ];
-
-    final completedCount = timeline.where((t) => t.completed).length;
-    final progress = completedCount / timeline.length;
+    final parsedStatus = requestStatusFromString(request.status);
+    final progress = _progressValue(parsedStatus);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F4F6),
+      backgroundColor: cs.background,
       body: SafeArea(
         child: Column(
           children: [
-            // ── Header ──────────────────────────────────────
             Container(
-              color: Colors.white,
-              padding: const EdgeInsets.fromLTRB(8, 12, 16, 12),
+              color: cs.surface,
+              padding: const EdgeInsets.fromLTRB(
+                AppSizes.paddingSmall,
+                AppSizes.paddingSmall,
+                AppSizes.paddingMedium,
+                AppSizes.paddingSmall,
+              ),
               child: Row(
                 children: [
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.arrow_forward),
+                    icon: Icon(
+                      Icons.arrow_forward,
+                      color: cs.onSurface,
+                    ),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSizes.paddingSmall),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          request.number,
-                          style: const TextStyle(
-                              fontSize: 11, color: Colors.grey),
+                          request.displayNumber,
+                          textAlign: TextAlign.right,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: cs.onSurfaceVariant,
+                          ),
                         ),
+                        const SizedBox(height: AppSizes.paddingSmall / 2),
                         Text(
-                          request.nameAr,
-                          style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold),
+                          request.displayTitle,
+                          textAlign: TextAlign.right,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            color: cs.onSurface,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
                       ],
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  StatusBadgeWidget(status: request.status),
+                  const SizedBox(width: AppSizes.paddingSmall),
+                  RequestStatusBadge(status: request.status),
                 ],
               ),
             ),
-
-            // ── Body ─────────────────────────────────────────
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSizes.paddingMedium),
                 child: Column(
                   children: [
-                    // Progress card
-                    _card(
+                    _SectionCard(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 '${(progress * 100).round()}%',
-                                style: const TextStyle(
-                                    color: Colors.grey, fontSize: 13),
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: cs.onSurfaceVariant,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
                               Text(
                                 l10n.progress,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600),
+                                style: theme.textTheme.titleSmall?.copyWith(
+                                  color: cs.onSurface,
+                                  fontWeight: FontWeight.w800,
+                                ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 10),
+                          const SizedBox(height: AppSizes.paddingSmall),
                           ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
+                            borderRadius: BorderRadius.circular(
+                              AppSizes.radiusMedium,
+                            ),
                             child: LinearProgressIndicator(
                               value: progress,
                               minHeight: 8,
-                              backgroundColor: Colors.grey.shade200,
-                              valueColor:
-                                  const AlwaysStoppedAnimation<Color>(
-                                      Color(0xFF1E3A5F)),
+                              backgroundColor:
+                                  cs.surfaceVariant.withOpacity(0.45),
+                              color: cs.primary,
                             ),
                           ),
                         ],
                       ),
                     ),
-
-                    const SizedBox(height: 12),
-
-                    // Timeline card
-                    _card(
+                    const SizedBox(height: AppSizes.paddingSmall),
+                    _SectionCard(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
                             l10n.timeline,
-                            style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.right,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: cs.onSurface,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
-                          const SizedBox(height: 16),
-                          ...List.generate(timeline.length, (i) {
-                            final step = timeline[i];
-                            final isLast = i == timeline.length - 1;
-                            return Row(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
-                              children: [
-                                // Left: connector line
-                                Column(
-                                  children: [
-                                    Container(
-                                      width: 12,
-                                      height: 12,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: step.completed
-                                            ? Colors.green
-                                            : Colors.grey.shade300,
-                                      ),
-                                    ),
-                                    if (!isLast)
-                                      Container(
-                                        width: 2,
-                                        height: 40,
-                                        color: step.completed
-                                            ? Colors.green
-                                            : Colors.grey.shade300,
-                                      ),
-                                  ],
-                                ),
-                                const SizedBox(width: 12),
-                                // Right: status + date
-                                Expanded(
-                                  child: Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 8),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        StatusBadgeWidget(
-                                            status: step.status),
-                                        if (step.date.isNotEmpty)
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(
-                                                    top: 4),
-                                            child: Text(
-                                              step.date,
-                                              style: const TextStyle(
-                                                  fontSize: 11,
-                                                  color: Colors.grey),
-                                            ),
-                                          ),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          }),
+                          const SizedBox(height: AppSizes.paddingMedium),
+                          ..._timelineStatuses().map(
+                            (step) {
+                              final completed = _isCompletedStep(
+                                parsedStatus,
+                                step,
+                              );
+
+                              final isLast = step == _timelineStatuses().last;
+
+                              return _TimelineRow(
+                                status: step,
+                                completed: completed,
+                                isLast: isLast,
+                                date: completed ? request.date : '',
+                              );
+                            },
+                          ),
                         ],
                       ),
                     ),
-
-                    const SizedBox(height: 12),
-
-                    // Details card
-                    _card(
+                    const SizedBox(height: AppSizes.paddingSmall),
+                    _SectionCard(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Text(
                             l10n.details,
-                            style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
+                            textAlign: TextAlign.right,
+                            style: theme.textTheme.titleMedium?.copyWith(
+                              color: cs.onSurface,
+                              fontWeight: FontWeight.w800,
+                            ),
                           ),
-                          const SizedBox(height: 12),
-                          _detailRow(
+                          const SizedBox(height: AppSizes.paddingMedium),
+                          _DetailRow(
+                            icon: Icons.confirmation_number_outlined,
+                            label: l10n.requestNumber,
+                            value: request.displayNumber,
+                          ),
+                          const SizedBox(height: AppSizes.paddingSmall),
+                          _DetailRow(
                             icon: Icons.description_outlined,
                             label: l10n.descriptionLabel,
-                            value:
-                                'طلب استخراج براءة ذمة بلدية للعقار رقم ١٢٣٤',
+                            value: request.description.trim().isEmpty
+                                ? l10n.notAvailable
+                                : request.description,
                           ),
-                          const SizedBox(height: 10),
-                          _detailRow(
+                          const SizedBox(height: AppSizes.paddingSmall),
+                          _DetailRow(
+                            icon: Icons.location_on_outlined,
+                            label: l10n.locationLabel,
+                            value: request.addressText.trim().isEmpty
+                                ? l10n.notAvailable
+                                : request.addressText,
+                          ),
+                          const SizedBox(height: AppSizes.paddingSmall),
+                          _DetailRow(
                             icon: Icons.calendar_today_outlined,
                             label: l10n.submissionDate,
-                            value: request.date,
+                            value: request.date.trim().isEmpty
+                                ? l10n.notAvailable
+                                : request.date,
                           ),
                         ],
                       ),
                     ),
-
-                    // Payment card (if waiting)
-                    if (request.status ==
-                        RequestStatus.waitingPayment) ...[
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFF8F0),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                              color: Colors.orange.shade200),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            Text(
-                              l10n.amountDue,
-                              style: const TextStyle(
-                                  fontSize: 13, color: Colors.grey),
-                            ),
-                            const SizedBox(height: 4),
-                            const Text(
-                              '5,000 ل.ل',
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.orange,
-                              ),
-                            ),
-                            const SizedBox(height: 14),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      const Color(0xFF1E3A5F),
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 14),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(12),
-                                  ),
-                                ),
-                                onPressed: () =>
-                                    Navigator.pop(context),
-                                child: Text(l10n.payNow),
-                              ),
-                            ),
-                          ],
-                        ),
+                    if (parsedStatus == CitizenRequestStatus.waitingPayment) ...[
+                      const SizedBox(height: AppSizes.paddingSmall),
+                      _PaymentCard(
+                        onPayPressed: () {
+                          Navigator.pop(context);
+                        },
                       ),
                     ],
-
-                    const SizedBox(height: 20),
+                    const SizedBox(height: AppSizes.paddingMedium),
                   ],
                 ),
               ),
@@ -303,17 +273,31 @@ class RequestDetailsScreen extends StatelessWidget {
       ),
     );
   }
+}
 
-  Widget _card({required Widget child}) {
+class _SectionCard extends StatelessWidget {
+  final Widget child;
+
+  const _SectionCard({
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSizes.paddingMedium),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+        border: Border.all(
+          color: cs.outline.withOpacity(0.10),
+        ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: cs.onSurface.withOpacity(0.04),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -322,30 +306,196 @@ class RequestDetailsScreen extends StatelessWidget {
       child: child,
     );
   }
+}
 
-  Widget _detailRow(
-      {required IconData icon,
-      required String label,
-      required String value}) {
+class _TimelineRow extends StatelessWidget {
+  final CitizenRequestStatus status;
+  final bool completed;
+  final bool isLast;
+  final String date;
+
+  const _TimelineRow({
+    required this.status,
+    required this.completed,
+    required this.isLast,
+    required this.date,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+
+    final activeColor = cs.primary;
+    final inactiveColor = cs.surfaceVariant;
+
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Spacer(),
         Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
           children: [
-            Text(label,
-                style:
-                    const TextStyle(fontSize: 11, color: Colors.grey)),
-            const SizedBox(height: 2),
-            Text(value,
-                textAlign: TextAlign.right,
-                style: const TextStyle(fontSize: 13)),
+            Container(
+              width: AppSizes.iconSmall,
+              height: AppSizes.iconSmall,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                color: completed ? activeColor : inactiveColor,
+              ),
+              child: completed
+                  ? Icon(
+                      Icons.check,
+                      color: cs.onPrimary,
+                      size: AppSizes.iconSmall * 0.70,
+                    )
+                  : null,
+            ),
+            if (!isLast)
+              Container(
+                width: 2,
+                height: AppSizes.paddingLarge,
+                color: completed ? activeColor : inactiveColor,
+              ),
           ],
         ),
-        const SizedBox(width: 8),
-        Icon(icon, color: Colors.grey, size: 18),
+        const SizedBox(width: AppSizes.paddingMedium),
+        Expanded(
+          child: Padding(
+            padding: const EdgeInsets.only(
+              bottom: AppSizes.paddingSmall,
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  requestStatusLabel(l10n, status),
+                  textAlign: TextAlign.right,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: completed ? cs.onSurface : cs.onSurfaceVariant,
+                    fontWeight: completed ? FontWeight.w800 : FontWeight.w500,
+                  ),
+                ),
+                if (date.trim().isNotEmpty) ...[
+                  const SizedBox(height: AppSizes.paddingSmall / 2),
+                  Text(
+                    date,
+                    textAlign: TextAlign.right,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: cs.onSurfaceVariant,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ),
       ],
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+
+  const _DetailRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Icon(
+          icon,
+          color: cs.onSurfaceVariant,
+          size: AppSizes.iconSmall,
+        ),
+        const SizedBox(width: AppSizes.paddingSmall),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(
+                label,
+                textAlign: TextAlign.right,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: cs.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: AppSizes.paddingSmall / 2),
+              Text(
+                value,
+                textAlign: TextAlign.right,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: cs.onSurface,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _PaymentCard extends StatelessWidget {
+  final VoidCallback onPayPressed;
+
+  const _PaymentCard({
+    required this.onPayPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSizes.paddingMedium),
+      decoration: BoxDecoration(
+        color: Colors.orange.withOpacity(0.10),
+        borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+        border: Border.all(
+          color: Colors.orange.withOpacity(0.35),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.end,
+        children: [
+          Text(
+            l10n.amountDue,
+            textAlign: TextAlign.right,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: cs.onSurfaceVariant,
+            ),
+          ),
+          const SizedBox(height: AppSizes.paddingSmall / 2),
+          Text(
+            l10n.notAvailable,
+            textAlign: TextAlign.right,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              color: Colors.orange.shade800,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: AppSizes.paddingMedium),
+          PrimaryButton(
+            label: l10n.payNow,
+            onPressed: onPayPressed,
+          ),
+        ],
+      ),
     );
   }
 }

@@ -2,26 +2,37 @@
 
 import 'package:baladiyati/features/citizen/requests/data/models/request_model.dart';
 
+enum RequestsStatus {
+  initial,
+  loading,
+  success,
+  failure,
+}
+
 class RequestsState {
-  final bool isLoading;
+  final RequestsStatus status;
   final List<RequestModel> requests;
   final String? errorMessage;
 
   const RequestsState({
-    this.isLoading = false,
+    this.status = RequestsStatus.initial,
     this.requests = const [],
     this.errorMessage,
   });
 
+  bool get isLoading => status == RequestsStatus.loading;
+  bool get hasError => status == RequestsStatus.failure;
+
   RequestsState copyWith({
-    bool? isLoading,
+    RequestsStatus? status,
     List<RequestModel>? requests,
     String? errorMessage,
+    bool clearError = false,
   }) {
     return RequestsState(
-      isLoading: isLoading ?? this.isLoading,
+      status: status ?? this.status,
       requests: requests ?? this.requests,
-      errorMessage: errorMessage,
+      errorMessage: clearError ? null : errorMessage ?? this.errorMessage,
     );
   }
 }

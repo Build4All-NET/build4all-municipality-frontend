@@ -1,40 +1,48 @@
 // lib/features/citizen/services/presentation/screens/new_request_screen.dart
 
 import 'dart:io';
+
+import 'package:baladiyati/common/widgets/app_text_field.dart';
+import 'package:baladiyati/common/widgets/app_toast.dart';
+import 'package:baladiyati/common/widgets/primary_button.dart';
+import 'package:baladiyati/core/config/app_sizes.dart';
+import 'package:baladiyati/features/citizen/services/data/models/request_submission.dart';
+import 'package:baladiyati/features/citizen/services/data/services/file_upload_service.dart';
+import 'package:baladiyati/features/citizen/services/data/services/request_service.dart';
+import 'package:baladiyati/features/citizen/services/domain/entities/citizen_service_entity.dart';
+import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:file_picker/file_picker.dart';
-import 'package:baladiyati/l10n/app_localizations.dart';
-import 'package:baladiyati/common/widgets/app_toast.dart';
-import 'package:baladiyati/features/citizen/services/data/models/request_submission.dart';
-import 'package:baladiyati/features/citizen/services/data/services/request_service.dart';
-import 'package:baladiyati/features/citizen/services/data/services/file_upload_service.dart';
-import 'services_by_category_screen.dart';
 
 class NewRequestScreen extends StatefulWidget {
-  final ServiceItem service;
-  const NewRequestScreen({super.key, required this.service});
+  final CitizenServiceEntity service;
+
+  const NewRequestScreen({
+    super.key,
+    required this.service,
+  });
 
   @override
   State<NewRequestScreen> createState() => _NewRequestScreenState();
 }
 
 class _NewRequestScreenState extends State<NewRequestScreen> {
-  final _formKey = GlobalKey<FormState>();
-  final _titleCtrl = TextEditingController();
-  final _descCtrl = TextEditingController();
-  final _locationCtrl = TextEditingController();
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
-  final _requestService = RequestService();
-  final _fileUploadService = FileUploadService();
-  final _imagePicker = ImagePicker();
+  final TextEditingController _titleCtrl = TextEditingController();
+  final TextEditingController _descCtrl = TextEditingController();
+  final TextEditingController _locationCtrl = TextEditingController();
+
+  final RequestService _requestService = RequestService();
+  final FileUploadService _fileUploadService = FileUploadService();
+  final ImagePicker _imagePicker = ImagePicker();
+
+  final List<File> _selectedFiles = [];
+  final List<String> _selectedFileNames = [];
 
   bool _isLoading = false;
   bool _isUploading = false;
-
-  // Store files with their names for display
-  final List<File> _selectedFiles = [];
-  final List<String> _selectedFileNames = [];
 
   @override
   void dispose() {
@@ -44,94 +52,106 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
     super.dispose();
   }
 
-  // ── Pick files bottom sheet ───────────────────────────────────────────────
   Future<void> _pickFiles() async {
-    showModalBottomSheet(
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
+    await showModalBottomSheet<void>(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      backgroundColor: cs.surface,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(AppSizes.radiusLarge),
+        ),
       ),
-      builder: (_) => SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(vertical: 8),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // ── Camera ──────────────────────────────────────────────────
-              ListTile(
-                leading: const Icon(Icons.camera_alt_outlined,
-                    color: Colors.blue),
-                title: const Text('Take Photo'),
-                onTap: () async {
-                  Navigator.pop(context);
-                  final picked = await _imagePicker.pickImage(
-                    source: ImageSource.camera,
-                    imageQuality: 80,
-                  );
-                  if (picked != null) {
+      builder: (_) {
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.symmetric(
+              vertical: AppSizes.paddingSmall,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                _PickerTile(
+                  icon: Icons.camera_alt_outlined,
+                  iconColor: cs.primary,
+                  title: l10n.takePhoto,
+                  onTap: () async {
+                    Navigator.pop(context);
+
+                    final picked = await _imagePicker.pickImage(
+                      source: ImageSource.camera,
+                      imageQuality: 80,
+                    );
+
+                    if (picked == null) return;
+
                     setState(() {
                       _selectedFiles.add(File(picked.path));
-                      _selectedFileNames
-                          .add(picked.name);
+                      _selectedFileNames.add(picked.name);
                     });
-                  }
-                },
-              ),
-              // ── Gallery ─────────────────────────────────────────────────
-              ListTile(
-                leading: const Icon(Icons.photo_library_outlined,
-                    color: Colors.green),
-                title: const Text('Choose Images from Gallery'),
-                onTap: () async {
-                  Navigator.pop(context);
-                  final picked =
-                      await _imagePicker.pickMultiImage(imageQuality: 80);
-                  if (picked.isNotEmpty) {
+                  },
+                ),
+                _PickerTile(
+                  icon: Icons.photo_library_outlined,
+                  iconColor: cs.tertiary,
+                  title: l10n.chooseImagesFromGallery,
+                  onTap: () async {
+                    Navigator.pop(context);
+
+                    final picked = await _imagePicker.pickMultiImage(
+                      imageQuality: 80,
+                    );
+
+                    if (picked.isEmpty) return;
+
                     setState(() {
-                      for (final xf in picked) {
-                        _selectedFiles.add(File(xf.path));
-                        _selectedFileNames.add(xf.name);
+                      for (final image in picked) {
+                        _selectedFiles.add(File(image.path));
+                        _selectedFileNames.add(image.name);
                       }
                     });
-                  }
-                },
-              ),
-              // ── PDF / Document ───────────────────────────────────────────
-              ListTile(
-                leading: const Icon(Icons.picture_as_pdf_outlined,
-                    color: Colors.red),
-                title: const Text('Choose PDF or Document'),
-                onTap: () async {
-                  Navigator.pop(context);
-                  final result = await FilePicker.platform.pickFiles(
-                    allowMultiple: true,
-                    type: FileType.custom,
-                    allowedExtensions: [
-                      'pdf',
-                      'doc',
-                      'docx',
-                      'jpg',
-                      'jpeg',
-                      'png',
-                    ],
-                  );
-                  if (result != null && result.files.isNotEmpty) {
+                  },
+                ),
+                _PickerTile(
+                  icon: Icons.picture_as_pdf_outlined,
+                  iconColor: cs.error,
+                  title: l10n.choosePdfOrDocument,
+                  onTap: () async {
+                    Navigator.pop(context);
+
+                    final result = await FilePicker.platform.pickFiles(
+                      allowMultiple: true,
+                      type: FileType.custom,
+                      allowedExtensions: const [
+                        'pdf',
+                        'doc',
+                        'docx',
+                        'jpg',
+                        'jpeg',
+                        'png',
+                      ],
+                    );
+
+                    if (result == null || result.files.isEmpty) return;
+
                     setState(() {
-                      for (final pf in result.files) {
-                        if (pf.path != null) {
-                          _selectedFiles.add(File(pf.path!));
-                          _selectedFileNames
-                              .add(pf.name);
+                      for (final file in result.files) {
+                        if (file.path != null) {
+                          _selectedFiles.add(File(file.path!));
+                          _selectedFileNames.add(file.name);
                         }
                       }
                     });
-                  }
-                },
-              ),
-            ],
+                  },
+                ),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -142,51 +162,70 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
     });
   }
 
-  // ── Get icon by file extension ────────────────────────────────────────────
-  Widget _fileIcon(String fileName) {
+  Widget _filePreview(String fileName) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
     final ext = fileName.split('.').last.toLowerCase();
+
     if (ext == 'pdf') {
-      return const Icon(Icons.picture_as_pdf, color: Colors.red, size: 36);
-    } else if (['doc', 'docx'].contains(ext)) {
-      return const Icon(Icons.description, color: Colors.blue, size: 36);
-    } else {
-      // Image — show thumbnail
-      final idx = _selectedFileNames.indexOf(fileName);
-      if (idx >= 0 && idx < _selectedFiles.length) {
-        return ClipRRect(
-          borderRadius: BorderRadius.circular(6),
-          child: Image.file(
-            _selectedFiles[idx],
-            width: 60,
-            height: 60,
-            fit: BoxFit.cover,
-          ),
-        );
-      }
-      return const Icon(Icons.insert_drive_file,
-          color: Colors.grey, size: 36);
+      return Icon(
+        Icons.picture_as_pdf,
+        color: cs.error,
+        size: AppSizes.iconMedium,
+      );
     }
+
+    if (ext == 'doc' || ext == 'docx') {
+      return Icon(
+        Icons.description,
+        color: cs.primary,
+        size: AppSizes.iconMedium,
+      );
+    }
+
+    final index = _selectedFileNames.indexOf(fileName);
+
+    if (index >= 0 && index < _selectedFiles.length) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(AppSizes.radiusSmall),
+        child: Image.file(
+          _selectedFiles[index],
+          width: AppSizes.iconLarge * 0.70,
+          height: AppSizes.iconLarge * 0.70,
+          fit: BoxFit.cover,
+        ),
+      );
+    }
+
+    return Icon(
+      Icons.insert_drive_file,
+      color: cs.onSurfaceVariant,
+      size: AppSizes.iconMedium,
+    );
   }
 
-  // ── Submit ────────────────────────────────────────────────────────────────
   Future<void> _submit() async {
+    final l10n = AppLocalizations.of(context)!;
+
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
     try {
-      // Step 1: Upload files if any
       List<String> uploadedUrls = [];
+
       if (_selectedFiles.isNotEmpty) {
         setState(() => _isUploading = true);
-        uploadedUrls =
-            await _fileUploadService.uploadFiles(_selectedFiles);
+
+        uploadedUrls = await _fileUploadService.uploadFiles(_selectedFiles);
+
+        if (!mounted) return;
         setState(() => _isUploading = false);
       }
 
-      // Step 2: Submit request with file URLs
       await _requestService.submitRequest(
-        serviceId: widget.service.id,
+        serviceId: widget.service.id.toString(),
         submission: RequestSubmission(
           title: _titleCtrl.text.trim(),
           description: _descCtrl.text.trim(),
@@ -199,104 +238,94 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
 
       if (!mounted) return;
 
-      // Step 3: Success dialog
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (_) => AlertDialog(
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
-          ),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Icon(Icons.check_circle,
-                  color: Colors.green, size: 72),
-              const SizedBox(height: 16),
-              const Text(
-                'تم تقديم الطلب بنجاح!',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 8),
-              Text(
-                'سيتم مراجعة طلبك من قبل البلدية',
-                textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontSize: 13, color: Colors.grey.shade600),
-              ),
-              const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.popUntil(
-                        context, (route) => route.isFirst);
-                  },
-                  child: const Text('حسناً',
-                      style: TextStyle(
-                          color: Colors.white, fontSize: 16)),
-                ),
-              ),
-            ],
-          ),
-        ),
-      );
-    } catch (e) {
-      if (!mounted) return;
-      setState(() => _isUploading = false);
       AppToast.show(
         context,
-        message: e.toString().replaceAll('Exception:', '').trim(),
+        message: l10n.requestSubmitted,
+        type: AppToastType.success,
+      );
+
+      Navigator.popUntil(
+        context,
+        (route) => route.isFirst,
+      );
+    } catch (error) {
+      if (!mounted) return;
+
+      setState(() => _isUploading = false);
+
+      AppToast.show(
+        context,
+        message: error.toString().replaceAll('Exception:', '').trim(),
         type: AppToastType.error,
       );
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
+  }
+
+  String _formatAmount(double amount) {
+    final value = amount.round();
+
+    return value.toString().replaceAllMapped(
+          RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+          (match) => '${match[1]},',
+        );
   }
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
     final l10n = AppLocalizations.of(context)!;
-    final s = widget.service;
+    final isArabic = Localizations.localeOf(context).languageCode == 'ar';
+
+    final service = widget.service;
+    final serviceName = service.localizedName(isArabic: isArabic);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F4F6),
+      backgroundColor: cs.background,
       body: SafeArea(
         child: Column(
           children: [
-            // ── Header ───────────────────────────────────────
             Container(
-              color: Colors.white,
-              padding: const EdgeInsets.fromLTRB(8, 12, 16, 12),
+              color: cs.surface,
+              padding: const EdgeInsets.fromLTRB(
+                AppSizes.paddingSmall,
+                AppSizes.paddingSmall,
+                AppSizes.paddingMedium,
+                AppSizes.paddingSmall,
+              ),
               child: Row(
                 children: [
                   IconButton(
                     onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.arrow_forward),
+                    icon: Icon(
+                      Icons.arrow_forward,
+                      color: cs.onSurface,
+                    ),
                   ),
-                  const SizedBox(width: 4),
+                  const SizedBox(width: AppSizes.paddingSmall / 2),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
                           l10n.newRequest,
-                          style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold),
+                          textAlign: TextAlign.right,
+                          style: theme.textTheme.titleLarge?.copyWith(
+                            color: cs.onSurface,
+                            fontWeight: FontWeight.w800,
+                          ),
                         ),
+                        const SizedBox(height: AppSizes.paddingSmall / 2),
                         Text(
-                          s.nameAr,
-                          style: const TextStyle(
-                              fontSize: 12, color: Colors.grey),
+                          serviceName,
+                          textAlign: TextAlign.right,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: cs.onSurfaceVariant,
+                          ),
                         ),
                       ],
                     ),
@@ -304,299 +333,141 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                 ],
               ),
             ),
-
-            // ── Form ─────────────────────────────────────────
             Expanded(
               child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(AppSizes.paddingMedium),
                 child: Form(
                   key: _formKey,
                   child: Column(
                     children: [
-                      // Service info card
-                      _card(
+                      _SectionCard(
                         title: l10n.serviceInfo,
                         child: Column(
                           children: [
-                            _infoRow(
+                            _InfoRow(
                               label: l10n.feeLabel,
-                              value: s.fee == 0
-                                  ? l10n.free
-                                  : '${_fmt(s.fee)} ${l10n.lbp}',
+                              value: service.hasFees && service.feeAmount > 0
+                                  ? '${_formatAmount(service.feeAmount)} ${l10n.lbp}'
+                                  : l10n.free,
                             ),
-                            const SizedBox(height: 8),
-                            _infoRow(
+                            const SizedBox(height: AppSizes.paddingSmall),
+                            _InfoRow(
                               label: l10n.processingTime,
-                              value:
-                                  '${s.processingDays} ${l10n.days}',
+                              value: '${service.slaDays} ${l10n.days}',
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 12),
-
-                      // Request details card
-                      _card(
+                      const SizedBox(height: AppSizes.paddingSmall),
+                      _SectionCard(
                         title: l10n.requestDetails,
                         child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            _fieldLabel(l10n.titleLabel),
-                            const SizedBox(height: 6),
-                            TextFormField(
+                            AppTextField(
                               controller: _titleCtrl,
+                              label: l10n.titleLabel,
+                              hint: l10n.titleHint,
                               textAlign: TextAlign.right,
-                              decoration: InputDecoration(
-                                hintText: l10n.titleHint,
-                                filled: true,
-                                fillColor: const Color(0xFFF3F4F6),
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(10),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                              validator: (v) =>
-                                  (v == null || v.trim().isEmpty)
-                                      ? l10n.fieldRequired
-                                      : null,
-                            ),
-                            const SizedBox(height: 12),
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return l10n.fieldRequired;
+                                }
 
-                            _fieldLabel(l10n.descriptionLabel),
-                            const SizedBox(height: 6),
-                            TextFormField(
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: AppSizes.paddingMedium),
+                            AppTextField(
                               controller: _descCtrl,
+                              label: l10n.descriptionLabel,
+                              hint: l10n.descriptionHint,
                               textAlign: TextAlign.right,
                               maxLines: 4,
-                              decoration: InputDecoration(
-                                hintText: l10n.descriptionHint,
-                                filled: true,
-                                fillColor: const Color(0xFFF3F4F6),
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(10),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
-                              validator: (v) =>
-                                  (v == null || v.trim().isEmpty)
-                                      ? l10n.fieldRequired
-                                      : null,
-                            ),
-                            const SizedBox(height: 12),
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return l10n.fieldRequired;
+                                }
 
-                            _fieldLabel(l10n.locationLabel),
-                            const SizedBox(height: 6),
-                            TextFormField(
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: AppSizes.paddingMedium),
+                            AppTextField(
                               controller: _locationCtrl,
+                              label: l10n.locationLabel,
+                              hint: l10n.locationHint,
+                              icon: Icons.location_on_outlined,
                               textAlign: TextAlign.right,
-                              decoration: InputDecoration(
-                                hintText: l10n.locationHint,
-                                prefixIcon: const Icon(
-                                    Icons.location_on_outlined,
-                                    color: Colors.grey),
-                                filled: true,
-                                fillColor: const Color(0xFFF3F4F6),
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(10),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
                             ),
                           ],
                         ),
                       ),
-                      const SizedBox(height: 12),
-
-                      // Attachments card
-                      _card(
+                      const SizedBox(height: AppSizes.paddingSmall),
+                      _SectionCard(
                         title: l10n.requiredAttachments,
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            // Required docs list
-                            ...s.requiredDocs.map((doc) => Padding(
-                                  padding: const EdgeInsets.only(
-                                      bottom: 4),
-                                  child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.end,
-                                    children: [
-                                      Text(doc,
-                                          style: const TextStyle(
-                                              fontSize: 13,
-                                              color: Colors.grey)),
-                                      const SizedBox(width: 6),
-                                      const Text('•',
-                                          style: TextStyle(
-                                              color: Colors.grey)),
-                                    ],
-                                  ),
-                                )),
-                            const SizedBox(height: 12),
-
-                            // Selected files preview
                             if (_selectedFiles.isNotEmpty) ...[
-                              ListView.builder(
+                              ListView.separated(
                                 shrinkWrap: true,
-                                physics:
-                                    const NeverScrollableScrollPhysics(),
+                                physics: const NeverScrollableScrollPhysics(),
                                 itemCount: _selectedFiles.length,
-                                itemBuilder: (_, i) => Container(
-                                  margin: const EdgeInsets.only(
-                                      bottom: 8),
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color:
-                                        const Color(0xFFF3F4F6),
-                                    borderRadius:
-                                        BorderRadius.circular(10),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      // Remove button
-                                      GestureDetector(
-                                        onTap: () => _removeFile(i),
-                                        child: const Icon(
-                                            Icons.close,
-                                            color: Colors.red,
-                                            size: 20),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      // File name
-                                      Expanded(
-                                        child: Text(
-                                          _selectedFileNames[i],
-                                          style: const TextStyle(
-                                              fontSize: 12),
-                                          overflow:
-                                              TextOverflow.ellipsis,
-                                          textAlign: TextAlign.right,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      // File icon/thumbnail
-                                      SizedBox(
-                                        width: 60,
-                                        height: 60,
-                                        child: _fileIcon(
-                                            _selectedFileNames[i]),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                separatorBuilder: (_, __) {
+                                  return const SizedBox(
+                                    height: AppSizes.paddingSmall,
+                                  );
+                                },
+                                itemBuilder: (context, index) {
+                                  return _SelectedFileTile(
+                                    fileName: _selectedFileNames[index],
+                                    preview: _filePreview(
+                                      _selectedFileNames[index],
+                                    ),
+                                    onRemove: () => _removeFile(index),
+                                  );
+                                },
                               ),
-                              const SizedBox(height: 12),
+                              const SizedBox(height: AppSizes.paddingMedium),
                             ],
-
-                            // Upload area
-                            GestureDetector(
-                              onTap: _isLoading ? null : _pickFiles,
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                      color: Colors.grey.shade300),
-                                  borderRadius:
-                                      BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: const [
-                                        Icon(Icons.upload_outlined,
-                                            size: 28,
-                                            color: Colors.grey),
-                                        SizedBox(width: 8),
-                                        Icon(
-                                            Icons.camera_alt_outlined,
-                                            size: 28,
-                                            color: Colors.grey),
-                                        SizedBox(width: 8),
-                                        Icon(
-                                            Icons
-                                                .picture_as_pdf_outlined,
-                                            size: 28,
-                                            color: Colors.grey),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      _selectedFiles.isEmpty
-                                          ? l10n.tapToUpload
-                                          : '${_selectedFiles.length} ${l10n.filesSelected}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        color: _selectedFiles.isEmpty
-                                            ? Colors.black87
-                                            : Colors.green,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    const Text(
-                                      'Photos, PDF or Word files',
-                                      style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.grey),
-                                    ),
-                                  ],
-                                ),
-                              ),
+                            _UploadBox(
+                              isDisabled: _isLoading,
+                              selectedCount: _selectedFiles.length,
+                              onTap: _pickFiles,
                             ),
-
-                            // Uploading indicator
                             if (_isUploading) ...[
-                              const SizedBox(height: 12),
-                              const Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.center,
+                              const SizedBox(height: AppSizes.paddingMedium),
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SizedBox(
-                                    width: 16,
-                                    height: 16,
+                                    width: AppSizes.iconSmall,
+                                    height: AppSizes.iconSmall,
                                     child: CircularProgressIndicator(
-                                        strokeWidth: 2),
+                                      strokeWidth: 2,
+                                      color: cs.primary,
+                                    ),
                                   ),
-                                  SizedBox(width: 8),
-                                  Text('Uploading files...',
-                                      style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 13)),
+                                  const SizedBox(width: AppSizes.paddingSmall),
+                                  Text(
+                                    l10n.uploadingFiles,
+                                    style: theme.textTheme.bodySmall?.copyWith(
+                                      color: cs.onSurfaceVariant,
+                                    ),
+                                  ),
                                 ],
                               ),
                             ],
                           ],
                         ),
                       ),
-                      const SizedBox(height: 16),
-
-                      // Submit button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 52,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF1E3A5F),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          onPressed: _isLoading ? null : _submit,
-                          child: _isLoading
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white)
-                              : Text(l10n.submitRequest,
-                                  style: const TextStyle(
-                                      fontSize: 16)),
-                        ),
+                      const SizedBox(height: AppSizes.paddingMedium),
+                      PrimaryButton(
+                        label: l10n.submitRequest,
+                        onPressed: _submit,
+                        isLoading: _isLoading,
                       ),
-                      const SizedBox(height: 20),
+                      const SizedBox(height: AppSizes.paddingMedium),
                     ],
                   ),
                 ),
@@ -607,52 +478,265 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
       ),
     );
   }
+}
 
-  Widget _card({required String title, required Widget child}) {
+class _PickerTile extends StatelessWidget {
+  final IconData icon;
+  final Color iconColor;
+  final String title;
+  final VoidCallback onTap;
+
+  const _PickerTile({
+    required this.icon,
+    required this.iconColor,
+    required this.title,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
+    return ListTile(
+      leading: Icon(
+        icon,
+        color: iconColor,
+      ),
+      title: Text(
+        title,
+        textAlign: TextAlign.right,
+        style: theme.textTheme.bodyMedium?.copyWith(
+          color: cs.onSurface,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      onTap: onTap,
+    );
+  }
+}
+
+class _SectionCard extends StatelessWidget {
+  final String title;
+  final Widget child;
+
+  const _SectionCard({
+    required this.title,
+    required this.child,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppSizes.paddingMedium),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
+            color: cs.onSurface.withOpacity(0.05),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
         ],
+        border: Border.all(
+          color: cs.outline.withOpacity(0.10),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
-          Text(title,
-              style: const TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.bold)),
-          const SizedBox(height: 12),
+          Text(
+            title,
+            textAlign: TextAlign.right,
+            style: theme.textTheme.titleMedium?.copyWith(
+              color: cs.onSurface,
+              fontWeight: FontWeight.w800,
+            ),
+          ),
+          const SizedBox(height: AppSizes.paddingMedium),
           child,
         ],
       ),
     );
   }
+}
 
-  Widget _infoRow({required String label, required String value}) {
+class _InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _InfoRow({
+    required this.label,
+    required this.value,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(value,
-            style: const TextStyle(fontWeight: FontWeight.w600)),
-        Text(label,
-            style:
-                const TextStyle(color: Colors.grey, fontSize: 13)),
+        Text(
+          value,
+          style: theme.textTheme.bodyMedium?.copyWith(
+            color: cs.onSurface,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+        Text(
+          label,
+          textAlign: TextAlign.right,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: cs.onSurfaceVariant,
+          ),
+        ),
       ],
     );
   }
+}
 
-  Widget _fieldLabel(String text) => Text(text,
-      style: const TextStyle(
-          fontSize: 13, fontWeight: FontWeight.w500));
+class _SelectedFileTile extends StatelessWidget {
+  final String fileName;
+  final Widget preview;
+  final VoidCallback onRemove;
 
-  String _fmt(int n) => n.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
+  const _SelectedFileTile({
+    required this.fileName,
+    required this.preview,
+    required this.onRemove,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(AppSizes.paddingSmall),
+      decoration: BoxDecoration(
+        color: cs.surfaceVariant.withOpacity(0.35),
+        borderRadius: BorderRadius.circular(AppSizes.radiusSmall),
+        border: Border.all(
+          color: cs.outline.withOpacity(0.10),
+        ),
+      ),
+      child: Row(
+        children: [
+          IconButton(
+            onPressed: onRemove,
+            icon: Icon(
+              Icons.close,
+              color: cs.error,
+              size: AppSizes.iconSmall,
+            ),
+          ),
+          const SizedBox(width: AppSizes.paddingSmall),
+          Expanded(
+            child: Text(
+              fileName,
+              overflow: TextOverflow.ellipsis,
+              textAlign: TextAlign.right,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: cs.onSurface,
+              ),
+            ),
+          ),
+          const SizedBox(width: AppSizes.paddingSmall),
+          SizedBox(
+            width: AppSizes.iconLarge * 0.70,
+            height: AppSizes.iconLarge * 0.70,
+            child: Center(
+              child: preview,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _UploadBox extends StatelessWidget {
+  final bool isDisabled;
+  final int selectedCount;
+  final VoidCallback onTap;
+
+  const _UploadBox({
+    required this.isDisabled,
+    required this.selectedCount,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+      onTap: isDisabled ? null : onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(AppSizes.paddingLarge),
+        decoration: BoxDecoration(
+          border: Border.all(
+            color: cs.outline.withOpacity(0.35),
+          ),
+          borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+          color: cs.surfaceVariant.withOpacity(0.20),
+        ),
+        child: Column(
+          children: [
+            Wrap(
+              alignment: WrapAlignment.center,
+              spacing: AppSizes.paddingSmall,
+              children: [
+                Icon(
+                  Icons.upload_outlined,
+                  size: AppSizes.iconMedium,
+                  color: cs.onSurfaceVariant,
+                ),
+                Icon(
+                  Icons.camera_alt_outlined,
+                  size: AppSizes.iconMedium,
+                  color: cs.onSurfaceVariant,
+                ),
+                Icon(
+                  Icons.picture_as_pdf_outlined,
+                  size: AppSizes.iconMedium,
+                  color: cs.onSurfaceVariant,
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSizes.paddingSmall),
+            Text(
+              selectedCount == 0
+                  ? l10n.tapToUpload
+                  : '$selectedCount ${l10n.filesSelected}',
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: selectedCount == 0 ? cs.onSurface : cs.primary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: AppSizes.paddingSmall / 2),
+            Text(
+              l10n.pdfOrImages,
+              textAlign: TextAlign.center,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: cs.onSurfaceVariant,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
