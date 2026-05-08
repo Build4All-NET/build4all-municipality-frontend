@@ -459,7 +459,38 @@
 "inboxComingSoon": "Inbox is not available yet",
 "accountInfo": "Account Info",
 "municipalityInfo": "Municipality Info",
-"municipalityStatus": "Municipality Status"
+"municipalityStatus": "Municipality Status",
+
+  "search": "Search...",
+  "requests": "Requests",
+  "status": "Status",
+  "approved": "Approved",
+  "rejected": "Rejected",
+  "noData": "No data",
+  "requestDetails": "Request details",
+  "address": "Address",
+  "approve": "Approve",
+  "reject": "Reject",
+
+
+
+"adminProfileTitle": "Owner Profile",
+"accountInformation": "Account information",
+"notificationPreferences": "Notification preferences",
+"notifyItemUpdates": "Item update notifications",
+"notifyUserFeedback": "User feedback notifications",
+"changePassword": "Change password",
+"currentPassword": "Current password",
+"leaveBlankToKeepPassword": "Leave password fields empty to keep the current password.",
+"profileDetails": "Profile details",
+"profileUpdated": "Profile updated successfully",
+"role": "Role",
+"createdAt": "Created at",
+"updatedAt": "Updated at",
+"saving": "Saving...",
+"firstName": "First name",
+"lastName": "Last name",
+"logoutSuccess": "Logged out successfully"
 
 
 

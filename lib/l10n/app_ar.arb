@@ -454,7 +454,40 @@
 "selectRole": "يرجى اختيار الدور",
 "invalidEmail": "أدخل بريدًا إلكترونيًا صالحًا",
 "inboxComingSoon": "البريد الوارد قادم قريبًا",
+
 "accountInfo": "معلومات الحساب",
 "municipalityInfo": "معلومات البلدية",
-"municipalityStatus": "حالة الملف البلدي"
+"municipalityStatus": "حالة الملف البلدي",
+
+  "search": "بحث...",
+  "requests": "الطلبات",
+  "status": "الحالة",
+  "approved": "موافق",
+  "rejected": "مرفوض",
+  "noData": "لا يوجد بيانات",
+  "requestDetails": "تفاصيل الطلب",
+  "address": "العنوان",
+  "approve": "موافقة",
+  "reject": "رفض",
+
+
+ 
+
+"adminProfileTitle": "ملف المالك",
+"accountInformation": "معلومات الحساب",
+"notificationPreferences": "إعدادات الإشعارات",
+"notifyItemUpdates": "إشعارات تحديث العناصر",
+"notifyUserFeedback": "إشعارات ملاحظات المستخدمين",
+"changePassword": "تغيير كلمة المرور",
+"currentPassword": "كلمة المرور الحالية",
+"leaveBlankToKeepPassword": "اترك حقول كلمة المرور فارغة للاحتفاظ بكلمة المرور الحالية.",
+"profileDetails": "تفاصيل الملف",
+"profileUpdated": "تم تحديث الملف بنجاح",
+"role": "الدور",
+"createdAt": "تاريخ الإنشاء",
+"updatedAt": "تاريخ التحديث",
+"saving": "جارٍ الحفظ...",
+"firstName": "الاسم الأول",
+"lastName": "اسم العائلة",
+"logoutSuccess": "تم تسجيل الخروج بنجاح"
 }

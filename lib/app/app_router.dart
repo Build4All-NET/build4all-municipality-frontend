@@ -1,8 +1,25 @@
 // lib/app/app_router.dart
 
 import 'package:baladiyati/core/network/dio_client.dart';
+import 'package:baladiyati/features/admin/Requests/data/Repository/Request_Repo_Impl.dart';
+import 'package:baladiyati/features/admin/Requests/domain/Repository/Request_Repo.dart';
+import 'package:baladiyati/features/admin/Requests/data/Service/Req_Api_Service.dart';
+import 'package:baladiyati/features/admin/Requests/domain/usecases/Get_Request.dart';
+import 'package:baladiyati/features/admin/Requests/domain/usecases/UpdateRequestStatus.dart';
+import 'package:baladiyati/features/admin/Requests/domain/usecases/getAll_Req_Admin.dart';
+import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_Bloc.dart';
+import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_Event.dart';
+import 'package:baladiyati/features/admin/Requests/presentation/screens/Req_screen.dart';
 import 'package:baladiyati/features/admin/manage_service/Domain/usecases/Delete_service.dart';
 import 'package:baladiyati/features/admin/manage_service/Domain/usecases/update_service.dart';
+import 'package:baladiyati/features/admin/profile/data/repositories/admin_profile_repository_impl.dart';
+import 'package:baladiyati/features/admin/profile/data/services/admin_profile_api_service.dart';
+import 'package:baladiyati/features/admin/profile/domain/usecases/get_admin_profile_usecase.dart';
+
+import 'package:baladiyati/features/admin/profile/presentation/cubit/admin_profile_cubit.dart';
+import 'package:baladiyati/features/admin/profile/presentation/screens/admin_profile_screen.dart';
+import 'package:baladiyati/features/staff/dashboard/presentation/screens/staff_dashboard_screen.dart';
+import 'package:baladiyati/features/staff/services/presentation/screens/staff_services_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -232,6 +249,27 @@ static void goToServices(BuildContext context) {
     goToServices(context);
   }
 
+ static void goToAdminProfile(BuildContext context) {
+  final repository = AdminProfileRepositoryImpl(
+    api: AdminProfileApiService(
+      dio: DioClient.build,
+    ),
+  );
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => BlocProvider(
+        create: (_) => AdminProfileCubit(
+          getAdminProfile: GetAdminProfileUseCase(repository),
+       
+        )..loadProfile(),
+        child: const AdminProfileScreen(),
+      ),
+    ),
+  );
+}
+
   // ================= ADMIN: EMPLOYEES =================
 
  static void goToEmployees(BuildContext context) {
@@ -269,5 +307,61 @@ static void goToServices(BuildContext context) {
   );
 }
 
-  
+static void goToStaffDashboard(BuildContext context) {
+  Navigator.pushAndRemoveUntil(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const StaffDashboardScreen(),
+    ),
+    (_) => false,
+  );
+}
+
+static void goToStaffServices(BuildContext context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => const StaffServicesScreen(),
+    ),
+  );
+}
+
+
+
+  // ================= ADMIN: REQUESTS =================
+
+static void goToRequests(BuildContext context) {
+  final departmentRepository = DepartmentRepositoryImpl(
+    DepartmentApiService(DioClient.muni),
+  );
+
+  final requestRepository = RequestRepositoryImpl(
+    RequestApiService(DioClient.muni),
+  );
+
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => MultiBlocProvider(
+        providers: [
+          BlocProvider(
+            create: (_) => RequestBloc(
+              getAllRequestsAdmin: GetAllRequestsAdmin(requestRepository),
+              updateRequestStatus: UpdateRequestStatus(requestRepository),
+            )..add(LoadRequests()),
+          ),
+          BlocProvider(
+            create: (_) => DepartmentCubit(
+              GetDepartments(departmentRepository),
+              AddDepartment(departmentRepository),
+              DeleteDepartment(departmentRepository),
+              UpdateDepartment(departmentRepository),
+            )..fetchDepartments(),
+          ),
+        ],
+        child: const RequestsScreen(),
+      ),
+    ),
+  );
+}
 }
