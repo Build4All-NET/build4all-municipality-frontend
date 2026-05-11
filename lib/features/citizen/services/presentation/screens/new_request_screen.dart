@@ -6,6 +6,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:baladiyati/common/widgets/app_toast.dart';
+import 'package:baladiyati/common/widgets/app_text_field.dart';
+import 'package:baladiyati/common/widgets/primary_button.dart';
 import 'package:baladiyati/features/citizen/services/data/models/request_submission.dart';
 import 'package:baladiyati/features/citizen/services/data/services/request_service.dart';
 import 'package:baladiyati/features/citizen/services/data/services/file_upload_service.dart';
@@ -32,7 +34,6 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
   bool _isLoading = false;
   bool _isUploading = false;
 
-  // Store files with their names for display
   final List<File> _selectedFiles = [];
   final List<String> _selectedFileNames = [];
 
@@ -44,7 +45,6 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
     super.dispose();
   }
 
-  // ── Pick files bottom sheet ───────────────────────────────────────────────
   Future<void> _pickFiles() async {
     showModalBottomSheet(
       context: context,
@@ -57,7 +57,6 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // ── Camera ──────────────────────────────────────────────────
               ListTile(
                 leading: const Icon(Icons.camera_alt_outlined,
                     color: Colors.blue),
@@ -71,13 +70,11 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                   if (picked != null) {
                     setState(() {
                       _selectedFiles.add(File(picked.path));
-                      _selectedFileNames
-                          .add(picked.name);
+                      _selectedFileNames.add(picked.name);
                     });
                   }
                 },
               ),
-              // ── Gallery ─────────────────────────────────────────────────
               ListTile(
                 leading: const Icon(Icons.photo_library_outlined,
                     color: Colors.green),
@@ -96,7 +93,6 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                   }
                 },
               ),
-              // ── PDF / Document ───────────────────────────────────────────
               ListTile(
                 leading: const Icon(Icons.picture_as_pdf_outlined,
                     color: Colors.red),
@@ -107,12 +103,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                     allowMultiple: true,
                     type: FileType.custom,
                     allowedExtensions: [
-                      'pdf',
-                      'doc',
-                      'docx',
-                      'jpg',
-                      'jpeg',
-                      'png',
+                      'pdf','doc','docx','jpg','jpeg','png',
                     ],
                   );
                   if (result != null && result.files.isNotEmpty) {
@@ -120,8 +111,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                       for (final pf in result.files) {
                         if (pf.path != null) {
                           _selectedFiles.add(File(pf.path!));
-                          _selectedFileNames
-                              .add(pf.name);
+                          _selectedFileNames.add(pf.name);
                         }
                       }
                     });
@@ -142,7 +132,6 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
     });
   }
 
-  // ── Get icon by file extension ────────────────────────────────────────────
   Widget _fileIcon(String fileName) {
     final ext = fileName.split('.').last.toLowerCase();
     if (ext == 'pdf') {
@@ -150,7 +139,6 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
     } else if (['doc', 'docx'].contains(ext)) {
       return const Icon(Icons.description, color: Colors.blue, size: 36);
     } else {
-      // Image — show thumbnail
       final idx = _selectedFileNames.indexOf(fileName);
       if (idx >= 0 && idx < _selectedFiles.length) {
         return ClipRRect(
@@ -163,28 +151,22 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
           ),
         );
       }
-      return const Icon(Icons.insert_drive_file,
-          color: Colors.grey, size: 36);
+      return const Icon(Icons.insert_drive_file, color: Colors.grey, size: 36);
     }
   }
 
-  // ── Submit ────────────────────────────────────────────────────────────────
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() => _isLoading = true);
 
     try {
-      // Step 1: Upload files if any
       List<String> uploadedUrls = [];
       if (_selectedFiles.isNotEmpty) {
         setState(() => _isUploading = true);
-        uploadedUrls =
-            await _fileUploadService.uploadFiles(_selectedFiles);
+        uploadedUrls = await _fileUploadService.uploadFiles(_selectedFiles);
         setState(() => _isUploading = false);
       }
 
-      // Step 2: Submit request with file URLs
       await _requestService.submitRequest(
         serviceId: widget.service.id,
         submission: RequestSubmission(
@@ -199,7 +181,13 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
 
       if (!mounted) return;
 
-      // Step 3: Success dialog
+      // Success toast instead of just dialog button
+      AppToast.show(
+        context,
+        message: 'تم تقديم الطلب بنجاح!',
+        type: AppToastType.success,
+      );
+
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -210,40 +198,26 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.check_circle,
-                  color: Colors.green, size: 72),
+              const Icon(Icons.check_circle, color: Colors.green, size: 72),
               const SizedBox(height: 16),
               const Text(
                 'تم تقديم الطلب بنجاح!',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontSize: 18, fontWeight: FontWeight.bold),
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
                 'سيتم مراجعة طلبك من قبل البلدية',
                 textAlign: TextAlign.center,
-                style: TextStyle(
-                    fontSize: 13, color: Colors.grey.shade600),
+                style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
               ),
               const SizedBox(height: 20),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.green,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.popUntil(
-                        context, (route) => route.isFirst);
-                  },
-                  child: const Text('حسناً',
-                      style: TextStyle(
-                          color: Colors.white, fontSize: 16)),
-                ),
+
+              //  PrimaryButton replaces raw ElevatedButton
+              PrimaryButton(
+                label: 'حسناً',
+                onPressed: () =>
+                    Navigator.popUntil(context, (route) => route.isFirst),
               ),
             ],
           ),
@@ -252,6 +226,8 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _isUploading = false);
+
+      //  AppToast.error 
       AppToast.show(
         context,
         message: e.toString().replaceAll('Exception:', '').trim(),
@@ -287,17 +263,12 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                          l10n.newRequest,
-                          style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          s.nameAr,
-                          style: const TextStyle(
-                              fontSize: 12, color: Colors.grey),
-                        ),
+                        Text(l10n.newRequest,
+                            style: const TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold)),
+                        Text(s.nameAr,
+                            style: const TextStyle(
+                                fontSize: 12, color: Colors.grey)),
                       ],
                     ),
                   ),
@@ -327,8 +298,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                             const SizedBox(height: 8),
                             _infoRow(
                               label: l10n.processingTime,
-                              value:
-                                  '${s.processingDays} ${l10n.days}',
+                              value: '${s.processingDays} ${l10n.days}',
                             ),
                           ],
                         ),
@@ -341,21 +311,12 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            _fieldLabel(l10n.titleLabel),
-                            const SizedBox(height: 6),
-                            TextFormField(
+                            // AppTextField replaces raw TextFormField
+                            AppTextField(
                               controller: _titleCtrl,
+                              label: l10n.titleLabel,
+                              hint: l10n.titleHint,
                               textAlign: TextAlign.right,
-                              decoration: InputDecoration(
-                                hintText: l10n.titleHint,
-                                filled: true,
-                                fillColor: const Color(0xFFF3F4F6),
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(10),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
                               validator: (v) =>
                                   (v == null || v.trim().isEmpty)
                                       ? l10n.fieldRequired
@@ -363,22 +324,13 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                             ),
                             const SizedBox(height: 12),
 
-                            _fieldLabel(l10n.descriptionLabel),
-                            const SizedBox(height: 6),
-                            TextFormField(
+                            // AppTextField for description
+                            AppTextField(
                               controller: _descCtrl,
+                              label: l10n.descriptionLabel,
+                              hint: l10n.descriptionHint,
                               textAlign: TextAlign.right,
                               maxLines: 4,
-                              decoration: InputDecoration(
-                                hintText: l10n.descriptionHint,
-                                filled: true,
-                                fillColor: const Color(0xFFF3F4F6),
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(10),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
                               validator: (v) =>
                                   (v == null || v.trim().isEmpty)
                                       ? l10n.fieldRequired
@@ -386,24 +338,13 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                             ),
                             const SizedBox(height: 12),
 
-                            _fieldLabel(l10n.locationLabel),
-                            const SizedBox(height: 6),
-                            TextFormField(
+                            // AppTextField for location
+                            AppTextField(
                               controller: _locationCtrl,
+                              label: l10n.locationLabel,
+                              hint: l10n.locationHint,
+                              icon: Icons.location_on_outlined,
                               textAlign: TextAlign.right,
-                              decoration: InputDecoration(
-                                hintText: l10n.locationHint,
-                                prefixIcon: const Icon(
-                                    Icons.location_on_outlined,
-                                    color: Colors.grey),
-                                filled: true,
-                                fillColor: const Color(0xFFF3F4F6),
-                                border: OutlineInputBorder(
-                                  borderRadius:
-                                      BorderRadius.circular(10),
-                                  borderSide: BorderSide.none,
-                                ),
-                              ),
                             ),
                           ],
                         ),
@@ -416,13 +357,10 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            // Required docs list
                             ...s.requiredDocs.map((doc) => Padding(
-                                  padding: const EdgeInsets.only(
-                                      bottom: 4),
+                                  padding: const EdgeInsets.only(bottom: 4),
                                   child: Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.end,
+                                    mainAxisAlignment: MainAxisAlignment.end,
                                     children: [
                                       Text(doc,
                                           style: const TextStyle(
@@ -430,59 +368,47 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                                               color: Colors.grey)),
                                       const SizedBox(width: 6),
                                       const Text('•',
-                                          style: TextStyle(
-                                              color: Colors.grey)),
+                                          style:
+                                              TextStyle(color: Colors.grey)),
                                     ],
                                   ),
                                 )),
                             const SizedBox(height: 12),
 
-                            // Selected files preview
                             if (_selectedFiles.isNotEmpty) ...[
                               ListView.builder(
                                 shrinkWrap: true,
-                                physics:
-                                    const NeverScrollableScrollPhysics(),
+                                physics: const NeverScrollableScrollPhysics(),
                                 itemCount: _selectedFiles.length,
                                 itemBuilder: (_, i) => Container(
-                                  margin: const EdgeInsets.only(
-                                      bottom: 8),
+                                  margin: const EdgeInsets.only(bottom: 8),
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
-                                    color:
-                                        const Color(0xFFF3F4F6),
-                                    borderRadius:
-                                        BorderRadius.circular(10),
+                                    color: const Color(0xFFF3F4F6),
+                                    borderRadius: BorderRadius.circular(10),
                                   ),
                                   child: Row(
                                     children: [
-                                      // Remove button
                                       GestureDetector(
                                         onTap: () => _removeFile(i),
-                                        child: const Icon(
-                                            Icons.close,
-                                            color: Colors.red,
-                                            size: 20),
+                                        child: const Icon(Icons.close,
+                                            color: Colors.red, size: 20),
                                       ),
                                       const SizedBox(width: 8),
-                                      // File name
                                       Expanded(
                                         child: Text(
                                           _selectedFileNames[i],
-                                          style: const TextStyle(
-                                              fontSize: 12),
-                                          overflow:
-                                              TextOverflow.ellipsis,
+                                          style:
+                                              const TextStyle(fontSize: 12),
+                                          overflow: TextOverflow.ellipsis,
                                           textAlign: TextAlign.right,
                                         ),
                                       ),
                                       const SizedBox(width: 8),
-                                      // File icon/thumbnail
                                       SizedBox(
                                         width: 60,
                                         height: 60,
-                                        child: _fileIcon(
-                                            _selectedFileNames[i]),
+                                        child: _fileIcon(_selectedFileNames[i]),
                                       ),
                                     ],
                                   ),
@@ -491,7 +417,6 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                               const SizedBox(height: 12),
                             ],
 
-                            // Upload area
                             GestureDetector(
                               onTap: _isLoading ? null : _pickFiles,
                               child: Container(
@@ -500,8 +425,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                                 decoration: BoxDecoration(
                                   border: Border.all(
                                       color: Colors.grey.shade300),
-                                  borderRadius:
-                                      BorderRadius.circular(12),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Column(
                                   children: [
@@ -510,19 +434,13 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                                           MainAxisAlignment.center,
                                       children: const [
                                         Icon(Icons.upload_outlined,
-                                            size: 28,
-                                            color: Colors.grey),
+                                            size: 28, color: Colors.grey),
                                         SizedBox(width: 8),
-                                        Icon(
-                                            Icons.camera_alt_outlined,
-                                            size: 28,
-                                            color: Colors.grey),
+                                        Icon(Icons.camera_alt_outlined,
+                                            size: 28, color: Colors.grey),
                                         SizedBox(width: 8),
-                                        Icon(
-                                            Icons
-                                                .picture_as_pdf_outlined,
-                                            size: 28,
-                                            color: Colors.grey),
+                                        Icon(Icons.picture_as_pdf_outlined,
+                                            size: 28, color: Colors.grey),
                                       ],
                                     ),
                                     const SizedBox(height: 8),
@@ -541,20 +459,17 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                                     const Text(
                                       'Photos, PDF or Word files',
                                       style: TextStyle(
-                                          fontSize: 11,
-                                          color: Colors.grey),
+                                          fontSize: 11, color: Colors.grey),
                                     ),
                                   ],
                                 ),
                               ),
                             ),
 
-                            // Uploading indicator
                             if (_isUploading) ...[
                               const SizedBox(height: 12),
                               const Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.center,
+                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
                                   SizedBox(
                                     width: 16,
@@ -565,8 +480,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                                   SizedBox(width: 8),
                                   Text('Uploading files...',
                                       style: TextStyle(
-                                          color: Colors.grey,
-                                          fontSize: 13)),
+                                          color: Colors.grey, fontSize: 13)),
                                 ],
                               ),
                             ],
@@ -575,27 +489,13 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                       ),
                       const SizedBox(height: 16),
 
-                      // Submit button
-                      SizedBox(
-                        width: double.infinity,
-                        height: 52,
-                        child: ElevatedButton(
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFF1E3A5F),
-                            foregroundColor: Colors.white,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(14),
-                            ),
-                          ),
-                          onPressed: _isLoading ? null : _submit,
-                          child: _isLoading
-                              ? const CircularProgressIndicator(
-                                  color: Colors.white)
-                              : Text(l10n.submitRequest,
-                                  style: const TextStyle(
-                                      fontSize: 16)),
-                        ),
+                      //  PrimaryButton replaces raw ElevatedButton
+                      PrimaryButton(
+                        label: l10n.submitRequest,
+                        onPressed: _submit,
+                        isLoading: _isLoading,
                       ),
+
                       const SizedBox(height: 20),
                     ],
                   ),
@@ -640,18 +540,12 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(value,
-            style: const TextStyle(fontWeight: FontWeight.w600)),
+        Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
         Text(label,
-            style:
-                const TextStyle(color: Colors.grey, fontSize: 13)),
+            style: const TextStyle(color: Colors.grey, fontSize: 13)),
       ],
     );
   }
-
-  Widget _fieldLabel(String text) => Text(text,
-      style: const TextStyle(
-          fontSize: 13, fontWeight: FontWeight.w500));
 
   String _fmt(int n) => n.toString().replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');

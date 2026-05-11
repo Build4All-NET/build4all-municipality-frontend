@@ -2,14 +2,18 @@
 
 import 'package:flutter/material.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:baladiyati/common/widgets/primary_button.dart';
 import 'requests_screen.dart';
 
 class _TimelineStep {
   final RequestStatus status;
   final String date;
   final bool completed;
-  const _TimelineStep(
-      {required this.status, required this.date, required this.completed});
+  const _TimelineStep({
+    required this.status,
+    required this.date,
+    required this.completed,
+  });
 }
 
 class RequestDetailsScreen extends StatelessWidget {
@@ -19,6 +23,7 @@ class RequestDetailsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
+    final cs = Theme.of(context).colorScheme;
 
     final timeline = [
       _TimelineStep(
@@ -67,17 +72,12 @@ class RequestDetailsScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                          request.number,
-                          style: const TextStyle(
-                              fontSize: 11, color: Colors.grey),
-                        ),
-                        Text(
-                          request.nameAr,
-                          style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold),
-                        ),
+                        Text(request.number,
+                            style: const TextStyle(
+                                fontSize: 11, color: Colors.grey)),
+                        Text(request.nameAr,
+                            style: const TextStyle(
+                                fontSize: 17, fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),
@@ -99,19 +99,16 @@ class RequestDetailsScreen extends StatelessWidget {
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
                           Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
                               Text(
                                 '${(progress * 100).round()}%',
                                 style: const TextStyle(
                                     color: Colors.grey, fontSize: 13),
                               ),
-                              Text(
-                                l10n.progress,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600),
-                              ),
+                              Text(l10n.progress,
+                                  style: const TextStyle(
+                                      fontWeight: FontWeight.w600)),
                             ],
                           ),
                           const SizedBox(height: 10),
@@ -121,9 +118,9 @@ class RequestDetailsScreen extends StatelessWidget {
                               value: progress,
                               minHeight: 8,
                               backgroundColor: Colors.grey.shade200,
-                              valueColor:
-                                  const AlwaysStoppedAnimation<Color>(
-                                      Color(0xFF1E3A5F)),
+                              //  Use theme color instead of hardcoded
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                  cs.primary),
                             ),
                           ),
                         ],
@@ -137,21 +134,16 @@ class RequestDetailsScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text(
-                            l10n.timeline,
-                            style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                          ),
+                          Text(l10n.timeline,
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 16),
                           ...List.generate(timeline.length, (i) {
                             final step = timeline[i];
                             final isLast = i == timeline.length - 1;
                             return Row(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Left: connector line
                                 Column(
                                   children: [
                                     Container(
@@ -160,7 +152,7 @@ class RequestDetailsScreen extends StatelessWidget {
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
                                         color: step.completed
-                                            ? Colors.green
+                                            ? cs.primary
                                             : Colors.grey.shade300,
                                       ),
                                     ),
@@ -169,28 +161,24 @@ class RequestDetailsScreen extends StatelessWidget {
                                         width: 2,
                                         height: 40,
                                         color: step.completed
-                                            ? Colors.green
+                                            ? cs.primary
                                             : Colors.grey.shade300,
                                       ),
                                   ],
                                 ),
                                 const SizedBox(width: 12),
-                                // Right: status + date
                                 Expanded(
                                   child: Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 8),
+                                    padding: const EdgeInsets.only(bottom: 8),
                                     child: Column(
                                       crossAxisAlignment:
                                           CrossAxisAlignment.end,
                                       children: [
-                                        StatusBadgeWidget(
-                                            status: step.status),
+                                        StatusBadgeWidget(status: step.status),
                                         if (step.date.isNotEmpty)
                                           Padding(
                                             padding:
-                                                const EdgeInsets.only(
-                                                    top: 4),
+                                                const EdgeInsets.only(top: 4),
                                             child: Text(
                                               step.date,
                                               style: const TextStyle(
@@ -216,12 +204,9 @@ class RequestDetailsScreen extends StatelessWidget {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text(
-                            l10n.details,
-                            style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                          ),
+                          Text(l10n.details,
+                              style: const TextStyle(
+                                  fontSize: 16, fontWeight: FontWeight.bold)),
                           const SizedBox(height: 12),
                           _detailRow(
                             icon: Icons.description_outlined,
@@ -239,26 +224,23 @@ class RequestDetailsScreen extends StatelessWidget {
                       ),
                     ),
 
-                    // Payment card (if waiting)
-                    if (request.status ==
-                        RequestStatus.waitingPayment) ...[
+                    // Payment card
+                    if (request.status == RequestStatus.waitingPayment) ...[
                       const SizedBox(height: 12),
                       Container(
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
                           color: const Color(0xFFFFF8F0),
                           borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                              color: Colors.orange.shade200),
+                          border:
+                              Border.all(color: Colors.orange.shade200),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(
-                              l10n.amountDue,
-                              style: const TextStyle(
-                                  fontSize: 13, color: Colors.grey),
-                            ),
+                            Text(l10n.amountDue,
+                                style: const TextStyle(
+                                    fontSize: 13, color: Colors.grey)),
                             const SizedBox(height: 4),
                             const Text(
                               '5,000 ل.ل',
@@ -269,24 +251,11 @@ class RequestDetailsScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 14),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      const Color(0xFF1E3A5F),
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 14),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(12),
-                                  ),
-                                ),
-                                onPressed: () =>
-                                    Navigator.pop(context),
-                                child: Text(l10n.payNow),
-                              ),
+
+                            // PrimaryButton replaces raw ElevatedButton
+                            PrimaryButton(
+                              label: l10n.payNow,
+                              onPressed: () => Navigator.pop(context),
                             ),
                           ],
                         ),
@@ -323,10 +292,11 @@ class RequestDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _detailRow(
-      {required IconData icon,
-      required String label,
-      required String value}) {
+  Widget _detailRow({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -335,8 +305,7 @@ class RequestDetailsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(label,
-                style:
-                    const TextStyle(fontSize: 11, color: Colors.grey)),
+                style: const TextStyle(fontSize: 11, color: Colors.grey)),
             const SizedBox(height: 2),
             Text(value,
                 textAlign: TextAlign.right,

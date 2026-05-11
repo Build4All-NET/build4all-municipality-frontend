@@ -3,6 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:baladiyati/common/widgets/app_search_field.dart';
+import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/features/citizen/requests/presentation/bloc/requests_bloc.dart';
 import 'package:baladiyati/features/citizen/requests/presentation/bloc/requests_state.dart';
 import 'package:baladiyati/features/citizen/requests/data/models/request_model.dart';
@@ -44,6 +46,9 @@ class _RequestsScreenState extends State<RequestsScreen> {
   final _searchCtrl = TextEditingController();
   String _query = '';
   RequestStatus? _filterStatus;
+
+  // Track previous error to avoid showing toast multiple times
+  String? _lastShownError;
 
   @override
   void dispose() {
@@ -93,7 +98,19 @@ class _RequestsScreenState extends State<RequestsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return BlocBuilder<RequestsBloc, RequestsState>(
+    return BlocConsumer<RequestsBloc, RequestsState>(
+      // Show error as toast, not inline red text
+      listener: (context, state) {
+        if (state.errorMessage != null &&
+            state.errorMessage != _lastShownError) {
+          _lastShownError = state.errorMessage;
+          AppToast.show(
+            context,
+            message: state.errorMessage!,
+            type: AppToastType.error,
+          );
+        }
+      },
       builder: (context, state) {
         final items = _filtered(_toItems(state.requests));
 
@@ -102,6 +119,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
           body: SafeArea(
             child: Column(
               children: [
+                // ── Header ───────────────────────────────────────
                 Container(
                   color: Colors.white,
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
@@ -110,32 +128,31 @@ class _RequestsScreenState extends State<RequestsScreen> {
                     children: [
                       Text(
                         l10n.myRequests,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1E3A5F),
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineSmall
+                            ?.copyWith(
+                              fontWeight: FontWeight.bold,
+                              color: Theme.of(context)
+                                  .colorScheme
+                                  .onSurface,
+                            ),
                       ),
                       const SizedBox(height: 12),
-                      TextField(
+
+                      //  AppSearchField replaces raw TextField
+                      AppSearchField(
                         controller: _searchCtrl,
-                        textAlign: TextAlign.right,
+                        hint: l10n.searchRequest,
                         onChanged: (v) => setState(() => _query = v),
-                        decoration: InputDecoration(
-                          hintText: l10n.searchRequest,
-                          hintStyle: const TextStyle(color: Colors.grey),
-                          prefixIcon: const Icon(Icons.search,
-                              color: Colors.grey),
-                          filled: true,
-                          fillColor: const Color(0xFFF3F4F6),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 12),
-                        ),
+                        onClear: _query.isEmpty
+                            ? null
+                            : () {
+                                _searchCtrl.clear();
+                                setState(() => _query = '');
+                              },
                       ),
+
                       const SizedBox(height: 10),
                       Row(
                         children: [
@@ -186,55 +203,41 @@ class _RequestsScreenState extends State<RequestsScreen> {
                   ),
                 ),
 
+                // ── List ─────────────────────────────────────────
                 Expanded(
                   child: state.isLoading
                       ? const Center(child: CircularProgressIndicator())
-                      : state.errorMessage != null
+                      : items.isEmpty
                           ? Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(24),
-                                child: Text(
-                                  state.errorMessage!,
-                                  style: const TextStyle(color: Colors.red),
-                                  textAlign: TextAlign.center,
-                                ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.description_outlined,
+                                      size: 64, color: Colors.grey),
+                                  const SizedBox(height: 12),
+                                  Text(l10n.noRequests,
+                                      style: const TextStyle(
+                                          color: Colors.grey)),
+                                ],
                               ),
                             )
-                          : items.isEmpty
-                              ? Center(
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(
-                                          Icons.description_outlined,
-                                          size: 64,
-                                          color: Colors.grey),
-                                      const SizedBox(height: 12),
-                                      Text(l10n.noRequests,
-                                          style: const TextStyle(
-                                              color: Colors.grey)),
-                                    ],
+                          : ListView.builder(
+                              padding: const EdgeInsets.all(16),
+                              itemCount: items.length,
+                              itemBuilder: (_, i) {
+                                final r = items[i];
+                                return _RequestCard(
+                                  item: r,
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          RequestDetailsScreen(request: r),
+                                    ),
                                   ),
-                                )
-                              : ListView.builder(
-                                  padding: const EdgeInsets.all(16),
-                                  itemCount: items.length,
-                                  itemBuilder: (_, i) {
-                                    final r = items[i];
-                                    return _RequestCard(
-                                      item: r,
-                                      onTap: () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) =>
-                                              RequestDetailsScreen(
-                                                  request: r),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
+                                );
+                              },
+                            ),
                 ),
               ],
             ),
@@ -283,8 +286,7 @@ class _RequestCard extends StatelessWidget {
                             fontSize: 11, color: Colors.grey)),
                     Text(item.nameAr,
                         style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.w600)),
+                            fontSize: 15, fontWeight: FontWeight.w600)),
                   ],
                 ),
               ],
