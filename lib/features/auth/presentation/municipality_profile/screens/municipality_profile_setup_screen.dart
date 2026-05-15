@@ -147,6 +147,21 @@ class _MunicipalityProfileSetupScreenState
     return _email().split('@').first;
   }
 
+  /// Derive a username from available build4all user data.
+  /// Falls back to the email prefix (before @) which is always present.
+  String _username() {
+    final usernameField =
+        (widget.build4allUser['username'] ?? '').toString().trim();
+    if (usernameField.isNotEmpty) return usernameField;
+
+    final firstName = (widget.build4allUser['firstName'] ?? '').toString().trim();
+    final lastName = (widget.build4allUser['lastName'] ?? '').toString().trim();
+    final combined = '$firstName$lastName'.trim();
+    if (combined.isNotEmpty) return combined;
+
+    return _email().split('@').first;
+  }
+
   String _phoneForBackend() {
     final phone = _phoneCtrl.value;
 
@@ -264,6 +279,7 @@ class _MunicipalityProfileSetupScreenState
         ),
         data: {
           'email': _email(),
+          'username': _username(),
           'passwordHash': 'BUILD4ALL_USER',
           'fullName': _fullName(),
           'phone': _phoneForBackend(),
