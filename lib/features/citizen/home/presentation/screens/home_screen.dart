@@ -50,54 +50,60 @@ class _HomeScreenState extends State<HomeScreen> {
     super.dispose();
   }
 
+  // ── Map raw API string → new RequestStatus enum ───────────────────────────
   RequestStatus _toEnum(String raw) {
-    switch (raw.toLowerCase()) {
-      case 'submitted':
-        return RequestStatus.submitted;
-      case 'under_review':
-      case 'underreview':
-      case 'review':
-        return RequestStatus.underReview;
-      case 'waiting_payment':
-      case 'waitingpayment':
-      case 'payment':
-        return RequestStatus.waitingPayment;
-      case 'approved':
-        return RequestStatus.approved;
-      case 'in_field':
-      case 'infield':
-      case 'field':
-        return RequestStatus.inField;
-      case 'delivered':
-      case 'completed':
-        return RequestStatus.delivered;
-      default:
-        return RequestStatus.submitted;
+    switch (raw.toUpperCase()) {
+      case 'DRAFT':             return RequestStatus.draft;
+      case 'SUBMITTED':         return RequestStatus.submitted;
+      case 'UNDER_REVIEW':      return RequestStatus.underReview;
+      case 'DOCUMENTS_MISSING': return RequestStatus.documentsMissing;
+      case 'IN_PROGRESS':       return RequestStatus.inProgress;
+      case 'APPROVED':          return RequestStatus.approved;
+      case 'TAX_PAID':          return RequestStatus.taxPaid;
+      case 'TAX_REJECTED':      return RequestStatus.taxRejected;
+      case 'COMPLETED':         return RequestStatus.completed;
+      case 'REJECTED':          return RequestStatus.rejected;
+      case 'CANCELLED':         return RequestStatus.cancelled;
+      default:                  return RequestStatus.draft;
     }
   }
 
+  // ── Map status → string key for RecentRequestItem ────────────────────────
   String _statusKey(String raw) {
     switch (_toEnum(raw)) {
-      case RequestStatus.submitted:      return 'submitted';
-      case RequestStatus.underReview:    return 'under_review';
-      case RequestStatus.waitingPayment: return 'waiting_payment';
-      case RequestStatus.approved:       return 'approved';
-      case RequestStatus.inField:        return 'in_field';
-      case RequestStatus.delivered:      return 'delivered';
+      case RequestStatus.draft:             return 'draft';
+      case RequestStatus.submitted:         return 'submitted';
+      case RequestStatus.underReview:       return 'under_review';
+      case RequestStatus.documentsMissing:  return 'documents_missing';
+      case RequestStatus.inProgress:        return 'in_progress';
+      case RequestStatus.approved:          return 'approved';
+      case RequestStatus.taxPaid:           return 'tax_paid';
+      case RequestStatus.taxRejected:       return 'tax_rejected';
+      case RequestStatus.completed:         return 'completed';
+      case RequestStatus.rejected:          return 'rejected';
+      case RequestStatus.cancelled:         return 'cancelled';
     }
   }
 
+  // ── Stats ─────────────────────────────────────────────────────────────────
+
+  // Active = still being processed
   int _countActive(List<RequestModel> r) => r.where((x) => [
         RequestStatus.submitted,
         RequestStatus.underReview,
-        RequestStatus.inField,
+        RequestStatus.documentsMissing,
+        RequestStatus.inProgress,
       ].contains(_toEnum(x.status))).length;
 
-  int _countAwaiting(List<RequestModel> r) =>
-      r.where((x) => _toEnum(x.status) == RequestStatus.waitingPayment).length;
+  // Awaiting = approved but waiting for tax payment
+  int _countAwaiting(List<RequestModel> r) => r.where((x) => [
+        RequestStatus.approved,
+        RequestStatus.taxPaid,
+      ].contains(_toEnum(x.status))).length;
 
+  // Completed = fully done
   int _countCompleted(List<RequestModel> r) =>
-      r.where((x) => _toEnum(x.status) == RequestStatus.delivered).length;
+      r.where((x) => _toEnum(x.status) == RequestStatus.completed).length;
 
   @override
   Widget build(BuildContext context) {
