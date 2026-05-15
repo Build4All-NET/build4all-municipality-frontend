@@ -1,3 +1,4 @@
+import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/common/widgets/primary_button.dart';
 import 'package:baladiyati/features/admin/Requests/data/model/RequestModel.dart';
 import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_Bloc.dart';
@@ -7,13 +8,20 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
-class RequestDetailPage extends StatelessWidget {
+class RequestDetailPage extends StatefulWidget {
   final RequestModel request;
 
   const RequestDetailPage({
     super.key,
     required this.request,
   });
+
+  @override
+  State<RequestDetailPage> createState() => _RequestDetailPageState();
+}
+
+class _RequestDetailPageState extends State<RequestDetailPage> {
+  bool _awaitingUpdate = false;
 
   String _safe(String? value) {
     final clean = value?.trim() ?? '';
@@ -23,33 +31,22 @@ class RequestDetailPage extends StatelessWidget {
   String _formatDate(String? value) {
     final clean = value?.trim() ?? '';
     if (clean.isEmpty || clean == 'null') return '---';
-
     return clean.replaceFirst('T', ' ').split('.').first;
   }
 
   String _formatStatus(String? status) {
     final clean = _safe(status);
     if (clean == '---') return clean;
-
     return clean.replaceAll('_', ' ');
   }
 
-  void _changeStatus(
-    BuildContext context,
-    String status,
-  ) {
-    final id = request.id;
-
+  void _changeStatus(BuildContext context, String status) {
+    final id = widget.request.id;
     if (id == null) return;
-
+    setState(() => _awaitingUpdate = true);
     context.read<RequestBloc>().add(
-          UpdateRequestStatusRequested(
-            id: id,
-            status: status,
-          ),
+          UpdateRequestStatusRequested(id: id, status: status),
         );
-
-    Navigator.pop(context);
   }
 
   @override
@@ -57,7 +54,26 @@ class RequestDetailPage extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final colors = Theme.of(context).colorScheme;
 
-    return BlocBuilder<RequestBloc, RequestState>(
+    return BlocConsumer<RequestBloc, RequestState>(
+      listener: (context, state) {
+        if (!_awaitingUpdate) return;
+        if (state.updating) return;
+
+        if (state.success.isNotEmpty) {
+          setState(() => _awaitingUpdate = false);
+          if (mounted) Navigator.pop(context);
+          return;
+        }
+
+        if (state.error.isNotEmpty) {
+          setState(() => _awaitingUpdate = false);
+          AppToast.show(
+            context,
+            message: state.error,
+            type: AppToastType.error,
+          );
+        }
+      },
       builder: (context, state) {
         return Scaffold(
           appBar: AppBar(
@@ -78,31 +94,31 @@ class RequestDetailPage extends StatelessWidget {
                     children: [
                       _DetailRow(
                         label: 'Title',
-                        value: _safe(request.title),
+                        value: _safe(widget.request.title),
                       ),
                       _DetailRow(
                         label: 'Tracking',
-                        value: _safe(request.trackingNumber),
+                        value: _safe(widget.request.trackingNumber),
                       ),
                       _DetailRow(
                         label: l10n.status,
-                        value: _formatStatus(request.status),
+                        value: _formatStatus(widget.request.status),
                       ),
                       _DetailRow(
                         label: 'Service',
-                        value: _safe(request.serviceName),
+                        value: _safe(widget.request.serviceName),
                       ),
                       _DetailRow(
                         label: 'Citizen',
-                        value: _safe(request.citizenName),
+                        value: _safe(widget.request.citizenName),
                       ),
                       _DetailRow(
                         label: l10n.address,
-                        value: _safe(request.addressText),
+                        value: _safe(widget.request.addressText),
                       ),
                       _DetailRow(
                         label: 'Created',
-                        value: _formatDate(request.createdAt),
+                        value: _formatDate(widget.request.createdAt),
                       ),
                     ],
                   ),
@@ -121,7 +137,7 @@ class RequestDetailPage extends StatelessWidget {
                       ),
                       const SizedBox(height: 10),
                       Text(
-                        _safe(request.description),
+                        _safe(widget.request.description),
                         style: TextStyle(
                           color: colors.onSurfaceVariant,
                           height: 1.4,

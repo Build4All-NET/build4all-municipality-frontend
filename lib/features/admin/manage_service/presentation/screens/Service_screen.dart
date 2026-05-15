@@ -307,6 +307,10 @@ class _ServiceCard extends StatelessWidget {
         ? service.descriptionEn
         : service.descriptionAr;
 
+    final deptLabel = service.departmentName?.trim().isNotEmpty == true
+        ? service.departmentName!
+        : '#${service.departmentId}';
+
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
@@ -353,7 +357,7 @@ class _ServiceCard extends StatelessWidget {
           child: Text(
             subtitle.trim().isNotEmpty
                 ? subtitle
-                : '${loc.department}: ${service.departmentId} • ${loc.price}: ${service.feeAmount.toStringAsFixed(2)}',
+                : '${loc.department}: $deptLabel • ${loc.price}: ${service.feeAmount.toStringAsFixed(2)}',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
             style: theme.textTheme.bodyMedium?.copyWith(

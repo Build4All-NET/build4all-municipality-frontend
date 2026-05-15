@@ -2,6 +2,7 @@ class ServiceModel {
   final int id;
   final int municipalityId;
   final int departmentId;
+  final String? departmentName;
   final String nameAr;
   final String nameEn;
   final String descriptionAr;
@@ -16,6 +17,7 @@ class ServiceModel {
     required this.id,
     required this.municipalityId,
     required this.departmentId,
+    this.departmentName,
     required this.nameAr,
     required this.nameEn,
     required this.descriptionAr,
@@ -32,6 +34,7 @@ class ServiceModel {
       id: _toInt(json['id']),
       municipalityId: _toInt(json['municipalityId'] ?? json['municipality']?['id']),
       departmentId: _toInt(json['departmentId'] ?? json['department']?['id']),
+      departmentName: (json['departmentName'] ?? json['department']?['name'])?.toString(),
       nameAr: (json['nameAr'] ?? '').toString(),
       nameEn: (json['nameEn'] ?? '').toString(),
       descriptionAr: (json['descriptionAr'] ?? '').toString(),
@@ -64,6 +67,7 @@ class ServiceModel {
     int? id,
     int? municipalityId,
     int? departmentId,
+    String? departmentName,
     String? nameAr,
     String? nameEn,
     String? descriptionAr,
@@ -78,6 +82,7 @@ class ServiceModel {
       id: id ?? this.id,
       municipalityId: municipalityId ?? this.municipalityId,
       departmentId: departmentId ?? this.departmentId,
+      departmentName: departmentName ?? this.departmentName,
       nameAr: nameAr ?? this.nameAr,
       nameEn: nameEn ?? this.nameEn,
       descriptionAr: descriptionAr ?? this.descriptionAr,

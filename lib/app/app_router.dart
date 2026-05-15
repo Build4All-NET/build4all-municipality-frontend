@@ -197,11 +197,11 @@ class AppRouter {
 
   // ================= ADMIN: DEPARTMENTS =================
 
-  static void goToDepartments(BuildContext context) {
+  static Future<void> goToDepartments(BuildContext context) {
     final repository = DepartmentRepositoryImpl(
       DepartmentApiService(DioClient.muni),
     );
-    Navigator.push(
+    return Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => BlocProvider(
@@ -219,11 +219,11 @@ class AppRouter {
 
   // ================= ADMIN: SERVICES =================
 
-  static void goToServices(BuildContext context) {
+  static Future<void> goToServices(BuildContext context) {
     final repository = ServiceRepositoryImpl(
       ServiceApiService(DioClient.muni),
     );
-    Navigator.push(
+    return Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => BlocProvider(
@@ -239,8 +239,8 @@ class AppRouter {
     );
   }
 
-  static void goToManageServices(BuildContext context) {
-    goToServices(context);
+  static Future<void> goToManageServices(BuildContext context) {
+    return goToServices(context);
   }
 
   static void goToAdminProfile(BuildContext context) {
@@ -262,14 +262,14 @@ class AppRouter {
 
   // ================= ADMIN: EMPLOYEES =================
 
-  static void goToEmployees(BuildContext context) {
+  static Future<void> goToEmployees(BuildContext context) {
     final employeeRepository = EmployeeRepositoryImpl(
       EmployeeApiService(DioClient.muni),
     );
     final departmentRepository = DepartmentRepositoryImpl(
       DepartmentApiService(DioClient.muni),
     );
-    Navigator.push(
+    return Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => MultiBlocProvider(
@@ -314,14 +314,14 @@ class AppRouter {
 
   // ================= ADMIN: REQUESTS =================
 
-  static void goToRequests(BuildContext context) {
+  static Future<void> goToRequests(BuildContext context) {
     final departmentRepository = DepartmentRepositoryImpl(
       DepartmentApiService(DioClient.muni),
     );
     final requestRepository = RequestRepositoryImpl(
       RequestApiService(DioClient.muni),
     );
-    Navigator.push(
+    return Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => MultiBlocProvider(

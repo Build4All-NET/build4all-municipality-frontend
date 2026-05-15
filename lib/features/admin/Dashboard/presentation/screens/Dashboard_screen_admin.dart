@@ -3,6 +3,7 @@ import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/core/l10n/locale_cubit.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/admin/Departement/data/Service/Departement_Api_Service.dart';
+import 'package:baladiyati/features/admin/Requests/data/Service/Req_Api_Service.dart';
 import 'package:baladiyati/features/admin/announcements/data/services/Announcement_Api_Service.dart';
 import 'package:baladiyati/features/admin/announcements/presentation/screens/announcementscreen.dart';
 import 'package:baladiyati/features/admin/manage_service/Data/service/Service_Api_service.dart';
@@ -27,6 +28,7 @@ class _AdminDashboardStats {
   final int departmentsCount;
   final int servicesCount;
   final int employeesCount;
+  final int requestsCount;
 
   const _AdminDashboardStats({
     required this.announcementsCount,
@@ -34,6 +36,7 @@ class _AdminDashboardStats {
     required this.departmentsCount,
     required this.servicesCount,
     required this.employeesCount,
+    required this.requestsCount,
   });
 
   factory _AdminDashboardStats.empty() {
@@ -43,6 +46,7 @@ class _AdminDashboardStats {
       departmentsCount: 0,
       servicesCount: 0,
       employeesCount: 0,
+      requestsCount: 0,
     );
   }
 }
@@ -55,6 +59,7 @@ class _DashboardPageState extends State<DashboardPage> {
   late final DepartmentApiService _departmentApiService;
   late final ServiceApiService _serviceApiService;
   late final EmployeeApiService _employeeApiService;
+  late final RequestApiService _requestApiService;
 
   late Future<_AdminDashboardStats> _statsFuture;
 
@@ -67,6 +72,7 @@ class _DashboardPageState extends State<DashboardPage> {
     _departmentApiService = DepartmentApiService(DioClient.muni);
     _serviceApiService = ServiceApiService(DioClient.muni);
     _employeeApiService = EmployeeApiService(DioClient.muni);
+    _requestApiService = RequestApiService(DioClient.muni);
 
     _statsFuture = _loadStats();
   }
@@ -78,6 +84,7 @@ class _DashboardPageState extends State<DashboardPage> {
       _departmentApiService.getAll(),
       _serviceApiService.getServices(),
       _employeeApiService.getEmployees(),
+      _requestApiService.getAllRequestsAdmin(),
     ]);
 
     return _AdminDashboardStats(
@@ -86,6 +93,7 @@ class _DashboardPageState extends State<DashboardPage> {
       departmentsCount: results[2].length,
       servicesCount: results[3].length,
       employeesCount: results[4].length,
+      requestsCount: results[5].length,
     );
   }
 
@@ -208,7 +216,7 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
     );
 
-    await _refreshStats();
+    if (mounted) await _refreshStats();
   }
 
   Future<void> _openViolations() async {
@@ -219,23 +227,28 @@ class _DashboardPageState extends State<DashboardPage> {
       ),
     );
 
-    await _refreshStats();
+    if (mounted) await _refreshStats();
   }
-void _openServices() {
-  AppRouter.goToServices(context);
-}
 
-void _openDepartments() {
-  AppRouter.goToDepartments(context);
-}
+  Future<void> _openServices() async {
+    await AppRouter.goToServices(context);
+    if (mounted) await _refreshStats();
+  }
 
-void _openEmployees() {
-  AppRouter.goToEmployees(context);
-}
+  Future<void> _openDepartments() async {
+    await AppRouter.goToDepartments(context);
+    if (mounted) await _refreshStats();
+  }
 
-void _openInbox() {
-  AppRouter.goToRequests(context);
-}
+  Future<void> _openEmployees() async {
+    await AppRouter.goToEmployees(context);
+    if (mounted) await _refreshStats();
+  }
+
+  Future<void> _openInbox() async {
+    await AppRouter.goToRequests(context);
+    if (mounted) await _refreshStats();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -287,7 +300,8 @@ void _openInbox() {
 
                   const SizedBox(height: 16),
 
-                  if (snapshot.hasError) ...[
+                  if (snapshot.hasError) ...
+                  [
                     _ErrorBox(
                       message: loc.networkError,
                       onRetry: _refreshStats,
@@ -335,7 +349,7 @@ void _openInbox() {
                       ),
                       _StatCard(
                         title: loc.inbox,
-                        value: '-',
+                        value: isLoading ? '...' : '${stats.requestsCount}',
                         icon: Icons.inbox_outlined,
                         iconColor: colors.outline,
                       ),
