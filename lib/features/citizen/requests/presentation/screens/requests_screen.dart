@@ -3,18 +3,25 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:baladiyati/common/widgets/app_search_field.dart';
+import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/features/citizen/requests/presentation/bloc/requests_bloc.dart';
 import 'package:baladiyati/features/citizen/requests/presentation/bloc/requests_state.dart';
 import 'package:baladiyati/features/citizen/requests/data/models/request_model.dart';
 import 'request_details_screen.dart';
 
 enum RequestStatus {
+  draft,
   submitted,
   underReview,
-  waitingPayment,
+  documentsMissing,
+  inProgress,
   approved,
-  inField,
-  delivered,
+  rejected,
+  completed,
+  cancelled,
+  taxPaid,
+  taxRejected,
 }
 
 class RequestItem {
@@ -23,6 +30,9 @@ class RequestItem {
   final String number;
   final RequestStatus status;
   final String date;
+  final String? title;
+  final String? description;
+  final String? updatedAt;
 
   const RequestItem({
     required this.id,
@@ -30,6 +40,9 @@ class RequestItem {
     required this.number,
     required this.status,
     required this.date,
+    this.title,
+    this.description,
+    this.updatedAt,
   });
 }
 
@@ -44,6 +57,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
   final _searchCtrl = TextEditingController();
   String _query = '';
   RequestStatus? _filterStatus;
+  String? _lastShownError;
 
   @override
   void dispose() {
@@ -51,22 +65,20 @@ class _RequestsScreenState extends State<RequestsScreen> {
     super.dispose();
   }
 
-  RequestStatus _toEnum(String raw) {
-    switch (raw.toLowerCase()) {
-      case 'submitted':        return RequestStatus.submitted;
-      case 'under_review':
-      case 'underreview':
-      case 'review':           return RequestStatus.underReview;
-      case 'waiting_payment':
-      case 'waitingpayment':
-      case 'payment':          return RequestStatus.waitingPayment;
-      case 'approved':         return RequestStatus.approved;
-      case 'in_field':
-      case 'infield':
-      case 'field':            return RequestStatus.inField;
-      case 'delivered':
-      case 'completed':        return RequestStatus.delivered;
-      default:                 return RequestStatus.submitted;
+  static RequestStatus toEnum(String raw) {
+    switch (raw.toUpperCase()) {
+      case 'DRAFT':             return RequestStatus.draft;
+      case 'SUBMITTED':         return RequestStatus.submitted;
+      case 'UNDER_REVIEW':      return RequestStatus.underReview;
+      case 'DOCUMENTS_MISSING': return RequestStatus.documentsMissing;
+      case 'IN_PROGRESS':       return RequestStatus.inProgress;
+      case 'APPROVED':          return RequestStatus.approved;
+      case 'REJECTED':          return RequestStatus.rejected;
+      case 'COMPLETED':         return RequestStatus.completed;
+      case 'CANCELLED':         return RequestStatus.cancelled;
+      case 'TAX_PAID':          return RequestStatus.taxPaid;
+      case 'TAX_REJECTED':      return RequestStatus.taxRejected;
+      default:                  return RequestStatus.submitted;
     }
   }
 
@@ -75,8 +87,11 @@ class _RequestsScreenState extends State<RequestsScreen> {
             id: r.id,
             nameAr: r.nameAr,
             number: r.number,
-            status: _toEnum(r.status),
+            status: toEnum(r.status),
             date: r.date,
+            title: r.title,
+            description: r.description,
+            updatedAt: r.updatedAt,
           )).toList();
 
   List<RequestItem> _filtered(List<RequestItem> items) =>
@@ -93,7 +108,18 @@ class _RequestsScreenState extends State<RequestsScreen> {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return BlocBuilder<RequestsBloc, RequestsState>(
+    return BlocConsumer<RequestsBloc, RequestsState>(
+      listener: (context, state) {
+        if (state.errorMessage != null &&
+            state.errorMessage != _lastShownError) {
+          _lastShownError = state.errorMessage;
+          AppToast.show(
+            context,
+            message: state.errorMessage!,
+            type: AppToastType.error,
+          );
+        }
+      },
       builder: (context, state) {
         final items = _filtered(_toItems(state.requests));
 
@@ -102,6 +128,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
           body: SafeArea(
             child: Column(
               children: [
+                // ── Header ───────────────────────────────────────
                 Container(
                   color: Colors.white,
                   padding: const EdgeInsets.fromLTRB(20, 16, 20, 12),
@@ -110,32 +137,25 @@ class _RequestsScreenState extends State<RequestsScreen> {
                     children: [
                       Text(
                         l10n.myRequests,
-                        style: const TextStyle(
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
-                          color: Color(0xFF1E3A5F),
-                        ),
+                        style: Theme.of(context)
+                            .textTheme
+                            .headlineSmall
+                            ?.copyWith(fontWeight: FontWeight.bold),
                       ),
                       const SizedBox(height: 12),
-                      TextField(
+
+                      AppSearchField(
                         controller: _searchCtrl,
-                        textAlign: TextAlign.right,
+                        hint: l10n.searchRequest,
                         onChanged: (v) => setState(() => _query = v),
-                        decoration: InputDecoration(
-                          hintText: l10n.searchRequest,
-                          hintStyle: const TextStyle(color: Colors.grey),
-                          prefixIcon: const Icon(Icons.search,
-                              color: Colors.grey),
-                          filled: true,
-                          fillColor: const Color(0xFFF3F4F6),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide.none,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 12),
-                        ),
+                        onClear: _query.isEmpty
+                            ? null
+                            : () {
+                                _searchCtrl.clear();
+                                setState(() => _query = '');
+                              },
                       ),
+
                       const SizedBox(height: 10),
                       Row(
                         children: [
@@ -159,20 +179,38 @@ class _RequestsScreenState extends State<RequestsScreen> {
                                         value: null,
                                         child: Text(l10n.filterAll)),
                                     DropdownMenuItem(
+                                        value: RequestStatus.draft,
+                                        child: Text(_statusLabel(RequestStatus.draft))),
+                                    DropdownMenuItem(
                                         value: RequestStatus.submitted,
-                                        child: Text(l10n.statusSubmitted)),
+                                        child: Text(_statusLabel(RequestStatus.submitted))),
                                     DropdownMenuItem(
                                         value: RequestStatus.underReview,
-                                        child: Text(l10n.statusUnderReview)),
+                                        child: Text(_statusLabel(RequestStatus.underReview))),
                                     DropdownMenuItem(
-                                        value: RequestStatus.waitingPayment,
-                                        child: Text(l10n.statusWaitingPayment)),
+                                        value: RequestStatus.documentsMissing,
+                                        child: Text(_statusLabel(RequestStatus.documentsMissing))),
+                                    DropdownMenuItem(
+                                        value: RequestStatus.inProgress,
+                                        child: Text(_statusLabel(RequestStatus.inProgress))),
                                     DropdownMenuItem(
                                         value: RequestStatus.approved,
-                                        child: Text(l10n.statusApproved)),
+                                        child: Text(_statusLabel(RequestStatus.approved))),
                                     DropdownMenuItem(
-                                        value: RequestStatus.delivered,
-                                        child: Text(l10n.statusDelivered)),
+                                        value: RequestStatus.rejected,
+                                        child: Text(_statusLabel(RequestStatus.rejected))),
+                                    DropdownMenuItem(
+                                        value: RequestStatus.completed,
+                                        child: Text(_statusLabel(RequestStatus.completed))),
+                                    DropdownMenuItem(
+                                        value: RequestStatus.cancelled,
+                                        child: Text(_statusLabel(RequestStatus.cancelled))),
+                                    DropdownMenuItem(
+                                        value: RequestStatus.taxPaid,
+                                        child: Text(_statusLabel(RequestStatus.taxPaid))),
+                                    DropdownMenuItem(
+                                        value: RequestStatus.taxRejected,
+                                        child: Text(_statusLabel(RequestStatus.taxRejected))),
                                   ],
                                   onChanged: (v) =>
                                       setState(() => _filterStatus = v),
@@ -186,55 +224,41 @@ class _RequestsScreenState extends State<RequestsScreen> {
                   ),
                 ),
 
+                // ── List ─────────────────────────────────────────
                 Expanded(
                   child: state.isLoading
                       ? const Center(child: CircularProgressIndicator())
-                      : state.errorMessage != null
+                      : items.isEmpty
                           ? Center(
-                              child: Padding(
-                                padding: const EdgeInsets.all(24),
-                                child: Text(
-                                  state.errorMessage!,
-                                  style: const TextStyle(color: Colors.red),
-                                  textAlign: TextAlign.center,
-                                ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Icon(Icons.description_outlined,
+                                      size: 64, color: Colors.grey),
+                                  const SizedBox(height: 12),
+                                  Text(l10n.noRequests,
+                                      style: const TextStyle(
+                                          color: Colors.grey)),
+                                ],
                               ),
                             )
-                          : items.isEmpty
-                              ? Center(
-                                  child: Column(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.center,
-                                    children: [
-                                      const Icon(
-                                          Icons.description_outlined,
-                                          size: 64,
-                                          color: Colors.grey),
-                                      const SizedBox(height: 12),
-                                      Text(l10n.noRequests,
-                                          style: const TextStyle(
-                                              color: Colors.grey)),
-                                    ],
+                          : ListView.builder(
+                              padding: const EdgeInsets.all(16),
+                              itemCount: items.length,
+                              itemBuilder: (_, i) {
+                                final r = items[i];
+                                return _RequestCard(
+                                  item: r,
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) =>
+                                          RequestDetailsScreen(request: r),
+                                    ),
                                   ),
-                                )
-                              : ListView.builder(
-                                  padding: const EdgeInsets.all(16),
-                                  itemCount: items.length,
-                                  itemBuilder: (_, i) {
-                                    final r = items[i];
-                                    return _RequestCard(
-                                      item: r,
-                                      onTap: () => Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (_) =>
-                                              RequestDetailsScreen(
-                                                  request: r),
-                                        ),
-                                      ),
-                                    );
-                                  },
-                                ),
+                                );
+                              },
+                            ),
                 ),
               ],
             ),
@@ -245,6 +269,24 @@ class _RequestsScreenState extends State<RequestsScreen> {
   }
 }
 
+// ── Status label ──────────────────────────────────────────────────────────────
+String _statusLabel(RequestStatus s) {
+  switch (s) {
+    case RequestStatus.draft:             return 'مسودة';
+    case RequestStatus.submitted:         return 'مقدمة';
+    case RequestStatus.underReview:       return 'قيد المراجعة';
+    case RequestStatus.documentsMissing:  return 'وثائق ناقصة';
+    case RequestStatus.inProgress:        return 'قيد التنفيذ';
+    case RequestStatus.approved:          return 'موافق عليها';
+    case RequestStatus.rejected:          return 'مرفوضة';
+    case RequestStatus.completed:         return 'مكتملة';
+    case RequestStatus.cancelled:         return 'ملغاة';
+    case RequestStatus.taxPaid:           return 'تم دفع الضريبة';
+    case RequestStatus.taxRejected:       return 'رُفض الدفع';
+  }
+}
+
+// ── Card ──────────────────────────────────────────────────────────────────────
 class _RequestCard extends StatelessWidget {
   final RequestItem item;
   final VoidCallback onTap;
@@ -301,6 +343,7 @@ class _RequestCard extends StatelessWidget {
   }
 }
 
+// ── Status Badge ──────────────────────────────────────────────────────────────
 class StatusBadgeWidget extends StatelessWidget {
   final RequestStatus status;
   const StatusBadgeWidget({super.key, required this.status});
@@ -315,7 +358,7 @@ class StatusBadgeWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
       ),
       child: Text(
-        config.label,
+        _statusLabel(status),
         style: TextStyle(
             fontSize: 11,
             fontWeight: FontWeight.w500,
@@ -326,31 +369,34 @@ class StatusBadgeWidget extends StatelessWidget {
 
   _StatusConfig _config(RequestStatus s) {
     switch (s) {
+      case RequestStatus.draft:
+        return _StatusConfig(const Color(0xFFF5F5F5), Colors.grey);
       case RequestStatus.submitted:
-        return _StatusConfig('مقدمة',
-            const Color(0xFFE3F2FD), const Color(0xFF1565C0));
+        return _StatusConfig(const Color(0xFFE3F2FD), const Color(0xFF1565C0));
       case RequestStatus.underReview:
-        return _StatusConfig('قيد التدقيق',
-            const Color(0xFFFFFDE7), const Color(0xFFF9A825));
-      case RequestStatus.waitingPayment:
-        return _StatusConfig('بانتظار الدفع',
-            const Color(0xFFFFF3E0), Colors.orange);
+        return _StatusConfig(const Color(0xFFFFFDE7), const Color(0xFFF9A825));
+      case RequestStatus.documentsMissing:
+        return _StatusConfig(const Color(0xFFFFEBEE), Colors.red);
+      case RequestStatus.inProgress:
+        return _StatusConfig(const Color(0xFFE8EAF6), const Color(0xFF3949AB));
       case RequestStatus.approved:
-        return _StatusConfig('موافق عليها',
-            const Color(0xFFE8F5E9), Colors.green);
-      case RequestStatus.inField:
-        return _StatusConfig('بالكشف',
-            const Color(0xFFEDE7F6), const Color(0xFF6A1B9A));
-      case RequestStatus.delivered:
-        return _StatusConfig('مستلمة',
-            const Color(0xFFE0F7FA), const Color(0xFF00838F));
+        return _StatusConfig(const Color(0xFFE8F5E9), Colors.green);
+      case RequestStatus.rejected:
+        return _StatusConfig(const Color(0xFFFFEBEE), const Color(0xFFC62828));
+      case RequestStatus.completed:
+        return _StatusConfig(const Color(0xFFE0F7FA), const Color(0xFF00838F));
+      case RequestStatus.cancelled:
+        return _StatusConfig(const Color(0xFFF5F5F5), Colors.grey);
+      case RequestStatus.taxPaid:
+        return _StatusConfig(const Color(0xFFE8F5E9), const Color(0xFF2E7D32));
+      case RequestStatus.taxRejected:
+        return _StatusConfig(const Color(0xFFFFEBEE), const Color(0xFFC62828));
     }
   }
 }
 
 class _StatusConfig {
-  final String label;
   final Color bg;
   final Color text;
-  const _StatusConfig(this.label, this.bg, this.text);
+  const _StatusConfig(this.bg, this.text);
 }

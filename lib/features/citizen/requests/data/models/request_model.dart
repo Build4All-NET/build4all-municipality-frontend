@@ -6,6 +6,9 @@ class RequestModel {
   final String number;
   final String status;
   final String date;
+  final String? title;
+  final String? description;
+  final String? updatedAt;
 
   const RequestModel({
     required this.id,
@@ -13,6 +16,9 @@ class RequestModel {
     required this.number,
     required this.status,
     required this.date,
+    this.title,
+    this.description,
+    this.updatedAt,
   });
 
   factory RequestModel.fromJson(Map<String, dynamic> json) {
@@ -34,6 +40,18 @@ class RequestModel {
       }
     } catch (_) {}
 
+    String formattedUpdatedAt = '';
+    try {
+      final rawU = json['updatedAt'] ?? json['updated_at'] ?? '';
+      if (rawU.toString().isNotEmpty) {
+        final dt = DateTime.parse(rawU.toString());
+        formattedUpdatedAt =
+            '${_ar(dt.day.toString().padLeft(2, '0'))}-'
+            '${_ar(dt.month.toString().padLeft(2, '0'))}-'
+            '${_ar(dt.year.toString())}';
+      }
+    } catch (_) {}
+
     return RequestModel(
       id: (json['id'] ?? json['_id'] ?? '').toString(),
       nameAr: json['serviceNameAr'] ??
@@ -43,15 +61,19 @@ class RequestModel {
           json['name'] ??
           json['title'] ??
           '',
-      number: json['requestNumber'] ??
+      number: json['trackingNumber'] ??
+          json['requestNumber'] ??
           json['request_number'] ??
           json['referenceNumber'] ??
           json['reference_number'] ??
           json['number'] ??
           json['code'] ??
           '',
-      status: (json['status'] ?? '').toString().toLowerCase(),
+      status: (json['status'] ?? '').toString().toUpperCase(),
       date: formattedDate,
+      title: json['title']?.toString(),
+      description: json['description']?.toString(),
+      updatedAt: formattedUpdatedAt.isEmpty ? null : formattedUpdatedAt,
     );
   }
 

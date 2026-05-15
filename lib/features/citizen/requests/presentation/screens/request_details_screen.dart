@@ -1,51 +1,64 @@
 // lib/features/citizen/requests/presentation/screens/request_details_screen.dart
 
 import 'package:flutter/material.dart';
-import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:baladiyati/common/widgets/primary_button.dart';
 import 'requests_screen.dart';
-
-class _TimelineStep {
-  final RequestStatus status;
-  final String date;
-  final bool completed;
-  const _TimelineStep(
-      {required this.status, required this.date, required this.completed});
-}
 
 class RequestDetailsScreen extends StatelessWidget {
   final RequestItem request;
   const RequestDetailsScreen({super.key, required this.request});
 
+  // ── Timeline progression order ────────────────────────────────────────────
+  // Each step shows as completed if current status has passed it
+  static const List<_StepDef> _steps = [
+    _StepDef(RequestStatus.submitted,        'مقدمة'),
+    _StepDef(RequestStatus.underReview,      'قيد المراجعة'),
+    _StepDef(RequestStatus.inProgress,       'قيد التنفيذ'),
+    _StepDef(RequestStatus.approved,         'موافق عليها'),
+    _StepDef(RequestStatus.taxPaid,          'تم الدفع'),
+    _StepDef(RequestStatus.completed,        'مكتملة'),
+  ];
+
+  // The "weight" of each status in the flow
+  static int _statusOrder(RequestStatus s) {
+    switch (s) {
+      case RequestStatus.draft:             return 0;
+      case RequestStatus.submitted:         return 1;
+      case RequestStatus.underReview:       return 2;
+      case RequestStatus.documentsMissing:  return 2; // stays at review level
+      case RequestStatus.inProgress:        return 3;
+      case RequestStatus.approved:          return 4;
+      case RequestStatus.taxPaid:           return 5;
+      case RequestStatus.taxRejected:       return 5;
+      case RequestStatus.completed:         return 6;
+      case RequestStatus.rejected:          return 6;
+      case RequestStatus.cancelled:         return 6;
+    }
+  }
+
+  bool _isTerminal() =>
+      request.status == RequestStatus.completed ||
+      request.status == RequestStatus.rejected ||
+      request.status == RequestStatus.cancelled ||
+      request.status == RequestStatus.taxRejected;
+
+  bool _isNegativeEnd() =>
+      request.status == RequestStatus.rejected ||
+      request.status == RequestStatus.cancelled ||
+      request.status == RequestStatus.taxRejected;
+
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final cs = Theme.of(context).colorScheme;
+    final currentOrder = _statusOrder(request.status);
 
-    final timeline = [
-      _TimelineStep(
-          status: RequestStatus.submitted,
-          date: '١٧-٠٣-٢٠٢٦',
-          completed: true),
-      _TimelineStep(
-          status: RequestStatus.underReview,
-          date: '١٨-٠٣-٢٠٢٦',
-          completed: true),
-      _TimelineStep(
-          status: RequestStatus.approved,
-          date: '١٩-٠٣-٢٠٢٦',
-          completed: true),
-      _TimelineStep(
-          status: RequestStatus.waitingPayment,
-          date: '١٩-٠٣-٢٠٢٦',
-          completed: request.status == RequestStatus.waitingPayment ||
-              request.status == RequestStatus.delivered),
-      _TimelineStep(
-          status: RequestStatus.delivered,
-          date: '',
-          completed: request.status == RequestStatus.delivered),
-    ];
-
-    final completedCount = timeline.where((t) => t.completed).length;
-    final progress = completedCount / timeline.length;
+    // Calculate progress
+    final completedSteps = _steps
+        .where((s) => _statusOrder(s.status) <= currentOrder)
+        .length;
+    final progress = _isNegativeEnd()
+        ? completedSteps / _steps.length
+        : completedSteps / _steps.length;
 
     return Scaffold(
       backgroundColor: const Color(0xFFF3F4F6),
@@ -67,17 +80,13 @@ class RequestDetailsScreen extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        Text(
-                          request.number,
-                          style: const TextStyle(
-                              fontSize: 11, color: Colors.grey),
-                        ),
-                        Text(
-                          request.nameAr,
-                          style: const TextStyle(
-                              fontSize: 17,
-                              fontWeight: FontWeight.bold),
-                        ),
+                        Text(request.number,
+                            style: const TextStyle(
+                                fontSize: 11, color: Colors.grey)),
+                        Text(request.nameAr,
+                            style: const TextStyle(
+                                fontSize: 17,
+                                fontWeight: FontWeight.bold)),
                       ],
                     ),
                   ),
@@ -93,7 +102,54 @@ class RequestDetailsScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   children: [
-                    // Progress card
+
+                    // ── Special state banners ─────────────────
+                    if (request.status == RequestStatus.documentsMissing)
+                      _banner(
+                        icon: Icons.folder_off_outlined,
+                        title: 'وثائق ناقصة',
+                        message: 'يرجى مراجعة البلدية لتقديم الوثائق المطلوبة',
+                        color: Colors.red,
+                        bg: const Color(0xFFFFEBEE),
+                      ),
+
+                    if (request.status == RequestStatus.rejected)
+                      _banner(
+                        icon: Icons.cancel_outlined,
+                        title: 'تم رفض الطلب',
+                        message: 'تم رفض طلبك من قبل رئيس البلدية',
+                        color: const Color(0xFFC62828),
+                        bg: const Color(0xFFFFEBEE),
+                      ),
+
+                    if (request.status == RequestStatus.taxRejected)
+                      _banner(
+                        icon: Icons.money_off_outlined,
+                        title: 'تم رفض الدفع',
+                        message: 'تم رفض الدفع الضريبي. يرجى مراجعة البلدية',
+                        color: Colors.red,
+                        bg: const Color(0xFFFFEBEE),
+                      ),
+
+                    if (request.status == RequestStatus.cancelled)
+                      _banner(
+                        icon: Icons.block_outlined,
+                        title: 'تم إلغاء الطلب',
+                        message: 'تم إلغاء هذا الطلب',
+                        color: Colors.grey,
+                        bg: const Color(0xFFF5F5F5),
+                      ),
+
+                    if (request.status == RequestStatus.completed)
+                      _banner(
+                        icon: Icons.check_circle_outline,
+                        title: 'مكتمل',
+                        message: 'تم إنجاز طلبك بنجاح',
+                        color: const Color(0xFF2E7D32),
+                        bg: const Color(0xFFE8F5E9),
+                      ),
+
+                    // ── Progress card ─────────────────────────
                     _card(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
@@ -104,14 +160,12 @@ class RequestDetailsScreen extends StatelessWidget {
                             children: [
                               Text(
                                 '${(progress * 100).round()}%',
-                                style: const TextStyle(
-                                    color: Colors.grey, fontSize: 13),
+                                style: TextStyle(
+                                    color: cs.outline, fontSize: 13),
                               ),
-                              Text(
-                                l10n.progress,
-                                style: const TextStyle(
-                                    fontWeight: FontWeight.w600),
-                              ),
+                              const Text('التقدم',
+                                  style: TextStyle(
+                                      fontWeight: FontWeight.w600)),
                             ],
                           ),
                           const SizedBox(height: 10),
@@ -121,9 +175,9 @@ class RequestDetailsScreen extends StatelessWidget {
                               value: progress,
                               minHeight: 8,
                               backgroundColor: Colors.grey.shade200,
-                              valueColor:
-                                  const AlwaysStoppedAnimation<Color>(
-                                      Color(0xFF1E3A5F)),
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                _isNegativeEnd() ? Colors.red : cs.primary,
+                              ),
                             ),
                           ),
                         ],
@@ -132,50 +186,69 @@ class RequestDetailsScreen extends StatelessWidget {
 
                     const SizedBox(height: 12),
 
-                    // Timeline card
+                    // ── Timeline card ─────────────────────────
                     _card(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text(
-                            l10n.timeline,
-                            style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                          ),
+                          const Text('مراحل الطلب',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
                           const SizedBox(height: 16),
-                          ...List.generate(timeline.length, (i) {
-                            final step = timeline[i];
-                            final isLast = i == timeline.length - 1;
+
+                          ...List.generate(_steps.length, (i) {
+                            final step = _steps[i];
+                            final stepOrder = _statusOrder(step.status);
+                            final isDone = stepOrder <= currentOrder &&
+                                !_isNegativeEnd();
+                            final isCurrent =
+                                step.status == request.status;
+                            final isLast = i == _steps.length - 1;
+
+                            // For negative end, color differently
+                            final dotColor = _isNegativeEnd() && isCurrent
+                                ? Colors.red
+                                : isDone
+                                    ? cs.primary
+                                    : Colors.grey.shade300;
+
                             return Row(
-                              crossAxisAlignment:
-                                  CrossAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                // Left: connector line
+                                // Connector
                                 Column(
                                   children: [
                                     Container(
-                                      width: 12,
-                                      height: 12,
+                                      width: 14,
+                                      height: 14,
                                       decoration: BoxDecoration(
                                         shape: BoxShape.circle,
-                                        color: step.completed
-                                            ? Colors.green
-                                            : Colors.grey.shade300,
+                                        color: dotColor,
+                                        border: isCurrent
+                                            ? Border.all(
+                                                color: dotColor,
+                                                width: 2)
+                                            : null,
                                       ),
+                                      child: isDone && !isCurrent
+                                          ? Icon(Icons.check,
+                                              size: 8,
+                                              color: cs.onPrimary)
+                                          : null,
                                     ),
                                     if (!isLast)
                                       Container(
                                         width: 2,
-                                        height: 40,
-                                        color: step.completed
-                                            ? Colors.green
-                                            : Colors.grey.shade300,
+                                        height: 44,
+                                        color: isDone
+                                            ? cs.primary
+                                            : Colors.grey.shade200,
                                       ),
                                   ],
                                 ),
                                 const SizedBox(width: 12),
-                                // Right: status + date
+                                // Label
                                 Expanded(
                                   child: Padding(
                                     padding:
@@ -184,20 +257,21 @@ class RequestDetailsScreen extends StatelessWidget {
                                       crossAxisAlignment:
                                           CrossAxisAlignment.end,
                                       children: [
-                                        StatusBadgeWidget(
-                                            status: step.status),
-                                        if (step.date.isNotEmpty)
-                                          Padding(
-                                            padding:
-                                                const EdgeInsets.only(
-                                                    top: 4),
-                                            child: Text(
-                                              step.date,
-                                              style: const TextStyle(
-                                                  fontSize: 11,
-                                                  color: Colors.grey),
-                                            ),
+                                        Text(
+                                          step.label,
+                                          style: TextStyle(
+                                            fontSize: 14,
+                                            fontWeight: isCurrent
+                                                ? FontWeight.bold
+                                                : FontWeight.normal,
+                                            color: isDone
+                                                ? cs.onSurface
+                                                : Colors.grey,
                                           ),
+                                        ),
+                                        if (isCurrent)
+                                          StatusBadgeWidget(
+                                              status: request.status),
                                       ],
                                     ),
                                   ),
@@ -205,43 +279,90 @@ class RequestDetailsScreen extends StatelessWidget {
                               ],
                             );
                           }),
+
+                          // Show rejected/cancelled as extra step at end
+                          if (_isNegativeEnd()) ...[
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: 14,
+                                  height: 14,
+                                  decoration: const BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    color: Colors.red,
+                                  ),
+                                  child: const Icon(Icons.close,
+                                      size: 8, color: Colors.white),
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.end,
+                                    children: [
+                                      StatusBadgeWidget(
+                                          status: request.status),
+                                    ],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
                         ],
                       ),
                     ),
 
                     const SizedBox(height: 12),
 
-                    // Details card
+                    // ── Details card ──────────────────────────
                     _card(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.end,
                         children: [
-                          Text(
-                            l10n.details,
-                            style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.bold),
-                          ),
+                          const Text('تفاصيل الطلب',
+                              style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold)),
                           const SizedBox(height: 12),
-                          _detailRow(
-                            icon: Icons.description_outlined,
-                            label: l10n.descriptionLabel,
-                            value:
-                                'طلب استخراج براءة ذمة بلدية للعقار رقم ١٢٣٤',
-                          ),
+                          if (request.title != null &&
+                              request.title!.isNotEmpty)
+                            _detailRow(
+                              icon: Icons.title_outlined,
+                              label: 'العنوان',
+                              value: request.title!,
+                            ),
+                          if (request.description != null &&
+                              request.description!.isNotEmpty) ...[
+                            const SizedBox(height: 10),
+                            _detailRow(
+                              icon: Icons.description_outlined,
+                              label: 'الوصف',
+                              value: request.description!,
+                            ),
+                          ],
                           const SizedBox(height: 10),
                           _detailRow(
                             icon: Icons.calendar_today_outlined,
-                            label: l10n.submissionDate,
+                            label: 'تاريخ التقديم',
                             value: request.date,
                           ),
+                          if (request.updatedAt != null &&
+                              request.updatedAt!.isNotEmpty) ...[
+                            const SizedBox(height: 10),
+                            _detailRow(
+                              icon: Icons.update_outlined,
+                              label: 'آخر تحديث',
+                              value: request.updatedAt!,
+                            ),
+                          ],
                         ],
                       ),
                     ),
 
-                    // Payment card (if waiting)
-                    if (request.status ==
-                        RequestStatus.waitingPayment) ...[
+                    // ── Tax payment card ──────────────────────
+                    if (request.status == RequestStatus.approved ||
+                        request.status == RequestStatus.taxPaid) ...[
                       const SizedBox(height: 12),
                       Container(
                         padding: const EdgeInsets.all(16),
@@ -254,11 +375,9 @@ class RequestDetailsScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.end,
                           children: [
-                            Text(
-                              l10n.amountDue,
-                              style: const TextStyle(
-                                  fontSize: 13, color: Colors.grey),
-                            ),
+                            const Text('الرسوم المستحقة',
+                                style: TextStyle(
+                                    fontSize: 13, color: Colors.grey)),
                             const SizedBox(height: 4),
                             const Text(
                               '5,000 ل.ل',
@@ -269,25 +388,28 @@ class RequestDetailsScreen extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 14),
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor:
-                                      const Color(0xFF1E3A5F),
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                      vertical: 14),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius:
-                                        BorderRadius.circular(12),
+                            request.status == RequestStatus.taxPaid
+                                ? Container(
+                                    width: double.infinity,
+                                    padding: const EdgeInsets.symmetric(
+                                        vertical: 12),
+                                    decoration: BoxDecoration(
+                                      color: const Color(0xFFE8F5E9),
+                                      borderRadius:
+                                          BorderRadius.circular(12),
+                                    ),
+                                    child: const Text(
+                                      '✓ تم الدفع',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                          color: Colors.green,
+                                          fontWeight: FontWeight.bold),
+                                    ),
+                                  )
+                                : PrimaryButton(
+                                    label: 'ادفع الآن',
+                                    onPressed: () {},
                                   ),
-                                ),
-                                onPressed: () =>
-                                    Navigator.pop(context),
-                                child: Text(l10n.payNow),
-                              ),
-                            ),
                           ],
                         ),
                       ),
@@ -300,6 +422,45 @@ class RequestDetailsScreen extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _banner({
+    required IconData icon,
+    required String title,
+    required String message,
+    required Color color,
+    required Color bg,
+  }) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withOpacity(0.3)),
+      ),
+      child: Row(
+        children: [
+          const Spacer(),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Text(title,
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: color,
+                      fontSize: 14)),
+              const SizedBox(height: 4),
+              Text(message,
+                  style: TextStyle(color: color.withOpacity(0.8),
+                      fontSize: 12)),
+            ],
+          ),
+          const SizedBox(width: 10),
+          Icon(icon, color: color, size: 28),
+        ],
       ),
     );
   }
@@ -323,10 +484,11 @@ class RequestDetailsScreen extends StatelessWidget {
     );
   }
 
-  Widget _detailRow(
-      {required IconData icon,
-      required String label,
-      required String value}) {
+  Widget _detailRow({
+    required IconData icon,
+    required String label,
+    required String value,
+  }) {
     return Row(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -335,8 +497,8 @@ class RequestDetailsScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.end,
           children: [
             Text(label,
-                style:
-                    const TextStyle(fontSize: 11, color: Colors.grey)),
+                style: const TextStyle(
+                    fontSize: 11, color: Colors.grey)),
             const SizedBox(height: 2),
             Text(value,
                 textAlign: TextAlign.right,
@@ -348,4 +510,10 @@ class RequestDetailsScreen extends StatelessWidget {
       ],
     );
   }
+}
+
+class _StepDef {
+  final RequestStatus status;
+  final String label;
+  const _StepDef(this.status, this.label);
 }
