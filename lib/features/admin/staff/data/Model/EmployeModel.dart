@@ -6,8 +6,10 @@ class EmployeeModel extends Employee {
     required String name,
     required String email,
     required String phone,
-    required int roleId,
-    required int depId,
+    int roleId = 0,
+    int depId = 0,
+    String? roleName,
+    String? departmentName,
   }) : super(
           id: id,
           name: name,
@@ -15,6 +17,8 @@ class EmployeeModel extends Employee {
           phone: phone,
           roleId: roleId,
           depId: depId,
+          roleName: roleName,
+          departmentName: departmentName,
         );
 
   factory EmployeeModel.fromJson(Map<String, dynamic> json) {
@@ -34,6 +38,8 @@ class EmployeeModel extends Employee {
             json['department_id'] ??
             json['department']?['id'],
       ),
+      roleName: json['roleName']?.toString(),
+      departmentName: json['departmentName']?.toString(),
     );
   }
 
@@ -45,6 +51,8 @@ class EmployeeModel extends Employee {
       phone: employee.phone,
       roleId: employee.roleId,
       depId: employee.depId,
+      roleName: employee.roleName,
+      departmentName: employee.departmentName,
     );
   }
 
@@ -66,13 +74,14 @@ class EmployeeModel extends Employee {
       phone: phone,
       roleId: roleId,
       depId: depId,
+      roleName: roleName,
+      departmentName: departmentName,
     );
   }
 
   static int _toInt(dynamic value) {
     if (value is int) return value;
     if (value is num) return value.toInt();
-
     return int.tryParse(value?.toString() ?? '') ?? 0;
   }
 
@@ -80,7 +89,6 @@ class EmployeeModel extends Employee {
     if (value == null) return null;
     if (value is int) return value;
     if (value is num) return value.toInt();
-
     return int.tryParse(value.toString());
   }
 }
