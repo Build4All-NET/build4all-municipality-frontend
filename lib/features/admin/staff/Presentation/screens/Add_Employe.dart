@@ -11,7 +11,9 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 class AddEmployeeDialog extends StatefulWidget {
-  const AddEmployeeDialog({super.key});
+  final Employee? employee;
+
+  const AddEmployeeDialog({super.key, this.employee});
 
   @override
   State<AddEmployeeDialog> createState() => _AddEmployeeDialogState();
@@ -20,17 +22,27 @@ class AddEmployeeDialog extends StatefulWidget {
 class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
   final _formKey = GlobalKey<FormState>();
 
-  final nameController = TextEditingController();
-  final emailController = TextEditingController();
-  final phoneController = TextEditingController();
-  final roleIdController = TextEditingController();
+  late final TextEditingController nameController;
+  late final TextEditingController emailController;
+  late final TextEditingController phoneController;
+  late final TextEditingController roleIdController;
 
   int? selectedDep;
   bool submitting = false;
 
+  bool get _isEditing => widget.employee != null;
+
   @override
   void initState() {
     super.initState();
+    final e = widget.employee;
+    nameController = TextEditingController(text: e?.name ?? '');
+    emailController = TextEditingController(text: e?.email ?? '');
+    phoneController = TextEditingController(text: e?.phone ?? '');
+    roleIdController = TextEditingController(
+      text: (e != null && e.roleId > 0) ? '${e.roleId}' : '',
+    );
+    selectedDep = (e != null && e.depId > 0) ? e.depId : null;
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<DepartmentCubit>().fetchDepartments();
@@ -48,54 +60,37 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
 
   String? _required(String? value) {
     final loc = AppLocalizations.of(context)!;
-    final text = value?.trim() ?? '';
-
-    if (text.isEmpty) return loc.fieldRequired;
-
+    if ((value?.trim() ?? '').isEmpty) return loc.fieldRequired;
     return null;
   }
 
   String? _emailValidator(String? value) {
     final loc = AppLocalizations.of(context)!;
     final text = value?.trim() ?? '';
-
     if (text.isEmpty) return loc.fieldRequired;
-
-    final isValid = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(text);
-
-    if (!isValid) return loc.invalidEmail;
-
+    if (!RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(text)) return loc.invalidEmail;
     return null;
   }
 
   String? _positiveNumber(String? value) {
     final loc = AppLocalizations.of(context)!;
     final number = int.tryParse((value ?? '').trim());
-
     if (number == null || number <= 0) return loc.invalidNumber;
-
     return null;
   }
 
   Future<void> _submit() async {
     final loc = AppLocalizations.of(context)!;
-
     if (!_formKey.currentState!.validate()) return;
-
     if (selectedDep == null) {
-      AppToast.show(
-        context,
-        message: loc.selectDepartment,
-        type: AppToastType.warning,
-      );
+      AppToast.show(context, message: loc.selectDepartment, type: AppToastType.warning);
       return;
     }
 
-    setState(() {
-      submitting = true;
-    });
+    setState(() { submitting = true; });
 
     final employee = Employee(
+      id: _isEditing ? widget.employee!.id : null,
       name: nameController.text.trim(),
       email: emailController.text.trim(),
       phone: phoneController.text.trim(),
@@ -103,7 +98,13 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
       roleId: int.parse(roleIdController.text.trim()),
     );
 
-    context.read<EmployeeBloc>().add(AddEmployee(employee));
+    if (_isEditing) {
+      context.read<EmployeeBloc>().add(
+        UpdateEmployee(id: widget.employee!.id!, employee: employee),
+      );
+    } else {
+      context.read<EmployeeBloc>().add(AddEmployee(employee));
+    }
   }
 
   @override
@@ -115,44 +116,26 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
     return BlocListener<EmployeeBloc, EmployeeState>(
       listener: (context, state) {
         final error = state.error;
-
         if (error != null && error.isNotEmpty) {
-          setState(() {
-            submitting = false;
-          });
-
-          AppToast.show(
-            context,
-            message: error,
-            type: AppToastType.error,
-          );
-
+          setState(() { submitting = false; });
+          AppToast.show(context, message: error, type: AppToastType.error);
           return;
         }
-
         if (submitting && !state.actionLoading) {
-          setState(() {
-            submitting = false;
-          });
-
+          setState(() { submitting = false; });
           AppToast.show(
             context,
-            message: loc.employeeCreated,
+            message: _isEditing ? loc.update : loc.employeeCreated,
             type: AppToastType.success,
           );
-
           Navigator.pop(context);
         }
       },
       child: AlertDialog(
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
-        ),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
         title: Text(
-          loc.addEmployee,
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w900,
-          ),
+          _isEditing ? loc.edit : loc.addEmployee,
+          style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
         ),
         content: Form(
           key: _formKey,
@@ -162,6 +145,17 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
+                  if (_isEditing && (widget.employee!.departmentName?.isNotEmpty == true))
+                    _InfoRow(
+                      label: loc.department,
+                      value: widget.employee!.departmentName!,
+                    ),
+                  if (_isEditing && (widget.employee!.roleName?.isNotEmpty == true))
+                    _InfoRow(
+                      label: loc.role,
+                      value: widget.employee!.roleName!,
+                    ),
+                  if (_isEditing) const Divider(height: 24),
                   _InputField(
                     controller: nameController,
                     label: loc.name,
@@ -190,11 +184,9 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
                           child: CircularProgressIndicator(),
                         );
                       }
-
                       if (state.departments.isEmpty) {
                         return _WarningBox(message: loc.noDepartmentsHint);
                       }
-
                       return DropdownButtonFormField<int>(
                         value: selectedDep,
                         isExpanded: true,
@@ -215,11 +207,7 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
                         }).toList(),
                         onChanged: submitting
                             ? null
-                            : (value) {
-                                setState(() {
-                                  selectedDep = value;
-                                });
-                              },
+                            : (value) => setState(() { selectedDep = value; }),
                         validator: (value) {
                           if (value == null) return loc.selectDepartment;
                           return null;
@@ -237,7 +225,7 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
                   ),
                   const SizedBox(height: 18),
                   PrimaryButton(
-                    label: loc.add,
+                    label: _isEditing ? loc.update : loc.add,
                     isLoading: submitting,
                     onPressed: _submit,
                   ),
@@ -276,7 +264,6 @@ class _InputField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
@@ -288,10 +275,40 @@ class _InputField extends StatelessWidget {
           prefixIcon: Icon(icon),
           filled: true,
           fillColor: colors.surface,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
         ),
+      ),
+    );
+  }
+}
+
+class _InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _InfoRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8),
+      child: Row(
+        children: [
+          Text(
+            '$label: ',
+            style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colors.onSurface.withOpacity(0.72),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -299,24 +316,18 @@ class _InputField extends StatelessWidget {
 
 class _WarningBox extends StatelessWidget {
   final String message;
-
-  const _WarningBox({
-    required this.message,
-  });
+  const _WarningBox({required this.message});
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
-
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(12),
       decoration: BoxDecoration(
         color: colors.error.withOpacity(0.08),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: colors.error.withOpacity(0.18),
-        ),
+        border: Border.all(color: colors.error.withOpacity(0.18)),
       ),
       child: Row(
         children: [

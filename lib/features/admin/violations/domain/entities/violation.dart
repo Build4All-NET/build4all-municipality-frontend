@@ -11,6 +11,9 @@ class Violation {
   final String? municipalityName;
   final String location;
   final String violationDate;
+  final String? identityNumber;
+  final String? carPlate;
+  final String? type;
 
   const Violation({
     this.id,
@@ -25,5 +28,8 @@ class Violation {
     this.municipalityName,
     required this.location,
     required this.violationDate,
+    this.identityNumber,
+    this.carPlate,
+    this.type,
   });
 }

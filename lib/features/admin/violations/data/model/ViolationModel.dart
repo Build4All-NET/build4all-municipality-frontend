@@ -14,6 +14,9 @@ class ViolationModel extends Violation {
     super.municipalityName,
     required super.location,
     required super.violationDate,
+    super.identityNumber,
+    super.carPlate,
+    super.type,
   });
 
   factory ViolationModel.fromJson(Map<String, dynamic> json) {
@@ -21,7 +24,8 @@ class ViolationModel extends Violation {
       id: _toInt(json['id']),
       title: json['title']?.toString() ?? '',
       description: json['description']?.toString() ?? '',
-      citizenName: json['citizenName']?.toString() ?? '',
+      // Backend ResponseDTO uses 'name' for citizen name
+      citizenName: (json['name'] ?? json['citizenName'] ?? '').toString(),
       citizenId: _toInt(json['citizenId']),
       amount: _toDouble(json['amount']),
       departmentId: _toInt(json['departmentId']) ?? 0,
@@ -30,6 +34,9 @@ class ViolationModel extends Violation {
       municipalityName: json['municipalityName']?.toString(),
       location: json['location']?.toString() ?? '',
       violationDate: json['violationDate']?.toString() ?? '',
+      identityNumber: json['identityNumber']?.toString(),
+      carPlate: json['carPlate']?.toString(),
+      type: json['type']?.toString(),
     );
   }
 
@@ -47,18 +54,30 @@ class ViolationModel extends Violation {
       municipalityName: violation.municipalityName,
       location: violation.location,
       violationDate: violation.violationDate,
+      identityNumber: violation.identityNumber,
+      carPlate: violation.carPlate,
+      type: violation.type,
     );
   }
 
   Map<String, dynamic> toJson() {
     return {
-      'citizenName': citizenName.trim(),
+      // Backend ViolationDTO uses 'name' not 'citizenName'
+      'name': citizenName.trim(),
       'departmentId': departmentId,
       'title': title.trim(),
       'description': description.trim(),
       'location': location.trim(),
       'violationDate': violationDate,
       'amount': amount,
+      if (identityNumber != null && identityNumber!.isNotEmpty)
+        'identityNumber': identityNumber,
+      if (carPlate != null && carPlate!.isNotEmpty)
+        'carPlate': carPlate,
+      if (type != null && type!.isNotEmpty)
+        'type': type,
+      if (municipalityId != null)
+        'municipalityId': municipalityId,
     };
   }
 

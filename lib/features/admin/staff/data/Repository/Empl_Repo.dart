@@ -11,12 +11,21 @@ class EmployeeRepositoryImpl implements EmployeeRepository {
   @override
   Future<List<Employee>> getEmployees() async {
     final result = await api.getEmployees();
-
     return result.map((e) => e.toEntity()).toList();
   }
 
   @override
   Future<void> createEmployee(Employee employee) async {
     await api.createEmployee(EmployeeModel.fromEntity(employee));
+  }
+
+  @override
+  Future<void> updateEmployee(int id, Employee employee) async {
+    await api.updateEmployee(id, EmployeeModel.fromEntity(employee));
+  }
+
+  @override
+  Future<void> deleteEmployee(int id) async {
+    await api.deleteEmployee(id);
   }
 }
