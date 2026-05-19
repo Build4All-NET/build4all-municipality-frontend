@@ -93,7 +93,7 @@ class _AnnouncementsCardState extends State<AnnouncementsCard> {
             )
           else if (_error != null)
             Text(
-              'تعذر تحميل الإعلانات',
+              l10n.loadFailed,
               textAlign: TextAlign.right,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: cs.error,
@@ -102,7 +102,7 @@ class _AnnouncementsCardState extends State<AnnouncementsCard> {
             )
           else if (_announcements.isEmpty)
             Text(
-              'لا توجد إعلانات حالياً',
+              l10n.noAnnouncements,
               textAlign: TextAlign.right,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: cs.outline,
