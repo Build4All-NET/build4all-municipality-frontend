@@ -1,5 +1,3 @@
-// lib/features/citizen/home/presentation/widgets/recent_requests.dart
-
 import 'package:flutter/material.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 
@@ -37,7 +35,6 @@ class RecentRequestsSection extends StatelessWidget {
 
     return Column(
       children: [
-        // Section header.
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
@@ -78,22 +75,37 @@ class _RequestCard extends StatelessWidget {
   final RecentRequestItem request;
   final VoidCallback onTap;
 
-  const _RequestCard({
-    required this.request,
-    required this.onTap,
-  });
+  const _RequestCard({required this.request, required this.onTap});
+
+  static String _statusLabel(AppLocalizations l10n, String status) {
+    switch (status.toUpperCase()) {
+      case 'DRAFT': return l10n.statusDraft;
+      case 'SUBMITTED': return l10n.statusSubmitted;
+      case 'UNDER_REVIEW': return l10n.statusUnderReview;
+      case 'DOCUMENTS_MISSING': return l10n.statusDocumentsMissing;
+      case 'IN_PROGRESS': return l10n.inProgress;
+      case 'APPROVED': return l10n.approved;
+      case 'REJECTED': return l10n.rejected;
+      case 'COMPLETED': return l10n.completed;
+      case 'CANCELLED': return l10n.statusCancelled;
+      case 'TAX_PAID': return l10n.statusTaxPaid;
+      case 'TAX_REJECTED': return l10n.statusTaxRejected;
+      default: return status;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    final isWaitingPayment = request.status == 'waiting_payment';
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
-    final badgeBackground = isWaitingPayment
-        ? cs.error.withOpacity(0.10)
-        : cs.primary.withOpacity(0.10);
-
-    final badgeTextColor = isWaitingPayment ? cs.error : cs.primary;
+    final s = request.status.toUpperCase();
+    final isError = s == 'REJECTED' || s == 'CANCELLED' ||
+        s == 'TAX_REJECTED' || s == 'DOCUMENTS_MISSING';
+    final badgeBackground =
+        isError ? cs.error.withOpacity(0.10) : cs.primary.withOpacity(0.10);
+    final badgeTextColor = isError ? cs.error : cs.primary;
 
     return GestureDetector(
       onTap: onTap,
@@ -114,21 +126,17 @@ class _RequestCard extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            // Date + status badge.
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 4,
-                  ),
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                   decoration: BoxDecoration(
                     color: badgeBackground,
                     borderRadius: BorderRadius.circular(20),
                   ),
                   child: Text(
-                    isWaitingPayment ? 'بانتظار الدفع' : 'قيد التدقيق',
+                    _statusLabel(l10n, request.status),
                     style: theme.textTheme.bodySmall?.copyWith(
                       fontSize: 11,
                       fontWeight: FontWeight.w500,
@@ -136,16 +144,10 @@ class _RequestCard extends StatelessWidget {
                     ),
                   ),
                 ),
-
                 const SizedBox(height: 6),
-
                 Row(
                   children: [
-                    Icon(
-                      Icons.access_time,
-                      size: 12,
-                      color: cs.outline,
-                    ),
+                    Icon(Icons.access_time, size: 12, color: cs.outline),
                     const SizedBox(width: 4),
                     Text(
                       request.date,
@@ -158,7 +160,6 @@ class _RequestCard extends StatelessWidget {
                 ),
               ],
             ),
-
             Text(
               request.nameAr,
               style: theme.textTheme.bodyMedium?.copyWith(
