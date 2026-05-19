@@ -1246,4 +1246,37 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get chooseDocument => 'Choose PDF or Document';
+
+  @override
+  String get notSpecified => 'Not specified';
+
+  @override
+  String get municipalityName => 'Municipality';
+
+  @override
+  String get violationTypeLabel => 'Type';
+
+  @override
+  String get inboxTitle => 'Requests Inbox';
+
+  @override
+  String get networkErrorBanner => 'Some data failed to load. Pull down to retry.';
+
+  @override
+  String get catGeneralServices => 'General Services';
+
+  @override
+  String get catCommercialServices => 'Commercial Services';
+
+  @override
+  String get catRealEstate => 'Real Estate';
+
+  @override
+  String get catEngineering => 'Engineering Services';
+
+  @override
+  String get statusInProgress => 'In Progress';
+
+  @override
+  String get requestsCount => 'Requests';
 }

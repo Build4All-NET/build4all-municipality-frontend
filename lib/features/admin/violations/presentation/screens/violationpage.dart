@@ -343,13 +343,13 @@ class _ViolationCard extends StatelessWidget {
             _InfoRow(label: loc.citizenName, value: violation.citizenName),
             _InfoRow(label: loc.amount, value: '${violation.amount.toStringAsFixed(2)} \$'),
             if ((violation.identityNumber ?? '').isNotEmpty)
-              _InfoRow(label: 'Identity No.', value: violation.identityNumber!),
+              _InfoRow(label: loc.identityNumber, value: violation.identityNumber!),
             if ((violation.carPlate ?? '').isNotEmpty)
-              _InfoRow(label: 'Car Plate', value: violation.carPlate!),
+              _InfoRow(label: loc.carPlate, value: violation.carPlate!),
             if ((violation.type ?? '').isNotEmpty)
-              _InfoRow(label: 'Type', value: violation.type!),
+              _InfoRow(label: loc.violationTypeLabel, value: violation.type!),
             if ((violation.municipalityName ?? '').trim().isNotEmpty)
-              _InfoRow(label: 'Municipality', value: violation.municipalityName!),
+              _InfoRow(label: loc.municipalityName, value: violation.municipalityName!),
             const SizedBox(height: 14),
             Row(
               children: [

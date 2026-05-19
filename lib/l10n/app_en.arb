@@ -529,5 +529,17 @@
   "retry": "Try Again",
   "takePhoto": "Take Photo",
   "chooseFromGallery": "Choose from Gallery",
-  "chooseDocument": "Choose PDF or Document"
+  "chooseDocument": "Choose PDF or Document",
+
+  "notSpecified": "Not specified",
+  "municipalityName": "Municipality",
+  "violationTypeLabel": "Type",
+  "inboxTitle": "Requests Inbox",
+  "networkErrorBanner": "Some data failed to load. Pull down to retry.",
+  "catGeneralServices": "General Services",
+  "catCommercialServices": "Commercial Services",
+  "catRealEstate": "Real Estate",
+  "catEngineering": "Engineering Services",
+  "statusInProgress": "In Progress",
+  "requestsCount": "Requests"
 }

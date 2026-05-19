@@ -3,44 +3,22 @@
 import 'package:flutter/material.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 
-class ServiceCategoryItem {
-  final String nameAr;
-  final String nameEn;
+class _CategoryData {
+  final String name;
   final IconData icon;
-
-  const ServiceCategoryItem({
-    required this.nameAr,
-    required this.nameEn,
-    required this.icon,
-  });
+  const _CategoryData(this.name, this.icon);
 }
 
-final List<ServiceCategoryItem> serviceCategories = [
-  const ServiceCategoryItem(
-    nameAr: 'الخدمات العامة',
-    nameEn: 'General Services',
-    icon: Icons.description_outlined,
-  ),
-  const ServiceCategoryItem(
-    nameAr: 'الخدمات التجارية والمهنية',
-    nameEn: 'Commercial Services',
-    icon: Icons.storefront_outlined,
-  ),
-  const ServiceCategoryItem(
-    nameAr: 'الخدمات العقارية',
-    nameEn: 'Real Estate',
-    icon: Icons.apartment_outlined,
-  ),
-  const ServiceCategoryItem(
-    nameAr: 'الخدمات الهندسية',
-    nameEn: 'Engineering',
-    icon: Icons.engineering_outlined,
-  ),
+List<_CategoryData> _categories(AppLocalizations loc) => [
+  _CategoryData(loc.catGeneralServices, Icons.description_outlined),
+  _CategoryData(loc.catCommercialServices, Icons.storefront_outlined),
+  _CategoryData(loc.catRealEstate, Icons.apartment_outlined),
+  _CategoryData(loc.catEngineering, Icons.engineering_outlined),
 ];
 
 class ServiceCategoriesSection extends StatelessWidget {
   final VoidCallback onViewAll;
-  final Function(ServiceCategoryItem) onCategoryTap;
+  final VoidCallback onCategoryTap;
 
   const ServiceCategoriesSection({
     super.key,
@@ -53,6 +31,8 @@ class ServiceCategoriesSection extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
+
+    final categories = _categories(l10n);
 
     return Column(
       children: [
@@ -89,9 +69,9 @@ class ServiceCategoriesSection extends StatelessWidget {
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
           childAspectRatio: 1.3,
-          children: serviceCategories.map((category) {
+          children: categories.map((category) {
             return GestureDetector(
-              onTap: () => onCategoryTap(category),
+              onTap: onCategoryTap,
               child: Container(
                 decoration: BoxDecoration(
                   color: cs.surface,
@@ -124,7 +104,7 @@ class ServiceCategoriesSection extends StatelessWidget {
                     const SizedBox(height: 8),
 
                     Text(
-                      category.nameAr,
+                      category.name,
                       textAlign: TextAlign.center,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: cs.onSurface,

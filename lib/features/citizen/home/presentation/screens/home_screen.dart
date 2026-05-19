@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/l10n/app_localizations.dart';
 
 import 'package:baladiyati/common/widgets/bottom_nav.dart';
 import 'package:baladiyati/features/citizen/payments/presentation/screens/payments_screen.dart';
@@ -122,7 +123,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ? profileState.profile!.municipalityName!
                     : profileState.isLoading
                         ? '...'
-                        : 'غير محدد';
+                        : AppLocalizations.of(context)!.notSpecified;
 
             final requests = requestsState.requests;
 
@@ -158,7 +159,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ServiceCategoriesSection(
                           onViewAll: () =>
                               setState(() => _currentIndex = 1),
-                          onCategoryTap: (_) =>
+                          onCategoryTap: () =>
                               setState(() => _currentIndex = 1),
                         ),
                         const SizedBox(height: 20),

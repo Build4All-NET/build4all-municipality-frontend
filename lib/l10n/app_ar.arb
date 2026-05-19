@@ -528,5 +528,17 @@
   "retry": "حاول مجدداً",
   "takePhoto": "التقط صورة",
   "chooseFromGallery": "اختر من المعرض",
-  "chooseDocument": "اختر ملف PDF أو وثيقة"
+  "chooseDocument": "اختر ملف PDF أو وثيقة",
+
+  "notSpecified": "غير محدد",
+  "municipalityName": "البلدية",
+  "violationTypeLabel": "النوع",
+  "inboxTitle": "صندوق الطلبات",
+  "networkErrorBanner": "فشل تحميل بعض البيانات. اسحب للأسفل للمحاولة.",
+  "catGeneralServices": "الخدمات العامة",
+  "catCommercialServices": "الخدمات التجارية",
+  "catRealEstate": "الخدمات العقارية",
+  "catEngineering": "الخدمات الهندسية",
+  "statusInProgress": "قيد المعالجة",
+  "requestsCount": "الطلبات"
 }

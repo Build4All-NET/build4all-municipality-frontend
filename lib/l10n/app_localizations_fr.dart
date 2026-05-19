@@ -1247,4 +1247,37 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get chooseDocument => 'Choisir un PDF ou document';
+
+  @override
+  String get notSpecified => 'Non spécifié';
+
+  @override
+  String get municipalityName => 'Municipalité';
+
+  @override
+  String get violationTypeLabel => 'Type';
+
+  @override
+  String get inboxTitle => 'Boîte de réception';
+
+  @override
+  String get networkErrorBanner => "Certaines données n'ont pas pu être chargées. Tirez pour réessayer.";
+
+  @override
+  String get catGeneralServices => 'Services généraux';
+
+  @override
+  String get catCommercialServices => 'Services commerciaux';
+
+  @override
+  String get catRealEstate => 'Immobilier';
+
+  @override
+  String get catEngineering => "Services d'ingénierie";
+
+  @override
+  String get statusInProgress => 'En cours';
+
+  @override
+  String get requestsCount => 'Demandes';
 }

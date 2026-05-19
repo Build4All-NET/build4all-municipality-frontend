@@ -1246,4 +1246,37 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get chooseDocument => 'اختر ملف PDF أو وثيقة';
+
+  @override
+  String get notSpecified => 'غير محدد';
+
+  @override
+  String get municipalityName => 'البلدية';
+
+  @override
+  String get violationTypeLabel => 'النوع';
+
+  @override
+  String get inboxTitle => 'صندوق الطلبات';
+
+  @override
+  String get networkErrorBanner => 'فشل تحميل بعض البيانات. اسحب للأسفل للمحاولة.';
+
+  @override
+  String get catGeneralServices => 'الخدمات العامة';
+
+  @override
+  String get catCommercialServices => 'الخدمات التجارية';
+
+  @override
+  String get catRealEstate => 'الخدمات العقارية';
+
+  @override
+  String get catEngineering => 'الخدمات الهندسية';
+
+  @override
+  String get statusInProgress => 'قيد المعالجة';
+
+  @override
+  String get requestsCount => 'الطلبات';
 }

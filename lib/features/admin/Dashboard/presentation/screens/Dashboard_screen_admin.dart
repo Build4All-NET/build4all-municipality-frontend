@@ -2,6 +2,7 @@ import 'package:baladiyati/app/app_router.dart';
 import 'package:baladiyati/core/l10n/locale_cubit.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/admin/Departement/data/Service/Departement_Api_Service.dart';
+import 'package:baladiyati/features/admin/Requests/data/Service/Req_Api_Service.dart';
 import 'package:baladiyati/features/admin/announcements/data/services/Announcement_Api_Service.dart';
 import 'package:baladiyati/features/admin/announcements/presentation/screens/announcementscreen.dart';
 import 'package:baladiyati/features/admin/manage_service/Data/service/Service_Api_service.dart';
@@ -27,6 +28,7 @@ class _AdminDashboardStats {
   final int departmentsCount;
   final int servicesCount;
   final int employeesCount;
+  final int requestsCount;
 
   const _AdminDashboardStats({
     required this.announcementsCount,
@@ -34,6 +36,7 @@ class _AdminDashboardStats {
     required this.departmentsCount,
     required this.servicesCount,
     required this.employeesCount,
+    required this.requestsCount,
   });
 
   factory _AdminDashboardStats.empty() {
@@ -43,6 +46,7 @@ class _AdminDashboardStats {
       departmentsCount: -1,
       servicesCount: -1,
       employeesCount: -1,
+      requestsCount: -1,
     );
   }
 }
@@ -55,6 +59,7 @@ class _DashboardPageState extends State<DashboardPage> {
   late final DepartmentApiService _departmentApiService;
   late final ServiceApiService _serviceApiService;
   late final EmployeeApiService _employeeApiService;
+  late final RequestApiService _requestApiService;
 
   late Future<_AdminDashboardStats> _statsFuture;
 
@@ -67,6 +72,7 @@ class _DashboardPageState extends State<DashboardPage> {
     _departmentApiService = DepartmentApiService(DioClient.muni);
     _serviceApiService = ServiceApiService(DioClient.muni);
     _employeeApiService = EmployeeApiService(DioClient.muni);
+    _requestApiService = RequestApiService(DioClient.muni);
 
     _statsFuture = _loadStats();
   }
@@ -94,6 +100,10 @@ class _DashboardPageState extends State<DashboardPage> {
           .getEmployees()
           .then<int>((v) => v.length)
           .catchError((_) => -1),
+      _requestApiService
+          .getAllRequestsAdmin()
+          .then<int>((v) => v.length)
+          .catchError((_) => -1),
     ]);
 
     return _AdminDashboardStats(
@@ -102,6 +112,7 @@ class _DashboardPageState extends State<DashboardPage> {
       departmentsCount: counts[2],
       servicesCount: counts[3],
       employeesCount: counts[4],
+      requestsCount: counts[5],
     );
   }
 
@@ -283,12 +294,41 @@ class _DashboardPageState extends State<DashboardPage> {
             final isLoading =
                 snapshot.connectionState == ConnectionState.waiting;
 
+            final bool hasNetworkError = !isLoading &&
+                stats.announcementsCount < 0 &&
+                stats.violationsCount < 0 &&
+                stats.departmentsCount < 0 &&
+                stats.servicesCount < 0 &&
+                stats.employeesCount < 0 &&
+                stats.requestsCount < 0;
+
             return SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
               padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  if (hasNetworkError)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      decoration: BoxDecoration(
+                        color: colors.errorContainer,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(Icons.wifi_off, color: colors.onErrorContainer, size: 18),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              loc.networkErrorBanner,
+                              style: theme.textTheme.bodySmall?.copyWith(color: colors.onErrorContainer),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
                   _WelcomeHeader(isLoading: isLoading),
 
                   const SizedBox(height: 16),
@@ -332,8 +372,8 @@ class _DashboardPageState extends State<DashboardPage> {
                         iconColor: colors.primary,
                       ),
                       _StatCard(
-                        title: loc.inbox,
-                        value: '-',
+                        title: loc.requestsCount,
+                        value: isLoading ? '...' : _formatCount(stats.requestsCount),
                         icon: Icons.inbox_outlined,
                         iconColor: colors.outline,
                       ),

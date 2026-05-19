@@ -535,6 +535,18 @@
   "retry": "Réessayer",
   "takePhoto": "Prendre une photo",
   "chooseFromGallery": "Choisir depuis la galerie",
-  "chooseDocument": "Choisir un PDF ou document"
+  "chooseDocument": "Choisir un PDF ou document",
+
+  "notSpecified": "Non spécifié",
+  "municipalityName": "Municipalité",
+  "violationTypeLabel": "Type",
+  "inboxTitle": "Boîte de réception",
+  "networkErrorBanner": "Certaines données n'ont pas pu être chargées. Tirez pour réessayer.",
+  "catGeneralServices": "Services généraux",
+  "catCommercialServices": "Services commerciaux",
+  "catRealEstate": "Immobilier",
+  "catEngineering": "Services d'ingénierie",
+  "statusInProgress": "En cours",
+  "requestsCount": "Demandes"
 }
 

@@ -2366,6 +2366,18 @@ abstract class AppLocalizations {
   String get takePhoto;
   String get chooseFromGallery;
   String get chooseDocument;
+
+  String get notSpecified;
+  String get municipalityName;
+  String get violationTypeLabel;
+  String get inboxTitle;
+  String get networkErrorBanner;
+  String get catGeneralServices;
+  String get catCommercialServices;
+  String get catRealEstate;
+  String get catEngineering;
+  String get statusInProgress;
+  String get requestsCount;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
