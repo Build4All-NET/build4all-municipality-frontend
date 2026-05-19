@@ -6,11 +6,13 @@ import 'package:baladiyati/features/admin/Dashboard/presentation/screens/Dashboa
 import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
 import 'package:baladiyati/features/auth/data/services/session_role_store.dart';
+import 'package:baladiyati/features/auth/presentation/municipality_profile/screens/municipality_profile_setup_screen.dart';
 import 'package:baladiyati/features/citizen/home/presentation/screens/home_screen.dart';
-
 import 'package:baladiyati/features/staff/dashboard/presentation/screens/staff_dashboard_screen.dart';
 import 'package:baladiyati/features/welcome/presentation/screens/welcome_screen.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
@@ -78,7 +80,7 @@ class _AuthGateState extends State<AuthGate> {
           return const StaffDashboardScreen();
         }
 
-        return const HomeScreen();
+        return await _citizenRoute(validUserToken, userStore);
       }
 
       await userStore.clear();
@@ -89,6 +91,44 @@ class _AuthGateState extends State<AuthGate> {
     // 3. No valid session.
     DioClient.clearAuthToken();
     return const WelcomeScreen();
+  }
+
+  Future<Widget> _citizenRoute(String token, AuthTokenStore userStore) async {
+    final ownerProjectLinkId = int.tryParse(Env.ownerProjectLinkId) ?? 0;
+    final userJson = await userStore.getUserJson() ?? {};
+    final userId = int.tryParse(userJson['id']?.toString() ?? '') ?? 0;
+
+    if (ownerProjectLinkId <= 0 || userId <= 0) return const HomeScreen();
+
+    final prefs = await SharedPreferences.getInstance();
+    final key = 'municipality_profile_completed_${ownerProjectLinkId}_$userId';
+
+    if (prefs.getBool(key) == true) return const HomeScreen();
+
+    try {
+      final response = await DioClient.muni.get('/users/profile');
+      if (response.statusCode == 200) {
+        await prefs.setBool(key, true);
+        return const HomeScreen();
+      }
+    } on DioException catch (e) {
+      final status = e.response?.statusCode ?? 0;
+      // 404 or 500 = no profile exists → show profile setup
+      if (status == 404 || status == 500) {
+        final email = userJson['email']?.toString()?.isNotEmpty == true
+            ? userJson['email'].toString()
+            : userJson['username']?.toString() ?? '';
+        return MunicipalityProfileSetupScreen(
+          build4allToken: token,
+          ownerProjectLinkId: ownerProjectLinkId,
+          build4allUser: userJson,
+          fallbackEmail: email,
+        );
+      }
+      // Any other network/server error → fail safe, go to HomeScreen
+    } catch (_) {}
+
+    return const HomeScreen();
   }
 
   @override
