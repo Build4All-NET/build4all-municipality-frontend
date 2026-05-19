@@ -1,7 +1,6 @@
 // lib/features/citizen/services/data/services/request_service.dart
 
 import 'package:baladiyati/core/exceptions/app_exception.dart';
-import 'package:baladiyati/core/network/api_client.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
 import 'package:baladiyati/features/citizen/requests/data/models/request_model.dart';
@@ -10,15 +9,12 @@ import 'package:dio/dio.dart';
 
 class RequestService {
   final Dio _muniDio;
-  final ApiClient _apiClient;
   final AuthTokenStore _tokenStore;
 
   RequestService({
     Dio? muniDio,
-    ApiClient? apiClient,
     AuthTokenStore? tokenStore,
   })  : _muniDio = muniDio ?? DioClient.muni,
-        _apiClient = apiClient ?? ApiClient(),
         _tokenStore = tokenStore ?? AuthTokenStore();
 
   Future<String?> _bearerToken() async {
@@ -40,8 +36,6 @@ class RequestService {
             ? Options(headers: {'Authorization': token})
             : null,
       );
-
-      print('🔥 RAW RESPONSE: ${response.data}');
 
       final data = response.data;
       final List<dynamic> list;
@@ -74,15 +68,26 @@ class RequestService {
     }
   }
 
-  /// POST /api/requests/{serviceId}
+  /// POST /api/requests/{serviceId} — uses DioClient.muni so OwnerInjector
+  /// automatically adds Authorization and Owner-Project-Link-Id headers.
   Future<void> submitRequest({
     required String serviceId,
     required RequestSubmission submission,
   }) async {
-    await _apiClient.post(
-      '/api/requests/$serviceId',
-      body: submission.toJson(),
-      requiresAuth: true,
-    );
+    try {
+      await _muniDio.post(
+        '/api/requests/$serviceId',
+        data: submission.toJson(),
+      );
+    } on DioException catch (e) {
+      final data = e.response?.data;
+      if (data is Map) {
+        throw AppException(
+          (data['message'] ?? data['error'] ?? 'Failed to submit request')
+              .toString(),
+        );
+      }
+      throw AppException('Failed to submit request');
+    }
   }
 }

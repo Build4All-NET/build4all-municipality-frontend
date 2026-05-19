@@ -24,7 +24,10 @@ class _ServicesScreenState extends State<ServicesScreen> {
   @override
   void initState() {
     super.initState();
-    context.read<CitizenServicesBloc>().add(CitizenServicesLoadRequested());
+    final bloc = context.read<CitizenServicesBloc>();
+    if (!bloc.state.isLoading && bloc.state.services.isEmpty) {
+      bloc.add(CitizenServicesLoadRequested());
+    }
   }
 
   @override

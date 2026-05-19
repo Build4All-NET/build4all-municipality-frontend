@@ -6,11 +6,13 @@ import 'package:baladiyati/features/admin/Dashboard/presentation/screens/Dashboa
 import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
 import 'package:baladiyati/features/auth/data/services/session_role_store.dart';
+import 'package:baladiyati/features/auth/presentation/municipality_profile/screens/municipality_profile_setup_screen.dart';
 import 'package:baladiyati/features/citizen/home/presentation/screens/home_screen.dart';
-
 import 'package:baladiyati/features/staff/dashboard/presentation/screens/staff_dashboard_screen.dart';
 import 'package:baladiyati/features/welcome/presentation/screens/welcome_screen.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AuthGate extends StatefulWidget {
   const AuthGate({super.key});
@@ -78,7 +80,7 @@ class _AuthGateState extends State<AuthGate> {
           return const StaffDashboardScreen();
         }
 
-        return const HomeScreen();
+        return await _citizenRoute(validUserToken);
       }
 
       await userStore.clear();
@@ -91,6 +93,48 @@ class _AuthGateState extends State<AuthGate> {
     return const WelcomeScreen();
   }
 
+  /// Determines whether a logged-in citizen needs to complete their municipality
+  /// profile or can proceed directly to HomeScreen.
+  Future<Widget> _citizenRoute(String validUserToken) async {
+    final ownerProjectLinkId = int.tryParse(Env.ownerProjectLinkId) ?? 0;
+    final userStore = AuthTokenStore();
+    final userJson = await userStore.getUserJson() ?? {};
+    final userId = int.tryParse(userJson['id']?.toString() ?? '') ?? 0;
+
+    if (ownerProjectLinkId > 0 && userId > 0) {
+      final prefs = await SharedPreferences.getInstance();
+      final key = 'municipality_profile_completed_${ownerProjectLinkId}_$userId';
+      final completedLocally = prefs.getBool(key) ?? false;
+
+      if (completedLocally) return const HomeScreen();
+
+      try {
+        final response = await DioClient.muni.get('/users/profile');
+        if ((response.statusCode ?? 0) == 200) {
+          await prefs.setBool(key, true);
+          return const HomeScreen();
+        }
+      } on DioException catch (e) {
+        if ((e.response?.statusCode ?? 0) == 404) {
+          final email = userJson['email']?.toString() ??
+              userJson['username']?.toString() ??
+              '';
+          return MunicipalityProfileSetupScreen(
+            build4allToken: validUserToken,
+            ownerProjectLinkId: ownerProjectLinkId,
+            build4allUser: userJson,
+            fallbackEmail: email,
+          );
+        }
+        // Network / server error → proceed to HomeScreen (fail safe)
+      } catch (_) {
+        // Unexpected error → proceed to HomeScreen (fail safe)
+      }
+    }
+
+    return const HomeScreen();
+  }
+
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
@@ -100,7 +144,7 @@ class _AuthGateState extends State<AuthGate> {
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return Scaffold(
-            backgroundColor: cs.background,
+            backgroundColor: cs.surface,
             body: Center(
               child: CircularProgressIndicator(
                 color: cs.primary,
