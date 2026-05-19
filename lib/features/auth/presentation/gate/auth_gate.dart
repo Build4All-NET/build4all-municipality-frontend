@@ -7,6 +7,7 @@ import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
 import 'package:baladiyati/features/auth/data/services/session_role_store.dart';
 import 'package:baladiyati/features/citizen/home/presentation/screens/home_screen.dart';
+
 import 'package:baladiyati/features/staff/dashboard/presentation/screens/staff_dashboard_screen.dart';
 import 'package:baladiyati/features/welcome/presentation/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
@@ -99,7 +100,7 @@ class _AuthGateState extends State<AuthGate> {
       builder: (context, snapshot) {
         if (snapshot.connectionState != ConnectionState.done) {
           return Scaffold(
-            backgroundColor: cs.surface,
+            backgroundColor: cs.background,
             body: Center(
               child: CircularProgressIndicator(
                 color: cs.primary,

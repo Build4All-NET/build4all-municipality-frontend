@@ -83,13 +83,6 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
         message: loc.departmentDeleted,
         type: AppToastType.success,
       );
-    } else {
-      final error = context.read<DepartmentCubit>().state.error;
-      if (error != null && error.isNotEmpty) {
-        AppToast.show(context, message: error, type: AppToastType.error);
-      } else {
-        AppToast.show(context, message: loc.deleteFailed, type: AppToastType.error);
-      }
     }
   }
 
