@@ -109,12 +109,15 @@ class _DashboardPageState extends State<DashboardPage> {
     setState(() {
       _statsFuture = _loadStats();
     });
+
     await _statsFuture;
   }
 
   Future<void> _logout() async {
     await _authApiService.logout();
+
     if (!mounted) return;
+
     AppRouter.goToLogin(context);
   }
 
@@ -127,7 +130,9 @@ class _DashboardPageState extends State<DashboardPage> {
       context: context,
       showDragHandle: true,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(24),
+        ),
       ),
       builder: (sheetContext) {
         final theme = Theme.of(sheetContext);
@@ -140,8 +145,11 @@ class _DashboardPageState extends State<DashboardPage> {
           required VoidCallback onTap,
         }) {
           final selected = currentCode == code;
+
           return ListTile(
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
             leading: CircleAvatar(
               backgroundColor: selected
                   ? colors.primary.withOpacity(0.14)
@@ -156,7 +164,12 @@ class _DashboardPageState extends State<DashboardPage> {
             ),
             title: Text(title),
             subtitle: Text(subtitle),
-            trailing: selected ? Icon(Icons.check_circle, color: colors.primary) : null,
+            trailing: selected
+                ? Icon(
+                    Icons.check_circle,
+                    color: colors.primary,
+                  )
+                : null,
             onTap: () {
               onTap();
               Navigator.pop(sheetContext);
@@ -172,7 +185,9 @@ class _DashboardPageState extends State<DashboardPage> {
               children: [
                 Text(
                   loc.selectLanguage,
-                  style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
                 const SizedBox(height: 14),
                 languageTile(
@@ -204,16 +219,22 @@ class _DashboardPageState extends State<DashboardPage> {
   Future<void> _openAnnouncements() async {
     await Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const AnnouncementsPage()),
+      MaterialPageRoute(
+        builder: (_) => const AnnouncementsPage(),
+      ),
     );
+
     await _refreshStats();
   }
 
   Future<void> _openViolations() async {
     await Navigator.push(
       context,
-      MaterialPageRoute(builder: (_) => const ViolationsPage()),
+      MaterialPageRoute(
+        builder: (_) => const ViolationsPage(),
+      ),
     );
+
     await _refreshStats();
   }
 
@@ -259,7 +280,8 @@ class _DashboardPageState extends State<DashboardPage> {
           future: _statsFuture,
           builder: (context, snapshot) {
             final stats = snapshot.data ?? _AdminDashboardStats.empty();
-            final isLoading = snapshot.connectionState == ConnectionState.waiting;
+            final isLoading =
+                snapshot.connectionState == ConnectionState.waiting;
 
             return SingleChildScrollView(
               physics: const AlwaysScrollableScrollPhysics(),
@@ -269,44 +291,43 @@ class _DashboardPageState extends State<DashboardPage> {
                 children: [
                   _WelcomeHeader(isLoading: isLoading),
 
-                  const SizedBox(height: 18),
+                  const SizedBox(height: 16),
 
-                  // 3-column compact stat grid
                   GridView.count(
-                    crossAxisCount: 3,
+                    crossAxisCount: 2,
                     shrinkWrap: true,
-                    crossAxisSpacing: 10,
-                    mainAxisSpacing: 10,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
                     physics: const NeverScrollableScrollPhysics(),
-                    childAspectRatio: 1.05,
+                    childAspectRatio: 1.28,
                     children: [
                       _StatCard(
                         title: loc.announcements,
-                        value: isLoading ? '…' : _formatCount(stats.announcementsCount),
+                        value: isLoading ? '...' : _formatCount(stats.announcementsCount),
                         icon: Icons.campaign_outlined,
                         iconColor: colors.primary,
                       ),
                       _StatCard(
                         title: loc.violations,
-                        value: isLoading ? '…' : _formatCount(stats.violationsCount),
+                        value: isLoading ? '...' : _formatCount(stats.violationsCount),
                         icon: Icons.gavel_outlined,
                         iconColor: colors.error,
                       ),
                       _StatCard(
                         title: loc.departments,
-                        value: isLoading ? '…' : _formatCount(stats.departmentsCount),
+                        value: isLoading ? '...' : _formatCount(stats.departmentsCount),
                         icon: Icons.account_tree_outlined,
                         iconColor: colors.tertiary,
                       ),
                       _StatCard(
                         title: loc.services,
-                        value: isLoading ? '…' : _formatCount(stats.servicesCount),
+                        value: isLoading ? '...' : _formatCount(stats.servicesCount),
                         icon: Icons.description_outlined,
                         iconColor: colors.secondary,
                       ),
                       _StatCard(
                         title: loc.employees,
-                        value: isLoading ? '…' : _formatCount(stats.employeesCount),
+                        value: isLoading ? '...' : _formatCount(stats.employeesCount),
                         icon: Icons.groups_outlined,
                         iconColor: colors.primary,
                       ),
@@ -319,26 +340,24 @@ class _DashboardPageState extends State<DashboardPage> {
                     ],
                   ),
 
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 24),
 
                   Text(
                     loc.quickActions,
-                    style: theme.textTheme.titleSmall?.copyWith(
+                    style: theme.textTheme.titleLarge?.copyWith(
                       fontWeight: FontWeight.w900,
-                      color: colors.onSurface.withOpacity(0.7),
                     ),
                   ),
 
-                  const SizedBox(height: 8),
+                  const SizedBox(height: 12),
 
-                  // 2-column quick-action grid
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
                     crossAxisSpacing: 12,
                     mainAxisSpacing: 12,
                     physics: const NeverScrollableScrollPhysics(),
-                    childAspectRatio: 2.4,
+                    childAspectRatio: 1.12,
                     children: [
                       _ActionCard(
                         title: loc.announcements,
@@ -404,28 +423,27 @@ class _WelcomeHeader extends StatelessWidget {
 
     return Container(
       width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: colors.primary,
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(24),
       ),
       child: Row(
         textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
         children: [
           Container(
-            height: 42,
-            width: 42,
+            height: 54,
+            width: 54,
             decoration: BoxDecoration(
               color: colors.onPrimary.withOpacity(0.14),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(18),
             ),
             child: Icon(
               Icons.admin_panel_settings_outlined,
               color: colors.onPrimary,
-              size: 22,
             ),
           ),
-          const SizedBox(width: 12),
+          const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment:
@@ -433,14 +451,15 @@ class _WelcomeHeader extends StatelessWidget {
               children: [
                 Text(
                   loc.dashboard,
-                  style: theme.textTheme.titleMedium?.copyWith(
+                  style: theme.textTheme.titleLarge?.copyWith(
                     color: colors.onPrimary,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
+                const SizedBox(height: 4),
                 Text(
                   loc.adminDashboardSubtitle,
-                  style: theme.textTheme.bodySmall?.copyWith(
+                  style: theme.textTheme.bodyMedium?.copyWith(
                     color: colors.onPrimary.withOpacity(0.78),
                   ),
                 ),
@@ -449,8 +468,8 @@ class _WelcomeHeader extends StatelessWidget {
           ),
           if (isLoading)
             SizedBox(
-              height: 18,
-              width: 18,
+              height: 22,
+              width: 22,
               child: CircularProgressIndicator(
                 strokeWidth: 2,
                 color: colors.onPrimary,
@@ -481,43 +500,40 @@ class _StatCard extends StatelessWidget {
     final colors = theme.colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(10),
+      padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: colors.surface,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: colors.outline.withOpacity(0.12)),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(
+          color: colors.outline.withOpacity(0.14),
+        ),
         boxShadow: [
           BoxShadow(
-            color: colors.shadow.withOpacity(0.04),
-            blurRadius: 8,
-            offset: const Offset(0, 3),
+            color: colors.shadow.withOpacity(0.045),
+            blurRadius: 12,
+            offset: const Offset(0, 7),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Icon(icon, color: iconColor, size: 20),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                value,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w900,
-                ),
-              ),
-              Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: colors.onSurface.withOpacity(0.62),
-                  fontSize: 11,
-                ),
-              ),
-            ],
+          Icon(icon, color: iconColor, size: 29),
+          const Spacer(),
+          Text(
+            value,
+            style: theme.textTheme.headlineSmall?.copyWith(
+              fontWeight: FontWeight.w900,
+            ),
+          ),
+          const SizedBox(height: 4),
+          Text(
+            title,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colors.onSurface.withOpacity(0.72),
+            ),
           ),
         ],
       ),
@@ -544,48 +560,37 @@ class _ActionCard extends StatelessWidget {
     final colors = theme.colorScheme;
 
     return InkWell(
-      borderRadius: BorderRadius.circular(14),
+      borderRadius: BorderRadius.circular(22),
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: colors.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: colors.outline.withOpacity(0.12)),
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(
+            color: colors.outline.withOpacity(0.14),
+          ),
           boxShadow: [
             BoxShadow(
               color: colors.shadow.withOpacity(0.04),
-              blurRadius: 8,
-              offset: const Offset(0, 3),
+              blurRadius: 12,
+              offset: const Offset(0, 7),
             ),
           ],
         ),
-        child: Row(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Container(
-              width: 36,
-              height: 36,
-              decoration: BoxDecoration(
-                color: iconColor.withOpacity(0.10),
-                borderRadius: BorderRadius.circular(10),
+            Icon(icon, color: iconColor, size: 34),
+            const SizedBox(height: 10),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w800,
               ),
-              child: Icon(icon, color: iconColor, size: 20),
-            ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                title,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: theme.textTheme.bodyMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
-              ),
-            ),
-            Icon(
-              Icons.chevron_right,
-              color: colors.onSurface.withOpacity(0.3),
-              size: 18,
             ),
           ],
         ),
