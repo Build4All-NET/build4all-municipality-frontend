@@ -1127,4 +1127,36 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get logoutSuccess => 'تم تسجيل الخروج بنجاح';
+
+  @override
+  String get violationTitle => 'عنوان المخالفة';
+
+  @override
+  String get enterViolationTitle => 'أدخل عنوان المخالفة';
+
+  @override
+  String get violationType => 'نوع المخالفة';
+
+  @override
+  String get selectViolationType => 'يرجى اختيار نوع المخالفة';
+
+  @override
+  String get identityNumber => 'رقم الهوية';
+
+  @override
+  String get enterIdentityNumber => 'أدخل رقم هوية المواطن';
+
+  @override
+  String get carPlate => 'لوحة السيارة';
+
+  @override
+  String get enterCarPlate => 'أدخل رقم لوحة المركبة';
+
+  @override
+  String get identifierRequired =>
+      'يرجى تقديم رقم الهوية أو لوحة السيارة على الأقل';
+
+  @override
+  String get nameRequiresIdentifier =>
+      'إذا تم إدخال اسم، يجب إضافة رقم الهوية أو لوحة السيارة';
 }

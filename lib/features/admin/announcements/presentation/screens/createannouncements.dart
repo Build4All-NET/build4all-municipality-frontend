@@ -1,3 +1,4 @@
+import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/features/admin/announcements/domain/entities/announcement.dart';
 import 'package:baladiyati/features/admin/announcements/presentation/bloc/Announcement_Event.dart';
 import 'package:baladiyati/features/admin/announcements/presentation/bloc/Announcement_bloc.dart';
@@ -48,17 +49,6 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
     super.dispose();
   }
 
-  void _showMessage(String message, {bool isError = false}) {
-    final colors = Theme.of(context).colorScheme;
-
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: isError ? colors.error : null,
-      ),
-    );
-  }
-
   String? _validateTitle(String? value) {
     final loc = AppLocalizations.of(context)!;
     final text = value?.trim() ?? '';
@@ -104,7 +94,7 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
         setState(() {
           _submitted = false;
         });
-        _showMessage(loc.missingAnnouncementId, isError: true);
+        AppToast.show(context, message: loc.missingAnnouncementId, type: AppToastType.error);
         return;
       }
 
@@ -132,7 +122,11 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
         if (!_submitted) return;
 
         if (state is AnnouncementLoaded) {
-          _showMessage(loc.announcementSaved);
+          AppToast.show(
+            context,
+            message: loc.announcementSaved,
+            type: AppToastType.success,
+          );
           Navigator.pop(context);
         }
 
@@ -140,7 +134,11 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
           setState(() {
             _submitted = false;
           });
-          _showMessage(state.message, isError: true);
+          AppToast.show(
+            context,
+            message: state.message,
+            type: AppToastType.error,
+          );
         }
       },
       child: Scaffold(

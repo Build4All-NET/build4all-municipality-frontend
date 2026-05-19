@@ -490,9 +490,16 @@
 "saving": "Saving...",
 "firstName": "First name",
 "lastName": "Last name",
-"logoutSuccess": "Logged out successfully"
+"logoutSuccess": "Logged out successfully",
 
-
-
-
+  "violationTitle": "Violation Title",
+  "enterViolationTitle": "Enter violation title (e.g. Illegal Parking)",
+  "violationType": "Violation Type",
+  "selectViolationType": "Please select violation type",
+  "identityNumber": "Identity Number",
+  "enterIdentityNumber": "Enter citizen identity number",
+  "carPlate": "Car Plate",
+  "enterCarPlate": "Enter vehicle plate number",
+  "identifierRequired": "Please provide at least Identity Number or Car Plate",
+  "nameRequiresIdentifier": "If a name is provided, you must also add Identity Number or Car Plate"
 }

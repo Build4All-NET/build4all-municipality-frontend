@@ -496,7 +496,18 @@
 "saving": "Enregistrement...",
 "firstName": "Prénom",
 "lastName": "Nom",
-"logoutSuccess": "Déconnexion réussie"
+"logoutSuccess": "Déconnexion réussie",
+
+  "violationTitle": "Titre de l'infraction",
+  "enterViolationTitle": "Entrez le titre de l'infraction",
+  "violationType": "Type d'infraction",
+  "selectViolationType": "Veuillez sélectionner le type d'infraction",
+  "identityNumber": "Numéro d'identité",
+  "enterIdentityNumber": "Entrez le numéro d'identité du citoyen",
+  "carPlate": "Plaque d'immatriculation",
+  "enterCarPlate": "Entrez le numéro de plaque du véhicule",
+  "identifierRequired": "Veuillez fournir au moins un numéro d'identité ou une plaque",
+  "nameRequiresIdentifier": "Si un nom est fourni, vous devez ajouter un numéro d'identité ou une plaque"
 
 
 }

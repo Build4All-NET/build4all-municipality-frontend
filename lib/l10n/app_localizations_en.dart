@@ -1127,4 +1127,36 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logoutSuccess => 'Logged out successfully';
+
+  @override
+  String get violationTitle => 'Violation Title';
+
+  @override
+  String get enterViolationTitle => 'Enter violation title (e.g. Illegal Parking)';
+
+  @override
+  String get violationType => 'Violation Type';
+
+  @override
+  String get selectViolationType => 'Please select violation type';
+
+  @override
+  String get identityNumber => 'Identity Number';
+
+  @override
+  String get enterIdentityNumber => 'Enter citizen identity number';
+
+  @override
+  String get carPlate => 'Car Plate';
+
+  @override
+  String get enterCarPlate => 'Enter vehicle plate number';
+
+  @override
+  String get identifierRequired =>
+      'Please provide at least Identity Number or Car Plate';
+
+  @override
+  String get nameRequiresIdentifier =>
+      'If a name is provided, you must also add Identity Number or Car Plate';
 }

@@ -1127,4 +1127,36 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get logoutSuccess => 'Déconnexion réussie';
+
+  @override
+  String get violationTitle => "Titre de l'infraction";
+
+  @override
+  String get enterViolationTitle => "Entrez le titre de l'infraction";
+
+  @override
+  String get violationType => "Type d'infraction";
+
+  @override
+  String get selectViolationType => "Veuillez sélectionner le type d'infraction";
+
+  @override
+  String get identityNumber => "Numéro d'identité";
+
+  @override
+  String get enterIdentityNumber => "Entrez le numéro d'identité du citoyen";
+
+  @override
+  String get carPlate => "Plaque d'immatriculation";
+
+  @override
+  String get enterCarPlate => "Entrez le numéro de plaque du véhicule";
+
+  @override
+  String get identifierRequired =>
+      "Veuillez fournir au moins un numéro d'identité ou une plaque";
+
+  @override
+  String get nameRequiresIdentifier =>
+      "Si un nom est fourni, vous devez ajouter un numéro d'identité ou une plaque";
 }

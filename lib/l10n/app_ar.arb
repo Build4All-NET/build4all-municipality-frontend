@@ -489,5 +489,16 @@
 "saving": "جارٍ الحفظ...",
 "firstName": "الاسم الأول",
 "lastName": "اسم العائلة",
-"logoutSuccess": "تم تسجيل الخروج بنجاح"
+"logoutSuccess": "تم تسجيل الخروج بنجاح",
+
+  "violationTitle": "عنوان المخالفة",
+  "enterViolationTitle": "أدخل عنوان المخالفة",
+  "violationType": "نوع المخالفة",
+  "selectViolationType": "يرجى اختيار نوع المخالفة",
+  "identityNumber": "رقم الهوية",
+  "enterIdentityNumber": "أدخل رقم هوية المواطن",
+  "carPlate": "لوحة السيارة",
+  "enterCarPlate": "أدخل رقم لوحة المركبة",
+  "identifierRequired": "يرجى تقديم رقم الهوية أو لوحة السيارة على الأقل",
+  "nameRequiresIdentifier": "إذا تم إدخال اسم، يجب إضافة رقم الهوية أو لوحة السيارة"
 }

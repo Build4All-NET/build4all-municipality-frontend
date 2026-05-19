@@ -2327,6 +2327,17 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Logged out successfully'**
   String get logoutSuccess;
+
+  String get violationTitle;
+  String get enterViolationTitle;
+  String get violationType;
+  String get selectViolationType;
+  String get identityNumber;
+  String get enterIdentityNumber;
+  String get carPlate;
+  String get enterCarPlate;
+  String get identifierRequired;
+  String get nameRequiresIdentifier;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
