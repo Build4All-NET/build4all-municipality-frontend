@@ -1,6 +1,5 @@
 import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/common/widgets/primary_button.dart';
-import 'package:baladiyati/core/config/env.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/core/utils/error_message.dart';
 import 'package:baladiyati/features/admin/Departement/data/Model/Departement_model.dart';
@@ -217,14 +216,6 @@ class _CreateViolationScreenState extends State<CreateViolationScreen> {
       return;
     }
 
-    // Read municipality ID from app configuration
-    final municipalityId = int.tryParse(Env.ownerProjectLinkId.trim());
-    if (municipalityId == null || municipalityId <= 0) {
-      AppToast.show(context,
-          message: loc.missingMunicipalityId, type: AppToastType.error);
-      return;
-    }
-
     final violation = Violation(
       title: _titleController.text.trim(),
       description: _descriptionController.text.trim(),
@@ -236,7 +227,7 @@ class _CreateViolationScreenState extends State<CreateViolationScreen> {
       location: _locationController.text.trim(),
       violationDate: _formatDateForBackend(_selectedDate!),
       type: _selectedType,
-      municipalityId: municipalityId,
+      municipalityId: null,
     );
 
     setState(() => _submitted = true);
