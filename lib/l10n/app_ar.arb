@@ -511,5 +511,22 @@
   "trafficIdentifierHint": "لوحة السيارة مطلوبة للمخالفات المرورية. رقم الهوية اختياري.",
   "generalIdentifierHint": "يجب توفير واحد على الأقل من: الاسم، رقم الهوية، أو لوحة السيارة.",
   "selectTypeFirst": "يرجى اختيار نوع المخالفة أولاً لعرض الحقول المناسبة.",
-  "deleteFailed": "فشل الحذف. يرجى المحاولة مجدداً."
+  "deleteFailed": "فشل الحذف. يرجى المحاولة مجدداً.",
+  "statusDraft": "مسودة",
+  "statusCancelled": "ملغي",
+  "statusDocumentsMissing": "وثائق مفقودة",
+  "statusTaxPaid": "الضريبة مدفوعة",
+  "statusTaxRejected": "رُفضت الضريبة",
+  "requestSubmittedTitle": "تم إرسال الطلب!",
+  "requestSubmittedMsg": "طلبك قيد المراجعة من قبل البلدية",
+  "browseServices": "تصفح الخدمات",
+  "startRequest": "ابدأ طلباً",
+  "serviceDetails": "تفاصيل الخدمة",
+  "loadFailed": "فشل التحميل. حاول مرة أخرى.",
+  "uploadingFiles": "جاري الرفع...",
+  "ok": "حسناً",
+  "retry": "حاول مجدداً",
+  "takePhoto": "التقط صورة",
+  "chooseFromGallery": "اختر من المعرض",
+  "chooseDocument": "اختر ملف PDF أو وثيقة"
 }

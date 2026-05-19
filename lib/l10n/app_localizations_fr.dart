@@ -1196,4 +1196,55 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get deleteFailed => 'Échec de la suppression. Veuillez réessayer.';
+
+  @override
+  String get statusDraft => 'Brouillon';
+
+  @override
+  String get statusCancelled => 'Annulé';
+
+  @override
+  String get statusDocumentsMissing => 'Documents manquants';
+
+  @override
+  String get statusTaxPaid => 'Taxe payée';
+
+  @override
+  String get statusTaxRejected => 'Taxe rejetée';
+
+  @override
+  String get requestSubmittedTitle => 'Demande soumise!';
+
+  @override
+  String get requestSubmittedMsg => 'Votre demande est en cours d\'examen par la municipalité';
+
+  @override
+  String get browseServices => 'Parcourir les services';
+
+  @override
+  String get startRequest => 'Démarrer une demande';
+
+  @override
+  String get serviceDetails => 'Détails du service';
+
+  @override
+  String get loadFailed => 'Échec du chargement. Veuillez réessayer.';
+
+  @override
+  String get uploadingFiles => 'Téléchargement en cours...';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get retry => 'Réessayer';
+
+  @override
+  String get takePhoto => 'Prendre une photo';
+
+  @override
+  String get chooseFromGallery => 'Choisir depuis la galerie';
+
+  @override
+  String get chooseDocument => 'Choisir un PDF ou document';
 }

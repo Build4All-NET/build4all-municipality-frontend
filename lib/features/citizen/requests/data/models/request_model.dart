@@ -1,89 +1,78 @@
-// lib/features/citizen/requests/data/models/request_model.dart
+import '../../domain/entities/request_entity.dart';
 
-class RequestModel {
-  final String id;
-  final String nameAr;
-  final String number;
-  final String status;
-  final String date;
-  final String? title;
-  final String? description;
-  final String? updatedAt;
-
+class RequestModel extends RequestEntity {
   const RequestModel({
-    required this.id,
-    required this.nameAr,
-    required this.number,
-    required this.status,
-    required this.date,
-    this.title,
-    this.description,
-    this.updatedAt,
+    required super.id,
+    required super.trackingNumber,
+    required super.title,
+    required super.description,
+    required super.status,
+    super.serviceName,
+    super.municipalityName,
+    super.citizenName,
+    super.addressText,
+    super.geoLat,
+    super.geoLng,
+    super.createdAt,
+    super.updatedAt,
+    super.closedAt,
   });
 
   factory RequestModel.fromJson(Map<String, dynamic> json) {
-    print('🔥 REQUEST JSON: $json');
-
-    String formattedDate = '';
-    try {
-      final raw = json['createdAt'] ??
-          json['created_at'] ??
-          json['date'] ??
-          json['submittedAt'] ??
-          '';
-      if (raw.toString().isNotEmpty) {
-        final dt = DateTime.parse(raw.toString());
-        formattedDate =
-            '${_ar(dt.day.toString().padLeft(2, '0'))}-'
-            '${_ar(dt.month.toString().padLeft(2, '0'))}-'
-            '${_ar(dt.year.toString())}';
-      }
-    } catch (_) {}
-
-    String formattedUpdatedAt = '';
-    try {
-      final rawU = json['updatedAt'] ?? json['updated_at'] ?? '';
-      if (rawU.toString().isNotEmpty) {
-        final dt = DateTime.parse(rawU.toString());
-        formattedUpdatedAt =
-            '${_ar(dt.day.toString().padLeft(2, '0'))}-'
-            '${_ar(dt.month.toString().padLeft(2, '0'))}-'
-            '${_ar(dt.year.toString())}';
-      }
-    } catch (_) {}
-
     return RequestModel(
       id: (json['id'] ?? json['_id'] ?? '').toString(),
-      nameAr: json['serviceNameAr'] ??
-          json['serviceNameAR'] ??
-          json['service_name_ar'] ??
-          json['serviceName'] ??
-          json['name'] ??
-          json['title'] ??
-          '',
-      number: json['trackingNumber'] ??
-          json['requestNumber'] ??
-          json['request_number'] ??
-          json['referenceNumber'] ??
-          json['reference_number'] ??
-          json['number'] ??
-          json['code'] ??
-          '',
+      trackingNumber: (json['trackingNumber'] ?? json['tracking_number'] ?? json['number'] ?? json['code'] ?? '').toString(),
+      title: (json['title'] ?? '').toString(),
+      description: (json['description'] ?? '').toString(),
       status: (json['status'] ?? '').toString().toUpperCase(),
-      date: formattedDate,
-      title: json['title']?.toString(),
-      description: json['description']?.toString(),
-      updatedAt: formattedUpdatedAt.isEmpty ? null : formattedUpdatedAt,
+      serviceName: json['serviceName']?.toString() ?? json['service_name']?.toString(),
+      municipalityName: json['municipalityName']?.toString(),
+      citizenName: json['citizenName']?.toString() ?? json['citizen_name']?.toString(),
+      addressText: json['addressText']?.toString() ?? json['address_text']?.toString(),
+      geoLat: _toDouble(json['geoLat'] ?? json['geo_lat']),
+      geoLng: _toDouble(json['geoLng'] ?? json['geo_lng']),
+      createdAt: _parseDate(json['createdAt'] ?? json['created_at']),
+      updatedAt: _parseDate(json['updatedAt'] ?? json['updated_at']),
+      closedAt: _parseDate(json['closedAt'] ?? json['closed_at']),
     );
   }
 
-  static String _ar(String input) {
-    const en = ['0','1','2','3','4','5','6','7','8','9'];
-    const ar = ['٠','١','٢','٣','٤','٥','٦','٧','٨','٩'];
-    String r = input;
-    for (int i = 0; i < en.length; i++) {
-      r = r.replaceAll(en[i], ar[i]);
+  static double? _toDouble(dynamic v) {
+    if (v == null) return null;
+    if (v is double) return v;
+    return double.tryParse(v.toString());
+  }
+
+  static DateTime? _parseDate(dynamic v) {
+    if (v == null) return null;
+    return DateTime.tryParse(v.toString());
+  }
+
+  Map<String, dynamic> toCreateJson({
+    required int serviceId,
+    List<String>? attachmentUrls,
+  }) {
+    List<Map<String, dynamic>>? attachments;
+    if (attachmentUrls != null && attachmentUrls.isNotEmpty) {
+      attachments = attachmentUrls.map((url) {
+        final fileName = url.split('/').last;
+        final ext = fileName.split('.').last.toLowerCase();
+        final fileType = ['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(ext)
+            ? 'image'
+            : ext == 'pdf'
+                ? 'pdf'
+                : 'document';
+        return {'fileName': fileName, 'fileUrl': url, 'fileType': fileType};
+      }).toList();
     }
-    return r;
+
+    return {
+      'title': title,
+      'description': description,
+      if (addressText != null && addressText!.isNotEmpty) 'addressText': addressText,
+      if (geoLat != null) 'geoLat': geoLat,
+      if (geoLng != null) 'geoLng': geoLng,
+      if (attachments != null) 'attachments': attachments,
+    };
   }
 }

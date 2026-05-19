@@ -2349,6 +2349,23 @@ abstract class AppLocalizations {
   String get generalIdentifierHint;
   String get selectTypeFirst;
   String get deleteFailed;
+  String get statusDraft;
+  String get statusCancelled;
+  String get statusDocumentsMissing;
+  String get statusTaxPaid;
+  String get statusTaxRejected;
+  String get requestSubmittedTitle;
+  String get requestSubmittedMsg;
+  String get browseServices;
+  String get startRequest;
+  String get serviceDetails;
+  String get loadFailed;
+  String get uploadingFiles;
+  String get ok;
+  String get retry;
+  String get takePhoto;
+  String get chooseFromGallery;
+  String get chooseDocument;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

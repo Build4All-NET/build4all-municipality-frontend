@@ -1195,4 +1195,55 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get deleteFailed => 'فشل الحذف. يرجى المحاولة مجدداً.';
+
+  @override
+  String get statusDraft => 'مسودة';
+
+  @override
+  String get statusCancelled => 'ملغي';
+
+  @override
+  String get statusDocumentsMissing => 'وثائق مفقودة';
+
+  @override
+  String get statusTaxPaid => 'الضريبة مدفوعة';
+
+  @override
+  String get statusTaxRejected => 'رُفضت الضريبة';
+
+  @override
+  String get requestSubmittedTitle => 'تم إرسال الطلب!';
+
+  @override
+  String get requestSubmittedMsg => 'طلبك قيد المراجعة من قبل البلدية';
+
+  @override
+  String get browseServices => 'تصفح الخدمات';
+
+  @override
+  String get startRequest => 'ابدأ طلباً';
+
+  @override
+  String get serviceDetails => 'تفاصيل الخدمة';
+
+  @override
+  String get loadFailed => 'فشل التحميل. حاول مرة أخرى.';
+
+  @override
+  String get uploadingFiles => 'جاري الرفع...';
+
+  @override
+  String get ok => 'حسناً';
+
+  @override
+  String get retry => 'حاول مجدداً';
+
+  @override
+  String get takePhoto => 'التقط صورة';
+
+  @override
+  String get chooseFromGallery => 'اختر من المعرض';
+
+  @override
+  String get chooseDocument => 'اختر ملف PDF أو وثيقة';
 }

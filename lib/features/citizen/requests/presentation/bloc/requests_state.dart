@@ -1,10 +1,8 @@
-// lib/features/citizen/requests/presentation/bloc/requests_state.dart
-
-import 'package:baladiyati/features/citizen/requests/data/models/request_model.dart';
+import 'package:baladiyati/features/citizen/requests/domain/entities/request_entity.dart';
 
 class RequestsState {
   final bool isLoading;
-  final List<RequestModel> requests;
+  final List<RequestEntity> requests;
   final String? errorMessage;
 
   const RequestsState({
@@ -15,7 +13,7 @@ class RequestsState {
 
   RequestsState copyWith({
     bool? isLoading,
-    List<RequestModel>? requests,
+    List<RequestEntity>? requests,
     String? errorMessage,
   }) {
     return RequestsState(

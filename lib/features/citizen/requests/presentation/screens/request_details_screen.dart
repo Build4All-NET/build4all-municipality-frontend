@@ -1,519 +1,384 @@
-// lib/features/citizen/requests/presentation/screens/request_details_screen.dart
-
 import 'package:flutter/material.dart';
-import 'package:baladiyati/common/widgets/primary_button.dart';
-import 'requests_screen.dart';
+import 'package:baladiyati/features/citizen/requests/domain/entities/request_entity.dart';
+import 'package:baladiyati/l10n/app_localizations.dart';
+import 'requests_screen.dart' show StatusBadgeWidget;
 
 class RequestDetailsScreen extends StatelessWidget {
-  final RequestItem request;
+  final RequestEntity request;
   const RequestDetailsScreen({super.key, required this.request});
 
-  // ── Timeline progression order ────────────────────────────────────────────
-  // Each step shows as completed if current status has passed it
   static const List<_StepDef> _steps = [
-    _StepDef(RequestStatus.submitted,        'مقدمة'),
-    _StepDef(RequestStatus.underReview,      'قيد المراجعة'),
-    _StepDef(RequestStatus.inProgress,       'قيد التنفيذ'),
-    _StepDef(RequestStatus.approved,         'موافق عليها'),
-    _StepDef(RequestStatus.taxPaid,          'تم الدفع'),
-    _StepDef(RequestStatus.completed,        'مكتملة'),
+    _StepDef('SUBMITTED'),
+    _StepDef('UNDER_REVIEW'),
+    _StepDef('IN_PROGRESS'),
+    _StepDef('APPROVED'),
+    _StepDef('TAX_PAID'),
+    _StepDef('COMPLETED'),
   ];
 
-  // The "weight" of each status in the flow
-  static int _statusOrder(RequestStatus s) {
+  static int _statusOrder(String s) {
     switch (s) {
-      case RequestStatus.draft:             return 0;
-      case RequestStatus.submitted:         return 1;
-      case RequestStatus.underReview:       return 2;
-      case RequestStatus.documentsMissing:  return 2; // stays at review level
-      case RequestStatus.inProgress:        return 3;
-      case RequestStatus.approved:          return 4;
-      case RequestStatus.taxPaid:           return 5;
-      case RequestStatus.taxRejected:       return 5;
-      case RequestStatus.completed:         return 6;
-      case RequestStatus.rejected:          return 6;
-      case RequestStatus.cancelled:         return 6;
+      case 'DRAFT': return 0;
+      case 'SUBMITTED': return 1;
+      case 'UNDER_REVIEW': return 2;
+      case 'DOCUMENTS_MISSING': return 2;
+      case 'IN_PROGRESS': return 3;
+      case 'APPROVED': return 4;
+      case 'TAX_PAID': return 5;
+      case 'TAX_REJECTED': return 5;
+      case 'COMPLETED': return 6;
+      case 'REJECTED': return 6;
+      case 'CANCELLED': return 6;
+      default: return 1;
     }
   }
 
-  bool _isTerminal() =>
-      request.status == RequestStatus.completed ||
-      request.status == RequestStatus.rejected ||
-      request.status == RequestStatus.cancelled ||
-      request.status == RequestStatus.taxRejected;
-
-  bool _isNegativeEnd() =>
-      request.status == RequestStatus.rejected ||
-      request.status == RequestStatus.cancelled ||
-      request.status == RequestStatus.taxRejected;
+  bool get _isNegativeEnd =>
+      request.status == 'REJECTED' ||
+      request.status == 'CANCELLED' ||
+      request.status == 'TAX_REJECTED';
 
   @override
   Widget build(BuildContext context) {
-    final cs = Theme.of(context).colorScheme;
+    final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
     final currentOrder = _statusOrder(request.status);
-
-    // Calculate progress
-    final completedSteps = _steps
-        .where((s) => _statusOrder(s.status) <= currentOrder)
-        .length;
-    final progress = _isNegativeEnd()
-        ? completedSteps / _steps.length
-        : completedSteps / _steps.length;
+    final completedSteps = _steps.where((s) => _statusOrder(s.status) <= currentOrder).length;
+    final progress = completedSteps / _steps.length;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F4F6),
-      body: SafeArea(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(loc.requestDetails),
+            if (request.trackingNumber.isNotEmpty)
+              Text(
+                '#${request.trackingNumber}',
+                style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurface.withOpacity(0.65)),
+              ),
+          ],
+        ),
+        actions: [
+          Padding(
+            padding: const EdgeInsets.only(right: 12),
+            child: StatusBadgeWidget(status: request.status),
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
         child: Column(
           children: [
-            // ── Header ──────────────────────────────────────
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.fromLTRB(8, 12, 16, 12),
-              child: Row(
+            // Status banners
+            if (request.status == 'DOCUMENTS_MISSING')
+              _Banner(
+                icon: Icons.folder_off_outlined,
+                title: loc.statusDocumentsMissing,
+                message: loc.errorGeneric,
+                color: colors.error,
+              ),
+            if (request.status == 'REJECTED')
+              _Banner(
+                icon: Icons.cancel_outlined,
+                title: loc.rejected,
+                message: loc.errorGeneric,
+                color: colors.error,
+              ),
+            if (request.status == 'CANCELLED')
+              _Banner(
+                icon: Icons.block_outlined,
+                title: loc.statusCancelled,
+                message: loc.errorGeneric,
+                color: colors.outline,
+              ),
+            if (request.status == 'COMPLETED')
+              _Banner(
+                icon: Icons.check_circle_outline,
+                title: loc.completed,
+                message: loc.requestSubmittedTitle,
+                color: colors.primary,
+              ),
+
+            // Progress card
+            _Card(
+              theme: theme,
+              colors: colors,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.arrow_forward),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        '${(progress * 100).round()}%',
+                        style: theme.textTheme.bodyMedium?.copyWith(color: colors.outline),
+                      ),
+                      Text(
+                        loc.progress,
+                        style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                      ),
+                    ],
                   ),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(request.number,
-                            style: const TextStyle(
-                                fontSize: 11, color: Colors.grey)),
-                        Text(request.nameAr,
-                            style: const TextStyle(
-                                fontSize: 17,
-                                fontWeight: FontWeight.bold)),
-                      ],
+                  const SizedBox(height: 10),
+                  ClipRRect(
+                    borderRadius: BorderRadius.circular(10),
+                    child: LinearProgressIndicator(
+                      value: progress,
+                      minHeight: 8,
+                      backgroundColor: colors.outline.withOpacity(0.15),
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        _isNegativeEnd ? colors.error : colors.primary,
+                      ),
                     ),
                   ),
-                  const SizedBox(width: 8),
-                  StatusBadgeWidget(status: request.status),
                 ],
               ),
             ),
 
-            // ── Body ─────────────────────────────────────────
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
+            const SizedBox(height: 12),
 
-                    // ── Special state banners ─────────────────
-                    if (request.status == RequestStatus.documentsMissing)
-                      _banner(
-                        icon: Icons.folder_off_outlined,
-                        title: 'وثائق ناقصة',
-                        message: 'يرجى مراجعة البلدية لتقديم الوثائق المطلوبة',
-                        color: Colors.red,
-                        bg: const Color(0xFFFFEBEE),
-                      ),
+            // Timeline card
+            _Card(
+              theme: theme,
+              colors: colors,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    loc.timeline,
+                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+                  ),
+                  const SizedBox(height: 16),
+                  ...List.generate(_steps.length, (i) {
+                    final step = _steps[i];
+                    final stepOrder = _statusOrder(step.status);
+                    final isDone = stepOrder <= currentOrder && !_isNegativeEnd;
+                    final isCurrent = step.status == request.status;
+                    final isLast = i == _steps.length - 1;
+                    final dotColor = _isNegativeEnd && isCurrent
+                        ? colors.error
+                        : isDone
+                            ? colors.primary
+                            : colors.outline.withOpacity(0.3);
 
-                    if (request.status == RequestStatus.rejected)
-                      _banner(
-                        icon: Icons.cancel_outlined,
-                        title: 'تم رفض الطلب',
-                        message: 'تم رفض طلبك من قبل رئيس البلدية',
-                        color: const Color(0xFFC62828),
-                        bg: const Color(0xFFFFEBEE),
-                      ),
-
-                    if (request.status == RequestStatus.taxRejected)
-                      _banner(
-                        icon: Icons.money_off_outlined,
-                        title: 'تم رفض الدفع',
-                        message: 'تم رفض الدفع الضريبي. يرجى مراجعة البلدية',
-                        color: Colors.red,
-                        bg: const Color(0xFFFFEBEE),
-                      ),
-
-                    if (request.status == RequestStatus.cancelled)
-                      _banner(
-                        icon: Icons.block_outlined,
-                        title: 'تم إلغاء الطلب',
-                        message: 'تم إلغاء هذا الطلب',
-                        color: Colors.grey,
-                        bg: const Color(0xFFF5F5F5),
-                      ),
-
-                    if (request.status == RequestStatus.completed)
-                      _banner(
-                        icon: Icons.check_circle_outline,
-                        title: 'مكتمل',
-                        message: 'تم إنجاز طلبك بنجاح',
-                        color: const Color(0xFF2E7D32),
-                        bg: const Color(0xFFE8F5E9),
-                      ),
-
-                    // ── Progress card ─────────────────────────
-                    _card(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Row(
-                            mainAxisAlignment:
-                                MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                '${(progress * 100).round()}%',
-                                style: TextStyle(
-                                    color: cs.outline, fontSize: 13),
-                              ),
-                              const Text('التقدم',
-                                  style: TextStyle(
-                                      fontWeight: FontWeight.w600)),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: LinearProgressIndicator(
-                              value: progress,
-                              minHeight: 8,
-                              backgroundColor: Colors.grey.shade200,
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                _isNegativeEnd() ? Colors.red : cs.primary,
-                              ),
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // ── Timeline card ─────────────────────────
-                    _card(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          const Text('مراحل الطلب',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 16),
-
-                          ...List.generate(_steps.length, (i) {
-                            final step = _steps[i];
-                            final stepOrder = _statusOrder(step.status);
-                            final isDone = stepOrder <= currentOrder &&
-                                !_isNegativeEnd();
-                            final isCurrent =
-                                step.status == request.status;
-                            final isLast = i == _steps.length - 1;
-
-                            // For negative end, color differently
-                            final dotColor = _isNegativeEnd() && isCurrent
-                                ? Colors.red
-                                : isDone
-                                    ? cs.primary
-                                    : Colors.grey.shade300;
-
-                            return Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                // Connector
-                                Column(
-                                  children: [
-                                    Container(
-                                      width: 14,
-                                      height: 14,
-                                      decoration: BoxDecoration(
-                                        shape: BoxShape.circle,
-                                        color: dotColor,
-                                        border: isCurrent
-                                            ? Border.all(
-                                                color: dotColor,
-                                                width: 2)
-                                            : null,
-                                      ),
-                                      child: isDone && !isCurrent
-                                          ? Icon(Icons.check,
-                                              size: 8,
-                                              color: cs.onPrimary)
-                                          : null,
-                                    ),
-                                    if (!isLast)
-                                      Container(
-                                        width: 2,
-                                        height: 44,
-                                        color: isDone
-                                            ? cs.primary
-                                            : Colors.grey.shade200,
-                                      ),
-                                  ],
-                                ),
-                                const SizedBox(width: 12),
-                                // Label
-                                Expanded(
-                                  child: Padding(
-                                    padding:
-                                        const EdgeInsets.only(bottom: 8),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.end,
-                                      children: [
-                                        Text(
-                                          step.label,
-                                          style: TextStyle(
-                                            fontSize: 14,
-                                            fontWeight: isCurrent
-                                                ? FontWeight.bold
-                                                : FontWeight.normal,
-                                            color: isDone
-                                                ? cs.onSurface
-                                                : Colors.grey,
-                                          ),
-                                        ),
-                                        if (isCurrent)
-                                          StatusBadgeWidget(
-                                              status: request.status),
-                                      ],
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            );
-                          }),
-
-                          // Show rejected/cancelled as extra step at end
-                          if (_isNegativeEnd()) ...[
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Container(
-                                  width: 14,
-                                  height: 14,
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.red,
-                                  ),
-                                  child: const Icon(Icons.close,
-                                      size: 8, color: Colors.white),
-                                ),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.end,
-                                    children: [
-                                      StatusBadgeWidget(
-                                          status: request.status),
-                                    ],
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // ── Details card ──────────────────────────
-                    _card(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          const Text('تفاصيل الطلب',
-                              style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold)),
-                          const SizedBox(height: 12),
-                          if (request.title != null &&
-                              request.title!.isNotEmpty)
-                            _detailRow(
-                              icon: Icons.title_outlined,
-                              label: 'العنوان',
-                              value: request.title!,
-                            ),
-                          if (request.description != null &&
-                              request.description!.isNotEmpty) ...[
-                            const SizedBox(height: 10),
-                            _detailRow(
-                              icon: Icons.description_outlined,
-                              label: 'الوصف',
-                              value: request.description!,
-                            ),
-                          ],
-                          const SizedBox(height: 10),
-                          _detailRow(
-                            icon: Icons.calendar_today_outlined,
-                            label: 'تاريخ التقديم',
-                            value: request.date,
-                          ),
-                          if (request.updatedAt != null &&
-                              request.updatedAt!.isNotEmpty) ...[
-                            const SizedBox(height: 10),
-                            _detailRow(
-                              icon: Icons.update_outlined,
-                              label: 'آخر تحديث',
-                              value: request.updatedAt!,
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-
-                    // ── Tax payment card ──────────────────────
-                    if (request.status == RequestStatus.approved ||
-                        request.status == RequestStatus.taxPaid) ...[
-                      const SizedBox(height: 12),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFFFF8F0),
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                              color: Colors.orange.shade200),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
+                    return Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Column(
                           children: [
-                            const Text('الرسوم المستحقة',
-                                style: TextStyle(
-                                    fontSize: 13, color: Colors.grey)),
-                            const SizedBox(height: 4),
-                            const Text(
-                              '5,000 ل.ل',
-                              style: TextStyle(
-                                fontSize: 28,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.orange,
-                              ),
+                            Container(
+                              width: 14,
+                              height: 14,
+                              decoration: BoxDecoration(shape: BoxShape.circle, color: dotColor),
+                              child: isDone && !isCurrent
+                                  ? Icon(Icons.check, size: 8, color: colors.onPrimary)
+                                  : null,
                             ),
-                            const SizedBox(height: 14),
-                            request.status == RequestStatus.taxPaid
-                                ? Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.symmetric(
-                                        vertical: 12),
-                                    decoration: BoxDecoration(
-                                      color: const Color(0xFFE8F5E9),
-                                      borderRadius:
-                                          BorderRadius.circular(12),
-                                    ),
-                                    child: const Text(
-                                      '✓ تم الدفع',
-                                      textAlign: TextAlign.center,
-                                      style: TextStyle(
-                                          color: Colors.green,
-                                          fontWeight: FontWeight.bold),
-                                    ),
-                                  )
-                                : PrimaryButton(
-                                    label: 'ادفع الآن',
-                                    onPressed: () {},
-                                  ),
+                            if (!isLast)
+                              Container(
+                                width: 2,
+                                height: 44,
+                                color: isDone ? colors.primary.withOpacity(0.4) : colors.outline.withOpacity(0.15),
+                              ),
                           ],
                         ),
-                      ),
-                    ],
-
-                    const SizedBox(height: 20),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Padding(
+                            padding: const EdgeInsets.only(bottom: 8),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  StatusBadgeWidget.label(AppLocalizations.of(context)!, step.status),
+                                  style: theme.textTheme.bodyMedium?.copyWith(
+                                    fontWeight: isCurrent ? FontWeight.w700 : FontWeight.normal,
+                                    color: isDone ? colors.onSurface : colors.outline,
+                                  ),
+                                ),
+                                if (isCurrent)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 4),
+                                    child: StatusBadgeWidget(status: request.status),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }),
+                  if (_isNegativeEnd) ...[
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 14,
+                          height: 14,
+                          decoration: BoxDecoration(shape: BoxShape.circle, color: colors.error),
+                          child: Icon(Icons.close, size: 8, color: colors.onError),
+                        ),
+                        const SizedBox(width: 12),
+                        StatusBadgeWidget(status: request.status),
+                      ],
+                    ),
                   ],
-                ),
+                ],
               ),
             ),
+
+            const SizedBox(height: 12),
+
+            // Details card
+            _Card(
+              theme: theme,
+              colors: colors,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(loc.details, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                  const SizedBox(height: 12),
+                  if (request.title.isNotEmpty)
+                    _DetailRow(icon: Icons.title_outlined, label: loc.titleLabel, value: request.title, theme: theme, colors: colors),
+                  if (request.description.isNotEmpty) ...[
+                    const Divider(height: 20),
+                    _DetailRow(icon: Icons.description_outlined, label: loc.descriptionLabel, value: request.description, theme: theme, colors: colors),
+                  ],
+                  if (request.serviceName != null && request.serviceName!.isNotEmpty) ...[
+                    const Divider(height: 20),
+                    _DetailRow(icon: Icons.description_outlined, label: loc.services, value: request.serviceName!, theme: theme, colors: colors),
+                  ],
+                  if (request.addressText != null && request.addressText!.isNotEmpty) ...[
+                    const Divider(height: 20),
+                    _DetailRow(icon: Icons.location_on_outlined, label: loc.address, value: request.addressText!, theme: theme, colors: colors),
+                  ],
+                  const Divider(height: 20),
+                  _DetailRow(
+                    icon: Icons.calendar_today_outlined,
+                    label: loc.submissionDate,
+                    value: _formatDate(request.createdAt),
+                    theme: theme,
+                    colors: colors,
+                  ),
+                  if (request.updatedAt != null) ...[
+                    const Divider(height: 20),
+                    _DetailRow(
+                      icon: Icons.update_outlined,
+                      label: loc.updatedAt,
+                      value: _formatDate(request.updatedAt),
+                      theme: theme,
+                      colors: colors,
+                    ),
+                  ],
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 24),
           ],
         ),
       ),
     );
   }
 
-  Widget _banner({
-    required IconData icon,
-    required String title,
-    required String message,
-    required Color color,
-    required Color bg,
-  }) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 12),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: bg,
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withOpacity(0.3)),
-      ),
-      child: Row(
-        children: [
-          const Spacer(),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Text(title,
-                  style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      color: color,
-                      fontSize: 14)),
-              const SizedBox(height: 4),
-              Text(message,
-                  style: TextStyle(color: color.withOpacity(0.8),
-                      fontSize: 12)),
-            ],
-          ),
-          const SizedBox(width: 10),
-          Icon(icon, color: color, size: 28),
-        ],
-      ),
-    );
-  }
-
-  Widget _card({required Widget child}) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
-        ],
-      ),
-      child: child,
-    );
-  }
-
-  Widget _detailRow({
-    required IconData icon,
-    required String label,
-    required String value,
-  }) {
-    return Row(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Spacer(),
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(label,
-                style: const TextStyle(
-                    fontSize: 11, color: Colors.grey)),
-            const SizedBox(height: 2),
-            Text(value,
-                textAlign: TextAlign.right,
-                style: const TextStyle(fontSize: 13)),
-          ],
-        ),
-        const SizedBox(width: 8),
-        Icon(icon, color: Colors.grey, size: 18),
-      ],
-    );
+  String _formatDate(DateTime? dt) {
+    if (dt == null) return '-';
+    return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}';
   }
 }
 
 class _StepDef {
-  final RequestStatus status;
+  final String status;
+  const _StepDef(this.status);
+}
+
+class _Banner extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String message;
+  final Color color;
+
+  const _Banner({required this.icon, required this.title, required this.message, required this.color});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: color.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(color: color.withOpacity(0.25)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, color: color, size: 28),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title, style: TextStyle(fontWeight: FontWeight.w700, color: color, fontSize: 14)),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Card extends StatelessWidget {
+  final Widget child;
+  final ThemeData theme;
+  final ColorScheme colors;
+
+  const _Card({required this.child, required this.theme, required this.colors});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.outline.withOpacity(0.12)),
+        boxShadow: [BoxShadow(color: colors.shadow.withOpacity(0.04), blurRadius: 8, offset: const Offset(0, 2))],
+      ),
+      child: child,
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  final IconData icon;
   final String label;
-  const _StepDef(this.status, this.label);
+  final String value;
+  final ThemeData theme;
+  final ColorScheme colors;
+
+  const _DetailRow({required this.icon, required this.label, required this.value, required this.theme, required this.colors});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          children: [
+            Icon(icon, size: 16, color: colors.outline),
+            const SizedBox(width: 8),
+            Text(label, style: theme.textTheme.bodySmall?.copyWith(color: colors.outline)),
+          ],
+        ),
+        const SizedBox(height: 4),
+        Text(value, style: theme.textTheme.bodyMedium),
+      ],
+    );
+  }
 }

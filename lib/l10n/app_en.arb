@@ -512,5 +512,22 @@
   "trafficIdentifierHint": "Car plate is required for traffic violations. Identity number is optional.",
   "generalIdentifierHint": "At least one of: name, identity number, or car plate must be provided.",
   "selectTypeFirst": "Please select a violation type first to see relevant fields.",
-  "deleteFailed": "Delete failed. Please try again."
+  "deleteFailed": "Delete failed. Please try again.",
+  "statusDraft": "Draft",
+  "statusCancelled": "Cancelled",
+  "statusDocumentsMissing": "Documents Missing",
+  "statusTaxPaid": "Tax Paid",
+  "statusTaxRejected": "Tax Rejected",
+  "requestSubmittedTitle": "Request Submitted!",
+  "requestSubmittedMsg": "Your request is being reviewed by the municipality",
+  "browseServices": "Browse Services",
+  "startRequest": "Start a Request",
+  "serviceDetails": "Service Details",
+  "loadFailed": "Failed to load. Please try again.",
+  "uploadingFiles": "Uploading...",
+  "ok": "OK",
+  "retry": "Try Again",
+  "takePhoto": "Take Photo",
+  "chooseFromGallery": "Choose from Gallery",
+  "chooseDocument": "Choose PDF or Document"
 }

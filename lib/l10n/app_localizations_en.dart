@@ -1195,4 +1195,55 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get deleteFailed => 'Delete failed. Please try again.';
+
+  @override
+  String get statusDraft => 'Draft';
+
+  @override
+  String get statusCancelled => 'Cancelled';
+
+  @override
+  String get statusDocumentsMissing => 'Documents Missing';
+
+  @override
+  String get statusTaxPaid => 'Tax Paid';
+
+  @override
+  String get statusTaxRejected => 'Tax Rejected';
+
+  @override
+  String get requestSubmittedTitle => 'Request Submitted!';
+
+  @override
+  String get requestSubmittedMsg => 'Your request is being reviewed by the municipality';
+
+  @override
+  String get browseServices => 'Browse Services';
+
+  @override
+  String get startRequest => 'Start a Request';
+
+  @override
+  String get serviceDetails => 'Service Details';
+
+  @override
+  String get loadFailed => 'Failed to load. Please try again.';
+
+  @override
+  String get uploadingFiles => 'Uploading...';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get retry => 'Try Again';
+
+  @override
+  String get takePhoto => 'Take Photo';
+
+  @override
+  String get chooseFromGallery => 'Choose from Gallery';
+
+  @override
+  String get chooseDocument => 'Choose PDF or Document';
 }

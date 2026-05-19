@@ -518,6 +518,23 @@
   "trafficIdentifierHint": "La plaque est obligatoire pour les infractions routières. Le numéro d'identité est facultatif.",
   "generalIdentifierHint": "Au moins un parmi : nom, numéro d'identité ou plaque d'immatriculation doit être fourni.",
   "selectTypeFirst": "Veuillez d'abord sélectionner un type d'infraction pour voir les champs pertinents.",
-  "deleteFailed": "Échec de la suppression. Veuillez réessayer."
+  "deleteFailed": "Échec de la suppression. Veuillez réessayer.",
+  "statusDraft": "Brouillon",
+  "statusCancelled": "Annulé",
+  "statusDocumentsMissing": "Documents manquants",
+  "statusTaxPaid": "Taxe payée",
+  "statusTaxRejected": "Taxe rejetée",
+  "requestSubmittedTitle": "Demande soumise!",
+  "requestSubmittedMsg": "Votre demande est en cours d'examen par la municipalité",
+  "browseServices": "Parcourir les services",
+  "startRequest": "Démarrer une demande",
+  "serviceDetails": "Détails du service",
+  "loadFailed": "Échec du chargement. Veuillez réessayer.",
+  "uploadingFiles": "Téléchargement en cours...",
+  "ok": "OK",
+  "retry": "Réessayer",
+  "takePhoto": "Prendre une photo",
+  "chooseFromGallery": "Choisir depuis la galerie",
+  "chooseDocument": "Choisir un PDF ou document"
 }
 
