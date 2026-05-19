@@ -29,6 +29,15 @@ class _RequestsScreenState extends State<RequestsScreen> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    final bloc = context.read<RequestsBloc>();
+    if (!bloc.state.isLoading && bloc.state.requests.isEmpty) {
+      bloc.add(RequestsLoadRequested());
+    }
+  }
+
+  @override
   void dispose() {
     _searchCtrl.dispose();
     super.dispose();
