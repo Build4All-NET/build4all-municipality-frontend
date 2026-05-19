@@ -507,8 +507,17 @@
   "carPlate": "Plaque d'immatriculation",
   "enterCarPlate": "Entrez le numéro de plaque du véhicule",
   "identifierRequired": "Veuillez fournir au moins un numéro d'identité ou une plaque",
-  "nameRequiresIdentifier": "Si un nom est fourni, vous devez ajouter un numéro d'identité ou une plaque"
-
-
+  "nameRequiresIdentifier": "Si un nom est fourni, vous devez ajouter un numéro d'identité ou une plaque",
+  "carPlateRequired": "La plaque est obligatoire pour les infractions de circulation",
+  "violationDetails": "Détails de l'infraction",
+  "citizenInfo": "Informations du citoyen",
+  "vehicleInfo": "Informations du véhicule",
+  "businessOwnerInfo": "Informations de l'établissement / propriétaire",
+  "businessOwnerName": "Nom de l'établissement / propriétaire",
+  "paymentAndAssignment": "Paiement et affectation",
+  "trafficIdentifierHint": "La plaque est obligatoire pour les infractions routières. Le numéro d'identité est facultatif.",
+  "generalIdentifierHint": "Au moins un parmi : nom, numéro d'identité ou plaque d'immatriculation doit être fourni.",
+  "selectTypeFirst": "Veuillez d'abord sélectionner un type d'infraction pour voir les champs pertinents.",
+  "deleteFailed": "Échec de la suppression. Veuillez réessayer."
 }
 

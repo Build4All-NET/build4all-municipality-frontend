@@ -500,5 +500,16 @@
   "carPlate": "لوحة السيارة",
   "enterCarPlate": "أدخل رقم لوحة المركبة",
   "identifierRequired": "يرجى تقديم رقم الهوية أو لوحة السيارة على الأقل",
-  "nameRequiresIdentifier": "إذا تم إدخال اسم، يجب إضافة رقم الهوية أو لوحة السيارة"
+  "nameRequiresIdentifier": "إذا تم إدخال اسم، يجب إضافة رقم الهوية أو لوحة السيارة",
+  "carPlateRequired": "لوحة السيارة مطلوبة للمخالفات المرورية",
+  "violationDetails": "تفاصيل المخالفة",
+  "citizenInfo": "معلومات المواطن",
+  "vehicleInfo": "معلومات المركبة",
+  "businessOwnerInfo": "معلومات المنشأة / المالك",
+  "businessOwnerName": "اسم المنشأة / المالك",
+  "paymentAndAssignment": "الدفع والتعيين",
+  "trafficIdentifierHint": "لوحة السيارة مطلوبة للمخالفات المرورية. رقم الهوية اختياري.",
+  "generalIdentifierHint": "يجب توفير واحد على الأقل من: الاسم، رقم الهوية، أو لوحة السيارة.",
+  "selectTypeFirst": "يرجى اختيار نوع المخالفة أولاً لعرض الحقول المناسبة.",
+  "deleteFailed": "فشل الحذف. يرجى المحاولة مجدداً."
 }

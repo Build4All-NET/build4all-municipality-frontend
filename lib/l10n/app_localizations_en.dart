@@ -1159,4 +1159,40 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get nameRequiresIdentifier =>
       'If a name is provided, you must also add Identity Number or Car Plate';
+
+  @override
+  String get carPlateRequired => 'Car plate is required for traffic violations';
+
+  @override
+  String get violationDetails => 'Violation Details';
+
+  @override
+  String get citizenInfo => 'Citizen Information';
+
+  @override
+  String get vehicleInfo => 'Vehicle Information';
+
+  @override
+  String get businessOwnerInfo => 'Business / Owner Information';
+
+  @override
+  String get businessOwnerName => 'Business / Owner Name';
+
+  @override
+  String get paymentAndAssignment => 'Payment & Assignment';
+
+  @override
+  String get trafficIdentifierHint =>
+      'Car plate is required for traffic violations. Identity number is optional.';
+
+  @override
+  String get generalIdentifierHint =>
+      'At least one of: name, identity number, or car plate must be provided.';
+
+  @override
+  String get selectTypeFirst =>
+      'Please select a violation type first to see relevant fields.';
+
+  @override
+  String get deleteFailed => 'Delete failed. Please try again.';
 }

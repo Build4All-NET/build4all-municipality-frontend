@@ -2338,6 +2338,17 @@ abstract class AppLocalizations {
   String get enterCarPlate;
   String get identifierRequired;
   String get nameRequiresIdentifier;
+  String get carPlateRequired;
+  String get violationDetails;
+  String get citizenInfo;
+  String get vehicleInfo;
+  String get businessOwnerInfo;
+  String get businessOwnerName;
+  String get paymentAndAssignment;
+  String get trafficIdentifierHint;
+  String get generalIdentifierHint;
+  String get selectTypeFirst;
+  String get deleteFailed;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

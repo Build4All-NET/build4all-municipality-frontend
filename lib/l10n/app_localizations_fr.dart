@@ -1159,4 +1159,41 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get nameRequiresIdentifier =>
       "Si un nom est fourni, vous devez ajouter un numéro d'identité ou une plaque";
+
+  @override
+  String get carPlateRequired =>
+      "La plaque est obligatoire pour les infractions de circulation";
+
+  @override
+  String get violationDetails => "Détails de l'infraction";
+
+  @override
+  String get citizenInfo => 'Informations du citoyen';
+
+  @override
+  String get vehicleInfo => 'Informations du véhicule';
+
+  @override
+  String get businessOwnerInfo => "Informations de l'établissement / propriétaire";
+
+  @override
+  String get businessOwnerName => "Nom de l'établissement / propriétaire";
+
+  @override
+  String get paymentAndAssignment => 'Paiement et affectation';
+
+  @override
+  String get trafficIdentifierHint =>
+      "La plaque est obligatoire pour les infractions routières. Le numéro d'identité est facultatif.";
+
+  @override
+  String get generalIdentifierHint =>
+      "Au moins un parmi : nom, numéro d'identité ou plaque d'immatriculation doit être fourni.";
+
+  @override
+  String get selectTypeFirst =>
+      "Veuillez d'abord sélectionner un type d'infraction pour voir les champs pertinents.";
+
+  @override
+  String get deleteFailed => 'Échec de la suppression. Veuillez réessayer.';
 }

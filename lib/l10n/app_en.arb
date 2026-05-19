@@ -501,5 +501,16 @@
   "carPlate": "Car Plate",
   "enterCarPlate": "Enter vehicle plate number",
   "identifierRequired": "Please provide at least Identity Number or Car Plate",
-  "nameRequiresIdentifier": "If a name is provided, you must also add Identity Number or Car Plate"
+  "nameRequiresIdentifier": "If a name is provided, you must also add Identity Number or Car Plate",
+  "carPlateRequired": "Car plate is required for traffic violations",
+  "violationDetails": "Violation Details",
+  "citizenInfo": "Citizen Information",
+  "vehicleInfo": "Vehicle Information",
+  "businessOwnerInfo": "Business / Owner Information",
+  "businessOwnerName": "Business / Owner Name",
+  "paymentAndAssignment": "Payment & Assignment",
+  "trafficIdentifierHint": "Car plate is required for traffic violations. Identity number is optional.",
+  "generalIdentifierHint": "At least one of: name, identity number, or car plate must be provided.",
+  "selectTypeFirst": "Please select a violation type first to see relevant fields.",
+  "deleteFailed": "Delete failed. Please try again."
 }

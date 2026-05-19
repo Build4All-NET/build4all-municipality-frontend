@@ -1159,4 +1159,40 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get nameRequiresIdentifier =>
       'إذا تم إدخال اسم، يجب إضافة رقم الهوية أو لوحة السيارة';
+
+  @override
+  String get carPlateRequired => 'لوحة السيارة مطلوبة للمخالفات المرورية';
+
+  @override
+  String get violationDetails => 'تفاصيل المخالفة';
+
+  @override
+  String get citizenInfo => 'معلومات المواطن';
+
+  @override
+  String get vehicleInfo => 'معلومات المركبة';
+
+  @override
+  String get businessOwnerInfo => 'معلومات المنشأة / المالك';
+
+  @override
+  String get businessOwnerName => 'اسم المنشأة / المالك';
+
+  @override
+  String get paymentAndAssignment => 'الدفع والتعيين';
+
+  @override
+  String get trafficIdentifierHint =>
+      'لوحة السيارة مطلوبة للمخالفات المرورية. رقم الهوية اختياري.';
+
+  @override
+  String get generalIdentifierHint =>
+      'يجب توفير واحد على الأقل من: الاسم، رقم الهوية، أو لوحة السيارة.';
+
+  @override
+  String get selectTypeFirst =>
+      'يرجى اختيار نوع المخالفة أولاً لعرض الحقول المناسبة.';
+
+  @override
+  String get deleteFailed => 'فشل الحذف. يرجى المحاولة مجدداً.';
 }
