@@ -1,3 +1,4 @@
+import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/admin/violations/data/Repository/violation_Repository_impl.dart';
 import 'package:baladiyati/features/admin/violations/data/services/violation_api_services.dart';
@@ -90,7 +91,6 @@ class _ViolationsBodyState extends State<ViolationsBody> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -112,11 +112,10 @@ class _ViolationsBodyState extends State<ViolationsBody> {
       body: BlocConsumer<ViolationBloc, ViolationState>(
         listener: (context, state) {
           if (state is ViolationError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: colors.error,
-              ),
+            AppToast.show(
+              context,
+              message: state.message,
+              type: AppToastType.error,
             );
           }
         },

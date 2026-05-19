@@ -1,5 +1,4 @@
 import 'package:baladiyati/app/app_router.dart';
-import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/core/l10n/locale_cubit.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/admin/Departement/data/Service/Departement_Api_Service.dart';
@@ -21,6 +20,7 @@ class DashboardPage extends StatefulWidget {
   State<DashboardPage> createState() => _DashboardPageState();
 }
 
+// -1 means the count failed to load (shown as "-")
 class _AdminDashboardStats {
   final int announcementsCount;
   final int violationsCount;
@@ -38,11 +38,11 @@ class _AdminDashboardStats {
 
   factory _AdminDashboardStats.empty() {
     return const _AdminDashboardStats(
-      announcementsCount: 0,
-      violationsCount: 0,
-      departmentsCount: 0,
-      servicesCount: 0,
-      employeesCount: 0,
+      announcementsCount: -1,
+      violationsCount: -1,
+      departmentsCount: -1,
+      servicesCount: -1,
+      employeesCount: -1,
     );
   }
 }
@@ -71,21 +71,37 @@ class _DashboardPageState extends State<DashboardPage> {
     _statsFuture = _loadStats();
   }
 
+  // Each API is wrapped independently — one failure never breaks the others.
   Future<_AdminDashboardStats> _loadStats() async {
-    final results = await Future.wait([
-      _announcementApiService.getAll(),
-      _violationApiService.getAllViolations(),
-      _departmentApiService.getAll(),
-      _serviceApiService.getServices(),
-      _employeeApiService.getEmployees(),
+    final counts = await Future.wait([
+      _announcementApiService
+          .getAll()
+          .then<int>((v) => v.length)
+          .catchError((_) => -1),
+      _violationApiService
+          .getAllViolations()
+          .then<int>((v) => v.length)
+          .catchError((_) => -1),
+      _departmentApiService
+          .getAll()
+          .then<int>((v) => v.length)
+          .catchError((_) => -1),
+      _serviceApiService
+          .getServices()
+          .then<int>((v) => v.length)
+          .catchError((_) => -1),
+      _employeeApiService
+          .getEmployees()
+          .then<int>((v) => v.length)
+          .catchError((_) => -1),
     ]);
 
     return _AdminDashboardStats(
-      announcementsCount: results[0].length,
-      violationsCount: results[1].length,
-      departmentsCount: results[2].length,
-      servicesCount: results[3].length,
-      employeesCount: results[4].length,
+      announcementsCount: counts[0],
+      violationsCount: counts[1],
+      departmentsCount: counts[2],
+      servicesCount: counts[3],
+      employeesCount: counts[4],
     );
   }
 
@@ -221,21 +237,13 @@ class _DashboardPageState extends State<DashboardPage> {
 
     await _refreshStats();
   }
-void _openServices() {
-  AppRouter.goToServices(context);
-}
 
-void _openDepartments() {
-  AppRouter.goToDepartments(context);
-}
+  void _openServices() => AppRouter.goToServices(context);
+  void _openDepartments() => AppRouter.goToDepartments(context);
+  void _openEmployees() => AppRouter.goToEmployees(context);
+  void _openInbox() => AppRouter.goToRequests(context);
 
-void _openEmployees() {
-  AppRouter.goToEmployees(context);
-}
-
-void _openInbox() {
-  AppRouter.goToRequests(context);
-}
+  String _formatCount(int count) => count < 0 ? '-' : '$count';
 
   @override
   Widget build(BuildContext context) {
@@ -257,7 +265,7 @@ void _openInbox() {
           IconButton(
             tooltip: loc.profile,
             icon: const Icon(Icons.person_outline),
-           onPressed: () => AppRouter.goToAdminProfile(context),
+            onPressed: () => AppRouter.goToAdminProfile(context),
           ),
           IconButton(
             tooltip: loc.logout,
@@ -281,19 +289,9 @@ void _openInbox() {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _WelcomeHeader(
-                    isLoading: isLoading,
-                  ),
+                  _WelcomeHeader(isLoading: isLoading),
 
                   const SizedBox(height: 16),
-
-                  if (snapshot.hasError) ...[
-                    _ErrorBox(
-                      message: loc.networkError,
-                      onRetry: _refreshStats,
-                    ),
-                    const SizedBox(height: 16),
-                  ],
 
                   GridView.count(
                     crossAxisCount: 2,
@@ -305,31 +303,31 @@ void _openInbox() {
                     children: [
                       _StatCard(
                         title: loc.announcements,
-                        value: isLoading ? '...' : '${stats.announcementsCount}',
+                        value: isLoading ? '...' : _formatCount(stats.announcementsCount),
                         icon: Icons.campaign_outlined,
                         iconColor: colors.primary,
                       ),
                       _StatCard(
                         title: loc.violations,
-                        value: isLoading ? '...' : '${stats.violationsCount}',
+                        value: isLoading ? '...' : _formatCount(stats.violationsCount),
                         icon: Icons.gavel_outlined,
                         iconColor: colors.error,
                       ),
                       _StatCard(
                         title: loc.departments,
-                        value: isLoading ? '...' : '${stats.departmentsCount}',
+                        value: isLoading ? '...' : _formatCount(stats.departmentsCount),
                         icon: Icons.account_tree_outlined,
                         iconColor: colors.tertiary,
                       ),
                       _StatCard(
                         title: loc.services,
-                        value: isLoading ? '...' : '${stats.servicesCount}',
+                        value: isLoading ? '...' : _formatCount(stats.servicesCount),
                         icon: Icons.description_outlined,
                         iconColor: colors.secondary,
                       ),
                       _StatCard(
                         title: loc.employees,
-                        value: isLoading ? '...' : '${stats.employeesCount}',
+                        value: isLoading ? '...' : _formatCount(stats.employeesCount),
                         icon: Icons.groups_outlined,
                         iconColor: colors.primary,
                       ),
@@ -399,46 +397,6 @@ void _openInbox() {
                       ),
                     ],
                   ),
-
-                  const SizedBox(height: 24),
-
-                  _SectionCard(
-                    title: loc.recentActivity,
-                    children: [
-                      _ActivityItem(
-                        text: loc.approvedRequest,
-                        color: Colors.green,
-                      ),
-                      _ActivityItem(
-                        text: loc.newRequest,
-                        color: colors.primary,
-                      ),
-                      _ActivityItem(
-                        text: loc.missingDocs,
-                        color: Colors.orange,
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 16),
-
-                  _SectionCard(
-                    title: loc.monthPerformance,
-                    children: [
-                      _PerformanceItem(
-                        title: loc.completedRequests,
-                        value: '-',
-                      ),
-                      _PerformanceItem(
-                        title: loc.avgTime,
-                        value: '-',
-                      ),
-                      _PerformanceItem(
-                        title: loc.satisfaction,
-                        value: '-',
-                      ),
-                    ],
-                  ),
                 ],
               ),
             );
@@ -449,12 +407,12 @@ void _openInbox() {
   }
 }
 
+// ─────────────────────────────────────────────────────────────────────────────
+
 class _WelcomeHeader extends StatelessWidget {
   final bool isLoading;
 
-  const _WelcomeHeader({
-    required this.isLoading,
-  });
+  const _WelcomeHeader({required this.isLoading});
 
   @override
   Widget build(BuildContext context) {
@@ -636,172 +594,6 @@ class _ActionCard extends StatelessWidget {
             ),
           ],
         ),
-      ),
-    );
-  }
-}
-
-class _SectionCard extends StatelessWidget {
-  final String title;
-  final List<Widget> children;
-
-  const _SectionCard({
-    required this.title,
-    required this.children,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        color: colors.surface,
-        borderRadius: BorderRadius.circular(22),
-        border: Border.all(
-          color: colors.outline.withOpacity(0.14),
-        ),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(
-            title,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-          const SizedBox(height: 12),
-          ...children,
-        ],
-      ),
-    );
-  }
-}
-
-class _ActivityItem extends StatelessWidget {
-  final String text;
-  final Color color;
-
-  const _ActivityItem({
-    required this.text,
-    required this.color,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isRtl = Directionality.of(context) == TextDirection.rtl;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: Row(
-        textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
-        children: [
-          CircleAvatar(
-            radius: 5,
-            backgroundColor: color,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              text,
-              style: theme.textTheme.bodyMedium,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _PerformanceItem extends StatelessWidget {
-  final String title;
-  final String value;
-
-  const _PerformanceItem({
-    required this.title,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final isRtl = Directionality.of(context) == TextDirection.rtl;
-
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: Row(
-        textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
-        children: [
-          Expanded(
-            child: Text(
-              title,
-              style: theme.textTheme.bodyMedium,
-            ),
-          ),
-          Text(
-            value,
-            style: theme.textTheme.titleSmall?.copyWith(
-              fontWeight: FontWeight.w900,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _ErrorBox extends StatelessWidget {
-  final String message;
-  final Future<void> Function() onRetry;
-
-  const _ErrorBox({
-    required this.message,
-    required this.onRetry,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final colors = theme.colorScheme;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: colors.error.withOpacity(0.08),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: colors.error.withOpacity(0.20),
-        ),
-      ),
-      child: Row(
-        children: [
-          Icon(
-            Icons.error_outline,
-            color: colors.error,
-          ),
-          const SizedBox(width: 10),
-          Expanded(
-            child: Text(
-              message,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colors.error,
-              ),
-            ),
-          ),
-          IconButton(
-            onPressed: onRetry,
-            icon: Icon(
-              Icons.refresh,
-              color: colors.error,
-            ),
-          ),
-        ],
       ),
     );
   }

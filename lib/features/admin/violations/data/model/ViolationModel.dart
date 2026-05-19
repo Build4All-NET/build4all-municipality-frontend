@@ -62,8 +62,8 @@ class ViolationModel extends Violation {
 
   Map<String, dynamic> toJson() {
     return {
-      // Backend ViolationDTO uses 'name' not 'citizenName'
-      'name': citizenName.trim(),
+      // Backend ViolationDTO uses 'name' for citizen name — only send when non-empty
+      if (citizenName.trim().isNotEmpty) 'name': citizenName.trim(),
       'departmentId': departmentId,
       'title': title.trim(),
       'description': description.trim(),
@@ -74,10 +74,8 @@ class ViolationModel extends Violation {
         'identityNumber': identityNumber,
       if (carPlate != null && carPlate!.isNotEmpty)
         'carPlate': carPlate,
-      if (type != null && type!.isNotEmpty)
-        'type': type,
-      if (municipalityId != null)
-        'municipalityId': municipalityId,
+      if (type != null && type!.isNotEmpty) 'type': type,
+      if (municipalityId != null) 'municipalityId': municipalityId,
     };
   }
 
