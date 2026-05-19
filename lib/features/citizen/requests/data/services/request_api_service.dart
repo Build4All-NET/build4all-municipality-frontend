@@ -19,6 +19,10 @@ class RequestApiService {
         list = data['data'] as List;
       } else if (data is Map && data['requests'] is List) {
         list = data['requests'] as List;
+      } else if (data is Map && data['content'] is List) {
+        list = data['content'] as List;
+      } else if (data is Map && data['items'] is List) {
+        list = data['items'] as List;
       } else {
         list = [];
       }

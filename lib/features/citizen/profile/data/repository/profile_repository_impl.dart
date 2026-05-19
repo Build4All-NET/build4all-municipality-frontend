@@ -2,6 +2,7 @@ import 'package:baladiyati/features/citizen/profile/domain/repository/profile_re
 
 import '../../domain/entities/profile_entity.dart';
 
+import '../models/municipality_profile_model.dart';
 import '../models/profile_model.dart';
 import '../services/profile_api_service.dart';
 
@@ -15,12 +16,14 @@ class ProfileRepositoryImpl implements ProfileRepository {
   @override
   Future<ProfileEntity> getProfile() async {
     final core = await api.getBuild4AllProfile();
-    final municipality = await api.getMunicipalityProfile();
+    MunicipalityProfileModel? municipality;
+    try {
+      municipality = await api.getMunicipalityProfile();
+    } catch (_) {
+      // municipality profile may not exist yet; use Build4All data only
+    }
 
-    return ProfileModel.fromParts(
-      core: core,
-      municipality: municipality,
-    );
+    return ProfileModel.fromParts(core: core, municipality: municipality);
   }
 
   @override
