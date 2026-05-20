@@ -68,7 +68,7 @@ class RequestApiService {
   Future<void> updateStatus(int id, String status) async {
     try {
       await dio.put(
-        '/api/admin/requests/$id/status',
+        '/api/admin/requests/$id',
         data: {'status': status},
       );
     } on DioException catch (e) {
