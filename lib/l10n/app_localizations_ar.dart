@@ -1127,4 +1127,156 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get logoutSuccess => 'تم تسجيل الخروج بنجاح';
+
+  @override
+  String get violationTitle => 'عنوان المخالفة';
+
+  @override
+  String get enterViolationTitle => 'أدخل عنوان المخالفة';
+
+  @override
+  String get violationType => 'نوع المخالفة';
+
+  @override
+  String get selectViolationType => 'يرجى اختيار نوع المخالفة';
+
+  @override
+  String get identityNumber => 'رقم الهوية';
+
+  @override
+  String get enterIdentityNumber => 'أدخل رقم هوية المواطن';
+
+  @override
+  String get carPlate => 'لوحة السيارة';
+
+  @override
+  String get enterCarPlate => 'أدخل رقم لوحة المركبة';
+
+  @override
+  String get identifierRequired =>
+      'يرجى تقديم رقم الهوية أو لوحة السيارة على الأقل';
+
+  @override
+  String get nameRequiresIdentifier =>
+      'إذا تم إدخال اسم، يجب إضافة رقم الهوية أو لوحة السيارة';
+
+  @override
+  String get carPlateRequired => 'لوحة السيارة مطلوبة للمخالفات المرورية';
+
+  @override
+  String get violationDetails => 'تفاصيل المخالفة';
+
+  @override
+  String get citizenInfo => 'معلومات المواطن';
+
+  @override
+  String get vehicleInfo => 'معلومات المركبة';
+
+  @override
+  String get businessOwnerInfo => 'معلومات المنشأة / المالك';
+
+  @override
+  String get businessOwnerName => 'اسم المنشأة / المالك';
+
+  @override
+  String get paymentAndAssignment => 'الدفع والتعيين';
+
+  @override
+  String get trafficIdentifierHint =>
+      'لوحة السيارة مطلوبة للمخالفات المرورية. رقم الهوية اختياري.';
+
+  @override
+  String get generalIdentifierHint =>
+      'يجب توفير واحد على الأقل من: الاسم، رقم الهوية، أو لوحة السيارة.';
+
+  @override
+  String get selectTypeFirst =>
+      'يرجى اختيار نوع المخالفة أولاً لعرض الحقول المناسبة.';
+
+  @override
+  String get deleteFailed => 'فشل الحذف. يرجى المحاولة مجدداً.';
+
+  @override
+  String get statusDraft => 'مسودة';
+
+  @override
+  String get statusCancelled => 'ملغي';
+
+  @override
+  String get statusDocumentsMissing => 'وثائق مفقودة';
+
+  @override
+  String get statusTaxPaid => 'الضريبة مدفوعة';
+
+  @override
+  String get statusTaxRejected => 'رُفضت الضريبة';
+
+  @override
+  String get requestSubmittedTitle => 'تم إرسال الطلب!';
+
+  @override
+  String get requestSubmittedMsg => 'طلبك قيد المراجعة من قبل البلدية';
+
+  @override
+  String get browseServices => 'تصفح الخدمات';
+
+  @override
+  String get startRequest => 'ابدأ طلباً';
+
+  @override
+  String get serviceDetails => 'تفاصيل الخدمة';
+
+  @override
+  String get loadFailed => 'فشل التحميل. حاول مرة أخرى.';
+
+  @override
+  String get uploadingFiles => 'جاري الرفع...';
+
+  @override
+  String get ok => 'حسناً';
+
+  @override
+  String get retry => 'حاول مجدداً';
+
+  @override
+  String get takePhoto => 'التقط صورة';
+
+  @override
+  String get chooseFromGallery => 'اختر من المعرض';
+
+  @override
+  String get chooseDocument => 'اختر ملف PDF أو وثيقة';
+
+  @override
+  String get notSpecified => 'غير محدد';
+
+  @override
+  String get municipalityName => 'البلدية';
+
+  @override
+  String get violationTypeLabel => 'النوع';
+
+  @override
+  String get inboxTitle => 'صندوق الطلبات';
+
+  @override
+  String get networkErrorBanner => 'فشل تحميل بعض البيانات. اسحب للأسفل للمحاولة.';
+
+  @override
+  String get catGeneralServices => 'الخدمات العامة';
+
+  @override
+  String get catCommercialServices => 'الخدمات التجارية';
+
+  @override
+  String get catRealEstate => 'الخدمات العقارية';
+
+  @override
+  String get catEngineering => 'الخدمات الهندسية';
+
+  @override
+  String get statusInProgress => 'قيد المعالجة';
+
+  @override
+  String get requestsCount => 'الطلبات';
 }

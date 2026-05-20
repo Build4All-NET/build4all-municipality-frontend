@@ -1,5 +1,3 @@
-// lib/features/citizen/services/presentation/screens/new_request_screen.dart
-
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
@@ -11,10 +9,10 @@ import 'package:baladiyati/common/widgets/primary_button.dart';
 import 'package:baladiyati/features/citizen/services/data/models/request_submission.dart';
 import 'package:baladiyati/features/citizen/services/data/services/request_service.dart';
 import 'package:baladiyati/features/citizen/services/data/services/file_upload_service.dart';
-import 'services_by_category_screen.dart';
+import 'package:baladiyati/features/citizen/services/domain/entities/service_entity.dart';
 
 class NewRequestScreen extends StatefulWidget {
-  final ServiceItem service;
+  final ServiceEntity service;
   const NewRequestScreen({super.key, required this.service});
 
   @override
@@ -46,6 +44,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
   }
 
   Future<void> _pickFiles() async {
+    final loc = AppLocalizations.of(context)!;
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -58,9 +57,9 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: const Icon(Icons.camera_alt_outlined,
-                    color: Colors.blue),
-                title: const Text('Take Photo'),
+                leading: Icon(Icons.camera_alt_outlined,
+                    color: Theme.of(context).colorScheme.primary),
+                title: Text(loc.takePhoto),
                 onTap: () async {
                   Navigator.pop(context);
                   final picked = await _imagePicker.pickImage(
@@ -76,9 +75,9 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.photo_library_outlined,
-                    color: Colors.green),
-                title: const Text('Choose Images from Gallery'),
+                leading: Icon(Icons.photo_library_outlined,
+                    color: Theme.of(context).colorScheme.secondary),
+                title: Text(loc.chooseFromGallery),
                 onTap: () async {
                   Navigator.pop(context);
                   final picked =
@@ -94,16 +93,16 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                 },
               ),
               ListTile(
-                leading: const Icon(Icons.picture_as_pdf_outlined,
-                    color: Colors.red),
-                title: const Text('Choose PDF or Document'),
+                leading: Icon(Icons.picture_as_pdf_outlined,
+                    color: Theme.of(context).colorScheme.error),
+                title: Text(loc.chooseDocument),
                 onTap: () async {
                   Navigator.pop(context);
                   final result = await FilePicker.platform.pickFiles(
                     allowMultiple: true,
                     type: FileType.custom,
                     allowedExtensions: [
-                      'pdf','doc','docx','jpg','jpeg','png',
+                      'pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png',
                     ],
                   );
                   if (result != null && result.files.isNotEmpty) {
@@ -134,10 +133,11 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
 
   Widget _fileIcon(String fileName) {
     final ext = fileName.split('.').last.toLowerCase();
+    final colors = Theme.of(context).colorScheme;
     if (ext == 'pdf') {
-      return const Icon(Icons.picture_as_pdf, color: Colors.red, size: 36);
+      return Icon(Icons.picture_as_pdf, color: colors.error, size: 36);
     } else if (['doc', 'docx'].contains(ext)) {
-      return const Icon(Icons.description, color: Colors.blue, size: 36);
+      return Icon(Icons.description, color: colors.primary, size: 36);
     } else {
       final idx = _selectedFileNames.indexOf(fileName);
       if (idx >= 0 && idx < _selectedFiles.length) {
@@ -151,12 +151,13 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
           ),
         );
       }
-      return const Icon(Icons.insert_drive_file, color: Colors.grey, size: 36);
+      return Icon(Icons.insert_drive_file, color: colors.outline, size: 36);
     }
   }
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+    final loc = AppLocalizations.of(context)!;
     setState(() => _isLoading = true);
 
     try {
@@ -168,7 +169,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
       }
 
       await _requestService.submitRequest(
-        serviceId: widget.service.id,
+        serviceId: widget.service.id.toString(),
         submission: RequestSubmission(
           title: _titleCtrl.text.trim(),
           description: _descCtrl.text.trim(),
@@ -181,13 +182,13 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
 
       if (!mounted) return;
 
-      // Success toast instead of just dialog button
       AppToast.show(
         context,
-        message: 'تم تقديم الطلب بنجاح!',
+        message: loc.requestSubmittedTitle,
         type: AppToastType.success,
       );
 
+      final colors = Theme.of(context).colorScheme;
       showDialog(
         context: context,
         barrierDismissible: false,
@@ -198,24 +199,28 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const Icon(Icons.check_circle, color: Colors.green, size: 72),
+              Icon(Icons.check_circle, color: colors.primary, size: 72),
               const SizedBox(height: 16),
-              const Text(
-                'تم تقديم الطلب بنجاح!',
+              Text(
+                loc.requestSubmittedTitle,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 8),
               Text(
-                'سيتم مراجعة طلبك من قبل البلدية',
+                loc.requestSubmittedMsg,
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 13, color: Colors.grey.shade600),
+                style: Theme.of(context)
+                    .textTheme
+                    .bodyMedium
+                    ?.copyWith(color: colors.outline),
               ),
               const SizedBox(height: 20),
-
-              //  PrimaryButton replaces raw ElevatedButton
               PrimaryButton(
-                label: 'حسناً',
+                label: loc.ok,
                 onPressed: () =>
                     Navigator.popUntil(context, (route) => route.isFirst),
               ),
@@ -226,8 +231,6 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
     } catch (e) {
       if (!mounted) return;
       setState(() => _isUploading = false);
-
-      //  AppToast.error 
       AppToast.show(
         context,
         message: e.toString().replaceAll('Exception:', '').trim(),
@@ -240,313 +243,298 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
+    final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final langCode = Localizations.localeOf(context).languageCode;
     final s = widget.service;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF3F4F6),
-      body: SafeArea(
-        child: Column(
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        title: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // ── Header ───────────────────────────────────────
-            Container(
-              color: Colors.white,
-              padding: const EdgeInsets.fromLTRB(8, 12, 16, 12),
-              child: Row(
-                children: [
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.arrow_forward),
-                  ),
-                  const SizedBox(width: 4),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(l10n.newRequest,
-                            style: const TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold)),
-                        Text(s.nameAr,
-                            style: const TextStyle(
-                                fontSize: 12, color: Colors.grey)),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-
-            // ── Form ─────────────────────────────────────────
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    children: [
-                      // Service info card
-                      _card(
-                        title: l10n.serviceInfo,
-                        child: Column(
-                          children: [
-                            _infoRow(
-                              label: l10n.feeLabel,
-                              value: s.fee == 0
-                                  ? l10n.free
-                                  : '${_fmt(s.fee)} ${l10n.lbp}',
-                            ),
-                            const SizedBox(height: 8),
-                            _infoRow(
-                              label: l10n.processingTime,
-                              value: '${s.processingDays} ${l10n.days}',
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-
-                      // Request details card
-                      _card(
-                        title: l10n.requestDetails,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            // AppTextField replaces raw TextFormField
-                            AppTextField(
-                              controller: _titleCtrl,
-                              label: l10n.titleLabel,
-                              hint: l10n.titleHint,
-                              textAlign: TextAlign.right,
-                              validator: (v) =>
-                                  (v == null || v.trim().isEmpty)
-                                      ? l10n.fieldRequired
-                                      : null,
-                            ),
-                            const SizedBox(height: 12),
-
-                            // AppTextField for description
-                            AppTextField(
-                              controller: _descCtrl,
-                              label: l10n.descriptionLabel,
-                              hint: l10n.descriptionHint,
-                              textAlign: TextAlign.right,
-                              maxLines: 4,
-                              validator: (v) =>
-                                  (v == null || v.trim().isEmpty)
-                                      ? l10n.fieldRequired
-                                      : null,
-                            ),
-                            const SizedBox(height: 12),
-
-                            // AppTextField for location
-                            AppTextField(
-                              controller: _locationCtrl,
-                              label: l10n.locationLabel,
-                              hint: l10n.locationHint,
-                              icon: Icons.location_on_outlined,
-                              textAlign: TextAlign.right,
-                            ),
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 12),
-
-                      // Attachments card
-                      _card(
-                        title: l10n.requiredAttachments,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
-                          children: [
-                            ...s.requiredDocs.map((doc) => Padding(
-                                  padding: const EdgeInsets.only(bottom: 4),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.end,
-                                    children: [
-                                      Text(doc,
-                                          style: const TextStyle(
-                                              fontSize: 13,
-                                              color: Colors.grey)),
-                                      const SizedBox(width: 6),
-                                      const Text('•',
-                                          style:
-                                              TextStyle(color: Colors.grey)),
-                                    ],
-                                  ),
-                                )),
-                            const SizedBox(height: 12),
-
-                            if (_selectedFiles.isNotEmpty) ...[
-                              ListView.builder(
-                                shrinkWrap: true,
-                                physics: const NeverScrollableScrollPhysics(),
-                                itemCount: _selectedFiles.length,
-                                itemBuilder: (_, i) => Container(
-                                  margin: const EdgeInsets.only(bottom: 8),
-                                  padding: const EdgeInsets.all(10),
-                                  decoration: BoxDecoration(
-                                    color: const Color(0xFFF3F4F6),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () => _removeFile(i),
-                                        child: const Icon(Icons.close,
-                                            color: Colors.red, size: 20),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      Expanded(
-                                        child: Text(
-                                          _selectedFileNames[i],
-                                          style:
-                                              const TextStyle(fontSize: 12),
-                                          overflow: TextOverflow.ellipsis,
-                                          textAlign: TextAlign.right,
-                                        ),
-                                      ),
-                                      const SizedBox(width: 8),
-                                      SizedBox(
-                                        width: 60,
-                                        height: 60,
-                                        child: _fileIcon(_selectedFileNames[i]),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              ),
-                              const SizedBox(height: 12),
-                            ],
-
-                            GestureDetector(
-                              onTap: _isLoading ? null : _pickFiles,
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.all(20),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                      color: Colors.grey.shade300),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      children: const [
-                                        Icon(Icons.upload_outlined,
-                                            size: 28, color: Colors.grey),
-                                        SizedBox(width: 8),
-                                        Icon(Icons.camera_alt_outlined,
-                                            size: 28, color: Colors.grey),
-                                        SizedBox(width: 8),
-                                        Icon(Icons.picture_as_pdf_outlined,
-                                            size: 28, color: Colors.grey),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 8),
-                                    Text(
-                                      _selectedFiles.isEmpty
-                                          ? l10n.tapToUpload
-                                          : '${_selectedFiles.length} ${l10n.filesSelected}',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.w500,
-                                        color: _selectedFiles.isEmpty
-                                            ? Colors.black87
-                                            : Colors.green,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    const Text(
-                                      'Photos, PDF or Word files',
-                                      style: TextStyle(
-                                          fontSize: 11, color: Colors.grey),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-
-                            if (_isUploading) ...[
-                              const SizedBox(height: 12),
-                              const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                    width: 16,
-                                    height: 16,
-                                    child: CircularProgressIndicator(
-                                        strokeWidth: 2),
-                                  ),
-                                  SizedBox(width: 8),
-                                  Text('Uploading files...',
-                                      style: TextStyle(
-                                          color: Colors.grey, fontSize: 13)),
-                                ],
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-
-                      //  PrimaryButton replaces raw ElevatedButton
-                      PrimaryButton(
-                        label: l10n.submitRequest,
-                        onPressed: _submit,
-                        isLoading: _isLoading,
-                      ),
-
-                      const SizedBox(height: 20),
-                    ],
-                  ),
-                ),
-              ),
+            Text(loc.newRequest),
+            Text(
+              s.localizedName(langCode),
+              style: theme.textTheme.bodySmall
+                  ?.copyWith(color: colors.onSurface.withOpacity(0.65)),
             ),
           ],
         ),
       ),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.all(16),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            children: [
+              // Service info card
+              if (s.slaDays != null || s.hasFees)
+                _InfoCard(
+                  title: loc.serviceInfo,
+                  theme: theme,
+                  colors: colors,
+                  child: Column(
+                    children: [
+                      if (s.hasFees)
+                        _InfoRow(
+                          label: loc.feeLabel,
+                          value: s.feeAmount != null
+                              ? s.feeAmount!.toStringAsFixed(0)
+                              : loc.free,
+                          theme: theme,
+                          colors: colors,
+                        ),
+                      if (s.hasFees && s.slaDays != null)
+                        const SizedBox(height: 8),
+                      if (s.slaDays != null)
+                        _InfoRow(
+                          label: loc.processingTime,
+                          value: '${s.slaDays} ${loc.days}',
+                          theme: theme,
+                          colors: colors,
+                        ),
+                    ],
+                  ),
+                ),
+              if (s.slaDays != null || s.hasFees) const SizedBox(height: 12),
+
+              // Request details card
+              _InfoCard(
+                title: loc.requestDetails,
+                theme: theme,
+                colors: colors,
+                child: Column(
+                  children: [
+                    AppTextField(
+                      controller: _titleCtrl,
+                      label: loc.titleLabel,
+                      hint: loc.titleHint,
+                      validator: (v) =>
+                          (v == null || v.trim().isEmpty)
+                              ? loc.fieldRequired
+                              : null,
+                    ),
+                    const SizedBox(height: 12),
+                    AppTextField(
+                      controller: _descCtrl,
+                      label: loc.descriptionLabel,
+                      hint: loc.descriptionHint,
+                      maxLines: 4,
+                      validator: (v) =>
+                          (v == null || v.trim().isEmpty)
+                              ? loc.fieldRequired
+                              : null,
+                    ),
+                    const SizedBox(height: 12),
+                    AppTextField(
+                      controller: _locationCtrl,
+                      label: loc.locationLabel,
+                      hint: loc.locationHint,
+                      icon: Icons.location_on_outlined,
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 12),
+
+              // Attachments card
+              _InfoCard(
+                title: loc.requiredAttachments,
+                theme: theme,
+                colors: colors,
+                child: Column(
+                  children: [
+                    if (_selectedFiles.isNotEmpty) ...[
+                      ListView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: _selectedFiles.length,
+                        itemBuilder: (_, i) => Container(
+                          margin: const EdgeInsets.only(bottom: 8),
+                          padding: const EdgeInsets.all(10),
+                          decoration: BoxDecoration(
+                            color: colors.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: Row(
+                            children: [
+                              GestureDetector(
+                                onTap: () => _removeFile(i),
+                                child:
+                                    Icon(Icons.close, color: colors.error, size: 20),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  _selectedFileNames[i],
+                                  style: theme.textTheme.bodySmall,
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              SizedBox(
+                                width: 60,
+                                height: 60,
+                                child: _fileIcon(_selectedFileNames[i]),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                    ],
+
+                    GestureDetector(
+                      onTap: _isLoading ? null : _pickFiles,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(20),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                              color: colors.outline.withOpacity(0.3)),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.upload_outlined,
+                                    size: 28, color: colors.outline),
+                                const SizedBox(width: 8),
+                                Icon(Icons.camera_alt_outlined,
+                                    size: 28, color: colors.outline),
+                                const SizedBox(width: 8),
+                                Icon(Icons.picture_as_pdf_outlined,
+                                    size: 28, color: colors.outline),
+                              ],
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              _selectedFiles.isEmpty
+                                  ? loc.tapToUpload
+                                  : '${_selectedFiles.length} ${loc.filesSelected}',
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                fontWeight: FontWeight.w500,
+                                color: _selectedFiles.isEmpty
+                                    ? colors.onSurface
+                                    : colors.primary,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    if (_isUploading) ...[
+                      const SizedBox(height: 12),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          SizedBox(
+                            width: 16,
+                            height: 16,
+                            child:
+                                CircularProgressIndicator(strokeWidth: 2),
+                          ),
+                          const SizedBox(width: 8),
+                          Text(loc.uploadingFiles,
+                              style: theme.textTheme.bodySmall
+                                  ?.copyWith(color: colors.outline)),
+                        ],
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              PrimaryButton(
+                label: loc.submitRequest,
+                onPressed: _submit,
+                isLoading: _isLoading,
+              ),
+
+              const SizedBox(height: 24),
+            ],
+          ),
+        ),
+      ),
     );
   }
+}
 
-  Widget _card({required String title, required Widget child}) {
+class _InfoCard extends StatelessWidget {
+  final String title;
+  final Widget child;
+  final ThemeData theme;
+  final ColorScheme colors;
+
+  const _InfoCard({
+    required this.title,
+    required this.child,
+    required this.theme,
+    required this.colors,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Container(
       width: double.infinity,
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.outline.withOpacity(0.12)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 8,
-            offset: const Offset(0, 2),
-          ),
+              color: colors.shadow.withOpacity(0.04),
+              blurRadius: 8,
+              offset: const Offset(0, 2))
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(title,
-              style: const TextStyle(
-                  fontSize: 16, fontWeight: FontWeight.bold)),
+              style: theme.textTheme.titleMedium
+                  ?.copyWith(fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
           child,
         ],
       ),
     );
   }
+}
 
-  Widget _infoRow({required String label, required String value}) {
+class _InfoRow extends StatelessWidget {
+  final String label;
+  final String value;
+  final ThemeData theme;
+  final ColorScheme colors;
+
+  const _InfoRow({
+    required this.label,
+    required this.value,
+    required this.theme,
+    required this.colors,
+  });
+
+  @override
+  Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(value, style: const TextStyle(fontWeight: FontWeight.w600)),
         Text(label,
-            style: const TextStyle(color: Colors.grey, fontSize: 13)),
+            style:
+                theme.textTheme.bodySmall?.copyWith(color: colors.outline)),
+        Text(value,
+            style: theme.textTheme.bodyMedium
+                ?.copyWith(fontWeight: FontWeight.w600)),
       ],
     );
   }
-
-  String _fmt(int n) => n.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (m) => '${m[1]},');
 }

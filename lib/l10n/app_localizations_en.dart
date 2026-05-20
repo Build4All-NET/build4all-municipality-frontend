@@ -1127,4 +1127,156 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get logoutSuccess => 'Logged out successfully';
+
+  @override
+  String get violationTitle => 'Violation Title';
+
+  @override
+  String get enterViolationTitle => 'Enter violation title (e.g. Illegal Parking)';
+
+  @override
+  String get violationType => 'Violation Type';
+
+  @override
+  String get selectViolationType => 'Please select violation type';
+
+  @override
+  String get identityNumber => 'Identity Number';
+
+  @override
+  String get enterIdentityNumber => 'Enter citizen identity number';
+
+  @override
+  String get carPlate => 'Car Plate';
+
+  @override
+  String get enterCarPlate => 'Enter vehicle plate number';
+
+  @override
+  String get identifierRequired =>
+      'Please provide at least Identity Number or Car Plate';
+
+  @override
+  String get nameRequiresIdentifier =>
+      'If a name is provided, you must also add Identity Number or Car Plate';
+
+  @override
+  String get carPlateRequired => 'Car plate is required for traffic violations';
+
+  @override
+  String get violationDetails => 'Violation Details';
+
+  @override
+  String get citizenInfo => 'Citizen Information';
+
+  @override
+  String get vehicleInfo => 'Vehicle Information';
+
+  @override
+  String get businessOwnerInfo => 'Business / Owner Information';
+
+  @override
+  String get businessOwnerName => 'Business / Owner Name';
+
+  @override
+  String get paymentAndAssignment => 'Payment & Assignment';
+
+  @override
+  String get trafficIdentifierHint =>
+      'Car plate is required for traffic violations. Identity number is optional.';
+
+  @override
+  String get generalIdentifierHint =>
+      'At least one of: name, identity number, or car plate must be provided.';
+
+  @override
+  String get selectTypeFirst =>
+      'Please select a violation type first to see relevant fields.';
+
+  @override
+  String get deleteFailed => 'Delete failed. Please try again.';
+
+  @override
+  String get statusDraft => 'Draft';
+
+  @override
+  String get statusCancelled => 'Cancelled';
+
+  @override
+  String get statusDocumentsMissing => 'Documents Missing';
+
+  @override
+  String get statusTaxPaid => 'Tax Paid';
+
+  @override
+  String get statusTaxRejected => 'Tax Rejected';
+
+  @override
+  String get requestSubmittedTitle => 'Request Submitted!';
+
+  @override
+  String get requestSubmittedMsg => 'Your request is being reviewed by the municipality';
+
+  @override
+  String get browseServices => 'Browse Services';
+
+  @override
+  String get startRequest => 'Start a Request';
+
+  @override
+  String get serviceDetails => 'Service Details';
+
+  @override
+  String get loadFailed => 'Failed to load. Please try again.';
+
+  @override
+  String get uploadingFiles => 'Uploading...';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get retry => 'Try Again';
+
+  @override
+  String get takePhoto => 'Take Photo';
+
+  @override
+  String get chooseFromGallery => 'Choose from Gallery';
+
+  @override
+  String get chooseDocument => 'Choose PDF or Document';
+
+  @override
+  String get notSpecified => 'Not specified';
+
+  @override
+  String get municipalityName => 'Municipality';
+
+  @override
+  String get violationTypeLabel => 'Type';
+
+  @override
+  String get inboxTitle => 'Requests Inbox';
+
+  @override
+  String get networkErrorBanner => 'Some data failed to load. Pull down to retry.';
+
+  @override
+  String get catGeneralServices => 'General Services';
+
+  @override
+  String get catCommercialServices => 'Commercial Services';
+
+  @override
+  String get catRealEstate => 'Real Estate';
+
+  @override
+  String get catEngineering => 'Engineering Services';
+
+  @override
+  String get statusInProgress => 'In Progress';
+
+  @override
+  String get requestsCount => 'Requests';
 }

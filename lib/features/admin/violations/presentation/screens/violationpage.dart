@@ -1,3 +1,4 @@
+import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/admin/violations/data/Repository/violation_Repository_impl.dart';
 import 'package:baladiyati/features/admin/violations/data/services/violation_api_services.dart';
@@ -46,6 +47,8 @@ class _ViolationsBodyState extends State<ViolationsBody> {
   final TextEditingController _searchController = TextEditingController();
 
   String _query = '';
+  // Cached list so operation errors (delete/update/create) don't blank the screen.
+  List<Violation>? _cachedViolations;
 
   @override
   void dispose() {
@@ -90,7 +93,6 @@ class _ViolationsBodyState extends State<ViolationsBody> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -112,11 +114,10 @@ class _ViolationsBodyState extends State<ViolationsBody> {
       body: BlocConsumer<ViolationBloc, ViolationState>(
         listener: (context, state) {
           if (state is ViolationError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: colors.error,
-              ),
+            AppToast.show(
+              context,
+              message: state.message,
+              type: AppToastType.error,
             );
           }
         },
@@ -124,39 +125,49 @@ class _ViolationsBodyState extends State<ViolationsBody> {
           if (state is ViolationLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (state is ViolationError) {
+
+          // Operation errors (delete/update/create failures): keep the list visible.
+          // The listener already showed the toast.
+          if (state is ViolationError && _cachedViolations == null) {
+            // Initial load failed — nothing to show
             return _ErrorState(message: state.message, onRetry: _reload);
           }
+
+          final violations = state is ViolationLoaded
+              ? state.violations
+              : _cachedViolations ?? [];
+
           if (state is ViolationLoaded) {
-            final filtered = _filter(state.violations);
-            return RefreshIndicator(
-              onRefresh: () async => _reload(),
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-                children: [
-                  _SearchField(
-                    controller: _searchController,
-                    hint: loc.search,
-                    onChanged: (value) => setState(() { _query = value; }),
-                  ),
-                  const SizedBox(height: 14),
-                  _SummaryStrip(total: state.violations.length, shown: filtered.length),
-                  const SizedBox(height: 14),
-                  if (filtered.isEmpty)
-                    _EmptyState(title: loc.noData, subtitle: loc.violations)
-                  else
-                    ...filtered.map(
-                      (violation) => _ViolationCard(
-                        violation: violation,
-                        onUpdated: _reload,
-                      ),
-                    ),
-                ],
-              ),
-            );
+            _cachedViolations = state.violations;
           }
-          return const SizedBox.shrink();
+
+          final filtered = _filter(violations);
+          return RefreshIndicator(
+            onRefresh: () async => _reload(),
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+              children: [
+                _SearchField(
+                  controller: _searchController,
+                  hint: loc.search,
+                  onChanged: (value) => setState(() { _query = value; }),
+                ),
+                const SizedBox(height: 14),
+                _SummaryStrip(total: violations.length, shown: filtered.length),
+                const SizedBox(height: 14),
+                if (filtered.isEmpty)
+                  _EmptyState(title: loc.noData, subtitle: loc.violations)
+                else
+                  ...filtered.map(
+                    (violation) => _ViolationCard(
+                      violation: violation,
+                      onUpdated: _reload,
+                    ),
+                  ),
+              ],
+            ),
+          );
         },
       ),
     );
@@ -344,13 +355,13 @@ class _ViolationCard extends StatelessWidget {
             _InfoRow(label: loc.citizenName, value: violation.citizenName),
             _InfoRow(label: loc.amount, value: '${violation.amount.toStringAsFixed(2)} \$'),
             if ((violation.identityNumber ?? '').isNotEmpty)
-              _InfoRow(label: 'Identity No.', value: violation.identityNumber!),
+              _InfoRow(label: loc.identityNumber, value: violation.identityNumber!),
             if ((violation.carPlate ?? '').isNotEmpty)
-              _InfoRow(label: 'Car Plate', value: violation.carPlate!),
+              _InfoRow(label: loc.carPlate, value: violation.carPlate!),
             if ((violation.type ?? '').isNotEmpty)
-              _InfoRow(label: 'Type', value: violation.type!),
+              _InfoRow(label: loc.violationTypeLabel, value: violation.type!),
             if ((violation.municipalityName ?? '').trim().isNotEmpty)
-              _InfoRow(label: 'Municipality', value: violation.municipalityName!),
+              _InfoRow(label: loc.municipalityName, value: violation.municipalityName!),
             const SizedBox(height: 14),
             Row(
               children: [

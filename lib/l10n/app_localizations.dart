@@ -2327,6 +2327,57 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Logged out successfully'**
   String get logoutSuccess;
+
+  String get violationTitle;
+  String get enterViolationTitle;
+  String get violationType;
+  String get selectViolationType;
+  String get identityNumber;
+  String get enterIdentityNumber;
+  String get carPlate;
+  String get enterCarPlate;
+  String get identifierRequired;
+  String get nameRequiresIdentifier;
+  String get carPlateRequired;
+  String get violationDetails;
+  String get citizenInfo;
+  String get vehicleInfo;
+  String get businessOwnerInfo;
+  String get businessOwnerName;
+  String get paymentAndAssignment;
+  String get trafficIdentifierHint;
+  String get generalIdentifierHint;
+  String get selectTypeFirst;
+  String get deleteFailed;
+  String get statusDraft;
+  String get statusCancelled;
+  String get statusDocumentsMissing;
+  String get statusTaxPaid;
+  String get statusTaxRejected;
+  String get requestSubmittedTitle;
+  String get requestSubmittedMsg;
+  String get browseServices;
+  String get startRequest;
+  String get serviceDetails;
+  String get loadFailed;
+  String get uploadingFiles;
+  String get ok;
+  String get retry;
+  String get takePhoto;
+  String get chooseFromGallery;
+  String get chooseDocument;
+
+  String get notSpecified;
+  String get municipalityName;
+  String get violationTypeLabel;
+  String get inboxTitle;
+  String get networkErrorBanner;
+  String get catGeneralServices;
+  String get catCommercialServices;
+  String get catRealEstate;
+  String get catEngineering;
+  String get statusInProgress;
+  String get requestsCount;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

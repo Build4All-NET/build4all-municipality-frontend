@@ -1127,4 +1127,157 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get logoutSuccess => 'Déconnexion réussie';
+
+  @override
+  String get violationTitle => "Titre de l'infraction";
+
+  @override
+  String get enterViolationTitle => "Entrez le titre de l'infraction";
+
+  @override
+  String get violationType => "Type d'infraction";
+
+  @override
+  String get selectViolationType => "Veuillez sélectionner le type d'infraction";
+
+  @override
+  String get identityNumber => "Numéro d'identité";
+
+  @override
+  String get enterIdentityNumber => "Entrez le numéro d'identité du citoyen";
+
+  @override
+  String get carPlate => "Plaque d'immatriculation";
+
+  @override
+  String get enterCarPlate => "Entrez le numéro de plaque du véhicule";
+
+  @override
+  String get identifierRequired =>
+      "Veuillez fournir au moins un numéro d'identité ou une plaque";
+
+  @override
+  String get nameRequiresIdentifier =>
+      "Si un nom est fourni, vous devez ajouter un numéro d'identité ou une plaque";
+
+  @override
+  String get carPlateRequired =>
+      "La plaque est obligatoire pour les infractions de circulation";
+
+  @override
+  String get violationDetails => "Détails de l'infraction";
+
+  @override
+  String get citizenInfo => 'Informations du citoyen';
+
+  @override
+  String get vehicleInfo => 'Informations du véhicule';
+
+  @override
+  String get businessOwnerInfo => "Informations de l'établissement / propriétaire";
+
+  @override
+  String get businessOwnerName => "Nom de l'établissement / propriétaire";
+
+  @override
+  String get paymentAndAssignment => 'Paiement et affectation';
+
+  @override
+  String get trafficIdentifierHint =>
+      "La plaque est obligatoire pour les infractions routières. Le numéro d'identité est facultatif.";
+
+  @override
+  String get generalIdentifierHint =>
+      "Au moins un parmi : nom, numéro d'identité ou plaque d'immatriculation doit être fourni.";
+
+  @override
+  String get selectTypeFirst =>
+      "Veuillez d'abord sélectionner un type d'infraction pour voir les champs pertinents.";
+
+  @override
+  String get deleteFailed => 'Échec de la suppression. Veuillez réessayer.';
+
+  @override
+  String get statusDraft => 'Brouillon';
+
+  @override
+  String get statusCancelled => 'Annulé';
+
+  @override
+  String get statusDocumentsMissing => 'Documents manquants';
+
+  @override
+  String get statusTaxPaid => 'Taxe payée';
+
+  @override
+  String get statusTaxRejected => 'Taxe rejetée';
+
+  @override
+  String get requestSubmittedTitle => 'Demande soumise!';
+
+  @override
+  String get requestSubmittedMsg => 'Votre demande est en cours d\'examen par la municipalité';
+
+  @override
+  String get browseServices => 'Parcourir les services';
+
+  @override
+  String get startRequest => 'Démarrer une demande';
+
+  @override
+  String get serviceDetails => 'Détails du service';
+
+  @override
+  String get loadFailed => 'Échec du chargement. Veuillez réessayer.';
+
+  @override
+  String get uploadingFiles => 'Téléchargement en cours...';
+
+  @override
+  String get ok => 'OK';
+
+  @override
+  String get retry => 'Réessayer';
+
+  @override
+  String get takePhoto => 'Prendre une photo';
+
+  @override
+  String get chooseFromGallery => 'Choisir depuis la galerie';
+
+  @override
+  String get chooseDocument => 'Choisir un PDF ou document';
+
+  @override
+  String get notSpecified => 'Non spécifié';
+
+  @override
+  String get municipalityName => 'Municipalité';
+
+  @override
+  String get violationTypeLabel => 'Type';
+
+  @override
+  String get inboxTitle => 'Boîte de réception';
+
+  @override
+  String get networkErrorBanner => "Certaines données n'ont pas pu être chargées. Tirez pour réessayer.";
+
+  @override
+  String get catGeneralServices => 'Services généraux';
+
+  @override
+  String get catCommercialServices => 'Services commerciaux';
+
+  @override
+  String get catRealEstate => 'Immobilier';
+
+  @override
+  String get catEngineering => "Services d'ingénierie";
+
+  @override
+  String get statusInProgress => 'En cours';
+
+  @override
+  String get requestsCount => 'Demandes';
 }

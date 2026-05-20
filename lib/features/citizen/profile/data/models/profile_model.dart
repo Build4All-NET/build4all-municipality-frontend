@@ -23,7 +23,7 @@ class ProfileModel extends ProfileEntity {
 
   factory ProfileModel.fromParts({
     required Build4AllProfileModel core,
-    required MunicipalityProfileModel municipality,
+    MunicipalityProfileModel? municipality,
   }) {
     return ProfileModel(
       build4allId: core.id,
@@ -34,13 +34,13 @@ class ProfileModel extends ProfileEntity {
       profilePictureUrl: core.profilePictureUrl,
       isPublicProfile: core.isPublicProfile,
       coreStatus: core.status,
-      municipalityProfileId: municipality.id,
-      phone: municipality.phone,
-      address: municipality.address,
-      municipalityStatus: municipality.status,
-      municipalityId: municipality.municipalityId,
-      municipalityName: municipality.municipalityName,
-      ownerProjectLinkId: municipality.ownerProjectLinkId,
+      municipalityProfileId: municipality?.id,
+      phone: municipality?.phone ?? '',
+      address: municipality?.address ?? '',
+      municipalityStatus: municipality?.status,
+      municipalityId: municipality?.municipalityId,
+      municipalityName: municipality?.municipalityName,
+      ownerProjectLinkId: municipality?.ownerProjectLinkId,
     );
   }
 }
