@@ -1,3 +1,4 @@
+import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/admin/announcements/data/Repository/announcement_Repository_Impl.dart';
 import 'package:baladiyati/features/admin/announcements/data/services/Announcement_Api_Service.dart';
@@ -46,6 +47,7 @@ class _AnnouncementsBodyState extends State<AnnouncementsBody> {
   final TextEditingController _searchController = TextEditingController();
 
   String _query = '';
+  List<Announcement>? _cachedList;
 
   @override
   void dispose() {
@@ -154,7 +156,6 @@ class _AnnouncementsBodyState extends State<AnnouncementsBody> {
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final colors = theme.colorScheme;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
@@ -181,11 +182,10 @@ class _AnnouncementsBodyState extends State<AnnouncementsBody> {
       body: BlocConsumer<AnnouncementBloc, AnnouncementState>(
         listener: (context, state) {
           if (state is AnnouncementError) {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text(state.message),
-                backgroundColor: colors.error,
-              ),
+            AppToast.show(
+              context,
+              message: state.message,
+              type: AppToastType.error,
             );
           }
         },
@@ -194,61 +194,63 @@ class _AnnouncementsBodyState extends State<AnnouncementsBody> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (state is AnnouncementError) {
-            return _ErrorState(
-              message: state.message,
-              onRetry: _reload,
-            );
+          // Operation error (delete/update/create): keep list visible, toast shown in listener.
+          if (state is AnnouncementError && _cachedList == null) {
+            return _ErrorState(message: state.message, onRetry: _reload);
           }
+
+          final announcements = state is AnnouncementLoaded
+              ? state.list
+              : _cachedList ?? [];
 
           if (state is AnnouncementLoaded) {
-            final filtered = _filter(state.list);
-
-            return RefreshIndicator(
-              onRefresh: () async => _reload(),
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
-                children: [
-                  _SearchField(
-                    controller: _searchController,
-                    hint: loc.search,
-                    onChanged: (value) {
-                      setState(() {
-                        _query = value;
-                      });
-                    },
-                  ),
-
-                  const SizedBox(height: 14),
-
-                  _SummaryStrip(
-                    total: state.list.length,
-                    shown: filtered.length,
-                  ),
-
-                  const SizedBox(height: 14),
-
-                  if (filtered.isEmpty)
-                    _EmptyState(
-                      title: loc.noAnnouncements,
-                      subtitle: loc.noAnnouncementsHint,
-                    )
-                  else
-                    ...filtered.map(
-                      (announcement) => _AnnouncementCard(
-                        announcement: announcement,
-                        createdAt: _formatDate(context, announcement.createdAt),
-                        onEdit: () => _openEditScreen(announcement),
-                        onDelete: () => _confirmDelete(announcement),
-                      ),
-                    ),
-                ],
-              ),
-            );
+            _cachedList = state.list;
           }
 
-          return const SizedBox.shrink();
+          final filtered = _filter(announcements);
+
+          return RefreshIndicator(
+            onRefresh: () async => _reload(),
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
+              children: [
+                _SearchField(
+                  controller: _searchController,
+                  hint: loc.search,
+                  onChanged: (value) {
+                    setState(() {
+                      _query = value;
+                    });
+                  },
+                ),
+
+                const SizedBox(height: 14),
+
+                _SummaryStrip(
+                  total: announcements.length,
+                  shown: filtered.length,
+                ),
+
+                const SizedBox(height: 14),
+
+                if (filtered.isEmpty)
+                  _EmptyState(
+                    title: loc.noAnnouncements,
+                    subtitle: loc.noAnnouncementsHint,
+                  )
+                else
+                  ...filtered.map(
+                    (announcement) => _AnnouncementCard(
+                      announcement: announcement,
+                      createdAt: _formatDate(context, announcement.createdAt),
+                      onEdit: () => _openEditScreen(announcement),
+                      onDelete: () => _confirmDelete(announcement),
+                    ),
+                  ),
+              ],
+            ),
+          );
         },
       ),
     );

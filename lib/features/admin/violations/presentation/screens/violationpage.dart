@@ -47,6 +47,8 @@ class _ViolationsBodyState extends State<ViolationsBody> {
   final TextEditingController _searchController = TextEditingController();
 
   String _query = '';
+  // Cached list so operation errors (delete/update/create) don't blank the screen.
+  List<Violation>? _cachedViolations;
 
   @override
   void dispose() {
@@ -123,39 +125,49 @@ class _ViolationsBodyState extends State<ViolationsBody> {
           if (state is ViolationLoading) {
             return const Center(child: CircularProgressIndicator());
           }
-          if (state is ViolationError) {
+
+          // Operation errors (delete/update/create failures): keep the list visible.
+          // The listener already showed the toast.
+          if (state is ViolationError && _cachedViolations == null) {
+            // Initial load failed — nothing to show
             return _ErrorState(message: state.message, onRetry: _reload);
           }
+
+          final violations = state is ViolationLoaded
+              ? state.violations
+              : _cachedViolations ?? [];
+
           if (state is ViolationLoaded) {
-            final filtered = _filter(state.violations);
-            return RefreshIndicator(
-              onRefresh: () async => _reload(),
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-                children: [
-                  _SearchField(
-                    controller: _searchController,
-                    hint: loc.search,
-                    onChanged: (value) => setState(() { _query = value; }),
-                  ),
-                  const SizedBox(height: 14),
-                  _SummaryStrip(total: state.violations.length, shown: filtered.length),
-                  const SizedBox(height: 14),
-                  if (filtered.isEmpty)
-                    _EmptyState(title: loc.noData, subtitle: loc.violations)
-                  else
-                    ...filtered.map(
-                      (violation) => _ViolationCard(
-                        violation: violation,
-                        onUpdated: _reload,
-                      ),
-                    ),
-                ],
-              ),
-            );
+            _cachedViolations = state.violations;
           }
-          return const SizedBox.shrink();
+
+          final filtered = _filter(violations);
+          return RefreshIndicator(
+            onRefresh: () async => _reload(),
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+              children: [
+                _SearchField(
+                  controller: _searchController,
+                  hint: loc.search,
+                  onChanged: (value) => setState(() { _query = value; }),
+                ),
+                const SizedBox(height: 14),
+                _SummaryStrip(total: violations.length, shown: filtered.length),
+                const SizedBox(height: 14),
+                if (filtered.isEmpty)
+                  _EmptyState(title: loc.noData, subtitle: loc.violations)
+                else
+                  ...filtered.map(
+                    (violation) => _ViolationCard(
+                      violation: violation,
+                      onUpdated: _reload,
+                    ),
+                  ),
+              ],
+            ),
+          );
         },
       ),
     );
