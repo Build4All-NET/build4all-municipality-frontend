@@ -447,7 +447,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statusSubmitted => 'Submitted';
 
   @override
-  String get statusUnderReview => 'Under Review';
+  String get statusUnderReview => 'Under review';
 
   @override
   String get statusWaitingPayment => 'Awaiting Payment';
@@ -818,7 +818,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addEmployee => 'Add Employee';
 
   @override
-  String get fullName => 'Full Name';
+  String get fullName => 'Full name';
 
   @override
   String get email => 'Email';
@@ -1081,6 +1081,8 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get reject => 'Reject';
+
+  @override
   String get adminProfileTitle => 'Owner Profile';
 
   @override
@@ -1153,12 +1155,10 @@ class AppLocalizationsEn extends AppLocalizations {
   String get enterCarPlate => 'Enter vehicle plate number';
 
   @override
-  String get identifierRequired =>
-      'Please provide at least Identity Number or Car Plate';
+  String get identifierRequired => 'Please provide at least Identity Number or Car Plate';
 
   @override
-  String get nameRequiresIdentifier =>
-      'If a name is provided, you must also add Identity Number or Car Plate';
+  String get nameRequiresIdentifier => 'If a name is provided, you must also add Identity Number or Car Plate';
 
   @override
   String get carPlateRequired => 'Car plate is required for traffic violations';
@@ -1182,16 +1182,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get paymentAndAssignment => 'Payment & Assignment';
 
   @override
-  String get trafficIdentifierHint =>
-      'Car plate is required for traffic violations. Identity number is optional.';
+  String get trafficIdentifierHint => 'Car plate is required for traffic violations. Identity number is optional.';
 
   @override
-  String get generalIdentifierHint =>
-      'At least one of: name, identity number, or car plate must be provided.';
+  String get generalIdentifierHint => 'At least one of: name, identity number, or car plate must be provided.';
 
   @override
-  String get selectTypeFirst =>
-      'Please select a violation type first to see relevant fields.';
+  String get selectTypeFirst => 'Please select a violation type first to see relevant fields.';
 
   @override
   String get deleteFailed => 'Delete failed. Please try again.';
@@ -1203,7 +1200,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get statusCancelled => 'Cancelled';
 
   @override
-  String get statusDocumentsMissing => 'Documents Missing';
+  String get statusDocumentsMissing => 'Documents missing';
 
   @override
   String get statusTaxPaid => 'Tax Paid';
@@ -1275,8 +1272,144 @@ class AppLocalizationsEn extends AppLocalizations {
   String get catEngineering => 'Engineering Services';
 
   @override
-  String get statusInProgress => 'In Progress';
+  String get statusInProgress => 'In progress';
 
   @override
   String get requestsCount => 'Requests';
+
+  @override
+  String get requestInformation => 'Request information';
+
+  @override
+  String get municipality => 'Municipality';
+
+  @override
+  String get service => 'Service';
+
+  @override
+  String get tracking => 'Tracking';
+
+  @override
+  String get requestId => 'Request ID';
+
+  @override
+  String get latitude => 'Latitude';
+
+  @override
+  String get longitude => 'Longitude';
+
+  @override
+  String get created => 'Created';
+
+  @override
+  String get updated => 'Updated';
+
+  @override
+  String get closed => 'Closed';
+
+  @override
+  String get actions => 'Actions';
+
+  @override
+  String get complete => 'Complete';
+
+  @override
+  String get invalidRequestId => 'Invalid request ID.';
+
+  @override
+  String get loading => 'Loading...';
+
+  @override
+  String requestClosedMessage(Object status) {
+    return 'This request is $status. No more actions are available.';
+  }
+
+  @override
+  String get statusPending => 'Pending';
+
+  @override
+  String get statusRejected => 'Rejected';
+
+  @override
+  String get statusCompleted => 'Completed';
+
+  @override
+  String get staff => 'Staff';
+
+  @override
+  String get manageStaff => 'Manage staff users and role assignment';
+
+  @override
+  String get assignStaff => 'Assign staff';
+
+  @override
+  String get searchUserByEmail => 'Search user by email';
+
+  @override
+  String get enterUserEmail => 'Enter user email';
+
+  @override
+  String get searchUser => 'Search user';
+
+  @override
+  String get userFound => 'User found';
+
+  @override
+  String get userNotFound => 'User not found';
+
+  @override
+  String get userNotFoundDescription => 'No user exists with this email in this app. Invite by email will be added next.';
+
+  @override
+  String get alreadyAssigned => 'Already assigned';
+
+  @override
+  String get assignAsStaff => 'Assign as staff';
+
+  @override
+  String get removeStaffRole => 'Remove staff role';
+
+  @override
+  String confirmRemoveStaffRole(Object name) {
+    return 'Remove staff role from $name?';
+  }
+
+  @override
+  String get staffAssignedSuccessfully => 'Staff assigned successfully.';
+
+  @override
+  String get staffRoleRemovedSuccessfully => 'Staff role removed successfully.';
+
+  @override
+  String get noStaffHint => 'No staff users found yet.';
+
+  @override
+  String get currentRole => 'Current role';
+
+  @override
+  String get targetRole => 'Target role';
+
+  @override
+  String get verified => 'Verified';
+
+  @override
+  String get notVerified => 'Not verified';
+
+  @override
+  String get sendRegistrationInvite => 'Send registration invite';
+
+  @override
+  String get inviteStaffToRegister => 'Invite staff to register';
+
+  @override
+  String get inviteStaffDescription => 'This user is not registered yet. Send an email asking them to register as a citizen first.';
+
+  @override
+  String get enterFullName => 'Enter full name';
+
+  @override
+  String get staffInviteSentSuccessfully => 'Registration invite email sent successfully.';
+
+  @override
+  String get fullNameRequired => 'Full name is required.';
 }

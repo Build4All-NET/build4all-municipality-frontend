@@ -37,7 +37,15 @@ class AppErrorInterceptor extends Interceptor {
       return data['code'].toString();
     }
 
+    if (err.response?.statusCode == 401 || err.response?.statusCode == 403) {
+      return 'AUTH_ERROR';
+    }
+
     return 'REQUEST_FAILED';
+  }
+
+  bool _isAuthError(int status) {
+    return status == 401 || status == 403;
   }
 
   @override
@@ -59,16 +67,27 @@ class AppErrorInterceptor extends Interceptor {
           code: 'SERVER_ERROR',
           original: err,
         );
-      } else if (status == 404) {
+      } else if (_isAuthError(status)) {
+        /*
+          IMPORTANT:
+          Do NOT hardcode "Your session expired" here.
+
+          RefreshTokenInterceptor runs before this interceptor.
+          So if we reach this point, either:
+          - refresh was not possible,
+          - refresh failed,
+          - or backend rejected the request for a real auth/permission reason.
+
+          Therefore we keep the backend message if available.
+        */
+        final message = _messageFromResponse(err);
+        final code = _codeFromResponse(err);
+
         appException = AppException(
-          _messageFromResponse(err),
-          code: _codeFromResponse(err),
-          original: err,
-        );
-      } else if (status == 401 || status == 403) {
-        appException = AppException(
-          'Your session expired. Please login again.',
-          code: 'AUTH_ERROR',
+          message == 'Something went wrong.'
+              ? 'Authentication failed. Please login again.'
+              : message,
+          code: code,
           original: err,
         );
       } else {

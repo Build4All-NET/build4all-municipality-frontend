@@ -976,7 +976,7 @@ abstract class AppLocalizations {
   /// No description provided for @statusUnderReview.
   ///
   /// In en, this message translates to:
-  /// **'Under Review'**
+  /// **'Under review'**
   String get statusUnderReview;
 
   /// No description provided for @statusWaitingPayment.
@@ -1714,7 +1714,7 @@ abstract class AppLocalizations {
   /// No description provided for @fullName.
   ///
   /// In en, this message translates to:
-  /// **'Full Name'**
+  /// **'Full name'**
   String get fullName;
 
   /// No description provided for @email.
@@ -2232,6 +2232,7 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Reject'**
   String get reject;
+
   /// No description provided for @adminProfileTitle.
   ///
   /// In en, this message translates to:
@@ -2328,56 +2329,563 @@ abstract class AppLocalizations {
   /// **'Logged out successfully'**
   String get logoutSuccess;
 
+  /// No description provided for @violationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Violation Title'**
   String get violationTitle;
+
+  /// No description provided for @enterViolationTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter violation title (e.g. Illegal Parking)'**
   String get enterViolationTitle;
+
+  /// No description provided for @violationType.
+  ///
+  /// In en, this message translates to:
+  /// **'Violation Type'**
   String get violationType;
+
+  /// No description provided for @selectViolationType.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select violation type'**
   String get selectViolationType;
+
+  /// No description provided for @identityNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity Number'**
   String get identityNumber;
+
+  /// No description provided for @enterIdentityNumber.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter citizen identity number'**
   String get enterIdentityNumber;
+
+  /// No description provided for @carPlate.
+  ///
+  /// In en, this message translates to:
+  /// **'Car Plate'**
   String get carPlate;
+
+  /// No description provided for @enterCarPlate.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter vehicle plate number'**
   String get enterCarPlate;
+
+  /// No description provided for @identifierRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Please provide at least Identity Number or Car Plate'**
   String get identifierRequired;
+
+  /// No description provided for @nameRequiresIdentifier.
+  ///
+  /// In en, this message translates to:
+  /// **'If a name is provided, you must also add Identity Number or Car Plate'**
   String get nameRequiresIdentifier;
+
+  /// No description provided for @carPlateRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Car plate is required for traffic violations'**
   String get carPlateRequired;
+
+  /// No description provided for @violationDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Violation Details'**
   String get violationDetails;
+
+  /// No description provided for @citizenInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Citizen Information'**
   String get citizenInfo;
+
+  /// No description provided for @vehicleInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Vehicle Information'**
   String get vehicleInfo;
+
+  /// No description provided for @businessOwnerInfo.
+  ///
+  /// In en, this message translates to:
+  /// **'Business / Owner Information'**
   String get businessOwnerInfo;
+
+  /// No description provided for @businessOwnerName.
+  ///
+  /// In en, this message translates to:
+  /// **'Business / Owner Name'**
   String get businessOwnerName;
+
+  /// No description provided for @paymentAndAssignment.
+  ///
+  /// In en, this message translates to:
+  /// **'Payment & Assignment'**
   String get paymentAndAssignment;
+
+  /// No description provided for @trafficIdentifierHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Car plate is required for traffic violations. Identity number is optional.'**
   String get trafficIdentifierHint;
+
+  /// No description provided for @generalIdentifierHint.
+  ///
+  /// In en, this message translates to:
+  /// **'At least one of: name, identity number, or car plate must be provided.'**
   String get generalIdentifierHint;
+
+  /// No description provided for @selectTypeFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Please select a violation type first to see relevant fields.'**
   String get selectTypeFirst;
+
+  /// No description provided for @deleteFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Delete failed. Please try again.'**
   String get deleteFailed;
+
+  /// No description provided for @statusDraft.
+  ///
+  /// In en, this message translates to:
+  /// **'Draft'**
   String get statusDraft;
+
+  /// No description provided for @statusCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Cancelled'**
   String get statusCancelled;
+
+  /// No description provided for @statusDocumentsMissing.
+  ///
+  /// In en, this message translates to:
+  /// **'Documents missing'**
   String get statusDocumentsMissing;
+
+  /// No description provided for @statusTaxPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax Paid'**
   String get statusTaxPaid;
+
+  /// No description provided for @statusTaxRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Tax Rejected'**
   String get statusTaxRejected;
+
+  /// No description provided for @requestSubmittedTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Request Submitted!'**
   String get requestSubmittedTitle;
+
+  /// No description provided for @requestSubmittedMsg.
+  ///
+  /// In en, this message translates to:
+  /// **'Your request is being reviewed by the municipality'**
   String get requestSubmittedMsg;
+
+  /// No description provided for @browseServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Browse Services'**
   String get browseServices;
+
+  /// No description provided for @startRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Start a Request'**
   String get startRequest;
+
+  /// No description provided for @serviceDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Service Details'**
   String get serviceDetails;
+
+  /// No description provided for @loadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load. Please try again.'**
   String get loadFailed;
+
+  /// No description provided for @uploadingFiles.
+  ///
+  /// In en, this message translates to:
+  /// **'Uploading...'**
   String get uploadingFiles;
+
+  /// No description provided for @ok.
+  ///
+  /// In en, this message translates to:
+  /// **'OK'**
   String get ok;
+
+  /// No description provided for @retry.
+  ///
+  /// In en, this message translates to:
+  /// **'Try Again'**
   String get retry;
+
+  /// No description provided for @takePhoto.
+  ///
+  /// In en, this message translates to:
+  /// **'Take Photo'**
   String get takePhoto;
+
+  /// No description provided for @chooseFromGallery.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose from Gallery'**
   String get chooseFromGallery;
+
+  /// No description provided for @chooseDocument.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose PDF or Document'**
   String get chooseDocument;
 
+  /// No description provided for @notSpecified.
+  ///
+  /// In en, this message translates to:
+  /// **'Not specified'**
   String get notSpecified;
+
+  /// No description provided for @municipalityName.
+  ///
+  /// In en, this message translates to:
+  /// **'Municipality'**
   String get municipalityName;
+
+  /// No description provided for @violationTypeLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Type'**
   String get violationTypeLabel;
+
+  /// No description provided for @inboxTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Requests Inbox'**
   String get inboxTitle;
+
+  /// No description provided for @networkErrorBanner.
+  ///
+  /// In en, this message translates to:
+  /// **'Some data failed to load. Pull down to retry.'**
   String get networkErrorBanner;
+
+  /// No description provided for @catGeneralServices.
+  ///
+  /// In en, this message translates to:
+  /// **'General Services'**
   String get catGeneralServices;
+
+  /// No description provided for @catCommercialServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Commercial Services'**
   String get catCommercialServices;
+
+  /// No description provided for @catRealEstate.
+  ///
+  /// In en, this message translates to:
+  /// **'Real Estate'**
   String get catRealEstate;
+
+  /// No description provided for @catEngineering.
+  ///
+  /// In en, this message translates to:
+  /// **'Engineering Services'**
   String get catEngineering;
+
+  /// No description provided for @statusInProgress.
+  ///
+  /// In en, this message translates to:
+  /// **'In progress'**
   String get statusInProgress;
+
+  /// No description provided for @requestsCount.
+  ///
+  /// In en, this message translates to:
+  /// **'Requests'**
   String get requestsCount;
+
+  /// No description provided for @requestInformation.
+  ///
+  /// In en, this message translates to:
+  /// **'Request information'**
+  String get requestInformation;
+
+  /// No description provided for @municipality.
+  ///
+  /// In en, this message translates to:
+  /// **'Municipality'**
+  String get municipality;
+
+  /// No description provided for @service.
+  ///
+  /// In en, this message translates to:
+  /// **'Service'**
+  String get service;
+
+  /// No description provided for @tracking.
+  ///
+  /// In en, this message translates to:
+  /// **'Tracking'**
+  String get tracking;
+
+  /// No description provided for @requestId.
+  ///
+  /// In en, this message translates to:
+  /// **'Request ID'**
+  String get requestId;
+
+  /// No description provided for @latitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Latitude'**
+  String get latitude;
+
+  /// No description provided for @longitude.
+  ///
+  /// In en, this message translates to:
+  /// **'Longitude'**
+  String get longitude;
+
+  /// No description provided for @created.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get created;
+
+  /// No description provided for @updated.
+  ///
+  /// In en, this message translates to:
+  /// **'Updated'**
+  String get updated;
+
+  /// No description provided for @closed.
+  ///
+  /// In en, this message translates to:
+  /// **'Closed'**
+  String get closed;
+
+  /// No description provided for @actions.
+  ///
+  /// In en, this message translates to:
+  /// **'Actions'**
+  String get actions;
+
+  /// No description provided for @complete.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get complete;
+
+  /// No description provided for @invalidRequestId.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid request ID.'**
+  String get invalidRequestId;
+
+  /// No description provided for @loading.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading...'**
+  String get loading;
+
+  /// No description provided for @requestClosedMessage.
+  ///
+  /// In en, this message translates to:
+  /// **'This request is {status}. No more actions are available.'**
+  String requestClosedMessage(Object status);
+
+  /// No description provided for @statusPending.
+  ///
+  /// In en, this message translates to:
+  /// **'Pending'**
+  String get statusPending;
+
+  /// No description provided for @statusRejected.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejected'**
+  String get statusRejected;
+
+  /// No description provided for @statusCompleted.
+  ///
+  /// In en, this message translates to:
+  /// **'Completed'**
+  String get statusCompleted;
+
+  /// No description provided for @staff.
+  ///
+  /// In en, this message translates to:
+  /// **'Staff'**
+  String get staff;
+
+  /// No description provided for @manageStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage staff users and role assignment'**
+  String get manageStaff;
+
+  /// No description provided for @assignStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign staff'**
+  String get assignStaff;
+
+  /// No description provided for @searchUserByEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Search user by email'**
+  String get searchUserByEmail;
+
+  /// No description provided for @enterUserEmail.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter user email'**
+  String get enterUserEmail;
+
+  /// No description provided for @searchUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Search user'**
+  String get searchUser;
+
+  /// No description provided for @userFound.
+  ///
+  /// In en, this message translates to:
+  /// **'User found'**
+  String get userFound;
+
+  /// No description provided for @userNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'User not found'**
+  String get userNotFound;
+
+  /// No description provided for @userNotFoundDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'No user exists with this email in this app. Invite by email will be added next.'**
+  String get userNotFoundDescription;
+
+  /// No description provided for @alreadyAssigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Already assigned'**
+  String get alreadyAssigned;
+
+  /// No description provided for @assignAsStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign as staff'**
+  String get assignAsStaff;
+
+  /// No description provided for @removeStaffRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove staff role'**
+  String get removeStaffRole;
+
+  /// No description provided for @confirmRemoveStaffRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Remove staff role from {name}?'**
+  String confirmRemoveStaffRole(Object name);
+
+  /// No description provided for @staffAssignedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Staff assigned successfully.'**
+  String get staffAssignedSuccessfully;
+
+  /// No description provided for @staffRoleRemovedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Staff role removed successfully.'**
+  String get staffRoleRemovedSuccessfully;
+
+  /// No description provided for @noStaffHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No staff users found yet.'**
+  String get noStaffHint;
+
+  /// No description provided for @currentRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Current role'**
+  String get currentRole;
+
+  /// No description provided for @targetRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Target role'**
+  String get targetRole;
+
+  /// No description provided for @verified.
+  ///
+  /// In en, this message translates to:
+  /// **'Verified'**
+  String get verified;
+
+  /// No description provided for @notVerified.
+  ///
+  /// In en, this message translates to:
+  /// **'Not verified'**
+  String get notVerified;
+
+  /// No description provided for @sendRegistrationInvite.
+  ///
+  /// In en, this message translates to:
+  /// **'Send registration invite'**
+  String get sendRegistrationInvite;
+
+  /// No description provided for @inviteStaffToRegister.
+  ///
+  /// In en, this message translates to:
+  /// **'Invite staff to register'**
+  String get inviteStaffToRegister;
+
+  /// No description provided for @inviteStaffDescription.
+  ///
+  /// In en, this message translates to:
+  /// **'This user is not registered yet. Send an email asking them to register as a citizen first.'**
+  String get inviteStaffDescription;
+
+  /// No description provided for @enterFullName.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter full name'**
+  String get enterFullName;
+
+  /// No description provided for @staffInviteSentSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Registration invite email sent successfully.'**
+  String get staffInviteSentSuccessfully;
+
+  /// No description provided for @fullNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name is required.'**
+  String get fullNameRequired;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

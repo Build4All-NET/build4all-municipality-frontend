@@ -6,6 +6,7 @@ import 'package:baladiyati/features/admin/Requests/data/Service/Req_Api_Service.
 import 'package:baladiyati/features/admin/announcements/data/services/Announcement_Api_Service.dart';
 import 'package:baladiyati/features/admin/announcements/presentation/screens/announcementscreen.dart';
 import 'package:baladiyati/features/admin/manage_service/Data/service/Service_Api_service.dart';
+import 'package:baladiyati/features/admin/staff/data/Service/AdminUserApiService.dart';
 import 'package:baladiyati/features/admin/staff/data/Service/Employe_Api_Service.dart';
 import 'package:baladiyati/features/admin/violations/data/services/violation_api_services.dart';
 import 'package:baladiyati/features/admin/violations/presentation/screens/violationpage.dart';
@@ -58,7 +59,7 @@ class _DashboardPageState extends State<DashboardPage> {
   late final ViolationApiService _violationApiService;
   late final DepartmentApiService _departmentApiService;
   late final ServiceApiService _serviceApiService;
-  late final EmployeeApiService _employeeApiService;
+ late final AdminUserApiService _adminUserApiService;
   late final RequestApiService _requestApiService;
 
   late Future<_AdminDashboardStats> _statsFuture;
@@ -71,7 +72,7 @@ class _DashboardPageState extends State<DashboardPage> {
     _violationApiService = ViolationApiService(dio: DioClient.muni);
     _departmentApiService = DepartmentApiService(DioClient.muni);
     _serviceApiService = ServiceApiService(DioClient.muni);
-    _employeeApiService = EmployeeApiService(DioClient.muni);
+    _adminUserApiService = AdminUserApiService(dio: DioClient.muni);
     _requestApiService = RequestApiService(DioClient.muni);
 
     _statsFuture = _loadStats();
@@ -96,10 +97,10 @@ class _DashboardPageState extends State<DashboardPage> {
           .getServices()
           .then<int>((v) => v.length)
           .catchError((_) => -1),
-      _employeeApiService
-          .getEmployees()
-          .then<int>((v) => v.length)
-          .catchError((_) => -1),
+      _adminUserApiService
+    .getUsersByRole(roleName: 'STAFF')
+    .then<int>((v) => v.length)
+    .catchError((_) => -1),
       _requestApiService
           .getAllRequestsAdmin()
           .then<int>((v) => v.length)
@@ -251,7 +252,10 @@ class _DashboardPageState extends State<DashboardPage> {
 
   void _openServices() => AppRouter.goToServices(context);
   void _openDepartments() => AppRouter.goToDepartments(context);
-  void _openEmployees() => AppRouter.goToEmployees(context);
+ Future<void> _openEmployees() async {
+  AppRouter.goToEmployees(context);
+  await _refreshStats();
+}
   void _openInbox() => AppRouter.goToRequests(context);
 
   String _formatCount(int count) => count < 0 ? '-' : '$count';
@@ -311,76 +315,95 @@ class _DashboardPageState extends State<DashboardPage> {
                   if (hasNetworkError)
                     Container(
                       margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
                       decoration: BoxDecoration(
                         color: colors.errorContainer,
                         borderRadius: BorderRadius.circular(14),
                       ),
                       child: Row(
                         children: [
-                          Icon(Icons.wifi_off, color: colors.onErrorContainer, size: 18),
+                          Icon(
+                            Icons.wifi_off,
+                            color: colors.onErrorContainer,
+                            size: 18,
+                          ),
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
                               loc.networkErrorBanner,
-                              style: theme.textTheme.bodySmall?.copyWith(color: colors.onErrorContainer),
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colors.onErrorContainer,
+                              ),
                             ),
                           ),
                         ],
                       ),
                     ),
+
                   _WelcomeHeader(isLoading: isLoading),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 14),
 
                   GridView.count(
                     crossAxisCount: 2,
                     shrinkWrap: true,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
                     physics: const NeverScrollableScrollPhysics(),
-                    childAspectRatio: 1.28,
+                    childAspectRatio: 1.72,
                     children: [
                       _StatCard(
                         title: loc.announcements,
-                        value: isLoading ? '...' : _formatCount(stats.announcementsCount),
+                        value: isLoading
+                            ? '...'
+                            : _formatCount(stats.announcementsCount),
                         icon: Icons.campaign_outlined,
                         iconColor: colors.primary,
                       ),
                       _StatCard(
                         title: loc.violations,
-                        value: isLoading ? '...' : _formatCount(stats.violationsCount),
+                        value: isLoading
+                            ? '...'
+                            : _formatCount(stats.violationsCount),
                         icon: Icons.gavel_outlined,
                         iconColor: colors.error,
                       ),
                       _StatCard(
                         title: loc.departments,
-                        value: isLoading ? '...' : _formatCount(stats.departmentsCount),
+                        value: isLoading
+                            ? '...'
+                            : _formatCount(stats.departmentsCount),
                         icon: Icons.account_tree_outlined,
                         iconColor: colors.tertiary,
                       ),
                       _StatCard(
                         title: loc.services,
-                        value: isLoading ? '...' : _formatCount(stats.servicesCount),
+                        value:
+                            isLoading ? '...' : _formatCount(stats.servicesCount),
                         icon: Icons.description_outlined,
                         iconColor: colors.secondary,
                       ),
                       _StatCard(
                         title: loc.employees,
-                        value: isLoading ? '...' : _formatCount(stats.employeesCount),
+                        value:
+                            isLoading ? '...' : _formatCount(stats.employeesCount),
                         icon: Icons.groups_outlined,
                         iconColor: colors.primary,
                       ),
                       _StatCard(
                         title: loc.requestsCount,
-                        value: isLoading ? '...' : _formatCount(stats.requestsCount),
+                        value:
+                            isLoading ? '...' : _formatCount(stats.requestsCount),
                         icon: Icons.inbox_outlined,
                         iconColor: colors.outline,
                       ),
                     ],
                   ),
 
-                  const SizedBox(height: 24),
+                  const SizedBox(height: 22),
 
                   Text(
                     loc.quickActions,
@@ -540,39 +563,62 @@ class _StatCard extends StatelessWidget {
     final colors = theme.colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(14),
+      padding: const EdgeInsets.all(10),
       decoration: BoxDecoration(
         color: colors.surface,
-        borderRadius: BorderRadius.circular(20),
+        borderRadius: BorderRadius.circular(16),
         border: Border.all(
           color: colors.outline.withOpacity(0.14),
         ),
         boxShadow: [
           BoxShadow(
-            color: colors.shadow.withOpacity(0.045),
-            blurRadius: 12,
-            offset: const Offset(0, 7),
+            color: colors.shadow.withOpacity(0.04),
+            blurRadius: 9,
+            offset: const Offset(0, 5),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Row(
         children: [
-          Icon(icon, color: iconColor, size: 29),
-          const Spacer(),
-          Text(
-            value,
-            style: theme.textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.w900,
+          Container(
+            height: 34,
+            width: 34,
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              icon,
+              color: iconColor,
+              size: 18,
             ),
           ),
-          const SizedBox(height: 4),
-          Text(
-            title,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: colors.onSurface.withOpacity(0.72),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 17,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontSize: 11,
+                    color: colors.onSurface.withOpacity(0.72),
+                  ),
+                ),
+              ],
             ),
           ),
         ],

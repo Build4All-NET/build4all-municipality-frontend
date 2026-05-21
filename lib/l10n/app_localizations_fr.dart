@@ -444,16 +444,16 @@ class AppLocalizationsFr extends AppLocalizations {
   String get filterAll => 'Tout';
 
   @override
-  String get statusSubmitted => 'Soumis';
+  String get statusSubmitted => 'Soumise';
 
   @override
-  String get statusUnderReview => 'En cours d\'examen';
+  String get statusUnderReview => 'En cours d’examen';
 
   @override
   String get statusWaitingPayment => 'En attente de paiement';
 
   @override
-  String get statusApproved => 'Approuvé';
+  String get statusApproved => 'Approuvée';
 
   @override
   String get statusDelivered => 'Livré';
@@ -744,7 +744,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get enterDescription => 'Entrez la description';
 
   @override
-  String get location => 'Emplacement';
+  String get location => 'Localisation';
 
   @override
   String get enterLocation => 'Entrez l\'emplacement';
@@ -1081,6 +1081,8 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get reject => 'Rejeter';
+
+  @override
   String get adminProfileTitle => 'Profil du propriétaire';
 
   @override
@@ -1129,43 +1131,40 @@ class AppLocalizationsFr extends AppLocalizations {
   String get logoutSuccess => 'Déconnexion réussie';
 
   @override
-  String get violationTitle => "Titre de l'infraction";
+  String get violationTitle => 'Titre de l\'infraction';
 
   @override
-  String get enterViolationTitle => "Entrez le titre de l'infraction";
+  String get enterViolationTitle => 'Entrez le titre de l\'infraction';
 
   @override
-  String get violationType => "Type d'infraction";
+  String get violationType => 'Type d\'infraction';
 
   @override
-  String get selectViolationType => "Veuillez sélectionner le type d'infraction";
+  String get selectViolationType => 'Veuillez sélectionner le type d\'infraction';
 
   @override
-  String get identityNumber => "Numéro d'identité";
+  String get identityNumber => 'Numéro d\'identité';
 
   @override
-  String get enterIdentityNumber => "Entrez le numéro d'identité du citoyen";
+  String get enterIdentityNumber => 'Entrez le numéro d\'identité du citoyen';
 
   @override
-  String get carPlate => "Plaque d'immatriculation";
+  String get carPlate => 'Plaque d\'immatriculation';
 
   @override
-  String get enterCarPlate => "Entrez le numéro de plaque du véhicule";
+  String get enterCarPlate => 'Entrez le numéro de plaque du véhicule';
 
   @override
-  String get identifierRequired =>
-      "Veuillez fournir au moins un numéro d'identité ou une plaque";
+  String get identifierRequired => 'Veuillez fournir au moins un numéro d\'identité ou une plaque';
 
   @override
-  String get nameRequiresIdentifier =>
-      "Si un nom est fourni, vous devez ajouter un numéro d'identité ou une plaque";
+  String get nameRequiresIdentifier => 'Si un nom est fourni, vous devez ajouter un numéro d\'identité ou une plaque';
 
   @override
-  String get carPlateRequired =>
-      "La plaque est obligatoire pour les infractions de circulation";
+  String get carPlateRequired => 'La plaque est obligatoire pour les infractions de circulation';
 
   @override
-  String get violationDetails => "Détails de l'infraction";
+  String get violationDetails => 'Détails de l\'infraction';
 
   @override
   String get citizenInfo => 'Informations du citoyen';
@@ -1174,25 +1173,22 @@ class AppLocalizationsFr extends AppLocalizations {
   String get vehicleInfo => 'Informations du véhicule';
 
   @override
-  String get businessOwnerInfo => "Informations de l'établissement / propriétaire";
+  String get businessOwnerInfo => 'Informations de l\'établissement / propriétaire';
 
   @override
-  String get businessOwnerName => "Nom de l'établissement / propriétaire";
+  String get businessOwnerName => 'Nom de l\'établissement / propriétaire';
 
   @override
   String get paymentAndAssignment => 'Paiement et affectation';
 
   @override
-  String get trafficIdentifierHint =>
-      "La plaque est obligatoire pour les infractions routières. Le numéro d'identité est facultatif.";
+  String get trafficIdentifierHint => 'La plaque est obligatoire pour les infractions routières. Le numéro d\'identité est facultatif.';
 
   @override
-  String get generalIdentifierHint =>
-      "Au moins un parmi : nom, numéro d'identité ou plaque d'immatriculation doit être fourni.";
+  String get generalIdentifierHint => 'Au moins un parmi : nom, numéro d\'identité ou plaque d\'immatriculation doit être fourni.';
 
   @override
-  String get selectTypeFirst =>
-      "Veuillez d'abord sélectionner un type d'infraction pour voir les champs pertinents.";
+  String get selectTypeFirst => 'Veuillez d\'abord sélectionner un type d\'infraction pour voir les champs pertinents.';
 
   @override
   String get deleteFailed => 'Échec de la suppression. Veuillez réessayer.';
@@ -1201,7 +1197,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get statusDraft => 'Brouillon';
 
   @override
-  String get statusCancelled => 'Annulé';
+  String get statusCancelled => 'Annulée';
 
   @override
   String get statusDocumentsMissing => 'Documents manquants';
@@ -1261,7 +1257,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get inboxTitle => 'Boîte de réception';
 
   @override
-  String get networkErrorBanner => "Certaines données n'ont pas pu être chargées. Tirez pour réessayer.";
+  String get networkErrorBanner => 'Certaines données n\'ont pas pu être chargées. Tirez pour réessayer.';
 
   @override
   String get catGeneralServices => 'Services généraux';
@@ -1273,11 +1269,147 @@ class AppLocalizationsFr extends AppLocalizations {
   String get catRealEstate => 'Immobilier';
 
   @override
-  String get catEngineering => "Services d'ingénierie";
+  String get catEngineering => 'Services d\'ingénierie';
 
   @override
   String get statusInProgress => 'En cours';
 
   @override
   String get requestsCount => 'Demandes';
+
+  @override
+  String get requestInformation => 'Informations de la demande';
+
+  @override
+  String get municipality => 'Municipalité';
+
+  @override
+  String get service => 'Service';
+
+  @override
+  String get tracking => 'Suivi';
+
+  @override
+  String get requestId => 'ID de la demande';
+
+  @override
+  String get latitude => 'Latitude';
+
+  @override
+  String get longitude => 'Longitude';
+
+  @override
+  String get created => 'Créé le';
+
+  @override
+  String get updated => 'Mis à jour le';
+
+  @override
+  String get closed => 'Fermé le';
+
+  @override
+  String get actions => 'Actions';
+
+  @override
+  String get complete => 'Terminer';
+
+  @override
+  String get invalidRequestId => 'ID de demande invalide.';
+
+  @override
+  String get loading => 'Chargement...';
+
+  @override
+  String requestClosedMessage(Object status) {
+    return 'Cette demande est $status. Aucune autre action n’est disponible.';
+  }
+
+  @override
+  String get statusPending => 'En attente';
+
+  @override
+  String get statusRejected => 'Rejetée';
+
+  @override
+  String get statusCompleted => 'Terminée';
+
+  @override
+  String get staff => 'Personnel';
+
+  @override
+  String get manageStaff => 'Gérer les utilisateurs du personnel et les rôles';
+
+  @override
+  String get assignStaff => 'Affecter un membre';
+
+  @override
+  String get searchUserByEmail => 'Rechercher un utilisateur par e-mail';
+
+  @override
+  String get enterUserEmail => 'Saisir l’e-mail de l’utilisateur';
+
+  @override
+  String get searchUser => 'Rechercher l’utilisateur';
+
+  @override
+  String get userFound => 'Utilisateur trouvé';
+
+  @override
+  String get userNotFound => 'Utilisateur introuvable';
+
+  @override
+  String get userNotFoundDescription => 'Aucun utilisateur avec cet e-mail n’existe dans cette application. L’invitation par e-mail sera ajoutée ensuite.';
+
+  @override
+  String get alreadyAssigned => 'Déjà affecté';
+
+  @override
+  String get assignAsStaff => 'Affecter comme personnel';
+
+  @override
+  String get removeStaffRole => 'Retirer le rôle personnel';
+
+  @override
+  String confirmRemoveStaffRole(Object name) {
+    return 'Retirer le rôle personnel de $name ?';
+  }
+
+  @override
+  String get staffAssignedSuccessfully => 'Personnel affecté avec succès.';
+
+  @override
+  String get staffRoleRemovedSuccessfully => 'Rôle personnel retiré avec succès.';
+
+  @override
+  String get noStaffHint => 'Aucun membre du personnel trouvé.';
+
+  @override
+  String get currentRole => 'Rôle actuel';
+
+  @override
+  String get targetRole => 'Rôle cible';
+
+  @override
+  String get verified => 'Vérifié';
+
+  @override
+  String get notVerified => 'Non vérifié';
+
+  @override
+  String get sendRegistrationInvite => 'Envoyer l’invitation d’inscription';
+
+  @override
+  String get inviteStaffToRegister => 'Inviter le membre à s’inscrire';
+
+  @override
+  String get inviteStaffDescription => 'Cet utilisateur n’est pas encore inscrit. Envoyez-lui un e-mail pour lui demander de s’inscrire d’abord comme citoyen.';
+
+  @override
+  String get enterFullName => 'Saisir le nom complet';
+
+  @override
+  String get staffInviteSentSuccessfully => 'E-mail d’invitation envoyé avec succès.';
+
+  @override
+  String get fullNameRequired => 'Le nom complet est obligatoire.';
 }
