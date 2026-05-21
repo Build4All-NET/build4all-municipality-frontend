@@ -27,7 +27,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get loginSubtitle => 'ادخل إلى حسابك البلدي';
 
   @override
-  String get citizen => 'مواطن';
+  String get citizen => 'المواطن';
 
   @override
   String get employee => 'موظف';
@@ -444,7 +444,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get filterAll => 'الكل';
 
   @override
-  String get statusSubmitted => 'تم الإرسال';
+  String get statusSubmitted => 'مُرسَل';
 
   @override
   String get statusUnderReview => 'قيد المراجعة';
@@ -453,7 +453,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get statusWaitingPayment => 'بانتظار الدفع';
 
   @override
-  String get statusApproved => 'تمت الموافقة';
+  String get statusApproved => 'موافق عليه';
 
   @override
   String get statusDelivered => 'تم التسليم';
@@ -465,7 +465,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get progress => 'التقدم';
 
   @override
-  String get timeline => 'الخط الزمني';
+  String get timeline => 'الجدول الزمني';
 
   @override
   String get details => 'التفاصيل';
@@ -756,7 +756,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get selectDate => 'اختر التاريخ';
 
   @override
-  String get category => 'القسم';
+  String get category => 'الفئة';
 
   @override
   String get amount => 'المبلغ';
@@ -1081,6 +1081,8 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get reject => 'رفض';
+
+  @override
   String get adminProfileTitle => 'ملف المالك';
 
   @override
@@ -1153,12 +1155,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enterCarPlate => 'أدخل رقم لوحة المركبة';
 
   @override
-  String get identifierRequired =>
-      'يرجى تقديم رقم الهوية أو لوحة السيارة على الأقل';
+  String get identifierRequired => 'يرجى تقديم رقم الهوية أو لوحة السيارة على الأقل';
 
   @override
-  String get nameRequiresIdentifier =>
-      'إذا تم إدخال اسم، يجب إضافة رقم الهوية أو لوحة السيارة';
+  String get nameRequiresIdentifier => 'إذا تم إدخال اسم، يجب إضافة رقم الهوية أو لوحة السيارة';
 
   @override
   String get carPlateRequired => 'لوحة السيارة مطلوبة للمخالفات المرورية';
@@ -1182,16 +1182,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get paymentAndAssignment => 'الدفع والتعيين';
 
   @override
-  String get trafficIdentifierHint =>
-      'لوحة السيارة مطلوبة للمخالفات المرورية. رقم الهوية اختياري.';
+  String get trafficIdentifierHint => 'لوحة السيارة مطلوبة للمخالفات المرورية. رقم الهوية اختياري.';
 
   @override
-  String get generalIdentifierHint =>
-      'يجب توفير واحد على الأقل من: الاسم، رقم الهوية، أو لوحة السيارة.';
+  String get generalIdentifierHint => 'يجب توفير واحد على الأقل من: الاسم، رقم الهوية، أو لوحة السيارة.';
 
   @override
-  String get selectTypeFirst =>
-      'يرجى اختيار نوع المخالفة أولاً لعرض الحقول المناسبة.';
+  String get selectTypeFirst => 'يرجى اختيار نوع المخالفة أولاً لعرض الحقول المناسبة.';
 
   @override
   String get deleteFailed => 'فشل الحذف. يرجى المحاولة مجدداً.';
@@ -1200,10 +1197,10 @@ class AppLocalizationsAr extends AppLocalizations {
   String get statusDraft => 'مسودة';
 
   @override
-  String get statusCancelled => 'ملغي';
+  String get statusCancelled => 'ملغى';
 
   @override
-  String get statusDocumentsMissing => 'وثائق مفقودة';
+  String get statusDocumentsMissing => 'المستندات ناقصة';
 
   @override
   String get statusTaxPaid => 'الضريبة مدفوعة';
@@ -1275,8 +1272,144 @@ class AppLocalizationsAr extends AppLocalizations {
   String get catEngineering => 'الخدمات الهندسية';
 
   @override
-  String get statusInProgress => 'قيد المعالجة';
+  String get statusInProgress => 'قيد التنفيذ';
 
   @override
   String get requestsCount => 'الطلبات';
+
+  @override
+  String get requestInformation => 'معلومات الطلب';
+
+  @override
+  String get municipality => 'البلدية';
+
+  @override
+  String get service => 'الخدمة';
+
+  @override
+  String get tracking => 'رقم التتبع';
+
+  @override
+  String get requestId => 'رقم الطلب';
+
+  @override
+  String get latitude => 'خط العرض';
+
+  @override
+  String get longitude => 'خط الطول';
+
+  @override
+  String get created => 'تاريخ الإنشاء';
+
+  @override
+  String get updated => 'آخر تحديث';
+
+  @override
+  String get closed => 'تاريخ الإغلاق';
+
+  @override
+  String get actions => 'الإجراءات';
+
+  @override
+  String get complete => 'إنهاء';
+
+  @override
+  String get invalidRequestId => 'رقم الطلب غير صالح.';
+
+  @override
+  String get loading => 'جارٍ التحميل...';
+
+  @override
+  String requestClosedMessage(Object status) {
+    return 'هذا الطلب بحالة $status. لا توجد إجراءات إضافية متاحة.';
+  }
+
+  @override
+  String get statusPending => 'قيد الانتظار';
+
+  @override
+  String get statusRejected => 'مرفوض';
+
+  @override
+  String get statusCompleted => 'مكتمل';
+
+  @override
+  String get staff => 'الموظفون';
+
+  @override
+  String get manageStaff => 'إدارة موظفي البلدية وتعيين الأدوار';
+
+  @override
+  String get assignStaff => 'تعيين موظف';
+
+  @override
+  String get searchUserByEmail => 'البحث عن مستخدم عبر البريد الإلكتروني';
+
+  @override
+  String get enterUserEmail => 'أدخل بريد المستخدم';
+
+  @override
+  String get searchUser => 'بحث عن المستخدم';
+
+  @override
+  String get userFound => 'تم العثور على المستخدم';
+
+  @override
+  String get userNotFound => 'المستخدم غير موجود';
+
+  @override
+  String get userNotFoundDescription => 'لا يوجد مستخدم بهذا البريد داخل هذا التطبيق. سيتم إضافة الدعوة عبر البريد لاحقًا.';
+
+  @override
+  String get alreadyAssigned => 'مُعيّن مسبقًا';
+
+  @override
+  String get assignAsStaff => 'تعيينه كموظف';
+
+  @override
+  String get removeStaffRole => 'إزالة دور الموظف';
+
+  @override
+  String confirmRemoveStaffRole(Object name) {
+    return 'هل تريد إزالة دور الموظف من $name؟';
+  }
+
+  @override
+  String get staffAssignedSuccessfully => 'تم تعيين الموظف بنجاح.';
+
+  @override
+  String get staffRoleRemovedSuccessfully => 'تمت إزالة دور الموظف بنجاح.';
+
+  @override
+  String get noStaffHint => 'لا يوجد موظفون حتى الآن.';
+
+  @override
+  String get currentRole => 'الدور الحالي';
+
+  @override
+  String get targetRole => 'الدور المطلوب';
+
+  @override
+  String get verified => 'موثّق';
+
+  @override
+  String get notVerified => 'غير موثّق';
+
+  @override
+  String get sendRegistrationInvite => 'إرسال دعوة التسجيل';
+
+  @override
+  String get inviteStaffToRegister => 'دعوة الموظف للتسجيل';
+
+  @override
+  String get inviteStaffDescription => 'هذا المستخدم غير مسجل بعد. أرسل له بريدًا ليقوم بالتسجيل كمواطن أولًا.';
+
+  @override
+  String get enterFullName => 'أدخل الاسم الكامل';
+
+  @override
+  String get staffInviteSentSuccessfully => 'تم إرسال دعوة التسجيل بنجاح.';
+
+  @override
+  String get fullNameRequired => 'الاسم الكامل مطلوب.';
 }

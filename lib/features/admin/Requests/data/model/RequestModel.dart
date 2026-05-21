@@ -46,7 +46,21 @@ class RequestModel extends RequestEntity {
 
     String asString(dynamic value) {
       final text = value?.toString().trim() ?? '';
-      return text == 'null' ? '' : text;
+      return text.toLowerCase() == 'null' ? '' : text;
+    }
+
+    dynamic readNested(Map<String, dynamic> source, List<String> keys) {
+      dynamic current = source;
+
+      for (final key in keys) {
+        if (current is Map && current.containsKey(key)) {
+          current = current[key];
+        } else {
+          return null;
+        }
+      }
+
+      return current;
     }
 
     List<AttachmentModel> parseAttachments(dynamic value) {
@@ -60,24 +74,55 @@ class RequestModel extends RequestEntity {
 
     return RequestModel(
       id: asNullableInt(json['id']),
-      municipalityId: asInt(json['municipalityId']),
-      serviceId: asInt(json['serviceId']),
-      citizenUserId: asInt(json['citizenUserId']),
-      trackingNumber: asString(json['trackingNumber']),
+      municipalityId: asInt(json['municipalityId'] ?? json['municipality_id']),
+      serviceId: asInt(json['serviceId'] ?? json['service_id']),
+      citizenUserId: asInt(
+        json['citizenUserId'] ??
+            json['citizen_user_id'] ??
+            json['userId'] ??
+            json['user_id'],
+      ),
+      trackingNumber: asString(
+        json['trackingNumber'] ?? json['tracking_number'],
+      ),
       title: asString(json['title']),
       description: asString(json['description']),
       category: asString(json['category']),
       status: asString(json['status']),
-      geoLat: asDouble(json['geoLat']),
-      geoLng: asDouble(json['geoLng']),
-      addressText: asString(json['addressText']),
-      createdAt: asString(json['createdAt']),
-      updatedAt: asString(json['updatedAt']),
-      closedAt: asString(json['closedAt']),
-      municipalityName: asString(json['municipalityName']),
-      serviceName: asString(json['serviceName']),
-      citizenName: asString(json['citizenName']),
-      attachments: parseAttachments(json['attachments']),
+      geoLat: asDouble(json['geoLat'] ?? json['geo_lat']),
+      geoLng: asDouble(json['geoLng'] ?? json['geo_lng']),
+      addressText: asString(json['addressText'] ?? json['address_text']),
+      createdAt: asString(json['createdAt'] ?? json['created_at']),
+      updatedAt: asString(json['updatedAt'] ?? json['updated_at']),
+      closedAt: asString(json['closedAt'] ?? json['closed_at']),
+      municipalityName: asString(
+        json['municipalityName'] ??
+            json['municipality_name'] ??
+            readNested(json, ['municipality', 'nameEn']) ??
+            readNested(json, ['municipality', 'name_en']) ??
+            readNested(json, ['municipality', 'name']),
+      ),
+      serviceName: asString(
+        json['serviceName'] ??
+            json['service_name'] ??
+            readNested(json, ['service', 'nameEn']) ??
+            readNested(json, ['service', 'name_en']) ??
+            readNested(json, ['service', 'name']) ??
+            readNested(json, ['service', 'title']),
+      ),
+      citizenName: asString(
+        json['citizenName'] ??
+            json['citizen_name'] ??
+            readNested(json, ['citizen', 'fullName']) ??
+            readNested(json, ['citizen', 'full_name']) ??
+            readNested(json, ['citizen', 'name']) ??
+            readNested(json, ['user', 'fullName']) ??
+            readNested(json, ['user', 'full_name']) ??
+            readNested(json, ['user', 'name']),
+      ),
+      attachments: parseAttachments(
+        json['attachments'] ?? json['attachements'] ?? json['files'],
+      ),
     );
   }
 
@@ -93,12 +138,14 @@ class RequestModel extends RequestEntity {
       'geoLng': geoLng,
       'addressText': addressText,
       'attachments': attachments
-          .map((e) => e is AttachmentModel
-              ? e.toJson()
-              : {
-                  'fileName': e.fileName,
-                  'fileUrl': e.fileUrl,
-                })
+          .map(
+            (e) => e is AttachmentModel
+                ? e.toJson()
+                : {
+                    'fileName': e.fileName,
+                    'fileUrl': e.fileUrl,
+                  },
+          )
           .toList(),
     };
   }

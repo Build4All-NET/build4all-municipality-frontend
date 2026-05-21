@@ -18,6 +18,8 @@ import 'package:baladiyati/features/admin/profile/domain/usecases/get_admin_prof
 
 import 'package:baladiyati/features/admin/profile/presentation/cubit/admin_profile_cubit.dart';
 import 'package:baladiyati/features/admin/profile/presentation/screens/admin_profile_screen.dart';
+import 'package:baladiyati/features/admin/staff/Presentation/bloc/AdminStaffBloc.dart';
+import 'package:baladiyati/features/admin/staff/data/Service/AdminUserApiService.dart';
 import 'package:baladiyati/features/staff/dashboard/presentation/screens/staff_dashboard_screen.dart';
 import 'package:baladiyati/features/staff/services/presentation/screens/staff_services_screen.dart';
 import 'package:flutter/material.dart';
@@ -262,40 +264,21 @@ class AppRouter {
 
   // ================= ADMIN: EMPLOYEES =================
 
-  static void goToEmployees(BuildContext context) {
-    final employeeRepository = EmployeeRepositoryImpl(
-      EmployeeApiService(DioClient.muni),
-    );
-    final departmentRepository = DepartmentRepositoryImpl(
-      DepartmentApiService(DioClient.muni),
-    );
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => MultiBlocProvider(
-          providers: [
-            BlocProvider(
-              create: (_) => EmployeeBloc(
-                GetEmployees(employeeRepository),
-                CreateEmployee(employeeRepository),
-                UpdateEmployeeUsecase(employeeRepository),
-                DeleteEmployeeUsecase(employeeRepository),
-              )..add(LoadEmployees()),
-            ),
-            BlocProvider(
-              create: (_) => DepartmentCubit(
-                GetDepartments(departmentRepository),
-                AddDepartment(departmentRepository),
-                DeleteDepartment(departmentRepository),
-                UpdateDepartment(departmentRepository),
-              )..fetchDepartments(),
-            ),
-          ],
-          child: const EmployeesScreen(),
+  // ================= ADMIN: EMPLOYEES / STAFF =================
+
+static void goToEmployees(BuildContext context) {
+  Navigator.push(
+    context,
+    MaterialPageRoute(
+      builder: (_) => BlocProvider(
+        create: (_) => AdminStaffBloc(
+          apiService: AdminUserApiService(),
         ),
+        child: const EmployeesScreen(),
       ),
-    );
-  }
+    ),
+  );
+}
 
   static void goToStaffDashboard(BuildContext context) {
     Navigator.pushAndRemoveUntil(

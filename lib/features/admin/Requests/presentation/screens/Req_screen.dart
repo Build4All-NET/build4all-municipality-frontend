@@ -303,59 +303,88 @@ class _RequestCard extends StatelessWidget {
 
   String _safe(String? value) {
     final clean = value?.trim() ?? '';
-    return clean.isEmpty || clean == 'null' ? '---' : clean;
+    return clean.isEmpty || clean.toLowerCase() == 'null' ? '---' : clean;
   }
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
 
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(22),
       child: Container(
         margin: const EdgeInsets.only(bottom: 12),
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
           color: colors.surface,
-          borderRadius: BorderRadius.circular(20),
+          borderRadius: BorderRadius.circular(22),
           border: Border.all(
             color: colors.outlineVariant.withOpacity(0.55),
           ),
+          boxShadow: [
+            BoxShadow(
+              color: colors.shadow.withOpacity(0.035),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
         ),
         child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            CircleAvatar(
-              backgroundColor: statusColor.withOpacity(0.13),
+            Container(
+              height: 44,
+              width: 44,
+              decoration: BoxDecoration(
+                color: statusColor.withOpacity(0.13),
+                borderRadius: BorderRadius.circular(15),
+              ),
               child: Icon(
-                Icons.mark_email_unread_outlined,
+                Icons.assignment_outlined,
                 color: statusColor,
+                size: 22,
               ),
             ),
             const SizedBox(width: 12),
             Expanded(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _ResponsiveText(
-                    text: _safe(request.title),
-                    maxFontSize: 15,
-                    minFontSize: 8,
-                    fontWeight: FontWeight.w900,
-                    color: colors.onSurface,
+                  Text(
+                    _safe(request.title),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: colors.onSurface,
+                    ),
                   ),
-                  const SizedBox(height: 5),
-                  _ResponsiveText(
-                    text: _safe(request.trackingNumber),
-                    maxFontSize: 12,
-                    minFontSize: 8,
-                    color: colors.onSurfaceVariant,
+                  const SizedBox(height: 6),
+                  _MiniInfoLine(
+                    icon: Icons.miscellaneous_services_outlined,
+                    text: _safe(request.serviceName),
                   ),
-                  const SizedBox(height: 5),
-                  _ResponsiveText(
-                    text: createdAt,
-                    maxFontSize: 11,
-                    minFontSize: 8,
-                    color: colors.onSurfaceVariant,
+                  const SizedBox(height: 4),
+                  _MiniInfoLine(
+                    icon: Icons.person_outline,
+                    text: _safe(request.citizenName),
+                  ),
+                  const SizedBox(height: 7),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
+                    children: [
+                      _TinyChip(
+                        icon: Icons.confirmation_number_outlined,
+                        text: _safe(request.trackingNumber),
+                      ),
+                      _TinyChip(
+                        icon: Icons.calendar_today_outlined,
+                        text: createdAt,
+                      ),
+                    ],
                   ),
                 ],
               ),
@@ -364,6 +393,94 @@ class _RequestCard extends StatelessWidget {
             _StatusBadge(
               label: statusText,
               color: statusColor,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MiniInfoLine extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _MiniInfoLine({
+    required this.icon,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 14,
+          color: colors.onSurfaceVariant,
+        ),
+        const SizedBox(width: 5),
+        Expanded(
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TinyChip extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _TinyChip({
+    required this.icon,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        maxWidth: 135,
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        decoration: BoxDecoration(
+          color: colors.surfaceContainerHighest.withOpacity(0.55),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 12,
+              color: colors.onSurfaceVariant,
+            ),
+            const SizedBox(width: 4),
+            Flexible(
+              child: Text(
+                text,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
             ),
           ],
         ),
@@ -383,20 +500,29 @@ class _StatusBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      constraints: const BoxConstraints(maxWidth: 112),
-      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 6),
-      decoration: BoxDecoration(
-        color: color.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: _ResponsiveText(
-        text: label,
-        maxFontSize: 11,
-        minFontSize: 7,
-        fontWeight: FontWeight.w800,
-        color: color,
-        textAlign: TextAlign.center,
+    return Flexible(
+      flex: 0,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          maxWidth: 92,
+        ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+        ),
       ),
     );
   }
