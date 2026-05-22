@@ -2886,6 +2886,120 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Full name is required.'**
   String get fullNameRequired;
+
+  /// No description provided for @workflowTask.
+  ///
+  /// In en, this message translates to:
+  /// **'Workflow Task'**
+  String get workflowTask;
+
+  /// No description provided for @taskId.
+  ///
+  /// In en, this message translates to:
+  /// **'Task ID'**
+  String get taskId;
+
+  /// No description provided for @taskState.
+  ///
+  /// In en, this message translates to:
+  /// **'State'**
+  String get taskState;
+
+  /// No description provided for @taskAssignee.
+  ///
+  /// In en, this message translates to:
+  /// **'Assignee'**
+  String get taskAssignee;
+
+  /// No description provided for @taskCandidates.
+  ///
+  /// In en, this message translates to:
+  /// **'Candidates'**
+  String get taskCandidates;
+
+  /// No description provided for @taskCreated.
+  ///
+  /// In en, this message translates to:
+  /// **'Created'**
+  String get taskCreated;
+
+  /// No description provided for @openForm.
+  ///
+  /// In en, this message translates to:
+  /// **'Open Form'**
+  String get openForm;
+
+  /// No description provided for @assign.
+  ///
+  /// In en, this message translates to:
+  /// **'Assign'**
+  String get assign;
+
+  /// No description provided for @unassign.
+  ///
+  /// In en, this message translates to:
+  /// **'Unassign'**
+  String get unassign;
+
+  /// No description provided for @workflowTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Workflow Tasks'**
+  String get workflowTasks;
+
+  /// No description provided for @loadTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Load Tasks'**
+  String get loadTasks;
+
+  /// No description provided for @noWorkflowStarted.
+  ///
+  /// In en, this message translates to:
+  /// **'No workflow has started for this request.'**
+  String get noWorkflowStarted;
+
+  /// No description provided for @noTasksFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No tasks found for this request.'**
+  String get noTasksFound;
+
+  /// No description provided for @tasksLoadedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Tasks loaded successfully.'**
+  String get tasksLoadedSuccessfully;
+
+  /// No description provided for @failedToLoadTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load tasks.'**
+  String get failedToLoadTasks;
+
+  /// No description provided for @taskForm.
+  ///
+  /// In en, this message translates to:
+  /// **'Task Form'**
+  String get taskForm;
+
+  /// No description provided for @loadingForm.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading form...'**
+  String get loadingForm;
+
+  /// No description provided for @noFormFound.
+  ///
+  /// In en, this message translates to:
+  /// **'No form found for this task.'**
+  String get noFormFound;
+
+  /// No description provided for @rawFormJson.
+  ///
+  /// In en, this message translates to:
+  /// **'Raw Form JSON'**
+  String get rawFormJson;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

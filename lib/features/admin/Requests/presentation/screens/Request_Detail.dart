@@ -5,6 +5,8 @@ import 'package:baladiyati/features/admin/Requests/data/model/RequestModel.dart'
 import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_Bloc.dart';
 import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_Event.dart';
 import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_State.dart';
+import 'package:baladiyati/features/staff/tasks/presentation/screens/staff_task_form_screen.dart';
+import 'package:baladiyati/features/staff/tasks/presentation/widgets/staff_request_tasks_section.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -308,22 +310,39 @@ class RequestDetailPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 14),
-                        _SectionCard(
-                          title: l10n.description,
-                          icon: Icons.notes_outlined,
-                          child: Text(
-                            _safe(request.description),
-                            softWrap: true,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: colors.onSurfaceVariant,
-                              height: 1.45,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        if (!isClosed)
-                          _ActionsCard(
+                       _SectionCard(
+  title: l10n.description,
+  icon: Icons.notes_outlined,
+  child: Text(
+    _safe(request.description),
+    softWrap: true,
+    style: theme.textTheme.bodyMedium?.copyWith(
+      color: colors.onSurfaceVariant,
+      height: 1.45,
+      fontWeight: FontWeight.w500,
+    ),
+  ),
+),
+
+if (request.processInstanceKey != null &&
+    request.processInstanceKey! > 0) ...[
+  const SizedBox(height: 14),
+ StaffRequestTasksSection(
+  request: request,
+  onOpenTaskForm: (task) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => StaffTaskFormScreen(task: task),
+      ),
+    );
+  },
+),
+],
+
+const SizedBox(height: 20),
+if (!isClosed)
+  _ActionsCard(
                             isLoading: state.updating,
                             onReject: () {
                               if (state.updating) return;

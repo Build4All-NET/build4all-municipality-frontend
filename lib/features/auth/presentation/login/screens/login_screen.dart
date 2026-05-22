@@ -162,16 +162,12 @@ class _LoginScreenState extends State<LoginScreen> {
     }
   }
 
-  Future<bool> _isStaffOnMunicipality({
+ Future<bool> _isStaffOnMunicipality({
   required String token,
-  required String email,
 }) async {
   try {
     final response = await DioClient.muni.get(
       '/users/my-access',
-      queryParameters: {
-        'email': email,
-      },
       options: Options(
         headers: {
           'Authorization': _bearer(token),
@@ -182,12 +178,16 @@ class _LoginScreenState extends State<LoginScreen> {
     final data = response.data;
 
     if (data is Map) {
-      return data['isStaff'] == true;
+      final isStaff = data['isStaff'] == true;
+      final roleName = data['roleName']?.toString().trim().toUpperCase();
+
+      return isStaff || roleName == 'STAFF';
     }
   } catch (_) {}
 
   return false;
 }
+
 
   Future<void> _saveUserSession({
     required DualLoginResult dual,
@@ -236,10 +236,9 @@ class _LoginScreenState extends State<LoginScreen> {
     final wantsEmployee = !isCitizen;
 
     if (wantsEmployee) {
-      final isStaff = await _isStaffOnMunicipality(
-        token: dual.userToken!, 
-        email: email,
-      );
+     final isStaff = await _isStaffOnMunicipality(
+  token: dual.userToken!,
+);
 
       if (!isStaff) {
         await _clearUserSession();

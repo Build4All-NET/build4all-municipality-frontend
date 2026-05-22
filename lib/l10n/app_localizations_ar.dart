@@ -312,7 +312,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get awaitingPayment => 'بانتظار الدفع';
 
   @override
-  String get completed => 'مكتمل';
+  String get completed => 'مكتملة';
 
   @override
   String get quickActions => 'إجراءات سريعة';
@@ -1412,4 +1412,61 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get fullNameRequired => 'الاسم الكامل مطلوب.';
+
+  @override
+  String get workflowTask => 'مهمة سير عمل';
+
+  @override
+  String get taskId => 'رقم المهمة';
+
+  @override
+  String get taskState => 'الحالة';
+
+  @override
+  String get taskAssignee => 'الموظف المسؤول';
+
+  @override
+  String get taskCandidates => 'المخولون';
+
+  @override
+  String get taskCreated => 'تاريخ الإنشاء';
+
+  @override
+  String get openForm => 'فتح النموذج';
+
+  @override
+  String get assign => 'تعيين';
+
+  @override
+  String get unassign => 'إلغاء التعيين';
+
+  @override
+  String get workflowTasks => 'مهام سير العمل';
+
+  @override
+  String get loadTasks => 'تحميل المهام';
+
+  @override
+  String get noWorkflowStarted => 'لم يبدأ سير العمل لهذا الطلب بعد.';
+
+  @override
+  String get noTasksFound => 'لا توجد مهام لهذا الطلب.';
+
+  @override
+  String get tasksLoadedSuccessfully => 'تم تحميل المهام بنجاح.';
+
+  @override
+  String get failedToLoadTasks => 'فشل تحميل المهام.';
+
+  @override
+  String get taskForm => 'نموذج المهمة';
+
+  @override
+  String get loadingForm => 'جارٍ تحميل النموذج...';
+
+  @override
+  String get noFormFound => 'لا يوجد نموذج لهذه المهمة.';
+
+  @override
+  String get rawFormJson => 'بيانات النموذج الخام';
 }

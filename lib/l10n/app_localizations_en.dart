@@ -1412,4 +1412,61 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get fullNameRequired => 'Full name is required.';
+
+  @override
+  String get workflowTask => 'Workflow Task';
+
+  @override
+  String get taskId => 'Task ID';
+
+  @override
+  String get taskState => 'State';
+
+  @override
+  String get taskAssignee => 'Assignee';
+
+  @override
+  String get taskCandidates => 'Candidates';
+
+  @override
+  String get taskCreated => 'Created';
+
+  @override
+  String get openForm => 'Open Form';
+
+  @override
+  String get assign => 'Assign';
+
+  @override
+  String get unassign => 'Unassign';
+
+  @override
+  String get workflowTasks => 'Workflow Tasks';
+
+  @override
+  String get loadTasks => 'Load Tasks';
+
+  @override
+  String get noWorkflowStarted => 'No workflow has started for this request.';
+
+  @override
+  String get noTasksFound => 'No tasks found for this request.';
+
+  @override
+  String get tasksLoadedSuccessfully => 'Tasks loaded successfully.';
+
+  @override
+  String get failedToLoadTasks => 'Failed to load tasks.';
+
+  @override
+  String get taskForm => 'Task Form';
+
+  @override
+  String get loadingForm => 'Loading form...';
+
+  @override
+  String get noFormFound => 'No form found for this task.';
+
+  @override
+  String get rawFormJson => 'Raw Form JSON';
 }

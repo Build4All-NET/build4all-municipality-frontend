@@ -13,6 +13,7 @@ class RequestEntity {
   final int municipalityId;
   final int serviceId;
   final int citizenUserId;
+  final int? processInstanceKey;
 
   final String trackingNumber;
   final String title;
@@ -39,6 +40,7 @@ class RequestEntity {
     required this.municipalityId,
     required this.serviceId,
     required this.citizenUserId,
+    this.processInstanceKey,
     required this.trackingNumber,
     required this.title,
     required this.description,

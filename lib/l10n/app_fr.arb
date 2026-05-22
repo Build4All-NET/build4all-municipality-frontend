@@ -613,6 +613,26 @@
   "fullName": "Nom complet",
   "enterFullName": "Saisir le nom complet",
   "staffInviteSentSuccessfully": "E-mail d’invitation envoyé avec succès.",
-  "fullNameRequired": "Le nom complet est obligatoire."
+  "fullNameRequired": "Le nom complet est obligatoire.",
+    "workflowTask": "Tâche de flux de travail",
+  "taskId": "ID de la tâche",
+  "taskState": "État",
+  "taskAssignee": "Destinataire",
+  "taskCandidates": "Candidats",
+  "taskCreated": "Créé",
+  "openForm": "Ouvrir le formulaire",
+  "assign": "Affecter",
+  "unassign": "Désaffecter",
+  "completed": "Terminé",
+  "workflowTasks": "Tâches de flux de travail",
+  "loadTasks": "Charger les tâches",
+  "noWorkflowStarted": "Aucun flux de travail n’a été démarré pour cette demande.",
+  "noTasksFound": "Aucune tâche trouvée pour cette demande.",
+  "tasksLoadedSuccessfully": "Tâches chargées avec succès.",
+  "failedToLoadTasks": "Échec du chargement des tâches.",
+  "taskForm": "Formulaire de tâche",
+"loadingForm": "Chargement du formulaire...",
+"noFormFound": "Aucun formulaire trouvé pour cette tâche.",
+"rawFormJson": "Données du formulaire brut"
 }
 

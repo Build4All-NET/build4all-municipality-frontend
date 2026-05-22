@@ -7,6 +7,7 @@ class RequestModel extends RequestEntity {
     required super.municipalityId,
     required super.serviceId,
     required super.citizenUserId,
+    super.processInstanceKey,
     required super.trackingNumber,
     required super.title,
     required super.description,
@@ -82,6 +83,9 @@ class RequestModel extends RequestEntity {
             json['userId'] ??
             json['user_id'],
       ),
+      processInstanceKey: asNullableInt(
+        json['processInstanceKey'] ?? json['process_instance_key'],
+      ),
       trackingNumber: asString(
         json['trackingNumber'] ?? json['tracking_number'],
       ),
@@ -131,6 +135,7 @@ class RequestModel extends RequestEntity {
       'municipalityId': municipalityId,
       'serviceId': serviceId,
       'citizenUserId': citizenUserId,
+      'processInstanceKey': processInstanceKey,
       'title': title,
       'description': description,
       'category': category,
