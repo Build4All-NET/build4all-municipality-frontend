@@ -627,5 +627,9 @@
 "taskForm": "Task Form",
 "loadingForm": "Loading form...",
 "noFormFound": "No form found for this task.",
-"rawFormJson": "Raw Form JSON"
+"rawFormJson": "Raw Form JSON",
+"submitTaskForm": "Submit Form",
+"formSubmittedSuccessfully": "Form submitted successfully.",
+"unsupportedFieldType": "Unsupported field type",
+"requiredField": "This field is required"
 }

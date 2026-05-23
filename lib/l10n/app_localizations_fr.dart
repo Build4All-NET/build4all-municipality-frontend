@@ -1469,4 +1469,16 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get rawFormJson => 'Données du formulaire brut';
+
+  @override
+  String get submitTaskForm => 'Soumettre le formulaire';
+
+  @override
+  String get formSubmittedSuccessfully => 'Formulaire soumis avec succès.';
+
+  @override
+  String get unsupportedFieldType => 'Type de champ non pris en charge';
+
+  @override
+  String get requiredField => 'Ce champ est requis';
 }

@@ -166,7 +166,7 @@ class RequestDetailPage extends StatelessWidget {
             type: AppToastType.success,
           );
 
-          Navigator.pop(context);
+         Navigator.pop(context, true);
         }
 
         if (error.isNotEmpty) {
@@ -245,11 +245,13 @@ class RequestDetailPage extends StatelessWidget {
                                 label: l10n.tracking,
                                 value: _safe(request.trackingNumber),
                               ),
-                              _DetailRow(
-                                icon: Icons.numbers_outlined,
-                                label: l10n.requestId,
-                                value: request.id == null ? '—' : '#${request.id}',
-                              ),
+                             _DetailRow(
+  icon: Icons.account_tree_outlined,
+  label: 'Process Key',
+  value: request.processInstanceKey == null
+      ? '—'
+      : request.processInstanceKey.toString(),
+),
                               _DetailRow(
                                 icon: Icons.category_outlined,
                                 label: l10n.category,
@@ -324,7 +326,8 @@ class RequestDetailPage extends StatelessWidget {
   ),
 ),
 
-if (request.processInstanceKey != null &&
+if (request.status.trim().toUpperCase() == 'APPROVED' &&
+    request.processInstanceKey != null &&
     request.processInstanceKey! > 0) ...[
   const SizedBox(height: 14),
  StaffRequestTasksSection(

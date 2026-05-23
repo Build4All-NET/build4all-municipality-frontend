@@ -633,6 +633,10 @@
   "taskForm": "Formulaire de tâche",
 "loadingForm": "Chargement du formulaire...",
 "noFormFound": "Aucun formulaire trouvé pour cette tâche.",
-"rawFormJson": "Données du formulaire brut"
+"rawFormJson": "Données du formulaire brut",
+"submitTaskForm": "Soumettre le formulaire",
+"formSubmittedSuccessfully": "Formulaire soumis avec succès.",
+"unsupportedFieldType": "Type de champ non pris en charge",
+"requiredField": "Ce champ est requis"
 }
 

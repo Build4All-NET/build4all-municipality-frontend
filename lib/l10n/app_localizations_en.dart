@@ -1469,4 +1469,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rawFormJson => 'Raw Form JSON';
+
+  @override
+  String get submitTaskForm => 'Submit Form';
+
+  @override
+  String get formSubmittedSuccessfully => 'Form submitted successfully.';
+
+  @override
+  String get unsupportedFieldType => 'Unsupported field type';
+
+  @override
+  String get requiredField => 'This field is required';
 }

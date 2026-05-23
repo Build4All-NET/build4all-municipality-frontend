@@ -1469,4 +1469,16 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get rawFormJson => 'بيانات النموذج الخام';
+
+  @override
+  String get submitTaskForm => 'إرسال النموذج';
+
+  @override
+  String get formSubmittedSuccessfully => 'تم إرسال النموذج بنجاح.';
+
+  @override
+  String get unsupportedFieldType => 'نوع الحقل غير مدعوم';
+
+  @override
+  String get requiredField => 'هذا الحقل مطلوب';
 }

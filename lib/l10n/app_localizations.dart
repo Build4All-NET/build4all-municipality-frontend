@@ -3000,6 +3000,30 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Raw Form JSON'**
   String get rawFormJson;
+
+  /// No description provided for @submitTaskForm.
+  ///
+  /// In en, this message translates to:
+  /// **'Submit Form'**
+  String get submitTaskForm;
+
+  /// No description provided for @formSubmittedSuccessfully.
+  ///
+  /// In en, this message translates to:
+  /// **'Form submitted successfully.'**
+  String get formSubmittedSuccessfully;
+
+  /// No description provided for @unsupportedFieldType.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsupported field type'**
+  String get unsupportedFieldType;
+
+  /// No description provided for @requiredField.
+  ///
+  /// In en, this message translates to:
+  /// **'This field is required'**
+  String get requiredField;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

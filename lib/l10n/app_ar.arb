@@ -627,5 +627,9 @@
 "taskForm": "نموذج المهمة",
 "loadingForm": "جارٍ تحميل النموذج...",
 "noFormFound": "لا يوجد نموذج لهذه المهمة.",
-"rawFormJson": "بيانات النموذج الخام"
+"rawFormJson": "بيانات النموذج الخام",
+"submitTaskForm": "إرسال النموذج",
+"formSubmittedSuccessfully": "تم إرسال النموذج بنجاح.",
+"unsupportedFieldType": "نوع الحقل غير مدعوم",
+"requiredField": "هذا الحقل مطلوب"
 }
