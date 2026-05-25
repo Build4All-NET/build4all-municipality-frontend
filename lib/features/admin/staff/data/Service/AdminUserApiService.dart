@@ -77,6 +77,7 @@ class AdminUserApiService {
   Future<AdminUserModel> assignRole({
     required int userId,
     required String roleName,
+    List<int> departmentIds = const [],
   }) async {
     if (userId <= 0) {
       throw Exception('Invalid user ID');
@@ -88,12 +89,18 @@ class AdminUserApiService {
       throw Exception('Role is required');
     }
 
+    final Map<String, dynamic> body = {
+      'userId': userId,
+      'roleName': cleanRole,
+    };
+
+    if (departmentIds.isNotEmpty) {
+      body['departmentIds'] = departmentIds;
+    }
+
     final response = await dio.post(
       '/api/admin/roles/assign',
-      data: {
-        'userId': userId,
-        'roleName': cleanRole,
-      },
+      data: body,
     );
 
     final data = response.data;
@@ -108,28 +115,28 @@ class AdminUserApiService {
   }
 
   Future<void> sendStaffRegistrationInvite({
-  required String email,
-  required String fullName,
-}) async {
-  final cleanEmail = email.trim();
-  final cleanName = fullName.trim();
+    required String email,
+    required String fullName,
+  }) async {
+    final cleanEmail = email.trim();
+    final cleanName = fullName.trim();
 
-  if (cleanEmail.isEmpty) {
-    throw Exception('Email is required');
+    if (cleanEmail.isEmpty) {
+      throw Exception('Email is required');
+    }
+
+    if (cleanName.isEmpty) {
+      throw Exception('Full name is required');
+    }
+
+    await dio.post(
+      '/api/admin/staff/invite-registration',
+      data: {
+        'email': cleanEmail,
+        'fullName': cleanName,
+      },
+    );
   }
-
-  if (cleanName.isEmpty) {
-    throw Exception('Full name is required');
-  }
-
-  await dio.post(
-    '/api/admin/staff/invite-registration',
-    data: {
-      'email': cleanEmail,
-      'fullName': cleanName,
-    },
-  );
-}
 
   Future<AdminUserModel> removeRole({
     required int userId,

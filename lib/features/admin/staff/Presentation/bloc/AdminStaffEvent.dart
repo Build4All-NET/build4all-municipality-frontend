@@ -29,10 +29,12 @@ class SearchUserForStaffAssignment extends AdminStaffEvent {
 class AssignUserAsStaff extends AdminStaffEvent {
   final int userId;
   final String roleName;
+  final List<int> departmentIds;
 
   AssignUserAsStaff({
     required this.userId,
     this.roleName = 'STAFF',
+    this.departmentIds = const [],
   });
 }
 

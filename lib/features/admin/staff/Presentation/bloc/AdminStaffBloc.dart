@@ -22,65 +22,65 @@ class AdminStaffBloc extends Bloc<AdminStaffEvent, AdminStaffState> {
     on<SendStaffRegistrationInvite>(_onSendStaffRegistrationInvite);
   }
 
+  Future<void> _onSendStaffRegistrationInvite(
+    SendStaffRegistrationInvite event,
+    Emitter<AdminStaffState> emit,
+  ) async {
+    final email = event.email.trim();
+    final fullName = event.fullName.trim();
 
-Future<void> _onSendStaffRegistrationInvite(
-  SendStaffRegistrationInvite event,
-  Emitter<AdminStaffState> emit,
-) async {
-  final email = event.email.trim();
-  final fullName = event.fullName.trim();
+    if (email.isEmpty) {
+      emit(
+        state.copyWith(
+          error: 'EMAIL_REQUIRED',
+          clearSuccess: true,
+        ),
+      );
+      return;
+    }
 
-  if (email.isEmpty) {
-    emit(
-      state.copyWith(
-        error: 'EMAIL_REQUIRED',
-        clearSuccess: true,
-      ),
-    );
-    return;
-  }
-
-  if (fullName.isEmpty) {
-    emit(
-      state.copyWith(
-        error: 'FULL_NAME_REQUIRED',
-        clearSuccess: true,
-      ),
-    );
-    return;
-  }
-
-  emit(
-    state.copyWith(
-      actionLoading: true,
-      clearError: true,
-      clearSuccess: true,
-    ),
-  );
-
-  try {
-    await apiService.sendStaffRegistrationInvite(
-      email: email,
-      fullName: fullName,
-    );
+    if (fullName.isEmpty) {
+      emit(
+        state.copyWith(
+          error: 'FULL_NAME_REQUIRED',
+          clearSuccess: true,
+        ),
+      );
+      return;
+    }
 
     emit(
       state.copyWith(
-        actionLoading: false,
-        success: 'STAFF_INVITE_SENT',
+        actionLoading: true,
         clearError: true,
-      ),
-    );
-  } catch (e) {
-    emit(
-      state.copyWith(
-        actionLoading: false,
-        error: errorMessage(e),
         clearSuccess: true,
       ),
     );
+
+    try {
+      await apiService.sendStaffRegistrationInvite(
+        email: email,
+        fullName: fullName,
+      );
+
+      emit(
+        state.copyWith(
+          actionLoading: false,
+          success: 'STAFF_INVITE_SENT',
+          clearError: true,
+        ),
+      );
+    } catch (e) {
+      emit(
+        state.copyWith(
+          actionLoading: false,
+          error: errorMessage(e),
+          clearSuccess: true,
+        ),
+      );
+    }
   }
-}
+
   Future<void> _onLoadStaffUsers(
     LoadStaffUsers event,
     Emitter<AdminStaffState> emit,
@@ -196,6 +196,7 @@ Future<void> _onSendStaffRegistrationInvite(
       await apiService.assignRole(
         userId: event.userId,
         roleName: event.roleName,
+        departmentIds: event.departmentIds,
       );
 
       final users = await apiService.getUsersByRole(
@@ -335,7 +336,10 @@ Future<void> _onSendStaffRegistrationInvite(
           user.phone.toLowerCase().contains(q) ||
           user.username.toLowerCase().contains(q) ||
           user.roleName.toLowerCase().contains(q) ||
-          user.status.toLowerCase().contains(q);
+          user.status.toLowerCase().contains(q) ||
+          user.assignedDepartments.any(
+            (d) => d.name.toLowerCase().contains(q),
+          );
     }).toList();
   }
 }

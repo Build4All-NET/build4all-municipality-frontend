@@ -1,6 +1,9 @@
 import 'package:baladiyati/common/widgets/app_search_field.dart';
 import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/common/widgets/primary_button.dart';
+import 'package:baladiyati/features/admin/Departement/domain/Entities/Departement.dart';
+import 'package:baladiyati/features/admin/Departement/presentation/bloc/Departement_State.dart';
+import 'package:baladiyati/features/admin/Departement/presentation/cubit/Departement_cubit.dart';
 import 'package:baladiyati/features/admin/staff/Presentation/bloc/AdminStaffBloc.dart';
 import 'package:baladiyati/features/admin/staff/Presentation/bloc/AdminStaffEvent.dart';
 import 'package:baladiyati/features/admin/staff/Presentation/bloc/AdminStaffState.dart';
@@ -51,11 +54,15 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
 
   void _openAssignStaffDialog() {
     context.read<AdminStaffBloc>().add(ClearStaffSearchResult());
+    context.read<DepartmentCubit>().fetchDepartments();
 
     showDialog(
       context: context,
-      builder: (_) => BlocProvider.value(
-        value: context.read<AdminStaffBloc>(),
+      builder: (_) => MultiBlocProvider(
+        providers: [
+          BlocProvider.value(value: context.read<AdminStaffBloc>()),
+          BlocProvider.value(value: context.read<DepartmentCubit>()),
+        ],
         child: const _AssignStaffDialog(roleName: _staffRoleName),
       ),
     );
@@ -105,20 +112,20 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
     }
   }
 
-String _successMessage(AppLocalizations l10n, String code) {
-  switch (code) {
-    case 'STAFF_ASSIGNED':
-      return l10n.staffAssignedSuccessfully;
-    case 'STAFF_ROLE_REMOVED':
-      return l10n.staffRoleRemovedSuccessfully;
-    case 'STAFF_INVITE_SENT':
-      return l10n.staffInviteSentSuccessfully;
-    case 'FULL_NAME_REQUIRED':
-      return l10n.fullNameRequired;
-    default:
-      return code;
+  String _successMessage(AppLocalizations l10n, String code) {
+    switch (code) {
+      case 'STAFF_ASSIGNED':
+        return l10n.staffAssignedSuccessfully;
+      case 'STAFF_ROLE_REMOVED':
+        return l10n.staffRoleRemovedSuccessfully;
+      case 'STAFF_INVITE_SENT':
+        return l10n.staffInviteSentSuccessfully;
+      case 'FULL_NAME_REQUIRED':
+        return l10n.fullNameRequired;
+      default:
+        return code;
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
@@ -255,6 +262,7 @@ class _AssignStaffDialog extends StatefulWidget {
 class _AssignStaffDialogState extends State<_AssignStaffDialog> {
   final TextEditingController _emailController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+  final Set<int> _selectedDepartmentIds = {};
 
   @override
   void dispose() {
@@ -285,15 +293,26 @@ class _AssignStaffDialogState extends State<_AssignStaffDialog> {
         );
   }
 
+  void _toggleDepartment(int id) {
+    setState(() {
+      if (_selectedDepartmentIds.contains(id)) {
+        _selectedDepartmentIds.remove(id);
+      } else {
+        _selectedDepartmentIds.add(id);
+      }
+    });
+  }
+
   void _assign(UserAssignmentSearchResult result) {
     final userId = result.userId;
-
     if (userId == null || userId <= 0) return;
+    if (_selectedDepartmentIds.isEmpty) return;
 
     context.read<AdminStaffBloc>().add(
           AssignUserAsStaff(
             userId: userId,
             roleName: widget.roleName,
+            departmentIds: _selectedDepartmentIds.toList(),
           ),
         );
 
@@ -306,18 +325,18 @@ class _AssignStaffDialogState extends State<_AssignStaffDialog> {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
-   return BlocConsumer<AdminStaffBloc, AdminStaffState>(
-  listenWhen: (previous, current) {
-    return previous.success != current.success;
-  },
-  listener: (context, state) {
-    if (state.success == 'STAFF_INVITE_SENT') {
-      if (Navigator.canPop(context)) {
-        Navigator.pop(context);
-      }
-    }
-  },
-  builder: (context, state) {
+    return BlocConsumer<AdminStaffBloc, AdminStaffState>(
+      listenWhen: (previous, current) {
+        return previous.success != current.success;
+      },
+      listener: (context, state) {
+        if (state.success == 'STAFF_INVITE_SENT') {
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context);
+          }
+        }
+      },
+      builder: (context, state) {
         final result = state.assignmentSearchResult;
 
         return AlertDialog(
@@ -369,20 +388,23 @@ class _AssignStaffDialogState extends State<_AssignStaffDialog> {
                       ),
                     ),
                     const SizedBox(height: 14),
-                   PrimaryButton(
+                    PrimaryButton(
                       label: state.searchLoading
                           ? l10n.loading
                           : l10n.searchUser,
                       isLoading: state.searchLoading,
                       onPressed: _search,
                     ),
-                    if (result != null) ...[
+                    if (result != null) ...[  
                       const SizedBox(height: 16),
                       if (result.exists)
                         _FoundUserCard(
                           result: result,
+                          selectedDepartmentIds: _selectedDepartmentIds,
+                          onToggleDepartment: _toggleDepartment,
                           onAssign: result.alreadyAssigned ||
-                                  state.actionLoading
+                                  state.actionLoading ||
+                                  _selectedDepartmentIds.isEmpty
                               ? null
                               : () => _assign(result),
                         )
@@ -411,10 +433,14 @@ class _AssignStaffDialogState extends State<_AssignStaffDialog> {
 class _FoundUserCard extends StatelessWidget {
   final UserAssignmentSearchResult result;
   final VoidCallback? onAssign;
+  final Set<int> selectedDepartmentIds;
+  final void Function(int) onToggleDepartment;
 
   const _FoundUserCard({
     required this.result,
     required this.onAssign,
+    required this.selectedDepartmentIds,
+    required this.onToggleDepartment,
   });
 
   String _safe(String value) {
@@ -492,18 +518,73 @@ class _FoundUserCard extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 12),
-         if (result.alreadyAssigned)
-          _InfoBox(
-            icon: Icons.done_all_outlined,
-            text: l10n.alreadyAssigned,
-            color: colors.primary,
-          )
-        else
-          PrimaryButton(
-            label: l10n.assignAsStaff,
-            onPressed: onAssign ?? () {},
+          const SizedBox(height: 14),
+          BlocBuilder<DepartmentCubit, DepartmentState>(
+            builder: (context, deptState) {
+              if (deptState.loading) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: Center(child: CircularProgressIndicator.adaptive()),
+                );
+              }
+              if (deptState.departments.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Select departments',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: colors.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
+                    children: deptState.departments.map((dept) {
+                      final selected = selectedDepartmentIds.contains(dept.id);
+                      return FilterChip(
+                        label: Text(dept.name),
+                        selected: selected,
+                        onSelected: (_) => onToggleDepartment(dept.id),
+                        selectedColor: colors.primary.withOpacity(0.18),
+                        checkmarkColor: colors.primary,
+                        labelStyle: theme.textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: selected ? colors.primary : colors.onSurface,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  if (selectedDepartmentIds.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Text(
+                        'Select at least one department',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colors.error,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
           ),
+          const SizedBox(height: 12),
+          if (result.alreadyAssigned)
+            _InfoBox(
+              icon: Icons.done_all_outlined,
+              text: l10n.alreadyAssigned,
+              color: colors.primary,
+            )
+          else
+            PrimaryButton(
+              label: l10n.assignAsStaff,
+              onPressed: onAssign ?? () {},
+            ),
         ],
       ),
     );
@@ -816,6 +897,20 @@ class _StaffCard extends StatelessWidget {
                     ),
                   ],
                 ),
+                if (user.assignedDepartments.isNotEmpty) ...[  
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: user.assignedDepartments.map((dept) {
+                      return _SmallBadge(
+                        label: dept.name,
+                        icon: Icons.account_balance_outlined,
+                        color: colors.primary,
+                      );
+                    }).toList(),
+                  ),
+                ],
               ],
             ),
           ),
