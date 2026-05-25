@@ -369,6 +369,20 @@ class _StaffTaskFormScreenState extends State<StaffTaskFormScreen> {
     }
   }
 
+  void _openCertificate() {
+    final pik = widget.task.processInstanceKey;
+    if (pik == null) return;
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => StaffCertificateScreen(
+          processInstanceKey: pik,
+          taskName: widget.task.name,
+        ),
+      ),
+    );
+  }
+
   // ─────────────────────────────────────────────────────────────────────────
   // BUILD
   // ─────────────────────────────────────────────────────────────────────────
@@ -419,7 +433,11 @@ class _StaffTaskFormScreenState extends State<StaffTaskFormScreen> {
                       ),
                       const SizedBox(height: 16),
                       if (widget.task.isCompleted)
-                        _CompletedBanner()
+                        _CompletedBanner(
+                          onViewCertificate: widget.task.processInstanceKey != null
+                              ? _openCertificate
+                              : null,
+                        )
                       else ...[
                         if (_fields.isEmpty)
                           _NoFormCard(
@@ -699,6 +717,10 @@ class _VarRow extends StatelessWidget {
 // ─── Completed banner ─────────────────────────────────────────────────────────
 
 class _CompletedBanner extends StatelessWidget {
+  final VoidCallback? onViewCertificate;
+
+  const _CompletedBanner({this.onViewCertificate});
+
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -709,23 +731,42 @@ class _CompletedBanner extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.primaryContainer.withOpacity(0.45),
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-            color: colors.primary.withOpacity(0.2)),
+        border: Border.all(color: colors.primary.withOpacity(0.2)),
       ),
-      child: Row(
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Icon(Icons.check_circle_outline,
-              color: colors.primary),
-          const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              'This task has already been completed.',
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: colors.primary,
-                fontWeight: FontWeight.w700,
+          Row(
+            children: [
+              Icon(Icons.check_circle_outline, color: colors.primary),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Text(
+                  'This task has already been completed.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colors.primary,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          if (onViewCertificate != null) ...[
+            const SizedBox(height: 12),
+            OutlinedButton.icon(
+              onPressed: onViewCertificate,
+              icon: const Icon(Icons.picture_as_pdf_outlined),
+              label: const Text('View / Download Certificate'),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: colors.primary,
+                side: BorderSide(color: colors.primary.withOpacity(0.4)),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                padding: const EdgeInsets.symmetric(vertical: 12),
               ),
             ),
-          ),
+          ],
         ],
       ),
     );
