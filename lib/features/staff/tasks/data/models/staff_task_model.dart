@@ -66,7 +66,12 @@ class StaffTaskModel {
       return {};
     }
 
-    final rawId = json['id'] ?? json['taskId'] ?? json['task_id'] ?? json['key'];
+    // Camunda v2 returns the task key as 'userTaskKey'
+    final rawId = json['userTaskKey'] ??
+        json['id'] ??
+        json['taskId'] ??
+        json['task_id'] ??
+        json['key'];
 
     return StaffTaskModel(
       id: asNullableInt(rawId),
@@ -75,7 +80,7 @@ class StaffTaskModel {
         json['name'] ?? json['taskName'] ?? json['task_name'] ?? json['elementId'],
       ),
       description: asString(json['description'] ?? json['taskDescription']),
-      state: asString(json['state'] ?? json['status'] ?? json['taskState']),
+      state: asString(json['state'] ?? json['taskState'] ?? json['status']),
       assignee: asString(json['assignee']),
       candidateUsers: asStringList(
         json['candidateUsers'] ?? json['candidate_users'],
@@ -115,7 +120,7 @@ class StaffTaskModel {
               .toLowerCase()
               .split(' ')
               .where((w) => w.isNotEmpty)
-              .map((w) => '${w[0].toUpperCase()}${w.substring(1)}')
+              .map((w) => '\${w[0].toUpperCase()}\${w.substring(1)}')
               .join(' ');
         })
         .toList();
