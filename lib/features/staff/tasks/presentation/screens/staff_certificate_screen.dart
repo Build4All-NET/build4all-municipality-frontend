@@ -53,11 +53,9 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
   }
 
   Future<void> _init() async {
-    // Check SharedPreferences for a previously saved file path
     final prefs = await SharedPreferences.getInstance();
     final savedPath = prefs.getString(_prefKey);
     if (savedPath != null && File(savedPath).existsSync()) {
-      // File still exists on device — try to fetch metadata, then show without polling
       try {
         final cert = await _api.getCertificateByProcessInstanceKey(
           widget.processInstanceKey,
@@ -69,7 +67,6 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
           _polling = false;
         });
       } catch (_) {
-        // Metadata fetch failed, but file is local — show minimal info
         if (!mounted) return;
         setState(() {
           _savedFilePath = savedPath;
@@ -118,8 +115,17 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
     }
   }
 
+  /// Returns a visible directory: external storage on Android, documents on iOS.
+  Future<Directory> _getSaveDir() async {
+    if (Platform.isAndroid) {
+      final ext = await getExternalStorageDirectory();
+      if (ext != null) return ext;
+    }
+    return getApplicationDocumentsDirectory();
+  }
+
   Future<String> _resolveFilePath(int certId) async {
-    final dir = await getApplicationDocumentsDirectory();
+    final dir = await _getSaveDir();
     final fileName =
         _certificate?['fileName']?.toString() ?? 'certificate_$certId.pdf';
     return '${dir.path}/$fileName';
@@ -333,12 +339,23 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
                         fontWeight: FontWeight.w700,
                       ),
                     ),
-                    Text(
-                      'PDF Document',
-                      style: theme.textTheme.bodySmall?.copyWith(
-                        color: colors.onSurfaceVariant,
+                    if (_savedFilePath != null)
+                      Text(
+                        _savedFilePath!,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                          fontSize: 10,
+                        ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      )
+                    else
+                      Text(
+                        'PDF Document',
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
                       ),
-                    ),
                   ],
                 ),
               ),
