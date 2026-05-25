@@ -7,27 +7,38 @@ class StaffTaskApiService {
 
   final Dio _dio;
 
+  Future<List<StaffTaskModel>> searchMyTasks({
+    Map<String, dynamic>? filter,
+    int limit = 50,
+  }) async {
+    final response = await _dio.post(
+      '/api/camunda/tasks/search',
+      data: {
+        'filter': filter ?? <String, dynamic>{},
+        'page': {'limit': limit},
+      },
+    );
+    final rawTasks = _extractTaskList(response.data);
+    return rawTasks.map(StaffTaskModel.fromJson).toList();
+  }
+
   Future<List<StaffTaskModel>> getTasksByProcessInstanceKey(
     int processInstanceKey,
   ) async {
     final response = await _dio.get(
       '/api/camunda/tasks/process/$processInstanceKey',
     );
-
     final rawTasks = _extractTaskList(response.data);
-
     return rawTasks.map(StaffTaskModel.fromJson).toList();
   }
 
   Future<Map<String, dynamic>> getTaskById(int taskId) async {
     final response = await _dio.get('/api/camunda/tasks/$taskId');
-
     return _asMap(response.data);
   }
 
   Future<Map<String, dynamic>> getTaskForm(int taskId) async {
     final response = await _dio.get('/api/camunda/tasks/$taskId/form');
-
     return _asMap(response.data);
   }
 
@@ -39,7 +50,6 @@ class StaffTaskApiService {
       '/api/camunda/tasks/$taskId/complete',
       data: variables,
     );
-
     return _asMap(response.data);
   }
 
@@ -49,11 +59,8 @@ class StaffTaskApiService {
   }) async {
     final response = await _dio.post(
       '/api/camunda/tasks/$taskId/assign',
-      data: {
-        'assignee': assignee,
-      },
+      data: {'assignee': assignee},
     );
-
     return _asMap(response.data);
   }
 
@@ -63,24 +70,12 @@ class StaffTaskApiService {
 
   List<Map<String, dynamic>> _extractTaskList(dynamic data) {
     if (data is List) {
-      return data
-          .whereType<Map>()
-          .map((e) => Map<String, dynamic>.from(e))
-          .toList();
+      return data.whereType<Map>().map((e) => Map<String, dynamic>.from(e)).toList();
     }
-
     if (data is Map) {
       final map = Map<String, dynamic>.from(data);
-
-      final candidates = [
-        map['items'],
-        map['tasks'],
-        map['data'],
-        map['results'],
-        map['content'],
-      ];
-
-      for (final candidate in candidates) {
+      for (final key in ['items', 'tasks', 'data', 'results', 'content']) {
+        final candidate = map[key];
         if (candidate is List) {
           return candidate
               .whereType<Map>()
@@ -89,15 +84,11 @@ class StaffTaskApiService {
         }
       }
     }
-
     return [];
   }
 
   Map<String, dynamic> _asMap(dynamic data) {
-    if (data is Map) {
-      return Map<String, dynamic>.from(data);
-    }
-
+    if (data is Map) return Map<String, dynamic>.from(data);
     return <String, dynamic>{};
   }
 }

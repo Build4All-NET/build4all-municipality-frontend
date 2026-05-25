@@ -23,68 +23,115 @@ class StaffTaskFormScreen extends StatefulWidget {
   State<StaffTaskFormScreen> createState() => _StaffTaskFormScreenState();
 }
 
+// ─── Normalised field definition ─────────────────────────────────────────────
+
+class _FieldDef {
+  final String key;
+  final String type;
+  final String label;
+  final bool required;
+  final dynamic defaultValue;
+  final List<_FieldOption> options;
+  final bool readOnly;
+  final num? min;
+  final num? max;
+  final String? placeholder;
+
+  const _FieldDef({
+    required this.key,
+    required this.type,
+    required this.label,
+    this.required = false,
+    this.defaultValue,
+    this.options = const [],
+    this.readOnly = false,
+    this.min,
+    this.max,
+    this.placeholder,
+  });
+}
+
+class _FieldOption {
+  final String value;
+  final String label;
+
+  const _FieldOption({required this.value, required this.label});
+}
+
+// ─── Screen state ────────────────────────────────────────────────────────────
+
 class _StaffTaskFormScreenState extends State<StaffTaskFormScreen> {
   final _formKey = GlobalKey<FormState>();
 
-  bool _loading = true;
+  bool _loadingDetail = true;
+  bool _loadingForm = true;
   bool _submitting = false;
 
-  Map<String, dynamic> _formJson = <String, dynamic>{};
-  Map<String, dynamic> _schema = <String, dynamic>{};
-  List<Map<String, dynamic>> _components = [];
+  Map<String, dynamic> _taskDetail = {};
+  List<_FieldDef> _fields = [];
 
-  final Map<String, TextEditingController> _controllers = {};
+  final Map<String, TextEditingController> _textControllers = {};
   final Map<String, bool> _checkboxValues = {};
   final Map<String, String?> _selectValues = {};
+  final Map<String, DateTime?> _dateValues = {};
+
+  late final StaffTaskApiService _api;
 
   @override
   void initState() {
     super.initState();
-    _loadForm();
+    _api = widget.apiService ?? StaffTaskApiService();
+    _init();
   }
 
   @override
   void dispose() {
-    for (final controller in _controllers.values) {
-      controller.dispose();
+    for (final c in _textControllers.values) {
+      c.dispose();
     }
     super.dispose();
   }
 
-  Future<void> _loadForm() async {
-    final taskId = widget.task.id;
+  Future<void> _init() async {
+    await Future.wait([_loadDetail(), _loadForm()]);
+  }
 
+  Future<void> _loadDetail() async {
+    final taskId = widget.task.id;
     if (taskId == null) {
-      setState(() {
-        _loading = false;
-      });
+      setState(() => _loadingDetail = false);
       return;
     }
-
     try {
-      final api = widget.apiService ?? StaffTaskApiService();
-      final form = await api.getTaskForm(taskId);
-
+      final detail = await _api.getTaskById(taskId);
       if (!mounted) return;
-
-      final parsedSchema = _parseSchema(form);
-      final components = _extractComponents(parsedSchema);
-
-      _initComponentState(components);
-
       setState(() {
-        _formJson = form;
-        _schema = parsedSchema;
-        _components = components;
-        _loading = false;
+        _taskDetail = detail;
+        _loadingDetail = false;
+      });
+    } catch (_) {
+      if (mounted) setState(() => _loadingDetail = false);
+    }
+  }
+
+  Future<void> _loadForm() async {
+    final taskId = widget.task.id;
+    if (taskId == null) {
+      setState(() => _loadingForm = false);
+      return;
+    }
+    try {
+      final formData = await _api.getTaskForm(taskId);
+      if (!mounted) return;
+      final fields = _parseFields(formData);
+      _initFieldState(fields);
+      setState(() {
+        _fields = fields;
+        _loadingForm = false;
       });
     } catch (e) {
       if (!mounted) return;
-
-      setState(() {
-        _loading = false;
-      });
-
+      setState(() => _loadingForm = false);
       AppToast.show(
         context,
         message: errorMessage(e),
@@ -93,315 +140,230 @@ class _StaffTaskFormScreenState extends State<StaffTaskFormScreen> {
     }
   }
 
-  Map<String, dynamic> _parseSchema(Map<String, dynamic> form) {
-    final rawSchema = form['schema'];
-
-    if (rawSchema is Map) {
-      return Map<String, dynamic>.from(rawSchema);
-    }
-
-    if (rawSchema is String && rawSchema.trim().isNotEmpty) {
-      final decoded = jsonDecode(rawSchema);
-
-      if (decoded is Map) {
-        return Map<String, dynamic>.from(decoded);
+  // ── Field parsing: handles both Camunda `schema.components` and simple `fields` format
+  List<_FieldDef> _parseFields(Map<String, dynamic> data) {
+    // Try Camunda-style schema.components
+    final rawSchema = data['schema'];
+    if (rawSchema != null) {
+      Map<String, dynamic> schema;
+      if (rawSchema is Map) {
+        schema = Map<String, dynamic>.from(rawSchema);
+      } else if (rawSchema is String && rawSchema.trim().isNotEmpty) {
+        final decoded = jsonDecode(rawSchema);
+        schema = decoded is Map ? Map<String, dynamic>.from(decoded) : {};
+      } else {
+        schema = {};
+      }
+      final components = schema['components'];
+      if (components is List) {
+        return components
+            .whereType<Map>()
+            .map((e) => Map<String, dynamic>.from(e))
+            .where((c) =>
+                (c['key']?.toString() ?? '').isNotEmpty &&
+                (c['type']?.toString() ?? '').isNotEmpty)
+            .map(_fieldFromCamunda)
+            .toList();
       }
     }
 
-    return <String, dynamic>{};
-  }
-
-  List<Map<String, dynamic>> _extractComponents(Map<String, dynamic> schema) {
-    final rawComponents = schema['components'];
-
-    if (rawComponents is! List) {
-      return [];
+    // Try simple `fields` array format
+    final rawFields = data['fields'];
+    if (rawFields is List) {
+      return rawFields
+          .whereType<Map>()
+          .map((e) => Map<String, dynamic>.from(e))
+          .where((f) =>
+              ((f['name'] ?? f['key'])?.toString() ?? '').isNotEmpty &&
+              (f['type']?.toString() ?? '').isNotEmpty)
+          .map(_fieldFromSimple)
+          .toList();
     }
 
-    return rawComponents
-        .whereType<Map>()
-        .map((e) => Map<String, dynamic>.from(e))
-        .where((component) {
-      final key = component['key']?.toString().trim() ?? '';
-      final type = component['type']?.toString().trim() ?? '';
-      return key.isNotEmpty && type.isNotEmpty;
-    }).toList();
+    return [];
   }
 
-  void _initComponentState(List<Map<String, dynamic>> components) {
-    for (final component in components) {
-      final key = component['key']?.toString().trim() ?? '';
-      final type = component['type']?.toString().trim().toLowerCase() ?? '';
-      final defaultValue = component['defaultValue'];
+  _FieldDef _fieldFromCamunda(Map<String, dynamic> c) {
+    final validate = c['validate'];
+    final isRequired =
+        (validate is Map && validate['required'] == true) ||
+            c['required'] == true;
+    final num? min = validate is Map
+        ? (validate['min'] is num ? validate['min'] as num : null)
+        : null;
+    final num? max = validate is Map
+        ? (validate['max'] is num ? validate['max'] as num : null)
+        : null;
 
-      if (key.isEmpty) continue;
+    final rawValues = c['values'];
+    final options = rawValues is List
+        ? rawValues
+            .whereType<Map>()
+            .map((v) => Map<String, dynamic>.from(v))
+            .map((v) => _FieldOption(
+                  value: v['value']?.toString() ?? '',
+                  label: v['label']?.toString() ??
+                      v['name']?.toString() ??
+                      v['value']?.toString() ??
+                      '',
+                ))
+            .toList()
+        : <_FieldOption>[];
 
-      if (_isTextLike(type) || type == 'number') {
-        _controllers[key] = TextEditingController(
-          text: defaultValue?.toString() ?? '',
-        );
-      } else if (type == 'checkbox') {
-        _checkboxValues[key] = defaultValue == true;
-      } else if (_isSelectLike(type)) {
-        _selectValues[key] = defaultValue?.toString();
+    return _FieldDef(
+      key: c['key']?.toString() ?? '',
+      type: c['type']?.toString().toLowerCase() ?? 'text',
+      label: c['label']?.toString() ?? c['key']?.toString() ?? '',
+      required: isRequired,
+      defaultValue: c['defaultValue'],
+      options: options,
+      readOnly: c['disabled'] == true || c['readonly'] == true,
+      min: min,
+      max: max,
+      placeholder: c['placeholder']?.toString(),
+    );
+  }
+
+  _FieldDef _fieldFromSimple(Map<String, dynamic> f) {
+    final key = (f['name'] ?? f['key'])?.toString() ?? '';
+    final type = f['type']?.toString().toLowerCase() ?? 'text';
+    final rawOptions = f['options'];
+    final options = rawOptions is List
+        ? rawOptions.map((o) {
+            if (o is Map) {
+              return _FieldOption(
+                value: o['value']?.toString() ?? o.toString(),
+                label: o['label']?.toString() ?? o['value']?.toString() ?? o.toString(),
+              );
+            }
+            return _FieldOption(value: o.toString(), label: o.toString());
+          }).toList()
+        : <_FieldOption>[];
+
+    return _FieldDef(
+      key: key,
+      type: type,
+      label: f['label']?.toString() ?? key,
+      required: f['required'] == true,
+      defaultValue: f['default'] ?? f['defaultValue'],
+      options: options,
+      readOnly: f['readOnly'] == true || f['disabled'] == true,
+      min: f['min'] is num ? f['min'] as num : null,
+      max: f['max'] is num ? f['max'] as num : null,
+      placeholder: f['placeholder']?.toString(),
+    );
+  }
+
+  void _initFieldState(List<_FieldDef> fields) {
+    for (final field in fields) {
+      final def = field.defaultValue;
+      switch (field.type) {
+        case 'checkbox':
+          _checkboxValues[field.key] = def == true;
+        case 'select':
+        case 'radio':
+        case 'dropdown':
+        case 'checklist':
+          _selectValues[field.key] = def?.toString();
+        case 'date':
+          if (def is String && def.isNotEmpty) {
+            _dateValues[field.key] = DateTime.tryParse(def);
+          } else {
+            _dateValues[field.key] = null;
+          }
+        default:
+          _textControllers[field.key] =
+              TextEditingController(text: def?.toString() ?? '');
       }
     }
   }
 
-  bool _isTextLike(String type) {
-    return type == 'textfield' ||
-        type == 'text' ||
-        type == 'textarea' ||
-        type == 'email' ||
-        type == 'phone';
-  }
+  // ── Submit
 
-  bool _isSelectLike(String type) {
-    return type == 'select' ||
-        type == 'radio' ||
-        type == 'dropdown' ||
-        type == 'checklist';
-  }
-
-  bool _isRequired(Map<String, dynamic> component) {
-    final validate = component['validate'];
-
-    if (validate is Map) {
-      return validate['required'] == true;
-    }
-
-    return component['required'] == true;
-  }
-
-  String _labelOf(Map<String, dynamic> component) {
-    final label = component['label']?.toString().trim() ?? '';
-    final key = component['key']?.toString().trim() ?? '';
-    return label.isNotEmpty ? label : key;
-  }
-
-  List<Map<String, dynamic>> _valuesOf(Map<String, dynamic> component) {
-    final values = component['values'];
-
-    if (values is! List) {
-      return [];
-    }
-
-    return values
-        .whereType<Map>()
-        .map((e) => Map<String, dynamic>.from(e))
-        .toList();
-  }
-
-  Future<void> _submitForm() async {
+  Future<void> _submit() async {
     final l10n = AppLocalizations.of(context)!;
     final taskId = widget.task.id;
 
     if (taskId == null) {
-      AppToast.show(
-        context,
-        message: l10n.noFormFound,
-        type: AppToastType.error,
-      );
+      AppToast.show(context,
+          message: l10n.noFormFound, type: AppToastType.error);
       return;
     }
 
-    if (!(_formKey.currentState?.validate() ?? false)) {
-      return;
-    }
+    if (!(_formKey.currentState?.validate() ?? false)) return;
 
     final variables = <String, dynamic>{};
 
-    for (final component in _components) {
-      final key = component['key']?.toString().trim() ?? '';
-      final type = component['type']?.toString().trim().toLowerCase() ?? '';
-
-      if (key.isEmpty) continue;
-
-      if (type == 'number') {
-        final rawValue = _controllers[key]?.text.trim() ?? '';
-
-        if (rawValue.isEmpty) {
-          variables[key] = null;
-        } else {
-          final intValue = int.tryParse(rawValue);
-          final doubleValue = double.tryParse(rawValue);
-
-          variables[key] = intValue ?? doubleValue ?? rawValue;
-        }
-      } else if (_isTextLike(type)) {
-        variables[key] = _controllers[key]?.text.trim() ?? '';
-      } else if (type == 'checkbox') {
-        variables[key] = _checkboxValues[key] ?? false;
-      } else if (_isSelectLike(type)) {
-        variables[key] = _selectValues[key];
+    for (final field in _fields) {
+      if (field.readOnly) continue;
+      switch (field.type) {
+        case 'number':
+          final raw = _textControllers[field.key]?.text.trim() ?? '';
+          if (raw.isEmpty) {
+            variables[field.key] = null;
+          } else {
+            variables[field.key] =
+                int.tryParse(raw) ?? double.tryParse(raw) ?? raw;
+          }
+        case 'checkbox':
+          variables[field.key] = _checkboxValues[field.key] ?? false;
+        case 'select':
+        case 'radio':
+        case 'dropdown':
+        case 'checklist':
+          variables[field.key] = _selectValues[field.key];
+        case 'date':
+          final d = _dateValues[field.key];
+          variables[field.key] =
+              d != null ? d.toIso8601String().split('T').first : null;
+        default:
+          variables[field.key] =
+              _textControllers[field.key]?.text.trim() ?? '';
       }
     }
 
-    setState(() {
-      _submitting = true;
-    });
+    setState(() => _submitting = true);
 
     try {
-      final api = widget.apiService ?? StaffTaskApiService();
-
-      await api.completeTask(
-        taskId: taskId,
-        variables: variables,
-      );
-
+      await _api.completeTask(taskId: taskId, variables: variables);
       if (!mounted) return;
-
       AppToast.show(
         context,
         message: l10n.formSubmittedSuccessfully,
         type: AppToastType.success,
       );
-
       Navigator.pop(context, true);
     } catch (e) {
       if (!mounted) return;
-
       AppToast.show(
-        context,
-        message: errorMessage(e),
-        type: AppToastType.error,
-      );
+          context, message: errorMessage(e), type: AppToastType.error);
     } finally {
-      if (mounted) {
-        setState(() {
-          _submitting = false;
-        });
-      }
+      if (mounted) setState(() => _submitting = false);
     }
   }
 
-  Widget _buildField(Map<String, dynamic> component) {
-    final l10n = AppLocalizations.of(context)!;
-    final type = component['type']?.toString().trim().toLowerCase() ?? '';
-    final key = component['key']?.toString().trim() ?? '';
-    final label = _labelOf(component);
-    final required = _isRequired(component);
-
-    if (type == 'number') {
-      return AppTextField(
-        controller: _controllers[key]!,
-        label: label,
-        hint: label,
-        keyboardType: const TextInputType.numberWithOptions(
-          decimal: true,
-          signed: false,
-        ),
-        validator: required
-            ? (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return l10n.requiredField;
-                }
-                return null;
-              }
-            : null,
-      );
-    }
-
-    if (_isTextLike(type)) {
-      return AppTextField(
-        controller: _controllers[key]!,
-        label: label,
-        hint: label,
-        maxLines: type == 'textarea' ? 4 : 1,
-        validator: required
-            ? (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return l10n.requiredField;
-                }
-                return null;
-              }
-            : null,
-      );
-    }
-
-    if (type == 'checkbox') {
-      final theme = Theme.of(context);
-      final cs = theme.colorScheme;
-
-      return Container(
-        decoration: BoxDecoration(
-          color: cs.surface,
-          borderRadius: BorderRadius.circular(14),
-          border: Border.all(color: cs.outlineVariant),
-        ),
-        child: CheckboxListTile(
-          value: _checkboxValues[key] ?? false,
-          title: Text(
-            label,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              fontWeight: FontWeight.w600,
-              color: cs.onSurface,
-            ),
-          ),
-          onChanged: (value) {
-            setState(() {
-              _checkboxValues[key] = value ?? false;
-            });
-          },
-        ),
-      );
-    }
-
-    if (_isSelectLike(type)) {
-      final values = _valuesOf(component);
-
-      return DropdownButtonFormField<String>(
-        value: _selectValues[key],
-        isExpanded: true,
-        decoration: InputDecoration(
-          labelText: label,
-        ),
-        validator: required
-            ? (value) {
-                if (value == null || value.trim().isEmpty) {
-                  return l10n.requiredField;
-                }
-                return null;
-              }
-            : null,
-        items: values.map((item) {
-          final itemLabel = item['label']?.toString() ??
-              item['name']?.toString() ??
-              item['value']?.toString() ??
-              '';
-
-          final itemValue = item['value']?.toString() ?? itemLabel;
-
-          return DropdownMenuItem<String>(
-            value: itemValue,
-            child: Text(itemLabel),
-          );
-        }).toList(),
-        onChanged: (value) {
-          setState(() {
-            _selectValues[key] = value;
-          });
-        },
-      );
-    }
-
-    return _UnsupportedField(
-      label: '$label (${l10n.unsupportedFieldType}: $type)',
-    );
-  }
+  // ─────────────────────────────────────────────────────────────────────────
+  // BUILD
+  // ─────────────────────────────────────────────────────────────────────────
 
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final cs = theme.colorScheme;
+    final colors = theme.colorScheme;
+    final isLoading = _loadingDetail || _loadingForm;
 
     return Scaffold(
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: Text(l10n.taskForm),
+        title: Text(
+          widget.task.name.isNotEmpty ? widget.task.name : l10n.taskForm,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
       ),
       body: SafeArea(
-        child: _loading
+        child: isLoading
             ? Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -410,90 +372,775 @@ class _StaffTaskFormScreenState extends State<StaffTaskFormScreen> {
                     const SizedBox(height: 12),
                     Text(
                       l10n.loadingForm,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: cs.onSurfaceVariant,
-                      ),
+                      style: theme.textTheme.bodyMedium
+                          ?.copyWith(color: colors.onSurfaceVariant),
                     ),
                   ],
                 ),
               )
-            : _formJson.isEmpty || _schema.isEmpty || _components.isEmpty
-                ? Center(
-                    child: Text(
-                      l10n.noFormFound,
-                      style: theme.textTheme.bodyMedium?.copyWith(
-                        color: cs.onSurfaceVariant,
+            : SingleChildScrollView(
+                padding:
+                    const EdgeInsets.fromLTRB(16, 12, 16, 32),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: [
+                      _TaskInfoCard(
+                        task: widget.task,
+                        detail: _taskDetail,
                       ),
-                    ),
-                  )
-                : SingleChildScrollView(
-                    padding: const EdgeInsets.all(16),
-                    child: Container(
-                      width: double.infinity,
-                      padding: const EdgeInsets.all(14),
-                      decoration: BoxDecoration(
-                        color: cs.surface,
-                        borderRadius: BorderRadius.circular(16),
-                        border: Border.all(color: cs.outlineVariant),
-                      ),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.stretch,
-                          children: [
-                            Text(
-                              _formJson['formId']?.toString() ?? l10n.taskForm,
-                              style: theme.textTheme.titleMedium?.copyWith(
-                                fontWeight: FontWeight.bold,
-                                color: cs.onSurface,
+                      const SizedBox(height: 16),
+                      if (widget.task.isCompleted)
+                        _CompletedBanner()
+                      else ...
+                        [
+                          if (_fields.isEmpty)
+                            _NoFormCard(
+                              onComplete: _submit,
+                              submitting: _submitting,
+                            )
+                          else ...
+                            [
+                              _FormCard(
+                                fields: _fields,
+                                textControllers: _textControllers,
+                                checkboxValues: _checkboxValues,
+                                selectValues: _selectValues,
+                                dateValues: _dateValues,
+                                onCheckboxChanged: (key, val) => setState(
+                                    () => _checkboxValues[key] = val),
+                                onSelectChanged: (key, val) =>
+                                    setState(() => _selectValues[key] = val),
+                                onDateChanged: (key, val) =>
+                                    setState(() => _dateValues[key] = val),
                               ),
-                            ),
-                            const SizedBox(height: 16),
-                            ..._components.map(
-                              (component) => Padding(
-                                padding: const EdgeInsets.only(bottom: 14),
-                                child: _buildField(component),
+                              const SizedBox(height: 20),
+                              PrimaryButton(
+                                label: l10n.submitTaskForm,
+                                isLoading: _submitting,
+                                onPressed: _submit,
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            PrimaryButton(
-                              label: l10n.submitTaskForm,
-                              isLoading: _submitting,
-                              onPressed: _submitForm,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
+                            ],
+                        ],
+                    ],
                   ),
+                ),
+              ),
       ),
     );
   }
 }
 
-class _UnsupportedField extends StatelessWidget {
-  final String label;
+// ─── Task info header card ────────────────────────────────────────────────────
 
-  const _UnsupportedField({
+class _TaskInfoCard extends StatelessWidget {
+  final StaffTaskModel task;
+  final Map<String, dynamic> detail;
+
+  const _TaskInfoCard({required this.task, required this.detail});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    final stateUpper = task.state.toUpperCase();
+    final bool isDone =
+        stateUpper == 'COMPLETED' || stateUpper == 'DONE';
+    final Color stateBg = isDone
+        ? colors.surfaceVariant
+        : colors.primaryContainer;
+    final Color stateFg = isDone
+        ? colors.onSurfaceVariant
+        : colors.onPrimaryContainer;
+
+    // Merge variables from model + detail response
+    final variables = <String, dynamic>{
+      ...task.variables,
+      if (detail['variables'] is Map)
+        ...Map<String, dynamic>.from(detail['variables'] as Map)
+      else if (detail['variables'] is List)
+        ...() {
+          final m = <String, dynamic>{};
+          for (final item in detail['variables'] as List) {
+            if (item is Map) {
+              final n = item['name']?.toString() ?? item['key']?.toString();
+              if (n != null) m[n] = item['value'];
+            }
+          }
+          return m;
+        }(),
+    };
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colors.outline.withOpacity(0.14)),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Container(
+                padding: const EdgeInsets.all(10),
+                decoration: BoxDecoration(
+                  color: colors.primaryContainer,
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(
+                  Icons.assignment_outlined,
+                  color: colors.onPrimaryContainer,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      task.name.isNotEmpty ? task.name : 'Task',
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        color: colors.onSurface,
+                      ),
+                    ),
+                    if (task.description.isNotEmpty) ...
+                      [
+                        const SizedBox(height: 4),
+                        Text(
+                          task.description,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: colors.onSurfaceVariant,
+                          ),
+                        ),
+                      ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          Wrap(
+            spacing: 8,
+            runSpacing: 6,
+            children: [
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+                decoration: BoxDecoration(
+                  color: stateBg,
+                  borderRadius: BorderRadius.circular(999),
+                ),
+                child: Text(
+                  isDone ? 'Completed' : (task.state.isEmpty ? 'Pending' : task.state),
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: stateFg,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
+              ),
+              if (task.creationDate.isNotEmpty)
+                _InfoChip(
+                  icon: Icons.schedule_outlined,
+                  label: task.creationDate,
+                  colors: colors,
+                  theme: theme,
+                ),
+              ...task.departmentLabels.map((d) => _InfoChip(
+                    icon: Icons.account_balance_outlined,
+                    label: d,
+                    colors: colors,
+                    theme: theme,
+                  )),
+            ],
+          ),
+          if (variables.isNotEmpty) ...
+            [
+              const SizedBox(height: 14),
+              const Divider(height: 1),
+              const SizedBox(height: 12),
+              Text(
+                'Request information',
+                style: theme.textTheme.labelMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: colors.onSurfaceVariant,
+                ),
+              ),
+              const SizedBox(height: 8),
+              ...variables.entries
+                  .where((e) =>
+                      e.value != null &&
+                      e.value.toString().trim().isNotEmpty)
+                  .map(
+                    (e) => _VarRow(
+                        label: e.key, value: e.value.toString()),
+                  ),
+            ],
+        ],
+      ),
+    );
+  }
+}
+
+class _InfoChip extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final ColorScheme colors;
+  final ThemeData theme;
+
+  const _InfoChip({
+    required this.icon,
     required this.label,
+    required this.colors,
+    required this.theme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 9, vertical: 4),
+      decoration: BoxDecoration(
+        color: colors.surfaceVariant,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 12, color: colors.onSurfaceVariant),
+          const SizedBox(width: 4),
+          Text(
+            label,
+            style: theme.textTheme.labelSmall?.copyWith(
+              color: colors.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _VarRow extends StatelessWidget {
+  final String label;
+  final String value;
+
+  const _VarRow({required this.label, required this.value});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 130,
+            child: Text(
+              label,
+              style: theme.textTheme.bodySmall?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: colors.onSurface,
+              ),
+            ),
+          ),
+          Expanded(
+            child: Text(
+              value,
+              style: theme.textTheme.bodySmall?.copyWith(
+                color: colors.onSurfaceVariant,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Completed banner ─────────────────────────────────────────────────────────
+
+class _CompletedBanner extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.primaryContainer.withOpacity(0.45),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+            color: colors.primary.withOpacity(0.2)),
+      ),
+      child: Row(
+        children: [
+          Icon(Icons.check_circle_outline,
+              color: colors.primary),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              'This task has already been completed.',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colors.primary,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── No form card (complete with no variables) ────────────────────────────────
+
+class _NoFormCard extends StatelessWidget {
+  final VoidCallback onComplete;
+  final bool submitting;
+
+  const _NoFormCard(
+      {required this.onComplete, required this.submitting});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+
+    return Container(
+      padding: const EdgeInsets.all(18),
+      decoration: BoxDecoration(
+        color: colors.surfaceVariant.withOpacity(0.45),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.outlineVariant),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.info_outline,
+                  color: colors.onSurfaceVariant, size: 20),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  'No input required for this task.',
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colors.onSurfaceVariant,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 14),
+          PrimaryButton(
+            label: l10n.submitTaskForm,
+            isLoading: submitting,
+            onPressed: onComplete,
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Dynamic form card ────────────────────────────────────────────────────────
+
+class _FormCard extends StatelessWidget {
+  final List<_FieldDef> fields;
+  final Map<String, TextEditingController> textControllers;
+  final Map<String, bool> checkboxValues;
+  final Map<String, String?> selectValues;
+  final Map<String, DateTime?> dateValues;
+  final void Function(String key, bool val) onCheckboxChanged;
+  final void Function(String key, String? val) onSelectChanged;
+  final void Function(String key, DateTime? val) onDateChanged;
+
+  const _FormCard({
+    required this.fields,
+    required this.textControllers,
+    required this.checkboxValues,
+    required this.selectValues,
+    required this.dateValues,
+    required this.onCheckboxChanged,
+    required this.onSelectChanged,
+    required this.onDateChanged,
   });
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final cs = theme.colorScheme;
+    final colors = theme.colorScheme;
 
     return Container(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: cs.errorContainer,
-        borderRadius: BorderRadius.circular(14),
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colors.outline.withOpacity(0.14)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Text(
+            'Fill in the required fields',
+            style: theme.textTheme.titleSmall?.copyWith(
+              fontWeight: FontWeight.w800,
+              color: colors.onSurface,
+            ),
+          ),
+          const SizedBox(height: 16),
+          ...fields.map(
+            (field) => Padding(
+              padding: const EdgeInsets.only(bottom: 16),
+              child: _DynamicField(
+                field: field,
+                textController: textControllers[field.key],
+                checkboxValue: checkboxValues[field.key] ?? false,
+                selectValue: selectValues[field.key],
+                dateValue: dateValues[field.key],
+                onCheckboxChanged: (val) =>
+                    onCheckboxChanged(field.key, val),
+                onSelectChanged: (val) =>
+                    onSelectChanged(field.key, val),
+                onDateChanged: (val) => onDateChanged(field.key, val),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Dynamic field widget ─────────────────────────────────────────────────────
+
+class _DynamicField extends StatelessWidget {
+  final _FieldDef field;
+  final TextEditingController? textController;
+  final bool checkboxValue;
+  final String? selectValue;
+  final DateTime? dateValue;
+  final void Function(bool) onCheckboxChanged;
+  final void Function(String?) onSelectChanged;
+  final void Function(DateTime?) onDateChanged;
+
+  const _DynamicField({
+    required this.field,
+    this.textController,
+    required this.checkboxValue,
+    required this.selectValue,
+    required this.dateValue,
+    required this.onCheckboxChanged,
+    required this.onSelectChanged,
+    required this.onDateChanged,
+  });
+
+  String? _validateText(String? value, BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    if (field.required && (value == null || value.trim().isEmpty)) {
+      return l10n.requiredField;
+    }
+    return null;
+  }
+
+  String? _validateNumber(String? value, BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final v = value?.trim() ?? '';
+    if (field.required && v.isEmpty) return l10n.requiredField;
+    if (v.isNotEmpty) {
+      final num? n = num.tryParse(v);
+      if (n == null) return 'Enter a valid number';
+      if (field.min != null && n < field.min!) {
+        return 'Minimum value is ${field.min}';
+      }
+      if (field.max != null && n > field.max!) {
+        return 'Maximum value is ${field.max}';
+      }
+    }
+    return null;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+    final type = field.type;
+
+    // ── Read-only / display
+    if (field.readOnly || type == 'readonly' || type == 'display') {
+      return Container(
+        padding:
+            const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        decoration: BoxDecoration(
+          color: colors.surfaceVariant.withOpacity(0.5),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: colors.outlineVariant),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              field.label,
+              style: theme.textTheme.labelSmall?.copyWith(
+                color: colors.onSurfaceVariant,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              textController?.text ?? field.defaultValue?.toString() ?? '-',
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colors.onSurface,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
+
+    // ── Checkbox
+    if (type == 'checkbox') {
+      return Container(
+        decoration: BoxDecoration(
+          color: colors.surface,
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(color: colors.outlineVariant),
+        ),
+        child: CheckboxListTile(
+          value: checkboxValue,
+          title: Text(
+            field.label,
+            style: theme.textTheme.bodyMedium
+                ?.copyWith(fontWeight: FontWeight.w600),
+          ),
+          onChanged: (val) => onCheckboxChanged(val ?? false),
+          controlAffinity: ListTileControlAffinity.leading,
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 12),
+        ),
+      );
+    }
+
+    // ── Radio buttons
+    if (type == 'radio') {
+      return FormField<String>(
+        initialValue: selectValue,
+        validator: field.required
+            ? (v) {
+                if (v == null || v.isEmpty) return l10n.requiredField;
+                return null;
+              }
+            : null,
+        builder: (state) {
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                '${field.label}${field.required ? ' *' : ''}',
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: state.hasError
+                      ? colors.error
+                      : colors.onSurface,
+                ),
+              ),
+              const SizedBox(height: 6),
+              Container(
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: state.hasError
+                        ? colors.error
+                        : colors.outlineVariant,
+                  ),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Column(
+                  children: field.options.map((opt) {
+                    return RadioListTile<String>(
+                      value: opt.value,
+                      groupValue: state.value,
+                      title: Text(opt.label),
+                      onChanged: (val) {
+                        state.didChange(val);
+                        onSelectChanged(val);
+                      },
+                      dense: true,
+                    );
+                  }).toList(),
+                ),
+              ),
+              if (state.hasError)
+                Padding(
+                  padding:
+                      const EdgeInsets.only(left: 12, top: 4),
+                  child: Text(
+                    state.errorText ?? '',
+                    style: theme.textTheme.bodySmall
+                        ?.copyWith(color: colors.error),
+                  ),
+                ),
+            ],
+          );
+        },
+      );
+    }
+
+    // ── Select / dropdown
+    if (type == 'select' || type == 'dropdown' || type == 'checklist') {
+      return DropdownButtonFormField<String>(
+        value: selectValue,
+        isExpanded: true,
+        decoration: InputDecoration(
+          labelText: field.label,
+          hintText: field.placeholder,
+          border:
+              OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+          contentPadding:
+              const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+        ),
+        validator: field.required
+            ? (v) {
+                if (v == null || v.trim().isEmpty) {
+                  return l10n.requiredField;
+                }
+                return null;
+              }
+            : null,
+        items: field.options
+            .map((opt) => DropdownMenuItem<String>(
+                  value: opt.value,
+                  child: Text(opt.label),
+                ))
+            .toList(),
+        onChanged: onSelectChanged,
+      );
+    }
+
+    // ── Date picker
+    if (type == 'date') {
+      return FormField<DateTime>(
+        initialValue: dateValue,
+        validator: field.required
+            ? (v) {
+                if (v == null) return l10n.requiredField;
+                return null;
+              }
+            : null,
+        builder: (state) {
+          final dateText = state.value != null
+              ? '${state.value!.year}-${state.value!.month.toString().padLeft(2, '0')}-${state.value!.day.toString().padLeft(2, '0')}'
+              : '';
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              GestureDetector(
+                onTap: () async {
+                  final picked = await showDatePicker(
+                    context: context,
+                    initialDate: state.value ?? DateTime.now(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                  );
+                  if (picked != null) {
+                    state.didChange(picked);
+                    onDateChanged(picked);
+                  }
+                },
+                child: AbsorbPointer(
+                  child: TextFormField(
+                    controller:
+                        TextEditingController(text: dateText),
+                    readOnly: true,
+                    decoration: InputDecoration(
+                      labelText:
+                          '${field.label}${field.required ? ' *' : ''}',
+                      hintText: 'Select date',
+                      suffixIcon: const Icon(
+                          Icons.calendar_today_outlined),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      errorText: state.errorText,
+                      contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 14, vertical: 14),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
+      );
+    }
+
+    // ── Number
+    if (type == 'number') {
+      return AppTextField(
+        controller: textController!,
+        label: '${field.label}${field.required ? ' *' : ''}',
+        hint: field.placeholder ?? field.label,
+        keyboardType: const TextInputType.numberWithOptions(
+          decimal: true,
+          signed: false,
+        ),
+        validator: (v) => _validateNumber(v, context),
+      );
+    }
+
+    // ── Text / textarea / email / phone (default)
+    if (type == 'textfield' ||
+        type == 'text' ||
+        type == 'textarea' ||
+        type == 'email' ||
+        type == 'phone' ||
+        type == 'string') {
+      return AppTextField(
+        controller: textController!,
+        label: '${field.label}${field.required ? ' *' : ''}',
+        hint: field.placeholder ?? field.label,
+        maxLines: type == 'textarea' ? 4 : 1,
+        keyboardType: type == 'email'
+            ? TextInputType.emailAddress
+            : type == 'phone'
+                ? TextInputType.phone
+                : TextInputType.text,
+        validator: (v) => _validateText(v, context),
+      );
+    }
+
+    // ── Unsupported
+    return Container(
+      padding:
+          const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+      decoration: BoxDecoration(
+        color: colors.errorContainer.withOpacity(0.4),
+        borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
-        label,
+        '${field.label} (unsupported type: $type)',
         style: theme.textTheme.bodySmall?.copyWith(
-          color: cs.onErrorContainer,
-          fontWeight: FontWeight.w600,
+          color: colors.onErrorContainer,
         ),
       ),
     );

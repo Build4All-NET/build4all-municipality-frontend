@@ -20,197 +20,219 @@ class StaffTaskCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
-    final cs = theme.colorScheme;
+    final colors = theme.colorScheme;
 
-    return Card(
-      elevation: 1,
-      margin: const EdgeInsets.symmetric(
-        horizontal: 12,
-        vertical: 8,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(14),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(14),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _Header(
-              title: task.name.isNotEmpty ? task.name : l10n.workflowTask,
-            ),
-            const SizedBox(height: 10),
-
-            _InfoRow(
-              icon: Icons.confirmation_number_outlined,
-              label: l10n.taskId,
-              value: task.taskId.isEmpty ? '-' : task.taskId,
-            ),
-
-            if (task.state.isNotEmpty)
-              _InfoRow(
-                icon: Icons.flag_outlined,
-                label: l10n.taskState,
-                value: task.state,
-              ),
-
-            if (task.assignee.isNotEmpty)
-              _InfoRow(
-                icon: Icons.person_outline,
-                label: l10n.taskAssignee,
-                value: task.assignee,
-              ),
-
-            if (task.candidateUsers.isNotEmpty)
-              _InfoRow(
-                icon: Icons.group_outlined,
-                label: l10n.taskCandidates,
-                value: task.candidateUsers.join(', '),
-              ),
-
-            if (task.creationDate.isNotEmpty)
-              _InfoRow(
-                icon: Icons.schedule_outlined,
-                label: l10n.taskCreated,
-                value: task.creationDate,
-              ),
-
-            const SizedBox(height: 12),
-
-            Row(
-              children: [
-                if (task.canOpenForm)
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: onOpenForm,
-                      icon: const Icon(Icons.dynamic_form_outlined),
-                      label: Text(l10n.openForm),
-                    ),
-                  ),
-
-                if (task.canOpenForm &&
-                    (onAssign != null || onUnassign != null))
-                  const SizedBox(width: 8),
-
-                if (!task.isAssigned && onAssign != null)
-                  OutlinedButton.icon(
-                    onPressed: onAssign,
-                    icon: const Icon(Icons.assignment_ind_outlined),
-                    label: Text(l10n.assign),
-                  ),
-
-                if (task.isAssigned && onUnassign != null)
-                  OutlinedButton.icon(
-                    onPressed: onUnassign,
-                    icon: const Icon(Icons.close),
-                    label: Text(l10n.unassign),
-                  ),
-              ],
-            ),
-
-            if (task.isCompleted)
-              Container(
-                margin: const EdgeInsets.only(top: 8),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 10,
-                  vertical: 6,
-                ),
-                decoration: BoxDecoration(
-                  color: cs.surfaceVariant,
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: Text(
-                  l10n.completed,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: cs.onSurfaceVariant,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-}
-
-class _Header extends StatelessWidget {
-  final String title;
-
-  const _Header({
-    required this.title,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-
-    return Row(
-      children: [
-        CircleAvatar(
-          backgroundColor: cs.primaryContainer,
-          foregroundColor: cs.onPrimaryContainer,
-          child: const Icon(Icons.task_alt_outlined),
-        ),
-        const SizedBox(width: 10),
-        Expanded(
-          child: Text(
-            title,
-            style: theme.textTheme.titleMedium?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: cs.onSurface,
-            ),
-          ),
-        ),
-      ],
-    );
-  }
-}
-
-class _InfoRow extends StatelessWidget {
-  final IconData icon;
-  final String label;
-  final String value;
-
-  const _InfoRow({
-    required this.icon,
-    required this.label,
-    required this.value,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-
-    return Padding(
-      padding: const EdgeInsets.only(bottom: 6),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Icon(
-            icon,
-            size: 18,
-            color: cs.primary,
-          ),
-          const SizedBox(width: 8),
-          Text(
-            '$label: ',
-            style: theme.textTheme.bodySmall?.copyWith(
-              fontWeight: FontWeight.bold,
-              color: cs.onSurface,
-            ),
-          ),
-          Expanded(
-            child: Text(
-              value,
-              style: theme.textTheme.bodySmall?.copyWith(
-                color: cs.onSurfaceVariant,
-              ),
-            ),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colors.outline.withOpacity(0.14)),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
           ),
         ],
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: task.canOpenForm ? onOpenForm : null,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(9),
+                    decoration: BoxDecoration(
+                      color: task.isCompleted
+                          ? colors.surfaceVariant
+                          : colors.primaryContainer,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      task.isCompleted
+                          ? Icons.check_circle_outline
+                          : Icons.assignment_outlined,
+                      size: 20,
+                      color: task.isCompleted
+                          ? colors.onSurfaceVariant
+                          : colors.onPrimaryContainer,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          task.name.isNotEmpty
+                              ? task.name
+                              : l10n.workflowTask,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: theme.textTheme.titleSmall?.copyWith(
+                            fontWeight: FontWeight.w800,
+                            color: colors.onSurface,
+                          ),
+                        ),
+                        if (task.creationDate.isNotEmpty) ...
+                          [
+                            const SizedBox(height: 2),
+                            Text(
+                              task.creationDate,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colors.onSurfaceVariant,
+                              ),
+                            ),
+                          ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: 8),
+                  _StatusChip(state: task.state),
+                ],
+              ),
+              if (task.departmentLabels.isNotEmpty) ...
+                [
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: task.departmentLabels.map((label) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 8, vertical: 3),
+                        decoration: BoxDecoration(
+                          color: colors.secondaryContainer,
+                          borderRadius: BorderRadius.circular(999),
+                        ),
+                        child: Text(
+                          label,
+                          style: theme.textTheme.labelSmall?.copyWith(
+                            color: colors.onSecondaryContainer,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              if (!task.isCompleted &&
+                  (task.canOpenForm ||
+                      onAssign != null ||
+                      onUnassign != null)) ...
+                [
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      if (task.canOpenForm)
+                        Expanded(
+                          child: FilledButton.icon(
+                            onPressed: onOpenForm,
+                            icon: const Icon(Icons.edit_document, size: 17),
+                            label: Text(l10n.openForm),
+                            style: FilledButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(
+                                  vertical: 10),
+                            ),
+                          ),
+                        ),
+                      if (task.canOpenForm &&
+                          (onAssign != null || onUnassign != null))
+                        const SizedBox(width: 8),
+                      if (!task.isAssigned && onAssign != null)
+                        OutlinedButton.icon(
+                          onPressed: onAssign,
+                          icon: const Icon(Icons.person_add_outlined,
+                              size: 17),
+                          label: Text(l10n.assign),
+                        ),
+                      if (task.isAssigned && onUnassign != null)
+                        OutlinedButton.icon(
+                          onPressed: onUnassign,
+                          icon: const Icon(Icons.person_remove_outlined,
+                              size: 17),
+                          label: Text(l10n.unassign),
+                        ),
+                    ],
+                  ),
+                ],
+              if (task.isCompleted) ...
+                [
+                  const SizedBox(height: 10),
+                  Row(
+                    children: [
+                      Icon(Icons.check_circle,
+                          size: 16,
+                          color: colors.primary.withOpacity(0.7)),
+                      const SizedBox(width: 6),
+                      Text(
+                        l10n.completed,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colors.primary.withOpacity(0.7),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _StatusChip extends StatelessWidget {
+  final String state;
+
+  const _StatusChip({required this.state});
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+    final upper = state.toUpperCase();
+
+    final Color bg;
+    final Color fg;
+    final String label;
+
+    if (upper == 'COMPLETED' || upper == 'DONE') {
+      bg = colors.surfaceVariant;
+      fg = colors.onSurfaceVariant;
+      label = 'Done';
+    } else if (upper == 'CREATED' || upper == 'PENDING') {
+      bg = colors.primaryContainer;
+      fg = colors.onPrimaryContainer;
+      label = 'Pending';
+    } else if (upper == 'ASSIGNED') {
+      bg = colors.tertiaryContainer;
+      fg = colors.onTertiaryContainer;
+      label = 'Assigned';
+    } else {
+      bg = colors.surfaceVariant;
+      fg = colors.onSurfaceVariant;
+      label = state.isEmpty ? '-' : state;
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+      decoration: BoxDecoration(
+        color: bg,
+        borderRadius: BorderRadius.circular(999),
+      ),
+      child: Text(
+        label,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: fg,
+              fontWeight: FontWeight.w800,
+            ),
       ),
     );
   }
