@@ -10,6 +10,7 @@ class StaffTaskModel {
   final String creationDate;
   final String completionDate;
   final int? processInstanceKey;
+  final int? rootProcessInstanceKey;
   final Map<String, dynamic> variables;
 
   const StaffTaskModel({
@@ -24,6 +25,7 @@ class StaffTaskModel {
     required this.creationDate,
     required this.completionDate,
     required this.processInstanceKey,
+    this.rootProcessInstanceKey,
     this.variables = const {},
   });
 
@@ -97,9 +99,16 @@ class StaffTaskModel {
       processInstanceKey: asNullableInt(
         json['processInstanceKey'] ?? json['process_instance_key'],
       ),
+      rootProcessInstanceKey: asNullableInt(
+        json['rootProcessInstanceKey'] ?? json['root_process_instance_key'],
+      ),
       variables: asVariables(json['variables']),
     );
   }
+
+  /// The key to use when looking up the certificate.
+  /// Camunda stores the root key in Request, so prefer rootProcessInstanceKey.
+  int? get certificateLookupKey => rootProcessInstanceKey ?? processInstanceKey;
 
   bool get isAssigned => assignee.isNotEmpty;
 

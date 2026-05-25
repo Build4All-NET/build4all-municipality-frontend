@@ -346,7 +346,7 @@ class _StaffTaskFormScreenState extends State<StaffTaskFormScreen> {
         message: l10n.formSubmittedSuccessfully,
         type: AppToastType.success,
       );
-      final pik = widget.task.processInstanceKey;
+      final pik = widget.task.certificateLookupKey;
       if (pik != null) {
         await Navigator.pushReplacement(
           context,
@@ -370,7 +370,7 @@ class _StaffTaskFormScreenState extends State<StaffTaskFormScreen> {
   }
 
   void _openCertificate() {
-    final pik = widget.task.processInstanceKey;
+    final pik = widget.task.certificateLookupKey;
     if (pik == null) return;
     Navigator.push(
       context,
@@ -434,7 +434,7 @@ class _StaffTaskFormScreenState extends State<StaffTaskFormScreen> {
                       const SizedBox(height: 16),
                       if (widget.task.isCompleted)
                         _CompletedBanner(
-                          onViewCertificate: widget.task.processInstanceKey != null
+                          onViewCertificate: widget.task.certificateLookupKey != null
                               ? _openCertificate
                               : null,
                         )
