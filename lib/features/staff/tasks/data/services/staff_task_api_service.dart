@@ -1,3 +1,5 @@
+import 'dart:typed_data';
+
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/staff/tasks/data/models/staff_task_model.dart';
 import 'package:dio/dio.dart';
@@ -66,6 +68,23 @@ class StaffTaskApiService {
 
   Future<void> unassignTask(int taskId) async {
     await _dio.delete('/api/camunda/tasks/$taskId/unassign');
+  }
+
+  Future<Map<String, dynamic>> getCertificateByProcessInstanceKey(
+    int processInstanceKey,
+  ) async {
+    final response = await _dio.get(
+      '/api/certificates/process-instance/$processInstanceKey',
+    );
+    return _asMap(response.data);
+  }
+
+  Future<Uint8List> downloadCertificateBytes(int certificateId) async {
+    final response = await _dio.get(
+      '/api/certificates/$certificateId/download',
+      options: Options(responseType: ResponseType.bytes),
+    );
+    return Uint8List.fromList(response.data as List<int>);
   }
 
   List<Map<String, dynamic>> _extractTaskList(dynamic data) {

@@ -6,6 +6,7 @@ import 'package:baladiyati/common/widgets/primary_button.dart';
 import 'package:baladiyati/core/utils/error_message.dart';
 import 'package:baladiyati/features/staff/tasks/data/models/staff_task_model.dart';
 import 'package:baladiyati/features/staff/tasks/data/services/staff_task_api_service.dart';
+import 'package:baladiyati/features/staff/tasks/presentation/screens/staff_certificate_screen.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -345,7 +346,20 @@ class _StaffTaskFormScreenState extends State<StaffTaskFormScreen> {
         message: l10n.formSubmittedSuccessfully,
         type: AppToastType.success,
       );
-      Navigator.pop(context, true);
+      final pik = widget.task.processInstanceKey;
+      if (pik != null) {
+        await Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(
+            builder: (_) => StaffCertificateScreen(
+              processInstanceKey: pik,
+              taskName: widget.task.name,
+            ),
+          ),
+        );
+      } else {
+        Navigator.pop(context, true);
+      }
     } catch (e) {
       if (!mounted) return;
       AppToast.show(
