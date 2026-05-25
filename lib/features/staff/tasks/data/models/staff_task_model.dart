@@ -100,15 +100,24 @@ class StaffTaskModel {
 
   bool get isCompleted {
     final value = state.toUpperCase();
-    return value == 'COMPLETED' || value == 'DONE';
+    return value == 'COMPLETED' || value == 'DONE' ||
+        value == 'CANCELED' || value == 'FAILED';
   }
 
   bool get canOpenForm => id != null && !isCompleted;
 
   List<String> get departmentLabels {
     return candidateGroups
-        .where((g) => g.startsWith('DEPT_'))
-        .map((g) => 'Dept ${g.replaceFirst('DEPT_', '')}')
+        .where((g) => g.startsWith('DEP_'))
+        .map((g) {
+          final raw = g.replaceFirst('DEP_', '').replaceAll('_', ' ');
+          return raw
+              .toLowerCase()
+              .split(' ')
+              .where((w) => w.isNotEmpty)
+              .map((w) => '${w[0].toUpperCase()}${w.substring(1)}')
+              .join(' ');
+        })
         .toList();
   }
 }

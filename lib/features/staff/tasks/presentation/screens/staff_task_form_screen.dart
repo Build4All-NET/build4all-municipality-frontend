@@ -7,6 +7,7 @@ import 'package:baladiyati/core/utils/error_message.dart';
 import 'package:baladiyati/features/staff/tasks/data/models/staff_task_model.dart';
 import 'package:baladiyati/features/staff/tasks/data/services/staff_task_api_service.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 
 class StaffTaskFormScreen extends StatefulWidget {
@@ -129,20 +130,33 @@ class _StaffTaskFormScreenState extends State<StaffTaskFormScreen> {
         _fields = fields;
         _loadingForm = false;
       });
+    } on DioException catch (e) {
+      if (!mounted) return;
+      setState(() => _loadingForm = false);
+      if (e.response?.statusCode == 404) return; // task has no form — proceed without one
+      AppToast.show(context, message: errorMessage(e), type: AppToastType.error);
     } catch (e) {
       if (!mounted) return;
       setState(() => _loadingForm = false);
-      AppToast.show(
-        context,
-        message: errorMessage(e),
-        type: AppToastType.error,
-      );
+      AppToast.show(context, message: errorMessage(e), type: AppToastType.error);
     }
   }
 
-  // ── Field parsing: handles both Camunda `schema.components` and simple `fields` format
+  // ── Field parsing ────────────────────────────────────────────────────────
+
+  List<_FieldDef> _parseComponents(List components) {
+    return components
+        .whereType<Map>()
+        .map((e) => Map<String, dynamic>.from(e))
+        .where((c) =>
+            (c['key']?.toString() ?? '').isNotEmpty &&
+            (c['type']?.toString() ?? '').isNotEmpty)
+        .map(_fieldFromCamunda)
+        .toList();
+  }
+
   List<_FieldDef> _parseFields(Map<String, dynamic> data) {
-    // Try Camunda-style schema.components
+    // 1. Camunda API format: { "schema": "JSON string", "formId": "..." }
     final rawSchema = data['schema'];
     if (rawSchema != null) {
       Map<String, dynamic> schema;
@@ -155,19 +169,18 @@ class _StaffTaskFormScreenState extends State<StaffTaskFormScreen> {
         schema = {};
       }
       final components = schema['components'];
-      if (components is List) {
-        return components
-            .whereType<Map>()
-            .map((e) => Map<String, dynamic>.from(e))
-            .where((c) =>
-                (c['key']?.toString() ?? '').isNotEmpty &&
-                (c['type']?.toString() ?? '').isNotEmpty)
-            .map(_fieldFromCamunda)
-            .toList();
+      if (components is List && components.isNotEmpty) {
+        return _parseComponents(components);
       }
     }
 
-    // Try simple `fields` array format
+    // 2. Direct form file format: { "components": [...], "type": "default" }
+    final rawComponents = data['components'];
+    if (rawComponents is List && rawComponents.isNotEmpty) {
+      return _parseComponents(rawComponents);
+    }
+
+    // 3. Simple fields array format: { "fields": [...] }
     final rawFields = data['fields'];
     if (rawFields is List) {
       return rawFields
@@ -393,36 +406,34 @@ class _StaffTaskFormScreenState extends State<StaffTaskFormScreen> {
                       const SizedBox(height: 16),
                       if (widget.task.isCompleted)
                         _CompletedBanner()
-                      else ...
-                        [
-                          if (_fields.isEmpty)
-                            _NoFormCard(
-                              onComplete: _submit,
-                              submitting: _submitting,
-                            )
-                          else ...
-                            [
-                              _FormCard(
-                                fields: _fields,
-                                textControllers: _textControllers,
-                                checkboxValues: _checkboxValues,
-                                selectValues: _selectValues,
-                                dateValues: _dateValues,
-                                onCheckboxChanged: (key, val) => setState(
-                                    () => _checkboxValues[key] = val),
-                                onSelectChanged: (key, val) =>
-                                    setState(() => _selectValues[key] = val),
-                                onDateChanged: (key, val) =>
-                                    setState(() => _dateValues[key] = val),
-                              ),
-                              const SizedBox(height: 20),
-                              PrimaryButton(
-                                label: l10n.submitTaskForm,
-                                isLoading: _submitting,
-                                onPressed: _submit,
-                              ),
-                            ],
+                      else ...[
+                        if (_fields.isEmpty)
+                          _NoFormCard(
+                            onComplete: _submit,
+                            submitting: _submitting,
+                          )
+                        else ...[
+                          _FormCard(
+                            fields: _fields,
+                            textControllers: _textControllers,
+                            checkboxValues: _checkboxValues,
+                            selectValues: _selectValues,
+                            dateValues: _dateValues,
+                            onCheckboxChanged: (key, val) => setState(
+                                () => _checkboxValues[key] = val),
+                            onSelectChanged: (key, val) =>
+                                setState(() => _selectValues[key] = val),
+                            onDateChanged: (key, val) =>
+                                setState(() => _dateValues[key] = val),
+                          ),
+                          const SizedBox(height: 20),
+                          PrimaryButton(
+                            label: l10n.submitTaskForm,
+                            isLoading: _submitting,
+                            onPressed: _submit,
+                          ),
                         ],
+                      ],
                     ],
                   ),
                 ),
@@ -516,16 +527,15 @@ class _TaskInfoCard extends StatelessWidget {
                         color: colors.onSurface,
                       ),
                     ),
-                    if (task.description.isNotEmpty) ...
-                      [
-                        const SizedBox(height: 4),
-                        Text(
-                          task.description,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: colors.onSurfaceVariant,
-                          ),
+                    if (task.description.isNotEmpty) ...[
+                      const SizedBox(height: 4),
+                      Text(
+                        task.description,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          color: colors.onSurfaceVariant,
                         ),
-                      ],
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -566,28 +576,27 @@ class _TaskInfoCard extends StatelessWidget {
                   )),
             ],
           ),
-          if (variables.isNotEmpty) ...
-            [
-              const SizedBox(height: 14),
-              const Divider(height: 1),
-              const SizedBox(height: 12),
-              Text(
-                'Request information',
-                style: theme.textTheme.labelMedium?.copyWith(
-                  fontWeight: FontWeight.w700,
-                  color: colors.onSurfaceVariant,
-                ),
+          if (variables.isNotEmpty) ...[
+            const SizedBox(height: 14),
+            const Divider(height: 1),
+            const SizedBox(height: 12),
+            Text(
+              'Request information',
+              style: theme.textTheme.labelMedium?.copyWith(
+                fontWeight: FontWeight.w700,
+                color: colors.onSurfaceVariant,
               ),
-              const SizedBox(height: 8),
-              ...variables.entries
-                  .where((e) =>
-                      e.value != null &&
-                      e.value.toString().trim().isNotEmpty)
-                  .map(
-                    (e) => _VarRow(
-                        label: e.key, value: e.value.toString()),
-                  ),
-            ],
+            ),
+            const SizedBox(height: 8),
+            ...variables.entries
+                .where((e) =>
+                    e.value != null &&
+                    e.value.toString().trim().isNotEmpty)
+                .map(
+                  (e) => _VarRow(
+                      label: e.key, value: e.value.toString()),
+                ),
+          ],
         ],
       ),
     );
