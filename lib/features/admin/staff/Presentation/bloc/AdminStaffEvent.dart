@@ -4,18 +4,26 @@ abstract class AdminStaffEvent {}
 
 class LoadStaffUsers extends AdminStaffEvent {
   final String roleName;
-  LoadStaffUsers({this.roleName = 'STAFF'});
+
+  LoadStaffUsers({
+    this.roleName = 'STAFF',
+  });
 }
 
 class SearchStaffUsersLocally extends AdminStaffEvent {
   final String query;
+
   SearchStaffUsersLocally(this.query);
 }
 
 class SearchUserForStaffAssignment extends AdminStaffEvent {
   final String email;
   final String roleName;
-  SearchUserForStaffAssignment({required this.email, this.roleName = 'STAFF'});
+
+  SearchUserForStaffAssignment({
+    required this.email,
+    this.roleName = 'STAFF',
+  });
 }
 
 class AssignUserAsStaff extends AdminStaffEvent {
@@ -26,20 +34,28 @@ class AssignUserAsStaff extends AdminStaffEvent {
   AssignUserAsStaff({
     required this.userId,
     this.roleName = 'STAFF',
-    required this.departmentIds,
+    this.departmentIds = const [],
   });
 }
 
 class RemoveStaffRole extends AdminStaffEvent {
   final int userId;
   final String roleName;
-  RemoveStaffRole({required this.userId, this.roleName = 'STAFF'});
+
+  RemoveStaffRole({
+    required this.userId,
+    this.roleName = 'STAFF',
+  });
 }
 
 class SendStaffRegistrationInvite extends AdminStaffEvent {
   final String email;
   final String fullName;
-  SendStaffRegistrationInvite({required this.email, required this.fullName});
+
+  SendStaffRegistrationInvite({
+    required this.email,
+    required this.fullName,
+  });
 }
 
 class LoadStaffRoles extends AdminStaffEvent {}

@@ -22,11 +22,13 @@ class EmployeesScreen extends StatefulWidget {
 
 class _EmployeesScreenState extends State<EmployeesScreen> {
   final TextEditingController _searchController = TextEditingController();
+
   static const String _staffRoleName = 'STAFF';
 
   @override
   void initState() {
     super.initState();
+
     final bloc = context.read<AdminStaffBloc>();
     bloc.add(LoadStaffRoles());
     bloc.add(LoadStaffUsers(roleName: _staffRoleName));
@@ -39,7 +41,9 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
   }
 
   Future<void> _refresh() async {
-    context.read<AdminStaffBloc>().add(LoadStaffUsers(roleName: _staffRoleName));
+    context.read<AdminStaffBloc>().add(
+          LoadStaffUsers(roleName: _staffRoleName),
+        );
   }
 
   void _clearSearch() {
@@ -72,9 +76,13 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(22),
+          ),
           title: Text(l10n.removeStaffRole),
-          content: Text(l10n.confirmRemoveStaffRole(user.displayName)),
+          content: Text(
+            l10n.confirmRemoveStaffRole(user.displayName),
+          ),
           actions: [
             TextButton(
               onPressed: () => Navigator.pop(dialogContext, false),
@@ -96,7 +104,10 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
 
     if (confirmed == true && mounted) {
       context.read<AdminStaffBloc>().add(
-            RemoveStaffRole(userId: user.id, roleName: _staffRoleName),
+            RemoveStaffRole(
+              userId: user.id,
+              roleName: _staffRoleName,
+            ),
           );
     }
   }
@@ -128,12 +139,20 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
         final success = state.success?.trim() ?? '';
 
         if (error.isNotEmpty) {
-          AppToast.show(context, message: error, type: AppToastType.error);
+          AppToast.show(
+            context,
+            message: error,
+            type: AppToastType.error,
+          );
           context.read<AdminStaffBloc>().add(ClearStaffMessages());
         }
 
         if (success.isNotEmpty) {
-          AppToast.show(context, message: _successMessage(l10n, success), type: AppToastType.success);
+          AppToast.show(
+            context,
+            message: _successMessage(l10n, success),
+            type: AppToastType.success,
+          );
           context.read<AdminStaffBloc>().add(ClearStaffMessages());
         }
       },
@@ -145,7 +164,9 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
               l10n.staff,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
-              style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
+              style: theme.textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.w900,
+              ),
             ),
             actions: [
               IconButton(
@@ -153,12 +174,16 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                 icon: const Icon(Icons.refresh),
                 onPressed: state.loading || state.actionLoading
                     ? null
-                    : () => context.read<AdminStaffBloc>().add(LoadStaffUsers(roleName: _staffRoleName)),
+                    : () => context.read<AdminStaffBloc>().add(
+                          LoadStaffUsers(roleName: _staffRoleName),
+                        ),
               ),
             ],
           ),
           floatingActionButton: FloatingActionButton.extended(
-            onPressed: state.loading || state.actionLoading ? null : _openAssignStaffDialog,
+            onPressed: state.loading || state.actionLoading
+                ? null
+                : _openAssignStaffDialog,
             icon: const Icon(Icons.person_add_alt_1_outlined),
             label: Text(l10n.assignStaff),
           ),
@@ -179,10 +204,14 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                     controller: _searchController,
                     hint: l10n.search,
                     onChanged: (value) {
-                      context.read<AdminStaffBloc>().add(SearchStaffUsersLocally(value));
+                      context
+                          .read<AdminStaffBloc>()
+                          .add(SearchStaffUsersLocally(value));
                       setState(() {});
                     },
-                    onClear: _searchController.text.trim().isEmpty ? null : _clearSearch,
+                    onClear: _searchController.text.trim().isEmpty
+                        ? null
+                        : _clearSearch,
                   ),
                   const SizedBox(height: 16),
                   if (state.actionLoading)
@@ -196,10 +225,16 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                       child: Center(child: CircularProgressIndicator()),
                     )
                   else if (state.visibleStaffUsers.isEmpty)
-                    _EmptyState(title: l10n.noData, subtitle: l10n.noStaffHint)
+                    _EmptyState(
+                      title: l10n.noData,
+                      subtitle: l10n.noStaffHint,
+                    )
                   else
                     ...state.visibleStaffUsers.map(
-                      (user) => _StaffCard(user: user, onRemove: () => _confirmRemoveRole(user)),
+                      (user) => _StaffCard(
+                        user: user,
+                        onRemove: () => _confirmRemoveRole(user),
+                      ),
                     ),
                 ],
               ),
@@ -215,7 +250,10 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
 
 class _AssignStaffDialog extends StatefulWidget {
   final String roleName;
-  const _AssignStaffDialog({required this.roleName});
+
+  const _AssignStaffDialog({
+    required this.roleName,
+  });
 
   @override
   State<_AssignStaffDialog> createState() => _AssignStaffDialogState();
@@ -235,15 +273,18 @@ class _AssignStaffDialogState extends State<_AssignStaffDialog> {
   String? _emailValidator(String? value) {
     final l10n = AppLocalizations.of(context)!;
     final text = value?.trim() ?? '';
+
     if (text.isEmpty) return l10n.fieldRequired;
+
     final valid = RegExp(r'^[^\s@]+@[^\s@]+\.[^\s@]+$').hasMatch(text);
     if (!valid) return l10n.invalidEmail;
+
     return null;
   }
 
   void _search() {
     if (!_formKey.currentState!.validate()) return;
-    setState(() => _selectedDepartmentIds.clear());
+
     context.read<AdminStaffBloc>().add(
           SearchUserForStaffAssignment(
             email: _emailController.text.trim(),
@@ -252,15 +293,20 @@ class _AssignStaffDialogState extends State<_AssignStaffDialog> {
         );
   }
 
+  void _toggleDepartment(int id) {
+    setState(() {
+      if (_selectedDepartmentIds.contains(id)) {
+        _selectedDepartmentIds.remove(id);
+      } else {
+        _selectedDepartmentIds.add(id);
+      }
+    });
+  }
+
   void _assign(UserAssignmentSearchResult result) {
     final userId = result.userId;
     if (userId == null || userId <= 0) return;
-
-    if (_selectedDepartmentIds.isEmpty) {
-      final l10n = AppLocalizations.of(context)!;
-      AppToast.show(context, message: l10n.selectDepartment, type: AppToastType.warning);
-      return;
-    }
+    if (_selectedDepartmentIds.isEmpty) return;
 
     context.read<AdminStaffBloc>().add(
           AssignUserAsStaff(
@@ -280,17 +326,23 @@ class _AssignStaffDialogState extends State<_AssignStaffDialog> {
     final colors = theme.colorScheme;
 
     return BlocConsumer<AdminStaffBloc, AdminStaffState>(
-      listenWhen: (previous, current) => previous.success != current.success,
+      listenWhen: (previous, current) {
+        return previous.success != current.success;
+      },
       listener: (context, state) {
         if (state.success == 'STAFF_INVITE_SENT') {
-          if (Navigator.canPop(context)) Navigator.pop(context);
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context);
+          }
         }
       },
       builder: (context, state) {
         final result = state.assignmentSearchResult;
 
         return AlertDialog(
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(24),
+          ),
           titlePadding: const EdgeInsets.fromLTRB(20, 18, 20, 0),
           contentPadding: const EdgeInsets.fromLTRB(20, 14, 20, 0),
           actionsPadding: const EdgeInsets.fromLTRB(20, 8, 20, 16),
@@ -298,7 +350,9 @@ class _AssignStaffDialogState extends State<_AssignStaffDialog> {
             l10n.assignStaff,
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
-            style: theme.textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w900),
+            style: theme.textTheme.titleLarge?.copyWith(
+              fontWeight: FontWeight.w900,
+            ),
           ),
           content: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 430),
@@ -328,29 +382,29 @@ class _AssignStaffDialogState extends State<_AssignStaffDialog> {
                         prefixIcon: const Icon(Icons.email_outlined),
                         filled: true,
                         fillColor: colors.surface,
-                        border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
                       ),
                     ),
                     const SizedBox(height: 14),
                     PrimaryButton(
-                      label: state.searchLoading ? l10n.loading : l10n.searchUser,
+                      label: state.searchLoading
+                          ? l10n.loading
+                          : l10n.searchUser,
                       isLoading: state.searchLoading,
                       onPressed: _search,
                     ),
-                    if (result != null) ...[
+                    if (result != null) ...[  
                       const SizedBox(height: 16),
                       if (result.exists)
                         _FoundUserCard(
                           result: result,
                           selectedDepartmentIds: _selectedDepartmentIds,
-                          onToggleDepartment: (id) => setState(() {
-                            if (_selectedDepartmentIds.contains(id)) {
-                              _selectedDepartmentIds.remove(id);
-                            } else {
-                              _selectedDepartmentIds.add(id);
-                            }
-                          }),
-                          onAssign: result.alreadyAssigned || state.actionLoading
+                          onToggleDepartment: _toggleDepartment,
+                          onAssign: result.alreadyAssigned ||
+                                  state.actionLoading ||
+                                  _selectedDepartmentIds.isEmpty
                               ? null
                               : () => _assign(result),
                         )
@@ -364,7 +418,9 @@ class _AssignStaffDialogState extends State<_AssignStaffDialog> {
           ),
           actions: [
             TextButton(
-              onPressed: state.searchLoading || state.actionLoading ? null : () => Navigator.pop(context),
+              onPressed: state.searchLoading || state.actionLoading
+                  ? null
+                  : () => Navigator.pop(context),
               child: Text(l10n.cancel),
             ),
           ],
@@ -376,15 +432,15 @@ class _AssignStaffDialogState extends State<_AssignStaffDialog> {
 
 class _FoundUserCard extends StatelessWidget {
   final UserAssignmentSearchResult result;
+  final VoidCallback? onAssign;
   final Set<int> selectedDepartmentIds;
   final void Function(int) onToggleDepartment;
-  final VoidCallback? onAssign;
 
   const _FoundUserCard({
     required this.result,
+    required this.onAssign,
     required this.selectedDepartmentIds,
     required this.onToggleDepartment,
-    required this.onAssign,
   });
 
   String _safe(String value) {
@@ -403,14 +459,19 @@ class _FoundUserCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.primary.withOpacity(0.08),
         borderRadius: BorderRadius.circular(18),
-        border: Border.all(color: colors.primary.withOpacity(0.18)),
+        border: Border.all(
+          color: colors.primary.withOpacity(0.18),
+        ),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Row(
             children: [
-              Icon(Icons.check_circle_outline, color: colors.primary),
+              Icon(
+                Icons.check_circle_outline,
+                color: colors.primary,
+              ),
               const SizedBox(width: 8),
               Expanded(
                 child: Text(
@@ -426,68 +487,92 @@ class _FoundUserCard extends StatelessWidget {
             ],
           ),
           const SizedBox(height: 12),
-          _InfoLine(icon: Icons.person_outline, value: result.displayName),
-          _InfoLine(icon: Icons.email_outlined, value: result.email),
-          _InfoLine(icon: Icons.phone_outlined, value: _safe(result.phone)),
+          _InfoLine(
+            icon: Icons.person_outline,
+            value: result.displayName,
+          ),
+          _InfoLine(
+            icon: Icons.email_outlined,
+            value: result.email,
+          ),
+          _InfoLine(
+            icon: Icons.phone_outlined,
+            value: _safe(result.phone),
+          ),
           const SizedBox(height: 8),
           Wrap(
             spacing: 8,
             runSpacing: 8,
             children: [
               _SmallBadge(
-                label: '\${l10n.currentRole}: \${_safe(result.currentRoleName)}',
+                label: '${l10n.currentRole}: ${_safe(result.currentRoleName)}',
                 icon: Icons.verified_user_outlined,
                 color: colors.secondary,
               ),
               _SmallBadge(
                 label: result.isVerified ? l10n.verified : l10n.notVerified,
-                icon: result.isVerified ? Icons.verified_outlined : Icons.info_outline,
+                icon: result.isVerified
+                    ? Icons.verified_outlined
+                    : Icons.info_outline,
                 color: result.isVerified ? colors.primary : colors.error,
               ),
             ],
           ),
-          if (!result.alreadyAssigned) ...[
-            const SizedBox(height: 14),
-            Text(
-              l10n.selectDepartment,
-              style: theme.textTheme.labelMedium?.copyWith(
-                fontWeight: FontWeight.w700,
-                color: colors.onSurfaceVariant,
-              ),
-            ),
-            const SizedBox(height: 8),
-            BlocBuilder<DepartmentCubit, DepartmentState>(
-              builder: (context, deptState) {
-                if (deptState.loading && deptState.departments.isEmpty) {
-                  return const Center(child: CircularProgressIndicator());
-                }
-                if (deptState.departments.isEmpty) {
-                  return Text(
-                    l10n.noDepartmentsHint,
-                    style: theme.textTheme.bodySmall?.copyWith(color: colors.error),
-                  );
-                }
-                return Wrap(
-                  spacing: 8,
-                  runSpacing: 8,
-                  children: deptState.departments.map((dept) {
-                    final selected = selectedDepartmentIds.contains(dept.id);
-                    return FilterChip(
-                      label: Text(dept.name),
-                      selected: selected,
-                      onSelected: (_) => onToggleDepartment(dept.id),
-                      selectedColor: colors.primary.withOpacity(0.18),
-                      checkmarkColor: colors.primary,
-                      labelStyle: theme.textTheme.labelSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                        color: selected ? colors.primary : colors.onSurfaceVariant,
-                      ),
-                    );
-                  }).toList(),
+          const SizedBox(height: 14),
+          BlocBuilder<DepartmentCubit, DepartmentState>(
+            builder: (context, deptState) {
+              if (deptState.loading) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 8),
+                  child: Center(child: CircularProgressIndicator.adaptive()),
                 );
-              },
-            ),
-          ],
+              }
+              if (deptState.departments.isEmpty) {
+                return const SizedBox.shrink();
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Select departments',
+                    style: theme.textTheme.labelMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: colors.onSurfaceVariant,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
+                    children: deptState.departments.map((dept) {
+                      final selected = selectedDepartmentIds.contains(dept.id);
+                      return FilterChip(
+                        label: Text(dept.name),
+                        selected: selected,
+                        onSelected: (_) => onToggleDepartment(dept.id),
+                        selectedColor: colors.primary.withOpacity(0.18),
+                        checkmarkColor: colors.primary,
+                        labelStyle: theme.textTheme.labelSmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: selected ? colors.primary : colors.onSurface,
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  if (selectedDepartmentIds.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 6),
+                      child: Text(
+                        'Select at least one department',
+                        style: theme.textTheme.labelSmall?.copyWith(
+                          color: colors.error,
+                        ),
+                      ),
+                    ),
+                ],
+              );
+            },
+          ),
           const SizedBox(height: 12),
           if (result.alreadyAssigned)
             _InfoBox(
@@ -508,7 +593,10 @@ class _FoundUserCard extends StatelessWidget {
 
 class _NotFoundCard extends StatefulWidget {
   final String email;
-  const _NotFoundCard({required this.email});
+
+  const _NotFoundCard({
+    required this.email,
+  });
 
   @override
   State<_NotFoundCard> createState() => _NotFoundCardState();
@@ -527,15 +615,21 @@ class _NotFoundCardState extends State<_NotFoundCard> {
   String? _nameValidator(String? value) {
     final l10n = AppLocalizations.of(context)!;
     final clean = value?.trim() ?? '';
+
     if (clean.isEmpty) return l10n.fullNameRequired;
     if (clean.length < 3) return l10n.fullNameRequired;
+
     return null;
   }
 
   void _sendInvite() {
     if (!_formKey.currentState!.validate()) return;
+
     context.read<AdminStaffBloc>().add(
-          SendStaffRegistrationInvite(email: widget.email, fullName: _nameController.text.trim()),
+          SendStaffRegistrationInvite(
+            email: widget.email,
+            fullName: _nameController.text.trim(),
+          ),
         );
   }
 
@@ -552,7 +646,9 @@ class _NotFoundCardState extends State<_NotFoundCard> {
           decoration: BoxDecoration(
             color: colors.error.withOpacity(0.07),
             borderRadius: BorderRadius.circular(18),
-            border: Border.all(color: colors.error.withOpacity(0.18)),
+            border: Border.all(
+              color: colors.error.withOpacity(0.18),
+            ),
           ),
           child: Form(
             key: _formKey,
@@ -580,7 +676,9 @@ class _NotFoundCardState extends State<_NotFoundCard> {
                             widget.email,
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w700),
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                           const SizedBox(height: 6),
                           Text(
@@ -595,7 +693,9 @@ class _NotFoundCardState extends State<_NotFoundCard> {
                     ),
                   ],
                 ),
+
                 const SizedBox(height: 14),
+
                 TextFormField(
                   controller: _nameController,
                   validator: _nameValidator,
@@ -606,12 +706,18 @@ class _NotFoundCardState extends State<_NotFoundCard> {
                     prefixIcon: const Icon(Icons.person_outline),
                     filled: true,
                     fillColor: colors.surface,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(16),
+                    ),
                   ),
                 ),
+
                 const SizedBox(height: 12),
+
                 PrimaryButton(
-                  label: state.actionLoading ? l10n.loading : l10n.sendRegistrationInvite,
+                  label: state.actionLoading
+                      ? l10n.loading
+                      : l10n.sendRegistrationInvite,
                   isLoading: state.actionLoading,
                   onPressed: _sendInvite,
                 ),
@@ -631,7 +737,11 @@ class _HeaderCard extends StatelessWidget {
   final String subtitle;
   final int count;
 
-  const _HeaderCard({required this.title, required this.subtitle, required this.count});
+  const _HeaderCard({
+    required this.title,
+    required this.subtitle,
+    required this.count,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -654,7 +764,10 @@ class _HeaderCard extends StatelessWidget {
               color: colors.onPrimary.withOpacity(0.14),
               borderRadius: BorderRadius.circular(16),
             ),
-            child: Icon(Icons.badge_outlined, color: colors.onPrimary),
+            child: Icon(
+              Icons.badge_outlined,
+              color: colors.onPrimary,
+            ),
           ),
           const SizedBox(width: 14),
           Expanded(
@@ -700,7 +813,10 @@ class _StaffCard extends StatelessWidget {
   final AdminUserModel user;
   final VoidCallback onRemove;
 
-  const _StaffCard({required this.user, required this.onRemove});
+  const _StaffCard({
+    required this.user,
+    required this.onRemove,
+  });
 
   String _safe(String value) {
     final clean = value.trim();
@@ -719,7 +835,9 @@ class _StaffCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: colors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: colors.outline.withOpacity(0.14)),
+        border: Border.all(
+          color: colors.outline.withOpacity(0.14),
+        ),
         boxShadow: [
           BoxShadow(
             color: colors.shadow.withOpacity(0.045),
@@ -733,7 +851,10 @@ class _StaffCard extends StatelessWidget {
         children: [
           CircleAvatar(
             backgroundColor: colors.primary.withOpacity(0.12),
-            child: Icon(Icons.person_outline, color: colors.primary),
+            child: Icon(
+              Icons.person_outline,
+              color: colors.primary,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -744,16 +865,19 @@ class _StaffCard extends StatelessWidget {
                   user.displayName,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w900),
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
                 const SizedBox(height: 4),
-                _InfoLine(icon: Icons.email_outlined, value: _safe(user.email)),
-                _InfoLine(icon: Icons.phone_outlined, value: _safe(user.phone)),
-                if (user.assignedDepartments.isNotEmpty)
-                  _InfoLine(
-                    icon: Icons.account_tree_outlined,
-                    value: user.departmentNames,
-                  ),
+                _InfoLine(
+                  icon: Icons.email_outlined,
+                  value: _safe(user.email),
+                ),
+                _InfoLine(
+                  icon: Icons.phone_outlined,
+                  value: _safe(user.phone),
+                ),
                 const SizedBox(height: 8),
                 Wrap(
                   spacing: 8,
@@ -766,11 +890,27 @@ class _StaffCard extends StatelessWidget {
                     ),
                     _SmallBadge(
                       label: user.isVerified ? l10n.verified : l10n.notVerified,
-                      icon: user.isVerified ? Icons.verified_outlined : Icons.info_outline,
+                      icon: user.isVerified
+                          ? Icons.verified_outlined
+                          : Icons.info_outline,
                       color: user.isVerified ? colors.primary : colors.error,
                     ),
                   ],
                 ),
+                if (user.assignedDepartments.isNotEmpty) ...[  
+                  const SizedBox(height: 6),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 4,
+                    children: user.assignedDepartments.map((dept) {
+                      return _SmallBadge(
+                        label: dept.name,
+                        icon: Icons.account_balance_outlined,
+                        color: colors.primary,
+                      );
+                    }).toList(),
+                  ),
+                ],
               ],
             ),
           ),
@@ -783,9 +923,16 @@ class _StaffCard extends StatelessWidget {
                 value: 'remove',
                 child: Row(
                   children: [
-                    Icon(Icons.person_remove_outlined, size: 18, color: colors.error),
+                    Icon(
+                      Icons.person_remove_outlined,
+                      size: 18,
+                      color: colors.error,
+                    ),
                     const SizedBox(width: 8),
-                    Text(l10n.removeStaffRole, style: TextStyle(color: colors.error)),
+                    Text(
+                      l10n.removeStaffRole,
+                      style: TextStyle(color: colors.error),
+                    ),
                   ],
                 ),
               ),
@@ -801,16 +948,24 @@ class _InfoLine extends StatelessWidget {
   final IconData icon;
   final String value;
 
-  const _InfoLine({required this.icon, required this.value});
+  const _InfoLine({
+    required this.icon,
+    required this.value,
+  });
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+
     return Padding(
       padding: const EdgeInsets.only(top: 3),
       child: Row(
         children: [
-          Icon(icon, size: 14, color: colors.onSurfaceVariant),
+          Icon(
+            icon,
+            size: 14,
+            color: colors.onSurfaceVariant,
+          ),
           const SizedBox(width: 5),
           Expanded(
             child: Text(
@@ -834,7 +989,11 @@ class _SmallBadge extends StatelessWidget {
   final IconData icon;
   final Color color;
 
-  const _SmallBadge({required this.label, required this.icon, required this.color});
+  const _SmallBadge({
+    required this.label,
+    required this.icon,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -845,7 +1004,9 @@ class _SmallBadge extends StatelessWidget {
         decoration: BoxDecoration(
           color: color.withOpacity(0.10),
           borderRadius: BorderRadius.circular(999),
-          border: Border.all(color: color.withOpacity(0.22)),
+          border: Border.all(
+            color: color.withOpacity(0.22),
+          ),
         ),
         child: Row(
           mainAxisSize: MainAxisSize.min,
@@ -875,7 +1036,11 @@ class _InfoBox extends StatelessWidget {
   final String text;
   final Color color;
 
-  const _InfoBox({required this.icon, required this.text, required this.color});
+  const _InfoBox({
+    required this.icon,
+    required this.text,
+    required this.color,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -885,7 +1050,9 @@ class _InfoBox extends StatelessWidget {
       decoration: BoxDecoration(
         color: color.withOpacity(0.09),
         borderRadius: BorderRadius.circular(14),
-        border: Border.all(color: color.withOpacity(0.18)),
+        border: Border.all(
+          color: color.withOpacity(0.18),
+        ),
       ),
       child: Row(
         children: [
@@ -910,7 +1077,10 @@ class _EmptyState extends StatelessWidget {
   final String title;
   final String subtitle;
 
-  const _EmptyState({required this.title, required this.subtitle});
+  const _EmptyState({
+    required this.title,
+    required this.subtitle,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -921,18 +1091,26 @@ class _EmptyState extends StatelessWidget {
       padding: const EdgeInsets.only(top: 120),
       child: Column(
         children: [
-          Icon(Icons.badge_outlined, size: 58, color: colors.onSurface.withOpacity(0.35)),
+          Icon(
+            Icons.badge_outlined,
+            size: 58,
+            color: colors.onSurface.withOpacity(0.35),
+          ),
           const SizedBox(height: 12),
           Text(
             title,
             textAlign: TextAlign.center,
-            style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+            style: theme.textTheme.titleMedium?.copyWith(
+              fontWeight: FontWeight.w800,
+            ),
           ),
           const SizedBox(height: 5),
           Text(
             subtitle,
             textAlign: TextAlign.center,
-            style: theme.textTheme.bodyMedium?.copyWith(color: colors.onSurface.withOpacity(0.6)),
+            style: theme.textTheme.bodyMedium?.copyWith(
+              color: colors.onSurface.withOpacity(0.6),
+            ),
           ),
         ],
       ),
