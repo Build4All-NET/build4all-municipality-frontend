@@ -5,6 +5,7 @@ import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/core/utils/error_message.dart';
 import 'package:baladiyati/features/staff/tasks/data/services/staff_task_api_service.dart';
 import 'package:flutter/material.dart';
+import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 
 class StaffCertificateScreen extends StatefulWidget {
@@ -33,6 +34,9 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
   Map<String, dynamic>? _certificate;
   int _attempts = 0;
   Timer? _timer;
+
+  /// Path of the PDF file once it has been saved to device storage.
+  String? _savedFilePath;
 
   @override
   void initState() {
@@ -75,7 +79,14 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
     }
   }
 
-  Future<void> _download() async {
+  Future<String> _resolveFilePath(int certId) async {
+    final dir = await getApplicationDocumentsDirectory();
+    final fileName =
+        _certificate?['fileName']?.toString() ?? 'certificate_$certId.pdf';
+    return '${dir.path}/$fileName';
+  }
+
+  Future<void> _downloadAndOpen() async {
     final certId = _certificate?['id'];
     if (certId == null) return;
 
@@ -83,17 +94,14 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
     try {
       final id = certId is int ? certId : int.parse(certId.toString());
       final bytes = await _api.downloadCertificateBytes(id);
-      final dir = await getApplicationDocumentsDirectory();
-      final fileName =
-          _certificate?['fileName']?.toString() ?? 'certificate_$id.pdf';
-      final file = File('${dir.path}/$fileName');
+      final filePath = await _resolveFilePath(id);
+      final file = File(filePath);
       await file.writeAsBytes(bytes);
+
       if (!mounted) return;
-      AppToast.show(
-        context,
-        message: 'Certificate saved: $fileName',
-        type: AppToastType.success,
-      );
+      setState(() => _savedFilePath = filePath);
+
+      await OpenFilex.open(filePath);
     } catch (e) {
       if (!mounted) return;
       AppToast.show(
@@ -103,6 +111,19 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
       );
     } finally {
       if (mounted) setState(() => _downloading = false);
+    }
+  }
+
+  Future<void> _openSaved() async {
+    final path = _savedFilePath;
+    if (path == null) return;
+    final result = await OpenFilex.open(path);
+    if (result.type != ResultType.done && mounted) {
+      AppToast.show(
+        context,
+        message: 'Could not open file: ${result.message}',
+        type: AppToastType.error,
+      );
     }
   }
 
@@ -185,6 +206,7 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
     final cert = _certificate!;
     final fileName = cert['fileName']?.toString() ?? 'certificate.pdf';
     final createdAt = cert['createdAt']?.toString() ?? '';
+    final alreadySaved = _savedFilePath != null;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -267,23 +289,56 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
           ),
         ),
         const SizedBox(height: 24),
-        FilledButton.icon(
-          onPressed: _downloading ? null : _download,
-          icon: _downloading
-              ? const SizedBox(
-                  width: 18,
-                  height: 18,
-                  child: CircularProgressIndicator(strokeWidth: 2),
-                )
-              : const Icon(Icons.download_outlined),
-          label: Text(_downloading ? 'Downloading…' : 'Download PDF'),
-          style: FilledButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
+        // If already saved on device → show Open button first
+        if (alreadySaved) ...[
+          FilledButton.icon(
+            onPressed: _openSaved,
+            icon: const Icon(Icons.open_in_new_outlined),
+            label: const Text('Open PDF'),
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
             ),
           ),
-        ),
+          const SizedBox(height: 10),
+          OutlinedButton.icon(
+            onPressed: _downloading ? null : _downloadAndOpen,
+            icon: _downloading
+                ? const SizedBox(
+                    width: 16,
+                    height: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.download_outlined),
+            label: Text(_downloading ? 'Downloading…' : 'Download Again'),
+            style: OutlinedButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 14),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+          ),
+        ] else ...[
+          FilledButton.icon(
+            onPressed: _downloading ? null : _downloadAndOpen,
+            icon: _downloading
+                ? const SizedBox(
+                    width: 18,
+                    height: 18,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Icon(Icons.download_outlined),
+            label: Text(_downloading ? 'Downloading…' : 'Download & Open'),
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 16),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+          ),
+        ],
         const SizedBox(height: 12),
         OutlinedButton(
           onPressed: () => Navigator.pop(context, true),
