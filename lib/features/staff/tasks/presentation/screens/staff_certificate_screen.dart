@@ -7,6 +7,7 @@ import 'package:baladiyati/features/staff/tasks/data/services/staff_task_api_ser
 import 'package:flutter/material.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class StaffCertificateScreen extends StatefulWidget {
   final int processInstanceKey;
@@ -25,6 +26,7 @@ class StaffCertificateScreen extends StatefulWidget {
 class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
   static const int _maxAttempts = 20;
   static const Duration _pollInterval = Duration(seconds: 2);
+  static const String _prefKeyPrefix = 'cert_file_';
 
   final StaffTaskApiService _api = StaffTaskApiService();
 
@@ -34,14 +36,14 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
   Map<String, dynamic>? _certificate;
   int _attempts = 0;
   Timer? _timer;
-
-  /// Path of the PDF file once it has been saved to device storage.
   String? _savedFilePath;
+
+  String get _prefKey => '$_prefKeyPrefix${widget.processInstanceKey}';
 
   @override
   void initState() {
     super.initState();
-    _startPolling();
+    _init();
   }
 
   @override
@@ -50,7 +52,44 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
     super.dispose();
   }
 
+  Future<void> _init() async {
+    // Check SharedPreferences for a previously saved file path
+    final prefs = await SharedPreferences.getInstance();
+    final savedPath = prefs.getString(_prefKey);
+    if (savedPath != null && File(savedPath).existsSync()) {
+      // File still exists on device — try to fetch metadata, then show without polling
+      try {
+        final cert = await _api.getCertificateByProcessInstanceKey(
+          widget.processInstanceKey,
+        );
+        if (!mounted) return;
+        setState(() {
+          _certificate = cert;
+          _savedFilePath = savedPath;
+          _polling = false;
+        });
+      } catch (_) {
+        // Metadata fetch failed, but file is local — show minimal info
+        if (!mounted) return;
+        setState(() {
+          _savedFilePath = savedPath;
+          _polling = false;
+          _certificate = {'fileName': savedPath.split('/').last};
+        });
+      }
+      return;
+    }
+    _startPolling();
+  }
+
   void _startPolling() {
+    _timer?.cancel();
+    if (!mounted) return;
+    setState(() {
+      _polling = true;
+      _error = null;
+      _attempts = 0;
+    });
     _timer = Timer.periodic(_pollInterval, (_) => _poll());
   }
 
@@ -73,7 +112,7 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
         if (!mounted) return;
         setState(() {
           _polling = false;
-          _error = 'Certificate not ready yet. Please check again later.';
+          _error = 'Certificate not ready yet.\nTap Retry to check again.';
         });
       }
     }
@@ -84,6 +123,11 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
     final fileName =
         _certificate?['fileName']?.toString() ?? 'certificate_$certId.pdf';
     return '${dir.path}/$fileName';
+  }
+
+  Future<void> _persistFilePath(String path) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(_prefKey, path);
   }
 
   Future<void> _downloadAndOpen() async {
@@ -97,6 +141,7 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
       final filePath = await _resolveFilePath(id);
       final file = File(filePath);
       await file.writeAsBytes(bytes);
+      await _persistFilePath(filePath);
 
       if (!mounted) return;
       setState(() => _savedFilePath = filePath);
@@ -193,6 +238,18 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 24),
+          FilledButton.icon(
+            onPressed: _startPolling,
+            icon: const Icon(Icons.refresh_outlined),
+            label: const Text('Retry'),
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 32),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(14),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
           OutlinedButton(
             onPressed: () => Navigator.pop(context, true),
             child: const Text('Back to Tasks'),
@@ -289,7 +346,6 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
           ),
         ),
         const SizedBox(height: 24),
-        // If already saved on device → show Open button first
         if (alreadySaved) ...[
           FilledButton.icon(
             onPressed: _openSaved,
