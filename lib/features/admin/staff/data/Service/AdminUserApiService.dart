@@ -13,17 +13,10 @@ class AdminUserApiService {
   }) async {
     final response = await dio.get(
       '/api/admin/users/by-role',
-      queryParameters: {
-        'roleName': roleName,
-      },
+      queryParameters: {'roleName': roleName},
     );
-
     final data = response.data;
-
-    if (data is! List) {
-      throw Exception('Invalid users response');
-    }
-
+    if (data is! List) throw Exception('Invalid users response');
     return data
         .whereType<Map>()
         .map((item) => AdminUserModel.fromJson(Map<String, dynamic>.from(item)))
@@ -35,128 +28,71 @@ class AdminUserApiService {
     String roleName = 'STAFF',
   }) async {
     final cleanEmail = email.trim();
-
-    if (cleanEmail.isEmpty) {
-      throw Exception('Email is required');
-    }
-
+    if (cleanEmail.isEmpty) throw Exception('Email is required');
     final response = await dio.get(
       '/api/admin/users/search-for-assignment',
-      queryParameters: {
-        'email': cleanEmail,
-        'roleName': roleName,
-      },
+      queryParameters: {'email': cleanEmail, 'roleName': roleName},
     );
-
     final data = response.data;
-
-    if (data is! Map) {
-      throw Exception('Invalid search response');
-    }
-
-    return UserAssignmentSearchResult.fromJson(
-      Map<String, dynamic>.from(data),
-    );
+    if (data is! Map) throw Exception('Invalid search response');
+    return UserAssignmentSearchResult.fromJson(Map<String, dynamic>.from(data));
   }
 
   Future<List<String>> getRoles() async {
     final response = await dio.get('/api/admin/roles');
-
     final data = response.data;
-
-    if (data is! List) {
-      throw Exception('Invalid roles response');
-    }
-
-    return data
-        .map((item) => item.toString().trim())
-        .where((role) => role.isNotEmpty)
-        .toList();
+    if (data is! List) throw Exception('Invalid roles response');
+    return data.map((item) => item.toString().trim()).where((role) => role.isNotEmpty).toList();
   }
 
   Future<AdminUserModel> assignRole({
     required int userId,
     required String roleName,
+    List<int> departmentIds = const [],
   }) async {
-    if (userId <= 0) {
-      throw Exception('Invalid user ID');
-    }
-
+    if (userId <= 0) throw Exception('Invalid user ID');
     final cleanRole = roleName.trim();
+    if (cleanRole.isEmpty) throw Exception('Role is required');
 
-    if (cleanRole.isEmpty) {
-      throw Exception('Role is required');
+    final Map<String, dynamic> body = {
+      'userId': userId,
+      'roleName': cleanRole,
+    };
+
+    if (cleanRole.toUpperCase() == 'STAFF') {
+      body['departmentIds'] = departmentIds;
     }
 
-    final response = await dio.post(
-      '/api/admin/roles/assign',
-      data: {
-        'userId': userId,
-        'roleName': cleanRole,
-      },
-    );
-
+    final response = await dio.post('/api/admin/roles/assign', data: body);
     final data = response.data;
-
-    if (data is! Map) {
-      throw Exception('Invalid assign role response');
-    }
-
-    return AdminUserModel.fromJson(
-      Map<String, dynamic>.from(data),
-    );
+    if (data is! Map) throw Exception('Invalid assign role response');
+    return AdminUserModel.fromJson(Map<String, dynamic>.from(data));
   }
 
   Future<void> sendStaffRegistrationInvite({
-  required String email,
-  required String fullName,
-}) async {
-  final cleanEmail = email.trim();
-  final cleanName = fullName.trim();
-
-  if (cleanEmail.isEmpty) {
-    throw Exception('Email is required');
+    required String email,
+    required String fullName,
+  }) async {
+    final cleanEmail = email.trim();
+    final cleanName = fullName.trim();
+    if (cleanEmail.isEmpty) throw Exception('Email is required');
+    if (cleanName.isEmpty) throw Exception('Full name is required');
+    await dio.post(
+      '/api/admin/staff/invite-registration',
+      data: {'email': cleanEmail, 'fullName': cleanName},
+    );
   }
-
-  if (cleanName.isEmpty) {
-    throw Exception('Full name is required');
-  }
-
-  await dio.post(
-    '/api/admin/staff/invite-registration',
-    data: {
-      'email': cleanEmail,
-      'fullName': cleanName,
-    },
-  );
-}
 
   Future<AdminUserModel> removeRole({
     required int userId,
     required String roleName,
   }) async {
-    if (userId <= 0) {
-      throw Exception('Invalid user ID');
-    }
-
+    if (userId <= 0) throw Exception('Invalid user ID');
     final cleanRole = roleName.trim();
-
-    if (cleanRole.isEmpty) {
-      throw Exception('Role is required');
-    }
-
-    final response = await dio.delete(
-      '/api/admin/users/$userId/roles/$cleanRole',
-    );
-
+    if (cleanRole.isEmpty) throw Exception('Role is required');
+    final response = await dio.delete('/api/admin/users/$userId/roles/$cleanRole');
     final data = response.data;
-
-    if (data is! Map) {
-      throw Exception('Invalid remove role response');
-    }
-
-    return AdminUserModel.fromJson(
-      Map<String, dynamic>.from(data),
-    );
+    if (data is! Map) throw Exception('Invalid remove role response');
+    return AdminUserModel.fromJson(Map<String, dynamic>.from(data));
   }
 }
