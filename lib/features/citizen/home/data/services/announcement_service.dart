@@ -10,10 +10,16 @@ class AnnouncementService {
   AnnouncementService() : _dio = DioClient.muni;
 
   Future<List<AnnouncementModel>> getAnnouncements() async {
-    final res = await _dio.get('/api/announcements');
-    return (res.data as List)
-        .map((e) => AnnouncementModel.fromJson(
-            Map<String, dynamic>.from(e as Map)))
-        .toList();
+    try {
+      final res = await _dio.get('/api/announcements');
+      final data = res.data;
+      if (data is! List) return [];
+      return data
+          .map((e) => AnnouncementModel.fromJson(
+              Map<String, dynamic>.from(e as Map)))
+          .toList();
+    } catch (_) {
+      return [];
+    }
   }
 }

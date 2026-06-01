@@ -17,6 +17,7 @@ import 'package:baladiyati/features/citizen/profile/domain/entities/profile_enti
 import 'package:baladiyati/features/citizen/profile/presentation/bloc/profile_bloc.dart';
 import 'package:baladiyati/features/citizen/profile/presentation/bloc/profile_event.dart';
 import 'package:baladiyati/features/citizen/profile/presentation/bloc/profile_state.dart';
+import 'package:baladiyati/core/config/env.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -91,7 +92,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return name;
     }
 
-    return _dash();
+    return Env.appName;
   }
 
   String _languageName(String code) {
