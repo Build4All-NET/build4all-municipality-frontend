@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
@@ -23,7 +24,6 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
-  final _locationCtrl = TextEditingController();
 
   final _requestService = RequestService();
   final _fileUploadService = FileUploadService();
@@ -31,6 +31,10 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
 
   bool _isLoading = false;
   bool _isUploading = false;
+  bool _pickingLocation = false;
+
+  double? _geoLat;
+  double? _geoLng;
 
   final List<File> _selectedFiles = [];
   final List<String> _selectedFileNames = [];
@@ -39,8 +43,58 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
   void dispose() {
     _titleCtrl.dispose();
     _descCtrl.dispose();
-    _locationCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _pickLocation() async {
+    final loc = AppLocalizations.of(context)!;
+    setState(() => _pickingLocation = true);
+    try {
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+      }
+      if (permission == LocationPermission.deniedForever) {
+        if (!mounted) return;
+        AppToast.show(
+          context,
+          message: loc.locationPermissionPermanentlyDenied,
+          type: AppToastType.error,
+        );
+        return;
+      }
+      if (permission == LocationPermission.denied) {
+        if (!mounted) return;
+        AppToast.show(
+          context,
+          message: loc.locationPermissionDenied,
+          type: AppToastType.error,
+        );
+        return;
+      }
+      final position = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+      if (!mounted) return;
+      setState(() {
+        _geoLat = position.latitude;
+        _geoLng = position.longitude;
+      });
+      AppToast.show(
+        context,
+        message: loc.locationPicked,
+        type: AppToastType.success,
+      );
+    } catch (_) {
+      if (!mounted) return;
+      AppToast.show(
+        context,
+        message: loc.locationPickFailed,
+        type: AppToastType.error,
+      );
+    } finally {
+      if (mounted) setState(() => _pickingLocation = false);
+    }
   }
 
   Future<void> _pickFiles() async {
@@ -173,9 +227,8 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
         submission: RequestSubmission(
           title: _titleCtrl.text.trim(),
           description: _descCtrl.text.trim(),
-          addressText: _locationCtrl.text.trim().isEmpty
-              ? null
-              : _locationCtrl.text.trim(),
+          geoLat: _geoLat,
+          geoLng: _geoLng,
           attachmentUrls: uploadedUrls.isEmpty ? null : uploadedUrls,
         ),
       );
@@ -329,11 +382,11 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                               : null,
                     ),
                     const SizedBox(height: 12),
-                    AppTextField(
-                      controller: _locationCtrl,
-                      label: loc.locationLabel,
-                      hint: loc.locationHint,
-                      icon: Icons.location_on_outlined,
+                    _LocationPickerButton(
+                      geoLat: _geoLat,
+                      geoLng: _geoLng,
+                      isLoading: _pickingLocation,
+                      onTap: _isLoading ? null : _pickLocation,
                     ),
                   ],
                 ),
@@ -535,6 +588,103 @@ class _InfoRow extends StatelessWidget {
             style: theme.textTheme.bodyMedium
                 ?.copyWith(fontWeight: FontWeight.w600)),
       ],
+    );
+  }
+}
+
+class _LocationPickerButton extends StatelessWidget {
+  final double? geoLat;
+  final double? geoLng;
+  final bool isLoading;
+  final VoidCallback? onTap;
+
+  const _LocationPickerButton({
+    this.geoLat,
+    this.geoLng,
+    required this.isLoading,
+    this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final loc = AppLocalizations.of(context)!;
+    final hasPick = geoLat != null && geoLng != null;
+
+    return GestureDetector(
+      onTap: isLoading ? null : onTap,
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: hasPick
+              ? colors.primaryContainer.withOpacity(0.35)
+              : colors.surfaceVariant.withOpacity(0.4),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: hasPick
+                ? colors.primary.withOpacity(0.4)
+                : colors.outline.withOpacity(0.25),
+          ),
+        ),
+        child: Row(
+          children: [
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: hasPick ? colors.primary : colors.outline.withOpacity(0.2),
+                shape: BoxShape.circle,
+              ),
+              child: isLoading
+                  ? SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: hasPick ? colors.onPrimary : colors.onSurfaceVariant,
+                      ),
+                    )
+                  : Icon(
+                      hasPick ? Icons.location_on : Icons.location_on_outlined,
+                      size: 18,
+                      color: hasPick ? colors.onPrimary : colors.onSurfaceVariant,
+                    ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    loc.locationLabel,
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    hasPick
+                        ? '${loc.lat}: ${geoLat!.toStringAsFixed(5)},  ${loc.lng}: ${geoLng!.toStringAsFixed(5)}'
+                        : loc.pickLocationHint,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      color: hasPick ? colors.onSurface : colors.onSurfaceVariant,
+                      fontWeight: hasPick ? FontWeight.w600 : FontWeight.normal,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            if (!isLoading)
+              Icon(
+                Icons.my_location,
+                size: 18,
+                color: hasPick ? colors.primary : colors.onSurfaceVariant,
+              ),
+          ],
+        ),
+      ),
     );
   }
 }

@@ -164,7 +164,7 @@ class RequestDetailPage extends StatelessWidget {
             type: AppToastType.success,
           );
 
-          Navigator.pop(context);
+         Navigator.pop(context, true);
         }
 
         if (error.isNotEmpty) {
@@ -243,11 +243,13 @@ class RequestDetailPage extends StatelessWidget {
                                 label: l10n.tracking,
                                 value: _safe(request.trackingNumber),
                               ),
-                              _DetailRow(
-                                icon: Icons.numbers_outlined,
-                                label: l10n.requestId,
-                                value: request.id == null ? '—' : '#${request.id}',
-                              ),
+                             _DetailRow(
+  icon: Icons.account_tree_outlined,
+  label: 'Process Key',
+  value: request.processInstanceKey == null
+      ? '—'
+      : request.processInstanceKey.toString(),
+),
                               _DetailRow(
                                 icon: Icons.category_outlined,
                                 label: l10n.category,
@@ -308,22 +310,23 @@ class RequestDetailPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 14),
-                        _SectionCard(
-                          title: l10n.description,
-                          icon: Icons.notes_outlined,
-                          child: Text(
-                            _safe(request.description),
-                            softWrap: true,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: colors.onSurfaceVariant,
-                              height: 1.45,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20),
-                        if (!isClosed)
-                          _ActionsCard(
+                       _SectionCard(
+  title: l10n.description,
+  icon: Icons.notes_outlined,
+  child: Text(
+    _safe(request.description),
+    softWrap: true,
+    style: theme.textTheme.bodyMedium?.copyWith(
+      color: colors.onSurfaceVariant,
+      height: 1.45,
+      fontWeight: FontWeight.w500,
+    ),
+  ),
+),
+
+const SizedBox(height: 20),
+if (!isClosed)
+  _ActionsCard(
                             isLoading: state.updating,
                             onReject: () {
                               if (state.updating) return;
