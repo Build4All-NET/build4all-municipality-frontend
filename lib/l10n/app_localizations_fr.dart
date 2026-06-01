@@ -1412,4 +1412,73 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get fullNameRequired => 'Le nom complet est obligatoire.';
+
+  @override
+  String get workflowTask => 'Tâche de flux de travail';
+
+  @override
+  String get taskId => 'ID de la tâche';
+
+  @override
+  String get taskState => 'État';
+
+  @override
+  String get taskAssignee => 'Destinataire';
+
+  @override
+  String get taskCandidates => 'Candidats';
+
+  @override
+  String get taskCreated => 'Créé';
+
+  @override
+  String get openForm => 'Ouvrir le formulaire';
+
+  @override
+  String get assign => 'Affecter';
+
+  @override
+  String get unassign => 'Désaffecter';
+
+  @override
+  String get workflowTasks => 'Tâches de flux de travail';
+
+  @override
+  String get loadTasks => 'Charger les tâches';
+
+  @override
+  String get noWorkflowStarted => 'Aucun flux de travail n’a été démarré pour cette demande.';
+
+  @override
+  String get noTasksFound => 'Aucune tâche trouvée pour cette demande.';
+
+  @override
+  String get tasksLoadedSuccessfully => 'Tâches chargées avec succès.';
+
+  @override
+  String get failedToLoadTasks => 'Échec du chargement des tâches.';
+
+  @override
+  String get taskForm => 'Formulaire de tâche';
+
+  @override
+  String get loadingForm => 'Chargement du formulaire...';
+
+  @override
+  String get noFormFound => 'Aucun formulaire trouvé pour cette tâche.';
+
+  @override
+  String get rawFormJson => 'Données du formulaire brut';
+
+  @override
+  String get submitTaskForm => 'Soumettre le formulaire';
+
+  @override
+  String get formSubmittedSuccessfully => 'Formulaire soumis avec succès.';
+
+  @override
+  String get unsupportedFieldType => 'Type de champ non pris en charge';
+
+  @override
+  String get requiredField => 'Ce champ est requis';
 }

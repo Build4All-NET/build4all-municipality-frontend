@@ -172,6 +172,10 @@ class _StaffDashboardScreenState extends State<StaffDashboardScreen> {
     AppRouter.goToStaffServices(context);
   }
 
+  void _openTasks() {
+    AppRouter.goToStaffTasks(context);
+  }
+
   void _openProfile() {
     AppRouter.goToProfile(context);
   }
@@ -238,6 +242,12 @@ class _StaffDashboardScreenState extends State<StaffDashboardScreen> {
               physics: const NeverScrollableScrollPhysics(),
               childAspectRatio: 1.12,
               children: [
+                _ActionCard(
+                  title: loc.workflowTasks,
+                  icon: Icons.assignment_outlined,
+                  iconColor: colors.tertiary,
+                  onTap: _openTasks,
+                ),
                 _ActionCard(
                   title: loc.inbox,
                   icon: Icons.inbox_outlined,

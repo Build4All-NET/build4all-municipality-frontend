@@ -1,3 +1,17 @@
+class DepartmentSummary {
+  final int id;
+  final String name;
+
+  const DepartmentSummary({required this.id, required this.name});
+
+  factory DepartmentSummary.fromJson(Map<String, dynamic> json) {
+    return DepartmentSummary(
+      id: json['id'] is int ? json['id'] as int : int.tryParse(json['id']?.toString() ?? '') ?? 0,
+      name: json['name']?.toString() ?? '',
+    );
+  }
+}
+
 class AdminUserModel {
   final int id;
   final int? ownerProjectLinkId;
@@ -10,6 +24,7 @@ class AdminUserModel {
   final String roleName;
   final String status;
   final bool isVerified;
+  final List<DepartmentSummary> assignedDepartments;
 
   const AdminUserModel({
     required this.id,
@@ -21,9 +36,18 @@ class AdminUserModel {
     required this.roleName,
     required this.status,
     required this.isVerified,
+    this.assignedDepartments = const [],
   });
 
   factory AdminUserModel.fromJson(Map<String, dynamic> json) {
+    final deptList = json['assignedDepartments'];
+    final departments = deptList is List
+        ? deptList
+            .whereType<Map>()
+            .map((e) => DepartmentSummary.fromJson(Map<String, dynamic>.from(e)))
+            .toList()
+        : <DepartmentSummary>[];
+
     return AdminUserModel(
       id: _toInt(
         json['id'] ??
@@ -62,6 +86,7 @@ class AdminUserModel {
             json['verified'] ??
             json['is_verified'],
       ),
+      assignedDepartments: departments,
     );
   }
 
@@ -70,6 +95,11 @@ class AdminUserModel {
     if (username.trim().isNotEmpty) return username.trim();
     if (email.trim().isNotEmpty) return email.trim();
     return '-';
+  }
+
+  String get departmentNames {
+    if (assignedDepartments.isEmpty) return '-';
+    return assignedDepartments.map((d) => d.name).join(', ');
   }
 
   static String _asString(dynamic value) {

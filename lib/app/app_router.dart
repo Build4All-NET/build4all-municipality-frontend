@@ -22,6 +22,9 @@ import 'package:baladiyati/features/admin/staff/Presentation/bloc/AdminStaffBloc
 import 'package:baladiyati/features/admin/staff/data/Service/AdminUserApiService.dart';
 import 'package:baladiyati/features/staff/dashboard/presentation/screens/staff_dashboard_screen.dart';
 import 'package:baladiyati/features/staff/services/presentation/screens/staff_services_screen.dart';
+import 'package:baladiyati/features/staff/tasks/data/services/staff_task_api_service.dart';
+import 'package:baladiyati/features/staff/tasks/presentation/cubit/staff_tasks_cubit.dart';
+import 'package:baladiyati/features/staff/tasks/presentation/screens/staff_tasks_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -262,23 +265,21 @@ class AppRouter {
     );
   }
 
-  // ================= ADMIN: EMPLOYEES =================
-
   // ================= ADMIN: EMPLOYEES / STAFF =================
 
-static void goToEmployees(BuildContext context) {
-  Navigator.push(
-    context,
-    MaterialPageRoute(
-      builder: (_) => BlocProvider(
-        create: (_) => AdminStaffBloc(
-          apiService: AdminUserApiService(),
+  static void goToEmployees(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (_) => AdminStaffBloc(
+            apiService: AdminUserApiService(),
+          ),
+          child: const EmployeesScreen(),
         ),
-        child: const EmployeesScreen(),
       ),
-    ),
-  );
-}
+    );
+  }
 
   static void goToStaffDashboard(BuildContext context) {
     Navigator.pushAndRemoveUntil(
@@ -292,6 +293,18 @@ static void goToEmployees(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(builder: (_) => const StaffServicesScreen()),
+    );
+  }
+
+  static void goToStaffTasks(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider(
+          create: (_) => StaffTasksCubit(StaffTaskApiService()),
+          child: const StaffTasksScreen(),
+        ),
+      ),
     );
   }
 
