@@ -1,3 +1,4 @@
+import 'package:baladiyati/core/network/dio_client.dart';
 import '../../domain/entities/profile_entity.dart';
 import 'build4all_profile_model.dart';
 import 'municipality_profile_model.dart';
@@ -25,13 +26,18 @@ class ProfileModel extends ProfileEntity {
     required Build4AllProfileModel core,
     MunicipalityProfileModel? municipality,
   }) {
+    // Prefer Build4All picture; fall back to municipality avatar resolved to full URL.
+    final pictureUrl = core.profilePictureUrl?.isNotEmpty == true
+        ? core.profilePictureUrl
+        : _resolveUrl(municipality?.avatarUrl);
+
     return ProfileModel(
       build4allId: core.id,
       firstName: core.firstName,
       lastName: core.lastName,
       username: core.username,
       email: core.email,
-      profilePictureUrl: core.profilePictureUrl,
+      profilePictureUrl: pictureUrl,
       isPublicProfile: core.isPublicProfile,
       coreStatus: core.status,
       municipalityProfileId: municipality?.id,
@@ -42,5 +48,12 @@ class ProfileModel extends ProfileEntity {
       municipalityName: municipality?.municipalityName,
       ownerProjectLinkId: municipality?.ownerProjectLinkId,
     );
+  }
+
+  static String? _resolveUrl(String? url) {
+    if (url == null || url.isEmpty) return null;
+    if (url.startsWith('http://') || url.startsWith('https://')) return url;
+    final base = DioClient.muni.options.baseUrl.replaceAll(RegExp(r'/$'), '');
+    return url.startsWith('/') ? '$base$url' : '$base/$url';
   }
 }

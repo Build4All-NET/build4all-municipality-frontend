@@ -5,8 +5,6 @@ import 'package:baladiyati/features/admin/Requests/data/model/RequestModel.dart'
 import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_Bloc.dart';
 import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_Event.dart';
 import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_State.dart';
-import 'package:baladiyati/features/staff/tasks/presentation/screens/staff_task_form_screen.dart';
-import 'package:baladiyati/features/staff/tasks/presentation/widgets/staff_request_tasks_section.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
@@ -27,7 +25,6 @@ class RequestDetailPage extends StatelessWidget {
   String _formatDate(String? value) {
     final clean = value?.trim() ?? '';
     if (clean.isEmpty || clean.toLowerCase() == 'null') return '—';
-
     return clean.replaceFirst('T', ' ').split('.').first;
   }
 
@@ -111,7 +108,6 @@ class RequestDetailPage extends StatelessWidget {
 
   bool _isClosedStatus(String? status) {
     final clean = status?.trim().toUpperCase() ?? '';
-
     return clean == 'COMPLETED' ||
         clean == 'REJECTED' ||
         clean == 'CANCELLED';
@@ -165,8 +161,7 @@ class RequestDetailPage extends StatelessWidget {
             message: success,
             type: AppToastType.success,
           );
-
-         Navigator.pop(context, true);
+          Navigator.pop(context, true);
         }
 
         if (error.isNotEmpty) {
@@ -194,7 +189,8 @@ class RequestDetailPage extends StatelessWidget {
           body: SafeArea(
             child: LayoutBuilder(
               builder: (context, constraints) {
-                final horizontalPadding = constraints.maxWidth < 360 ? 12.0 : 16.0;
+                final horizontalPadding =
+                    constraints.maxWidth < 360 ? 12.0 : 16.0;
 
                 return SingleChildScrollView(
                   keyboardDismissBehavior:
@@ -245,13 +241,13 @@ class RequestDetailPage extends StatelessWidget {
                                 label: l10n.tracking,
                                 value: _safe(request.trackingNumber),
                               ),
-                             _DetailRow(
-  icon: Icons.account_tree_outlined,
-  label: 'Process Key',
-  value: request.processInstanceKey == null
-      ? '—'
-      : request.processInstanceKey.toString(),
-),
+                              _DetailRow(
+                                icon: Icons.account_tree_outlined,
+                                label: 'Process Key',
+                                value: request.processInstanceKey == null
+                                    ? '—'
+                                    : request.processInstanceKey.toString(),
+                              ),
                               _DetailRow(
                                 icon: Icons.category_outlined,
                                 label: l10n.category,
@@ -312,40 +308,22 @@ class RequestDetailPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(height: 14),
-                       _SectionCard(
-  title: l10n.description,
-  icon: Icons.notes_outlined,
-  child: Text(
-    _safe(request.description),
-    softWrap: true,
-    style: theme.textTheme.bodyMedium?.copyWith(
-      color: colors.onSurfaceVariant,
-      height: 1.45,
-      fontWeight: FontWeight.w500,
-    ),
-  ),
-),
-
-if (request.status.trim().toUpperCase() == 'APPROVED' &&
-    request.processInstanceKey != null &&
-    request.processInstanceKey! > 0) ...[
-  const SizedBox(height: 14),
- StaffRequestTasksSection(
-  request: request,
-  onOpenTaskForm: (task) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => StaffTaskFormScreen(task: task),
-      ),
-    );
-  },
-),
-],
-
-const SizedBox(height: 20),
-if (!isClosed)
-  _ActionsCard(
+                        _SectionCard(
+                          title: l10n.description,
+                          icon: Icons.notes_outlined,
+                          child: Text(
+                            _safe(request.description),
+                            softWrap: true,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: colors.onSurfaceVariant,
+                              height: 1.45,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20),
+                        if (!isClosed)
+                          _ActionsCard(
                             isLoading: state.updating,
                             onReject: () {
                               if (state.updating) return;
@@ -710,11 +688,8 @@ class _ActionsCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
-              if (stackButtons) ...[
-                rejectButton,
-                const SizedBox(height: 10),
-                approveButton,
-              ] else
+              if (stackButtons) ...[rejectButton, const SizedBox(height: 10), approveButton]
+              else
                 Row(
                   children: [
                     Expanded(child: rejectButton),
@@ -741,9 +716,7 @@ class _ActionsCard extends StatelessWidget {
 class _ClosedStatusCard extends StatelessWidget {
   final String status;
 
-  const _ClosedStatusCard({
-    required this.status,
-  });
+  const _ClosedStatusCard({required this.status});
 
   @override
   Widget build(BuildContext context) {
