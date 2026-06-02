@@ -8,6 +8,7 @@ class MunicipalityProfileModel {
   final int? municipalityId;
   final String? municipalityName;
   final int? ownerProjectLinkId;
+  final String? avatarUrl;
 
   const MunicipalityProfileModel({
     required this.id,
@@ -19,6 +20,7 @@ class MunicipalityProfileModel {
     required this.municipalityId,
     required this.municipalityName,
     required this.ownerProjectLinkId,
+    this.avatarUrl,
   });
 
   factory MunicipalityProfileModel.fromJson(Map<String, dynamic> json) {
@@ -60,6 +62,9 @@ class MunicipalityProfileModel {
       ownerProjectLinkId: int.tryParse(
         json['ownerProjectLinkId']?.toString() ?? '',
       ),
+      avatarUrl: json['avatarUrl']?.toString() ??
+          json['profilePictureUrl']?.toString() ??
+          json['avatar_url']?.toString(),
     );
   }
 }

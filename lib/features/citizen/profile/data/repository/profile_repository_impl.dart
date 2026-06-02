@@ -2,6 +2,7 @@ import 'package:baladiyati/features/citizen/profile/domain/repository/profile_re
 
 import '../../domain/entities/profile_entity.dart';
 
+import '../models/build4all_profile_model.dart';
 import '../models/municipality_profile_model.dart';
 import '../models/profile_model.dart';
 import '../services/profile_api_service.dart';
@@ -15,13 +16,35 @@ class ProfileRepositoryImpl implements ProfileRepository {
 
   @override
   Future<ProfileEntity> getProfile() async {
-    final core = await api.getBuild4AllProfile();
+    Build4AllProfileModel? core;
+    try {
+      core = await api.getBuild4AllProfile();
+    } catch (_) {
+      // Build4All may be unreachable; fall back to municipality data
+    }
+
     MunicipalityProfileModel? municipality;
     try {
       municipality = await api.getMunicipalityProfile();
     } catch (_) {
-      // municipality profile may not exist yet; use Build4All data only
+      // municipality profile may not exist yet
     }
+
+    if (core == null && municipality == null) {
+      throw Exception('Failed to load profile data');
+    }
+
+    // If Build4All is down, synthesise a minimal core from municipality data
+    core ??= Build4AllProfileModel(
+      id: 0,
+      firstName: '',
+      lastName: '',
+      username: municipality!.email.split('@').first,
+      email: municipality.email,
+      profilePictureUrl: null,
+      isPublicProfile: null,
+      status: null,
+    );
 
     return ProfileModel.fromParts(core: core, municipality: municipality);
   }

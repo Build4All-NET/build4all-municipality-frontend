@@ -1,8 +1,7 @@
-// lib/features/citizen/home/presentation/screens/home_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:baladiyati/core/config/env.dart';
 
 import 'package:baladiyati/common/widgets/bottom_nav.dart';
 import 'package:baladiyati/features/citizen/payments/presentation/screens/payments_screen.dart';
@@ -123,7 +122,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     ? profileState.profile!.municipalityName!
                     : profileState.isLoading
                         ? '...'
-                        : AppLocalizations.of(context)!.notSpecified;
+                        : Env.appName;
 
             final requests = requestsState.requests;
 

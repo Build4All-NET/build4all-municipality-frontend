@@ -120,6 +120,28 @@ class StaffTaskModel {
 
   bool get canOpenForm => id != null && !isCompleted;
 
+  /// Human-readable name derived from the Camunda element ID or task name.
+  String get displayName {
+    final source = name.isNotEmpty ? name : taskId;
+    if (source.isEmpty) return 'Task';
+    final stripped = source
+        .replaceFirst(
+            RegExp(
+                r'^(Activity|Task|UserTask|ServiceTask|Gateway|Event)_',
+                caseSensitive: false),
+            '')
+        .replaceAll('_', ' ')
+        .trim();
+    if (stripped.isEmpty) return source;
+    final spaced = stripped.replaceAllMapped(
+        RegExp(r'([a-z])([A-Z])'), (m) => '${m[1]} ${m[2]}');
+    return spaced
+        .split(' ')
+        .where((w) => w.isNotEmpty)
+        .map((w) => '${w[0].toUpperCase()}${w.substring(1)}')
+        .join(' ');
+  }
+
   List<String> get departmentLabels {
     return candidateGroups
         .where((g) => g.startsWith('DEP_'))
@@ -129,7 +151,7 @@ class StaffTaskModel {
               .toLowerCase()
               .split(' ')
               .where((w) => w.isNotEmpty)
-              .map((w) => '\${w[0].toUpperCase()}\${w.substring(1)}')
+              .map((w) => '${w[0].toUpperCase()}${w.substring(1)}')
               .join(' ');
         })
         .toList();
