@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/core/utils/error_message.dart';
 import 'package:baladiyati/features/staff/tasks/data/services/staff_task_api_service.dart';
+import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
@@ -109,7 +110,7 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
         if (!mounted) return;
         setState(() {
           _polling = false;
-          _error = 'Certificate not ready yet.\nTap Retry to check again.';
+          _error = 'timeout';
         });
       }
     }
@@ -170,9 +171,10 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
     if (path == null) return;
     final result = await OpenFilex.open(path);
     if (result.type != ResultType.done && mounted) {
+      final l10n = AppLocalizations.of(context)!;
       AppToast.show(
         context,
-        message: 'Could not open file: ${result.message}',
+        message: '${l10n.couldNotOpenFile}: ${result.message}',
         type: AppToastType.error,
       );
     }
@@ -180,13 +182,14 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        title: const Text('Certificate'),
+        title: Text(l10n.certificate),
         leading: BackButton(
           onPressed: () => Navigator.pop(context, true),
         ),
@@ -195,16 +198,16 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
         child: Padding(
           padding: const EdgeInsets.all(20),
           child: _polling
-              ? _buildPolling(theme, colors)
+              ? _buildPolling(theme, colors, l10n)
               : _error != null
-                  ? _buildError(theme, colors)
-                  : _buildCertificate(theme, colors),
+                  ? _buildError(theme, colors, l10n)
+                  : _buildCertificate(theme, colors, l10n),
         ),
       ),
     );
   }
 
-  Widget _buildPolling(ThemeData theme, ColorScheme colors) {
+  Widget _buildPolling(ThemeData theme, ColorScheme colors, AppLocalizations l10n) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -212,14 +215,14 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
           const CircularProgressIndicator(),
           const SizedBox(height: 20),
           Text(
-            'Generating certificate…',
+            l10n.generatingCertificate,
             style: theme.textTheme.titleMedium?.copyWith(
               fontWeight: FontWeight.w700,
             ),
           ),
           const SizedBox(height: 8),
           Text(
-            'This may take a few seconds.',
+            l10n.certificateTakingTime,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colors.onSurfaceVariant,
             ),
@@ -229,7 +232,7 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
     );
   }
 
-  Widget _buildError(ThemeData theme, ColorScheme colors) {
+  Widget _buildError(ThemeData theme, ColorScheme colors, AppLocalizations l10n) {
     return Center(
       child: Column(
         mainAxisSize: MainAxisSize.min,
@@ -237,7 +240,7 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
           Icon(Icons.hourglass_empty, size: 48, color: colors.onSurfaceVariant),
           const SizedBox(height: 16),
           Text(
-            _error ?? 'Unknown error',
+            l10n.certificateNotReady,
             style: theme.textTheme.bodyLarge?.copyWith(
               color: colors.onSurfaceVariant,
             ),
@@ -247,7 +250,7 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
           FilledButton.icon(
             onPressed: _startPolling,
             icon: const Icon(Icons.refresh_outlined),
-            label: const Text('Retry'),
+            label: Text(l10n.retry),
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 32),
               shape: RoundedRectangleBorder(
@@ -258,14 +261,14 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
           const SizedBox(height: 12),
           OutlinedButton(
             onPressed: () => Navigator.pop(context, true),
-            child: const Text('Back to Tasks'),
+            child: Text(l10n.backToTasks),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildCertificate(ThemeData theme, ColorScheme colors) {
+  Widget _buildCertificate(ThemeData theme, ColorScheme colors, AppLocalizations l10n) {
     final cert = _certificate!;
     final fileName = cert['fileName']?.toString() ?? 'certificate.pdf';
     final createdAt = cert['createdAt']?.toString() ?? '';
@@ -289,7 +292,7 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
               ),
               const SizedBox(height: 12),
               Text(
-                'Certificate Ready',
+                l10n.certificateReady,
                 style: theme.textTheme.titleLarge?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: colors.onPrimaryContainer,
@@ -351,7 +354,7 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
                       )
                     else
                       Text(
-                        'PDF Document',
+                        l10n.pdfDocument,
                         style: theme.textTheme.bodySmall?.copyWith(
                           color: colors.onSurfaceVariant,
                         ),
@@ -367,7 +370,7 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
           FilledButton.icon(
             onPressed: _openSaved,
             icon: const Icon(Icons.open_in_new_outlined),
-            label: const Text('Open PDF'),
+            label: Text(l10n.openPdf),
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
@@ -385,7 +388,7 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.download_outlined),
-            label: Text(_downloading ? 'Downloading…' : 'Download Again'),
+            label: Text(_downloading ? l10n.loading : l10n.downloadAgain),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 14),
               shape: RoundedRectangleBorder(
@@ -403,7 +406,7 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
                     child: CircularProgressIndicator(strokeWidth: 2),
                   )
                 : const Icon(Icons.download_outlined),
-            label: Text(_downloading ? 'Downloading…' : 'Download & Open'),
+            label: Text(_downloading ? l10n.loading : l10n.downloadAndOpen),
             style: FilledButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               shape: RoundedRectangleBorder(
@@ -421,7 +424,7 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
               borderRadius: BorderRadius.circular(14),
             ),
           ),
-          child: const Text('Done'),
+          child: Text(l10n.done),
         ),
       ],
     );
