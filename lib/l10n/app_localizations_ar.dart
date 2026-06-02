@@ -1481,4 +1481,77 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get requiredField => 'هذا الحقل مطلوب';
+
+  @override
+  String get certificate => 'الشهادة';
+
+  @override
+  String get taskAlreadyCompleted => 'هذه المهمة مكتملة بالفعل.';
+
+  @override
+  String get viewCertificate => 'عرض الشهادة';
+
+  @override
+  String get generatingCertificate => 'جاري إنشاء الشهادة...';
+
+  @override
+  String get certificateTakingTime => 'قد يستغرق هذا لحظة';
+
+  @override
+  String get certificateNotReady => 'الشهادة غير جاهزة بعد';
+
+  @override
+  String get certificateReady => 'الشهادة جاهزة';
+
+  @override
+  String get pdfDocument => 'مستند PDF';
+
+  @override
+  String get openPdf => 'فتح PDF';
+
+  @override
+  String get downloadAgain => 'تحميل مرة أخرى';
+
+  @override
+  String get downloadAndOpen => 'تحميل وفتح';
+
+  @override
+  String get backToTasks => 'العودة إلى المهام';
+
+  @override
+  String get done => 'تم';
+
+  @override
+  String get couldNotOpenFile => 'تعذر فتح الملف';
+
+  @override
+  String get noInputRequired => 'لا يلزم إدخال بيانات لهذه المهمة';
+
+  @override
+  String get fillRequiredFields => 'املأ الحقول المطلوبة';
+
+  @override
+  String get useCurrentLocation => 'استخدم الموقع الحالي';
+
+  @override
+  String get locationRequired => 'الموقع مطلوب';
+
+  @override
+  String get locationPermissionDenied => 'تم رفض إذن الموقع';
+
+  @override
+  String get locationServiceDisabled => 'خدمات الموقع معطلة';
+
+  @override
+  String get locationError => 'تعذر الحصول على الموقع';
+
+  @override
+  String get gpsCoordinatesLabel => 'إحداثيات GPS';
+
+  @override
+  String get tapToPickLocation => 'اضغط لاختيار الموقع';
+
+  @override
+  String get locationSelected => 'تم تحديد الموقع';
+
 }

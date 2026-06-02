@@ -398,7 +398,7 @@ class _StaffTaskFormScreenState extends State<StaffTaskFormScreen> {
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
         title: Text(
-          widget.task.name.isNotEmpty ? widget.task.name : l10n.taskForm,
+          widget.task.displayName.isNotEmpty ? widget.task.displayName : l10n.taskForm,
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
@@ -487,6 +487,7 @@ class _TaskInfoCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     final stateUpper = task.state.toUpperCase();
     final bool isDone =
@@ -553,7 +554,7 @@ class _TaskInfoCard extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      task.name.isNotEmpty ? task.name : 'Task',
+                      task.displayName,
                       style: theme.textTheme.titleMedium?.copyWith(
                         fontWeight: FontWeight.w900,
                         color: colors.onSurface,
@@ -586,7 +587,7 @@ class _TaskInfoCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  isDone ? 'Completed' : (task.state.isEmpty ? 'Pending' : task.state),
+                  isDone ? l10n.completed : (task.state.isEmpty ? l10n.statusPending : task.state),
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: stateFg,
                     fontWeight: FontWeight.w800,
@@ -613,7 +614,7 @@ class _TaskInfoCard extends StatelessWidget {
             const Divider(height: 1),
             const SizedBox(height: 12),
             Text(
-              'Request information',
+              l10n.requestInformation,
               style: theme.textTheme.labelMedium?.copyWith(
                 fontWeight: FontWeight.w700,
                 color: colors.onSurfaceVariant,
@@ -725,6 +726,7 @@ class _CompletedBanner extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -742,7 +744,7 @@ class _CompletedBanner extends StatelessWidget {
               const SizedBox(width: 12),
               Expanded(
                 child: Text(
-                  'This task has already been completed.',
+                  l10n.taskAlreadyCompleted,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: colors.primary,
                     fontWeight: FontWeight.w700,
@@ -756,7 +758,7 @@ class _CompletedBanner extends StatelessWidget {
             OutlinedButton.icon(
               onPressed: onViewCertificate,
               icon: const Icon(Icons.picture_as_pdf_outlined),
-              label: const Text('View / Download Certificate'),
+              label: Text(l10n.viewCertificate),
               style: OutlinedButton.styleFrom(
                 foregroundColor: colors.primary,
                 side: BorderSide(color: colors.primary.withOpacity(0.4)),
@@ -805,7 +807,7 @@ class _NoFormCard extends StatelessWidget {
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  'No input required for this task.',
+                  l10n.noInputRequired,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: colors.onSurfaceVariant,
                     fontWeight: FontWeight.w600,
@@ -853,6 +855,7 @@ class _FormCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return Container(
       padding: const EdgeInsets.all(16),
@@ -865,7 +868,7 @@ class _FormCard extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Text(
-            'Fill in the required fields',
+            l10n.fillRequiredFields,
             style: theme.textTheme.titleSmall?.copyWith(
               fontWeight: FontWeight.w800,
               color: colors.onSurface,
@@ -932,7 +935,7 @@ class _DynamicField extends StatelessWidget {
     if (field.required && v.isEmpty) return l10n.requiredField;
     if (v.isNotEmpty) {
       final num? n = num.tryParse(v);
-      if (n == null) return 'Enter a valid number';
+      if (n == null) return l10n.invalidNumber;
       if (field.min != null && n < field.min!) {
         return 'Minimum value is ${field.min}';
       }
@@ -1139,7 +1142,7 @@ class _DynamicField extends StatelessWidget {
                     decoration: InputDecoration(
                       labelText:
                           '${field.label}${field.required ? ' *' : ''}',
-                      hintText: 'Select date',
+                      hintText: l10n.selectDate,
                       suffixIcon: const Icon(
                           Icons.calendar_today_outlined),
                       border: OutlineInputBorder(

@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:geolocator/geolocator.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
@@ -23,7 +24,6 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
   final _formKey = GlobalKey<FormState>();
   final _titleCtrl = TextEditingController();
   final _descCtrl = TextEditingController();
-  final _locationCtrl = TextEditingController();
 
   final _requestService = RequestService();
   final _fileUploadService = FileUploadService();
@@ -31,6 +31,11 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
 
   bool _isLoading = false;
   bool _isUploading = false;
+  bool _gettingLocation = false;
+  bool _showLocationError = false;
+
+  double? _geoLat;
+  double? _geoLng;
 
   final List<File> _selectedFiles = [];
   final List<String> _selectedFileNames = [];
@@ -39,8 +44,59 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
   void dispose() {
     _titleCtrl.dispose();
     _descCtrl.dispose();
-    _locationCtrl.dispose();
     super.dispose();
+  }
+
+  Future<void> _getCurrentLocation() async {
+    final loc = AppLocalizations.of(context)!;
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        if (!mounted) return;
+        AppToast.show(context,
+            message: loc.locationPermissionDenied, type: AppToastType.error);
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      if (!mounted) return;
+      AppToast.show(context,
+          message: loc.locationPermissionDenied, type: AppToastType.error);
+      return;
+    }
+
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      if (!mounted) return;
+      AppToast.show(context,
+          message: loc.locationServiceDisabled, type: AppToastType.error);
+      return;
+    }
+
+    setState(() => _gettingLocation = true);
+    try {
+      final position = await Geolocator.getCurrentPosition(
+        locationSettings: const LocationSettings(
+          accuracy: LocationAccuracy.high,
+        ),
+      );
+      if (!mounted) return;
+      setState(() {
+        _geoLat = position.latitude;
+        _geoLng = position.longitude;
+        _showLocationError = false;
+      });
+    } catch (_) {
+      if (!mounted) return;
+      AppToast.show(context,
+          message: AppLocalizations.of(context)!.locationError,
+          type: AppToastType.error);
+    } finally {
+      if (mounted) setState(() => _gettingLocation = false);
+    }
   }
 
   Future<void> _pickFiles() async {
@@ -157,6 +213,12 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (_geoLat == null) {
+      setState(() => _showLocationError = true);
+      return;
+    }
+
     final loc = AppLocalizations.of(context)!;
     setState(() => _isLoading = true);
 
@@ -173,9 +235,10 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
         submission: RequestSubmission(
           title: _titleCtrl.text.trim(),
           description: _descCtrl.text.trim(),
-          addressText: _locationCtrl.text.trim().isEmpty
-              ? null
-              : _locationCtrl.text.trim(),
+          geoLat: _geoLat,
+          geoLng: _geoLng,
+          addressText:
+              '${_geoLat!.toStringAsFixed(6)}, ${_geoLng!.toStringAsFixed(6)}',
           attachmentUrls: uploadedUrls.isEmpty ? null : uploadedUrls,
         ),
       );
@@ -329,11 +392,19 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                               : null,
                     ),
                     const SizedBox(height: 12),
-                    AppTextField(
-                      controller: _locationCtrl,
-                      label: loc.locationLabel,
-                      hint: loc.locationHint,
-                      icon: Icons.location_on_outlined,
+                    _LocationPickerCard(
+                      geoLat: _geoLat,
+                      geoLng: _geoLng,
+                      gettingLocation: _gettingLocation,
+                      showError: _showLocationError,
+                      onGetLocation: _getCurrentLocation,
+                      onClear: () => setState(() {
+                        _geoLat = null;
+                        _geoLng = null;
+                      }),
+                      loc: loc,
+                      theme: theme,
+                      colors: colors,
                     ),
                   ],
                 ),
@@ -363,8 +434,8 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                             children: [
                               GestureDetector(
                                 onTap: () => _removeFile(i),
-                                child:
-                                    Icon(Icons.close, color: colors.error, size: 20),
+                                child: Icon(Icons.close,
+                                    color: colors.error, size: 20),
                               ),
                               const SizedBox(width: 8),
                               Expanded(
@@ -434,11 +505,10 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                       Row(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
-                          SizedBox(
+                          const SizedBox(
                             width: 16,
                             height: 16,
-                            child:
-                                CircularProgressIndicator(strokeWidth: 2),
+                            child: CircularProgressIndicator(strokeWidth: 2),
                           ),
                           const SizedBox(width: 8),
                           Text(loc.uploadingFiles,
@@ -463,6 +533,141 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
           ),
         ),
       ),
+    );
+  }
+}
+
+class _LocationPickerCard extends StatelessWidget {
+  final double? geoLat;
+  final double? geoLng;
+  final bool gettingLocation;
+  final bool showError;
+  final VoidCallback onGetLocation;
+  final VoidCallback onClear;
+  final AppLocalizations loc;
+  final ThemeData theme;
+  final ColorScheme colors;
+
+  const _LocationPickerCard({
+    required this.geoLat,
+    required this.geoLng,
+    required this.gettingLocation,
+    required this.showError,
+    required this.onGetLocation,
+    required this.onClear,
+    required this.loc,
+    required this.theme,
+    required this.colors,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final hasLocation = geoLat != null && geoLng != null;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          '${loc.locationLabel} *',
+          style: theme.textTheme.bodyMedium?.copyWith(
+            fontWeight: FontWeight.w600,
+            color: showError && !hasLocation ? colors.error : colors.onSurface,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Container(
+          padding: const EdgeInsets.all(14),
+          decoration: BoxDecoration(
+            color: hasLocation
+                ? colors.primaryContainer.withOpacity(0.25)
+                : colors.surface,
+            borderRadius: BorderRadius.circular(12),
+            border: Border.all(
+              color: showError && !hasLocation
+                  ? colors.error
+                  : hasLocation
+                      ? colors.primary.withOpacity(0.4)
+                      : colors.outline.withOpacity(0.4),
+            ),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              if (hasLocation)
+                Row(
+                  children: [
+                    Icon(Icons.location_on, color: colors.primary, size: 20),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      child: Text(
+                        '${geoLat!.toStringAsFixed(5)}, ${geoLng!.toStringAsFixed(5)}',
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colors.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                    IconButton(
+                      icon: Icon(Icons.close,
+                          color: colors.onSurfaceVariant, size: 18),
+                      onPressed: onClear,
+                      padding: EdgeInsets.zero,
+                      constraints: const BoxConstraints(),
+                    ),
+                  ],
+                )
+              else
+                Row(
+                  children: [
+                    Icon(Icons.location_off_outlined,
+                        color: colors.onSurfaceVariant, size: 18),
+                    const SizedBox(width: 8),
+                    Text(
+                      loc.tapToPickLocation,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ),
+                  ],
+                ),
+              const SizedBox(height: 10),
+              OutlinedButton.icon(
+                onPressed: gettingLocation ? null : onGetLocation,
+                icon: gettingLocation
+                    ? SizedBox(
+                        width: 16,
+                        height: 16,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: colors.primary,
+                        ),
+                      )
+                    : const Icon(Icons.my_location, size: 18),
+                label: Text(loc.useCurrentLocation),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: colors.primary,
+                  side: BorderSide(color: colors.primary.withOpacity(0.5)),
+                  padding: const EdgeInsets.symmetric(
+                      vertical: 10, horizontal: 14),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+        if (showError && !hasLocation) ...[
+          const SizedBox(height: 4),
+          Padding(
+            padding: const EdgeInsets.only(left: 12),
+            child: Text(
+              loc.locationRequired,
+              style: theme.textTheme.bodySmall?.copyWith(color: colors.error),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }

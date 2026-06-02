@@ -1481,4 +1481,77 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get requiredField => 'This field is required';
+
+  @override
+  String get certificate => 'Certificate';
+
+  @override
+  String get taskAlreadyCompleted => 'This task has already been completed.';
+
+  @override
+  String get viewCertificate => 'View Certificate';
+
+  @override
+  String get generatingCertificate => 'Generating certificate...';
+
+  @override
+  String get certificateTakingTime => 'This may take a moment';
+
+  @override
+  String get certificateNotReady => 'Certificate is not ready yet';
+
+  @override
+  String get certificateReady => 'Certificate ready';
+
+  @override
+  String get pdfDocument => 'PDF Document';
+
+  @override
+  String get openPdf => 'Open PDF';
+
+  @override
+  String get downloadAgain => 'Download Again';
+
+  @override
+  String get downloadAndOpen => 'Download & Open';
+
+  @override
+  String get backToTasks => 'Back to Tasks';
+
+  @override
+  String get done => 'Done';
+
+  @override
+  String get couldNotOpenFile => 'Could not open the file';
+
+  @override
+  String get noInputRequired => 'No input required for this task';
+
+  @override
+  String get fillRequiredFields => 'Fill Required Fields';
+
+  @override
+  String get useCurrentLocation => 'Use Current Location';
+
+  @override
+  String get locationRequired => 'Location is required';
+
+  @override
+  String get locationPermissionDenied => 'Location permission denied';
+
+  @override
+  String get locationServiceDisabled => 'Location services are disabled';
+
+  @override
+  String get locationError => 'Could not get location';
+
+  @override
+  String get gpsCoordinatesLabel => 'GPS Coordinates';
+
+  @override
+  String get tapToPickLocation => 'Tap to pick location';
+
+  @override
+  String get locationSelected => 'Location selected';
+
 }

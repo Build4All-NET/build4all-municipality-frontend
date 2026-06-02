@@ -3024,8 +3024,80 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'This field is required'**
   String get requiredField;
-}
 
+  /// **'Certificate'**
+  String get certificate;
+
+  /// **'This task has already been completed.'**
+  String get taskAlreadyCompleted;
+
+  /// **'View Certificate'**
+  String get viewCertificate;
+
+  /// **'Generating certificate...'**
+  String get generatingCertificate;
+
+  /// **'This may take a moment'**
+  String get certificateTakingTime;
+
+  /// **'Certificate is not ready yet'**
+  String get certificateNotReady;
+
+  /// **'Certificate ready'**
+  String get certificateReady;
+
+  /// **'PDF Document'**
+  String get pdfDocument;
+
+  /// **'Open PDF'**
+  String get openPdf;
+
+  /// **'Download Again'**
+  String get downloadAgain;
+
+  /// **'Download & Open'**
+  String get downloadAndOpen;
+
+  /// **'Back to Tasks'**
+  String get backToTasks;
+
+  /// **'Done'**
+  String get done;
+
+  /// **'Could not open the file'**
+  String get couldNotOpenFile;
+
+  /// **'No input required for this task'**
+  String get noInputRequired;
+
+  /// **'Fill Required Fields'**
+  String get fillRequiredFields;
+
+  /// **'Use Current Location'**
+  String get useCurrentLocation;
+
+  /// **'Location is required'**
+  String get locationRequired;
+
+  /// **'Location permission denied'**
+  String get locationPermissionDenied;
+
+  /// **'Location services are disabled'**
+  String get locationServiceDisabled;
+
+  /// **'Could not get location'**
+  String get locationError;
+
+  /// **'GPS Coordinates'**
+  String get gpsCoordinatesLabel;
+
+  /// **'Tap to pick location'**
+  String get tapToPickLocation;
+
+  /// **'Location selected'**
+  String get locationSelected;
+
+}
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 

@@ -1481,4 +1481,77 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get requiredField => 'Ce champ est requis';
+
+  @override
+  String get certificate => 'Certificat';
+
+  @override
+  String get taskAlreadyCompleted => 'Cette tâche a déjà été complétée.';
+
+  @override
+  String get viewCertificate => 'Voir le certificat';
+
+  @override
+  String get generatingCertificate => 'Génération du certificat...';
+
+  @override
+  String get certificateTakingTime => 'Cela peut prendre un moment';
+
+  @override
+  String get certificateNotReady => "Le certificat n'est pas encore prêt";
+
+  @override
+  String get certificateReady => 'Certificat prêt';
+
+  @override
+  String get pdfDocument => 'Document PDF';
+
+  @override
+  String get openPdf => 'Ouvrir le PDF';
+
+  @override
+  String get downloadAgain => 'Télécharger à nouveau';
+
+  @override
+  String get downloadAndOpen => 'Télécharger et ouvrir';
+
+  @override
+  String get backToTasks => 'Retour aux tâches';
+
+  @override
+  String get done => 'Terminé';
+
+  @override
+  String get couldNotOpenFile => "Impossible d'ouvrir le fichier";
+
+  @override
+  String get noInputRequired => 'Aucune saisie requise pour cette tâche';
+
+  @override
+  String get fillRequiredFields => 'Remplir les champs obligatoires';
+
+  @override
+  String get useCurrentLocation => 'Utiliser la position actuelle';
+
+  @override
+  String get locationRequired => 'La localisation est requise';
+
+  @override
+  String get locationPermissionDenied => 'Permission de localisation refusée';
+
+  @override
+  String get locationServiceDisabled => 'Les services de localisation sont désactivés';
+
+  @override
+  String get locationError => 'Impossible d\'obtenir la localisation';
+
+  @override
+  String get gpsCoordinatesLabel => 'Coordonnées GPS';
+
+  @override
+  String get tapToPickLocation => 'Appuyez pour choisir la localisation';
+
+  @override
+  String get locationSelected => 'Localisation sélectionnée';
+
 }
