@@ -6,7 +6,7 @@ on:
 
 concurrency:
   group: ios-${{ github.event.client_payload.CONFIG.OWNER_PROJECT_LINK_ID || github.event.client_payload.OWNER_PROJECT_LINK_ID || github.event.client_payload.ownerProjectLinkId || github.event.client_payload.CONFIG.ownerProjectLinkId || 'unknown' }}
-  cancel-in-progress: false
+  cancel-in-progress: true
 
 permissions:
   contents: write
@@ -16,6 +16,7 @@ jobs:
     runs-on: macos-15
 
     env:
+      CI_AUTH_TOKEN: ${{ secrets.CI_AUTH_TOKEN }}
       CI_CALLBACK_TOKEN: ${{ secrets.CI_CALLBACK_TOKEN }}
       CI_RUNTIME_TOKEN: ${{ secrets.CI_RUNTIME_TOKEN }}
 
@@ -199,8 +200,24 @@ jobs:
               return default
 
           app_name = pick("APP_NAME", "My App")
-          app_type = pick("APP_TYPE", "ECOMMERCE")
+          app_type = pick("APP_TYPE", "MUNICIPALITY")
           project_id = str(pick("PROJECT_ID", "")).strip()
+
+          # Municipality-specific: OVERRIDE_BASE_URL
+          override_base = (
+              pick("OVERRIDE_BASE_URL")
+              or pick("API_BASE_URL_OVERRIDE")
+              or pick("MUNI_API")
+              or pick("MUNICIPALITY_API_BASE_URL")
+              or pick("MUNICIPALITY_BASE_URL")
+              or pick("municipalityBaseUrl")
+              or pick("overrideBaseUrl")
+              or ""
+          )
+          override_base = str(override_base).strip().rstrip("/")
+          if not override_base:
+              print("⚠️ OVERRIDE_BASE_URL not found, using API_BASE_URL as fallback for municipality")
+              override_base = api_base
 
           ios_bundle = (
               pick("iosBundleId")
@@ -232,6 +249,7 @@ jobs:
 
           env = {
               "API_BASE_URL": api_base,
+              "OVERRIDE_BASE_URL": override_base,
               "APP_NAME": app_name,
               "APP_TYPE": app_type,
               "OWNER_PROJECT_LINK_ID": link_id,
@@ -268,6 +286,7 @@ jobs:
               logo_url = (runtime.get("logoUrl") or cfg.get("logoUrl") or payload.get("logoUrl") or "").strip()
           if logo_url:
               env["LOGO_URL"] = logo_url
+              env["APP_LOGO_URL"] = logo_url
 
           open("ci_api_base.txt", "w", encoding="utf-8").write(api_base)
           open("ci_link_id.txt", "w", encoding="utf-8").write(link_id)
@@ -278,6 +297,7 @@ jobs:
 
           print("✅ ci_env.json written")
           print("API_BASE_URL =", api_base)
+          print("OVERRIDE_BASE_URL =", override_base)
           print("OWNER_PROJECT_LINK_ID =", link_id)
           print("PROJECT_ID =", project_id)
           print("IOS_BUNDLE_ID =", ios_bundle)
@@ -286,6 +306,7 @@ jobs:
           print("CURRENCY_ID =", env.get("CURRENCY_ID"))
           print("CONFIG_SOURCE =", source)
           print("LOGO_URL =", env.get("LOGO_URL"))
+          print("APP_LOGO_URL =", env.get("APP_LOGO_URL"))
 
           for k in ["THEME_JSON_B64","NAV_JSON_B64","HOME_JSON_B64","ENABLED_FEATURES_JSON_B64","BRANDING_JSON_B64"]:
               print(k, "=", "YES" if env.get(k) else "NO")
@@ -406,20 +427,20 @@ jobs:
           BODY=$(echo "$RESPONSE" | sed '$d')
 
           DEMO_EMAIL=$(echo "$BODY" | python3 -c "
-          import sys, json
-          try:
-              print(json.load(sys.stdin).get('email',''))
-          except:
-              print('')
-          " 2>/dev/null || echo "")
+import sys, json
+try:
+    print(json.load(sys.stdin).get('email',''))
+except:
+    print('')
+" 2>/dev/null || echo "")
 
           DEMO_PASSWORD=$(echo "$BODY" | python3 -c "
-          import sys, json
-          try:
-              print(json.load(sys.stdin).get('password',''))
-          except:
-              print('')
-          " 2>/dev/null || echo "")
+import sys, json
+try:
+    print(json.load(sys.stdin).get('password',''))
+except:
+    print('')
+" 2>/dev/null || echo "")
 
           [ -n "$DEMO_EMAIL"    ] || DEMO_EMAIL="demo@applereview.com"
           [ -n "$DEMO_PASSWORD" ] || DEMO_PASSWORD="AppleReview2026!"
@@ -676,8 +697,8 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          VN="$(python3 -c "import json; print(json.load(open('lib/env/ci_env.json'))['IOS_VERSION_NAME'])")"
-          BN="$(python3 -c "import json; print(json.load(open('lib/env/ci_env.json'))['IOS_BUILD_NUMBER'])")"
+          VN="$(python3 -c "import json; print(json.load(open('lib/env/ci_env.json'))['IOS_VERSION_NAME'])""
+          BN="$(python3 -c "import json; print(json.load(open('lib/env/ci_env.json'))['IOS_BUILD_NUMBER'])""
           echo "IOS_VERSION_NAME=$VN" >> "$GITHUB_ENV"
           echo "IOS_BUILD_NUMBER=$BN" >> "$GITHUB_ENV"
           python3 - <<PY
@@ -1057,7 +1078,7 @@ jobs:
 
           API_KEY_JSON="$GITHUB_WORKSPACE/.private/api_key.json"
           BUNDLE_ID="$(tr -d '\r\n' < ci_ios_bundle_id.txt)"
-          APP_NAME="$(python3 -c "import json; print(json.load(open('lib/env/ci_env.json'))['APP_NAME'])")"
+          APP_NAME="$(python3 -c "import json; print(json.load(open('lib/env/ci_env.json'))['APP_NAME'])""
 
           python3 - <<'PY' > /tmp/owner_env.sh
           import json, shlex
