@@ -120,6 +120,21 @@ jobs:
           echo "----- pretty -----"
           python3 -m json.tool payload.json || true
 
+      - name: Install Android NDK 27.0.12077973
+        uses: nttld/setup-ndk@v1
+        id: setup-ndk
+        with:
+          ndk-version: r27
+          local-cache: false
+
+      - name: Configure NDK path (local.properties)
+        run: |
+          NDK_PATH="${{ steps.setup-ndk.outputs.ndk-path }}"
+          echo "ndk.dir=$NDK_PATH" >> android/local.properties
+          echo "✅ ndk.dir=$NDK_PATH written to android/local.properties"
+          echo "---- android/local.properties ----"
+          cat android/local.properties || true
+
       - name: Force Android NDK 27
         run: |
           set -e
