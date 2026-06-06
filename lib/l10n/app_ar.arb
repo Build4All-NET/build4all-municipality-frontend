@@ -563,5 +563,11 @@
   "chooseOnMap": "اختر على الخريطة",
   "mapPickerTitle": "اختر الموقع",
   "mapPickerConfirm": "تأكيد الموقع",
-  "mapPickerHint": "اضغط على الخريطة لاختيار موقع"
+  "mapPickerHint": "اضغط على الخريطة لاختيار موقع",
+  "certFilterSigned": "موقّع",
+  "certFilterUnsigned": "غير موقّع",
+  "newestFirst": "الأحدث أولاً",
+  "oldestFirst": "الأقدم أولاً",
+  "dateLabel": "التاريخ",
+  "requestIdLabel": "رقم الطلب"
 }

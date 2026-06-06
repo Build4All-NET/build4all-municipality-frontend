@@ -1632,4 +1632,22 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get mapPickerHint => 'Tap on the map to select a location';
 
+  @override
+  String get certFilterSigned => 'Signed';
+
+  @override
+  String get certFilterUnsigned => 'Unsigned';
+
+  @override
+  String get newestFirst => 'Newest first';
+
+  @override
+  String get oldestFirst => 'Oldest first';
+
+  @override
+  String get dateLabel => 'Date';
+
+  @override
+  String get requestIdLabel => 'Request ID';
+
 }

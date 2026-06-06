@@ -1632,4 +1632,22 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get mapPickerHint => 'اضغط على الخريطة لاختيار موقع';
 
+  @override
+  String get certFilterSigned => 'موقّع';
+
+  @override
+  String get certFilterUnsigned => 'غير موقّع';
+
+  @override
+  String get newestFirst => 'الأحدث أولاً';
+
+  @override
+  String get oldestFirst => 'الأقدم أولاً';
+
+  @override
+  String get dateLabel => 'التاريخ';
+
+  @override
+  String get requestIdLabel => 'رقم الطلب';
+
 }

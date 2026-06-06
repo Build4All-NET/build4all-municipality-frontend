@@ -40,4 +40,38 @@ class CertificateModel {
     final t = request?['trackingNumber']?.toString() ?? '';
     return t.isEmpty ? '-' : t;
   }
+
+  String get requestStatus {
+    final s = request?['status']?.toString() ?? '';
+    return s.isEmpty ? '-' : s;
+  }
+
+  String get citizenName {
+    // Try common field names used by various backends
+    for (final key in ['citizenName', 'citizenFullName', 'fullName']) {
+      final v = request?[key]?.toString() ?? '';
+      if (v.isNotEmpty) return v;
+    }
+    // Nested citizen object
+    final citizen = request?['citizen'];
+    if (citizen is Map) {
+      for (final key in ['fullName', 'name', 'firstName']) {
+        final v = citizen[key]?.toString() ?? '';
+        if (v.isNotEmpty) return v;
+      }
+    }
+    return '-';
+  }
+
+  /// ISO-8601 date string parsed as local DateTime, or null.
+  DateTime? get createdAtDate {
+    if (createdAt == null) return null;
+    return DateTime.tryParse(createdAt!);
+  }
+
+  String get formattedDate {
+    final dt = createdAtDate;
+    if (dt == null) return '-';
+    return '${dt.year}-${dt.month.toString().padLeft(2, '0')}-${dt.day.toString().padLeft(2, '0')}';
+  }
 }

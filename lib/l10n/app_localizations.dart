@@ -3123,6 +3123,12 @@ abstract class AppLocalizations {
   String get mapPickerTitle;
   String get mapPickerConfirm;
   String get mapPickerHint;
+  String get certFilterSigned;
+  String get certFilterUnsigned;
+  String get newestFirst;
+  String get oldestFirst;
+  String get dateLabel;
+  String get requestIdLabel;
 }
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();

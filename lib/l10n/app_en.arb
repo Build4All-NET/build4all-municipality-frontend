@@ -563,5 +563,11 @@
   "chooseOnMap": "Choose on Map",
   "mapPickerTitle": "Pick Location",
   "mapPickerConfirm": "Confirm Location",
-  "mapPickerHint": "Tap on the map to select a location"
+  "mapPickerHint": "Tap on the map to select a location",
+  "certFilterSigned": "Signed",
+  "certFilterUnsigned": "Unsigned",
+  "newestFirst": "Newest first",
+  "oldestFirst": "Oldest first",
+  "dateLabel": "Date",
+  "requestIdLabel": "Request ID"
 }
