@@ -13,6 +13,7 @@ import 'package:baladiyati/features/citizen/services/data/models/request_submiss
 import 'package:baladiyati/features/citizen/services/data/services/request_service.dart';
 import 'package:baladiyati/features/citizen/services/data/services/file_upload_service.dart';
 import 'package:baladiyati/features/citizen/services/domain/entities/service_entity.dart';
+import 'map_picker_screen.dart';
 
 class NewRequestScreen extends StatefulWidget {
   final ServiceEntity service;
@@ -135,6 +136,26 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
       }
     } catch (_) {}
     return null;
+  }
+
+  Future<void> _openMapPicker() async {
+    final result = await Navigator.push<MapPickerResult>(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MapPickerScreen(
+          initialLat: _geoLat,
+          initialLng: _geoLng,
+        ),
+      ),
+    );
+    if (result != null && mounted) {
+      setState(() {
+        _geoLat = result.lat;
+        _geoLng = result.lng;
+        _locationName = result.locationName;
+        _showLocationError = false;
+      });
+    }
   }
 
   Future<void> _pickFiles() async {
@@ -437,6 +458,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                       gettingLocation: _gettingLocation,
                       showError: _showLocationError,
                       onGetLocation: _getCurrentLocation,
+                      onOpenMap: _openMapPicker,
                       onClear: () => setState(() {
                         _geoLat = null;
                         _geoLng = null;
@@ -584,6 +606,7 @@ class _LocationPickerCard extends StatelessWidget {
   final bool gettingLocation;
   final bool showError;
   final VoidCallback onGetLocation;
+  final VoidCallback onOpenMap;
   final VoidCallback onClear;
   final AppLocalizations loc;
   final ThemeData theme;
@@ -596,6 +619,7 @@ class _LocationPickerCard extends StatelessWidget {
     required this.gettingLocation,
     required this.showError,
     required this.onGetLocation,
+    required this.onOpenMap,
     required this.onClear,
     required this.loc,
     required this.theme,
@@ -685,28 +709,55 @@ class _LocationPickerCard extends StatelessWidget {
                   ],
                 ),
               const SizedBox(height: 10),
-              OutlinedButton.icon(
-                onPressed: gettingLocation ? null : onGetLocation,
-                icon: gettingLocation
-                    ? SizedBox(
-                        width: 16,
-                        height: 16,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: colors.primary,
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: gettingLocation ? null : onGetLocation,
+                      icon: gettingLocation
+                          ? SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: colors.primary,
+                              ),
+                            )
+                          : const Icon(Icons.my_location, size: 16),
+                      label: Text(loc.useCurrentLocation,
+                          style: const TextStyle(fontSize: 12)),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: colors.primary,
+                        side:
+                            BorderSide(color: colors.primary.withOpacity(0.5)),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
                         ),
-                      )
-                    : const Icon(Icons.my_location, size: 18),
-                label: Text(loc.useCurrentLocation),
-                style: OutlinedButton.styleFrom(
-                  foregroundColor: colors.primary,
-                  side: BorderSide(color: colors.primary.withOpacity(0.5)),
-                  padding: const EdgeInsets.symmetric(
-                      vertical: 10, horizontal: 14),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: gettingLocation ? null : onOpenMap,
+                      icon: const Icon(Icons.map_outlined, size: 16),
+                      label: Text(loc.chooseOnMap,
+                          style: const TextStyle(fontSize: 12)),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: colors.secondary,
+                        side: BorderSide(
+                            color: colors.secondary.withOpacity(0.5)),
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 10, horizontal: 10),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ],
           ),

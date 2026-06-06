@@ -1590,4 +1590,40 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get locationNameLabel => 'الموقع المحدد';
 
+  @override
+  String get aiChatTitle => 'المساعد الذكي';
+
+  @override
+  String get aiChatHint => 'اكتب رسالتك...';
+
+  @override
+  String get aiChatWelcome => 'مرحباً! أنا مساعدك الذكي. اسألني أي شيء عن خدمات البلدية.';
+
+  @override
+  String get aiChatClear => 'مسح المحادثة';
+
+  @override
+  String get aiChatCleared => 'تم مسح المحادثة';
+
+  @override
+  String get aiChatSending => 'يكتب...';
+
+  @override
+  String get aiChatError => 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get aiChatEmptyHint => 'اسألني أي شيء عن خدمات البلدية';
+
+  @override
+  String get chooseOnMap => 'اختر على الخريطة';
+
+  @override
+  String get mapPickerTitle => 'اختر الموقع';
+
+  @override
+  String get mapPickerConfirm => 'تأكيد الموقع';
+
+  @override
+  String get mapPickerHint => 'اضغط على الخريطة لاختيار موقع';
+
 }

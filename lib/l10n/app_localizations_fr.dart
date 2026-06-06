@@ -1590,4 +1590,40 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get locationNameLabel => 'Emplacement sélectionné';
 
+  @override
+  String get aiChatTitle => 'Assistant IA';
+
+  @override
+  String get aiChatHint => 'Tapez un message...';
+
+  @override
+  String get aiChatWelcome => 'Bonjour! Je suis votre assistant IA. Posez-moi des questions sur les services municipaux.';
+
+  @override
+  String get aiChatClear => 'Effacer la conversation';
+
+  @override
+  String get aiChatCleared => 'Conversation effacée';
+
+  @override
+  String get aiChatSending => 'Écriture...';
+
+  @override
+  String get aiChatError => 'Une erreur s\'est produite. Veuillez réessayer.';
+
+  @override
+  String get aiChatEmptyHint => 'Posez-moi des questions sur les services municipaux';
+
+  @override
+  String get chooseOnMap => 'Choisir sur la carte';
+
+  @override
+  String get mapPickerTitle => "Choisir l'emplacement";
+
+  @override
+  String get mapPickerConfirm => "Confirmer l'emplacement";
+
+  @override
+  String get mapPickerHint => 'Appuyez sur la carte pour sélectionner un emplacement';
+
 }

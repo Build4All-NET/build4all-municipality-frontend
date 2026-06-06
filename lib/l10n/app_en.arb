@@ -549,5 +549,17 @@
   "aiExplanation": "AI Explanation",
   "aiHelpLoading": "Getting AI explanation...",
   "aiHelpError": "Could not get AI explanation",
-  "locationNameLabel": "Selected Location"
+  "locationNameLabel": "Selected Location",
+  "aiChatTitle": "AI Assistant",
+  "aiChatHint": "Type a message...",
+  "aiChatWelcome": "Hello! I'm your AI assistant. Ask me anything about municipal services.",
+  "aiChatClear": "Clear conversation",
+  "aiChatCleared": "Conversation cleared",
+  "aiChatSending": "Typing...",
+  "aiChatError": "Something went wrong. Please try again.",
+  "aiChatEmptyHint": "Ask me anything about municipal services",
+  "chooseOnMap": "Choose on Map",
+  "mapPickerTitle": "Pick Location",
+  "mapPickerConfirm": "Confirm Location",
+  "mapPickerHint": "Tap on the map to select a location"
 }

@@ -549,5 +549,17 @@
   "aiExplanation": "شرح ذكي",
   "aiHelpLoading": "جاري الحصول على الشرح...",
   "aiHelpError": "تعذر الحصول على الشرح",
-  "locationNameLabel": "الموقع المحدد"
+  "locationNameLabel": "الموقع المحدد",
+  "aiChatTitle": "المساعد الذكي",
+  "aiChatHint": "اكتب رسالتك...",
+  "aiChatWelcome": "مرحباً! أنا مساعدك الذكي. اسألني أي شيء عن خدمات البلدية.",
+  "aiChatClear": "مسح المحادثة",
+  "aiChatCleared": "تم مسح المحادثة",
+  "aiChatSending": "يكتب...",
+  "aiChatError": "حدث خطأ ما. يرجى المحاولة مرة أخرى.",
+  "aiChatEmptyHint": "اسألني أي شيء عن خدمات البلدية",
+  "chooseOnMap": "اختر على الخريطة",
+  "mapPickerTitle": "اختر الموقع",
+  "mapPickerConfirm": "تأكيد الموقع",
+  "mapPickerHint": "اضغط على الخريطة لاختيار موقع"
 }

@@ -549,5 +549,17 @@
   "aiExplanation": "Explication IA",
   "aiHelpLoading": "Récupération de l'explication...",
   "aiHelpError": "Impossible d'obtenir l'explication IA",
-  "locationNameLabel": "Emplacement sélectionné"
+  "locationNameLabel": "Emplacement sélectionné",
+  "aiChatTitle": "Assistant IA",
+  "aiChatHint": "Tapez un message...",
+  "aiChatWelcome": "Bonjour! Je suis votre assistant IA. Posez-moi des questions sur les services municipaux.",
+  "aiChatClear": "Effacer la conversation",
+  "aiChatCleared": "Conversation effacée",
+  "aiChatSending": "Écriture...",
+  "aiChatError": "Une erreur s'est produite. Veuillez réessayer.",
+  "aiChatEmptyHint": "Posez-moi des questions sur les services municipaux",
+  "chooseOnMap": "Choisir sur la carte",
+  "mapPickerTitle": "Choisir l'emplacement",
+  "mapPickerConfirm": "Confirmer l'emplacement",
+  "mapPickerHint": "Appuyez sur la carte pour sélectionner un emplacement"
 }

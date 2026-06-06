@@ -3109,6 +3109,18 @@ abstract class AppLocalizations {
   String get aiHelpLoading;
   String get aiHelpError;
   String get locationNameLabel;
+  String get aiChatTitle;
+  String get aiChatHint;
+  String get aiChatWelcome;
+  String get aiChatClear;
+  String get aiChatCleared;
+  String get aiChatSending;
+  String get aiChatError;
+  String get aiChatEmptyHint;
+  String get chooseOnMap;
+  String get mapPickerTitle;
+  String get mapPickerConfirm;
+  String get mapPickerHint;
 }
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();

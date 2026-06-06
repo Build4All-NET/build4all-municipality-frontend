@@ -1590,4 +1590,40 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get locationNameLabel => 'Selected Location';
 
+  @override
+  String get aiChatTitle => 'AI Assistant';
+
+  @override
+  String get aiChatHint => 'Type a message...';
+
+  @override
+  String get aiChatWelcome => 'Hello! I\'m your AI assistant. Ask me anything about municipal services.';
+
+  @override
+  String get aiChatClear => 'Clear conversation';
+
+  @override
+  String get aiChatCleared => 'Conversation cleared';
+
+  @override
+  String get aiChatSending => 'Typing...';
+
+  @override
+  String get aiChatError => 'Something went wrong. Please try again.';
+
+  @override
+  String get aiChatEmptyHint => 'Ask me anything about municipal services';
+
+  @override
+  String get chooseOnMap => 'Choose on Map';
+
+  @override
+  String get mapPickerTitle => 'Pick Location';
+
+  @override
+  String get mapPickerConfirm => 'Confirm Location';
+
+  @override
+  String get mapPickerHint => 'Tap on the map to select a location';
+
 }
