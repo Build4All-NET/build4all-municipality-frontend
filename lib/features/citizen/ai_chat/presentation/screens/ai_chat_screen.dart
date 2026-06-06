@@ -61,7 +61,7 @@ class _AiChatViewState extends State<_AiChatView> {
   void _clearConversation(BuildContext context, AppLocalizations loc) {
     context.read<AiChatCubit>().clearConversation();
     setState(() => _hasShownWelcome = false);
-    AppToast.show(context, loc.aiChatCleared, type: AppToastType.info);
+    AppToast.show(context, message: loc.aiChatCleared, type: AppToastType.info);
   }
 
   @override
@@ -108,7 +108,7 @@ class _AiChatViewState extends State<_AiChatView> {
             child: BlocConsumer<AiChatCubit, AiChatState>(
               listener: (context, state) {
                 if (state.status == AiChatStatus.error && state.error != null) {
-                  AppToast.show(context, loc.aiChatError, type: AppToastType.error);
+                  AppToast.show(context, message: loc.aiChatError, type: AppToastType.error);
                 }
                 if (state.messages.isNotEmpty) _scrollToBottom();
               },

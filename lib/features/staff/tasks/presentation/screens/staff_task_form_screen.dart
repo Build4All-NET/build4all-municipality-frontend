@@ -829,7 +829,7 @@ class _FileDownloadCardState extends State<_FileDownloadCard> {
       final fullUrl = _resolveFileUrl(widget.url);
       final fileName = _cacheFileName(widget.url);
 
-      final Uint8List bytes;
+      Uint8List bytes;
       try {
         final response = await DioClient.muni.get<List<int>>(
           fullUrl,

@@ -926,7 +926,7 @@ class _AttachmentCardState extends State<_AttachmentCard> {
     setState(() => _downloading = true);
     try {
       final fullUrl = _resolveUrl(widget.attachment.fileUrl);
-      final Uint8List bytes;
+      late Uint8List bytes;
       try {
         final response = await DioClient.muni.get<List<int>>(
           fullUrl,
