@@ -22,11 +22,17 @@ class CertificateApiService {
   }
 
   Future<void> signCertificate(int requestId) async {
-    await _dio.put('/api/certificates/request/$requestId/sign');
+    await _dio.put(
+      '/api/certificates/request/$requestId/sign',
+      options: Options(responseType: ResponseType.plain),
+    );
   }
 
   Future<void> unsignCertificate(int requestId) async {
-    await _dio.put('/api/certificates/request/$requestId/unsign');
+    await _dio.put(
+      '/api/certificates/request/$requestId/unsign',
+      options: Options(responseType: ResponseType.plain),
+    );
   }
 
   Future<Uint8List> downloadCertificate(int certificateId) async {
