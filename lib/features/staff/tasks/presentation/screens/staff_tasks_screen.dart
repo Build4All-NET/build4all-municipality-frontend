@@ -204,9 +204,7 @@ class _StaffTasksBody extends StatelessWidget {
                   final task = state.tasks[index - 1];
                   return StaffTaskCard(
                     task: task,
-                    onOpenForm: task.canOpenForm
-                        ? () => _openTask(context, task)
-                        : null,
+                    onOpenForm: () => _openTask(context, task),
                   );
                 },
               ),

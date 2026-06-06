@@ -38,7 +38,7 @@ class StaffTaskCard extends StatelessWidget {
       ),
       child: InkWell(
         borderRadius: BorderRadius.circular(20),
-        onTap: task.canOpenForm ? onOpenForm : null,
+        onTap: onOpenForm,
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(

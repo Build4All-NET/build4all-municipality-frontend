@@ -354,12 +354,19 @@ class _StaffTaskFormScreenState extends State<StaffTaskFormScreen> {
       );
       final pik = widget.task.certificateLookupKey;
       if (pik != null) {
+        final allVars = <String, dynamic>{
+          ...widget.task.variables,
+          if (_taskDetail['variables'] is Map)
+            ...Map<String, dynamic>.from(_taskDetail['variables'] as Map),
+          ...variables,
+        };
         await Navigator.pushReplacement(
           context,
           MaterialPageRoute(
             builder: (_) => StaffCertificateScreen(
               processInstanceKey: pik,
               taskName: widget.task.name,
+              taskVariables: allVars,
             ),
           ),
         );
@@ -378,12 +385,18 @@ class _StaffTaskFormScreenState extends State<StaffTaskFormScreen> {
   void _openCertificate() {
     final pik = widget.task.certificateLookupKey;
     if (pik == null) return;
+    final allVars = <String, dynamic>{
+      ...widget.task.variables,
+      if (_taskDetail['variables'] is Map)
+        ...Map<String, dynamic>.from(_taskDetail['variables'] as Map),
+    };
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => StaffCertificateScreen(
           processInstanceKey: pik,
           taskName: widget.task.name,
+          taskVariables: allVars,
         ),
       ),
     );
@@ -755,35 +768,75 @@ class _FileDownloadCard extends StatefulWidget {
 
 class _FileDownloadCardState extends State<_FileDownloadCard> {
   bool _downloading = false;
+  String? _localPath;
+
+  static const _kImageExts = {'jpg', 'jpeg', 'png', 'gif', 'webp'};
+
+  @override
+  void initState() {
+    super.initState();
+    _checkCache();
+  }
+
+  String _cacheFileName(String url) {
+    final name = _fileNameFromUrl(url);
+    if (name.isNotEmpty && name.contains('.')) return name;
+    return 'attachment_${url.hashCode.abs()}';
+  }
+
+  Future<Directory> _cacheDir() async {
+    try {
+      return (await getExternalStorageDirectory())!;
+    } catch (_) {
+      return getApplicationDocumentsDirectory();
+    }
+  }
+
+  Future<void> _checkCache() async {
+    try {
+      final dir = await _cacheDir();
+      final path = '${dir.path}/${_cacheFileName(widget.url)}';
+      if (File(path).existsSync()) {
+        if (mounted) setState(() => _localPath = path);
+      }
+    } catch (_) {}
+  }
 
   IconData _iconForFile(String name) {
     final ext = name.split('.').last.toLowerCase();
     if (ext == 'pdf') return Icons.picture_as_pdf_outlined;
-    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(ext)) return Icons.image_outlined;
+    if (_kImageExts.contains(ext)) return Icons.image_outlined;
     if (['doc', 'docx'].contains(ext)) return Icons.description_outlined;
     return Icons.insert_drive_file_outlined;
   }
 
+  bool _isImage(String name) =>
+      _kImageExts.contains(name.split('.').last.toLowerCase());
+
+  Future<void> _openOrDownload(BuildContext context) async {
+    // If already cached, just open it
+    if (_localPath != null && File(_localPath!).existsSync()) {
+      await OpenFilex.open(_localPath!);
+      return;
+    }
+    await _download(context);
+  }
+
   Future<void> _download(BuildContext context) async {
-    final l10n = AppLocalizations.of(context)!;
     setState(() => _downloading = true);
 
     try {
       final fullUrl = _resolveFileUrl(widget.url);
-      final fileName = _fileNameFromUrl(widget.url).isNotEmpty
-          ? _fileNameFromUrl(widget.url)
-          : 'attachment_${DateTime.now().millisecondsSinceEpoch}';
+      final fileName = _cacheFileName(widget.url);
 
       final Uint8List bytes;
       try {
-        // Try with muni client first (includes auth token)
         final response = await DioClient.muni.get<List<int>>(
           fullUrl,
           options: Options(responseType: ResponseType.bytes),
         );
         bytes = Uint8List.fromList(response.data!);
       } on DioException catch (_) {
-        // Fallback: full URL fetch without base prefix
         final response = await DioClient.muni.get<List<int>>(
           widget.url,
           options: Options(responseType: ResponseType.bytes),
@@ -791,18 +844,15 @@ class _FileDownloadCardState extends State<_FileDownloadCard> {
         bytes = Uint8List.fromList(response.data!);
       }
 
-      Directory dir;
-      try {
-        dir = (await getExternalStorageDirectory())!;
-      } catch (_) {
-        dir = await getApplicationDocumentsDirectory();
-      }
-
-      final file = File('${dir.path}/$fileName');
+      final dir = await _cacheDir();
+      final path = '${dir.path}/$fileName';
+      final file = File(path);
       await file.writeAsBytes(bytes);
 
+      if (mounted) setState(() => _localPath = path);
+
       if (!context.mounted) return;
-      await OpenFilex.open(file.path);
+      await OpenFilex.open(path);
     } catch (e) {
       if (!context.mounted) return;
       AppToast.show(
@@ -822,40 +872,72 @@ class _FileDownloadCardState extends State<_FileDownloadCard> {
     final l10n = AppLocalizations.of(context)!;
     final fileName = _fileNameFromUrl(widget.url);
     final displayName = fileName.isNotEmpty ? fileName : widget.url;
+    final isCached = _localPath != null && File(_localPath!).existsSync();
+    final isImg = _isImage(displayName);
 
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       decoration: BoxDecoration(
         color: colors.surfaceContainerHighest,
         borderRadius: BorderRadius.circular(10),
-        border: Border.all(color: colors.outline.withOpacity(0.15)),
-      ),
-      child: ListTile(
-        dense: true,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
-        leading: Icon(_iconForFile(displayName), color: colors.primary, size: 22),
-        title: Text(
-          displayName,
-          style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
-          overflow: TextOverflow.ellipsis,
-          maxLines: 1,
+        border: Border.all(
+          color: isCached
+              ? colors.primary.withOpacity(0.25)
+              : colors.outline.withOpacity(0.15),
         ),
-        trailing: _downloading
-            ? SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2,
-                  color: colors.primary,
-                ),
-              )
-            : IconButton(
-                icon: Icon(Icons.download_outlined, color: colors.primary, size: 20),
-                tooltip: l10n.downloadAndOpen,
-                onPressed: () => _download(context),
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (isCached && isImg)
+            ClipRRect(
+              borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+              child: Image.file(
+                File(_localPath!),
+                width: double.infinity,
+                height: 140,
+                fit: BoxFit.cover,
               ),
+            ),
+          ListTile(
+            dense: true,
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+            leading: Icon(_iconForFile(displayName), color: colors.primary, size: 22),
+            title: Text(
+              displayName,
+              style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+            subtitle: isCached
+                ? Text(
+                    l10n.openPdf,
+                    style: theme.textTheme.labelSmall
+                        ?.copyWith(color: colors.primary),
+                  )
+                : null,
+            trailing: _downloading
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: colors.primary,
+                    ),
+                  )
+                : IconButton(
+                    icon: Icon(
+                      isCached ? Icons.open_in_new : Icons.download_outlined,
+                      color: colors.primary,
+                      size: 20,
+                    ),
+                    tooltip: isCached ? l10n.openPdf : l10n.downloadAndOpen,
+                    onPressed: () => _openOrDownload(context),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+          ),
+        ],
       ),
     );
   }
