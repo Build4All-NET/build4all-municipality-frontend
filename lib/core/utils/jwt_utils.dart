@@ -18,6 +18,22 @@ class JwtUtils {
     }
   }
 
+  /// True when the token is already expired OR will expire within
+  /// [bufferSeconds] seconds from now. Used for proactive silent refresh.
+  static bool isExpiredOrExpiringSoon(String token,
+      {int bufferSeconds = 90}) {
+    try {
+      final payload = _decodePayload(token);
+      final exp = payload['exp'];
+      if (exp is! num) return false;
+      final expiry = DateTime.fromMillisecondsSinceEpoch(exp.toInt() * 1000);
+      return DateTime.now()
+          .isAfter(expiry.subtract(Duration(seconds: bufferSeconds)));
+    } catch (_) {
+      return false;
+    }
+  }
+
   /// Extracts userId from common JWT payload keys.
   /// Works with many Spring Boot JWT styles:
   /// - { "id": 12 }
