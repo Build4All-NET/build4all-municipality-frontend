@@ -444,6 +444,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get filterAll => 'Tout';
 
   @override
+  String get filterActive => 'Actif';
+
+  @override
+  String get filterDone => 'Terminé';
+
+  @override
   String get statusSubmitted => 'Soumise';
 
   @override

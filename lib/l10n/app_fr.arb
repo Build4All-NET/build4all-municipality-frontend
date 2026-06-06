@@ -145,6 +145,8 @@
   "myRequests": "Mes demandes",
   "searchRequest": "Rechercher par numéro ou nom...",
   "filterAll": "Tout",
+  "filterActive": "Actif",
+  "filterDone": "Terminé",
   "statusSubmitted": "Soumise",
   "statusUnderReview": "En cours d’examen",
   "statusWaitingPayment": "En attente de paiement",

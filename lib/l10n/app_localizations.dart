@@ -966,6 +966,8 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All'**
   String get filterAll;
+  String get filterActive;
+  String get filterDone;
 
   /// No description provided for @statusSubmitted.
   ///

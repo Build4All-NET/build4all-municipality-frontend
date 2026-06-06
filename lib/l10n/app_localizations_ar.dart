@@ -444,6 +444,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get filterAll => 'الكل';
 
   @override
+  String get filterActive => 'نشط';
+
+  @override
+  String get filterDone => 'منتهي';
+
+  @override
   String get statusSubmitted => 'مُرسَل';
 
   @override

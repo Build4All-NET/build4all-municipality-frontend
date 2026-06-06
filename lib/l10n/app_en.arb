@@ -145,6 +145,8 @@
   "myRequests": "My Requests",
   "searchRequest": "Search by number or name...",
   "filterAll": "All",
+  "filterActive": "Active",
+  "filterDone": "Done",
   "statusSubmitted": "Submitted",
   "statusUnderReview": "Under review",
   "statusWaitingPayment": "Awaiting Payment",

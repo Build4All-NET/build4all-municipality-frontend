@@ -444,6 +444,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filterAll => 'All';
 
   @override
+  String get filterActive => 'Active';
+
+  @override
+  String get filterDone => 'Done';
+
+  @override
   String get statusSubmitted => 'Submitted';
 
   @override

@@ -145,6 +145,8 @@
   "myRequests": "طلباتي",
   "searchRequest": "ابحث برقم الطلب أو الاسم...",
   "filterAll": "الكل",
+  "filterActive": "نشط",
+  "filterDone": "منتهي",
   "statusSubmitted": "مُرسَل",
   "statusUnderReview": "قيد المراجعة",
   "statusWaitingPayment": "بانتظار الدفع",
