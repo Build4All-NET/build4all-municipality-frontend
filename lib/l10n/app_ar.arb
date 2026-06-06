@@ -537,5 +537,17 @@
   "locationError": "تعذر الحصول على الموقع",
   "gpsCoordinatesLabel": "إحداثيات GPS",
   "tapToPickLocation": "اضغط لاختيار الموقع",
-  "locationSelected": "تم تحديد الموقع"
+  "locationSelected": "تم تحديد الموقع",
+  "manageCertificates": "إدارة شهادات البلدية",
+  "noCertificates": "لا توجد شهادات",
+  "noCertificatesHint": "لم يتم إنشاء أي شهادات بعد.",
+  "signCertificate": "توقيع الشهادة",
+  "unsignCertificate": "إلغاء التوقيع",
+  "certificateSigned": "تم توقيع الشهادة بنجاح",
+  "certificateUnsigned": "تم إلغاء توقيع الشهادة بنجاح",
+  "aiHelp": "مساعدة الذكاء الاصطناعي",
+  "aiExplanation": "شرح ذكي",
+  "aiHelpLoading": "جاري الحصول على الشرح...",
+  "aiHelpError": "تعذر الحصول على الشرح",
+  "locationNameLabel": "الموقع المحدد"
 }

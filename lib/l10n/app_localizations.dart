@@ -3097,6 +3097,18 @@ abstract class AppLocalizations {
   /// **'Location selected'**
   String get locationSelected;
 
+  String get manageCertificates;
+  String get noCertificates;
+  String get noCertificatesHint;
+  String get signCertificate;
+  String get unsignCertificate;
+  String get certificateSigned;
+  String get certificateUnsigned;
+  String get aiHelp;
+  String get aiExplanation;
+  String get aiHelpLoading;
+  String get aiHelpError;
+  String get locationNameLabel;
 }
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();

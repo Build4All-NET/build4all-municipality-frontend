@@ -252,11 +252,12 @@ class _DashboardPageState extends State<DashboardPage> {
 
   void _openServices() => AppRouter.goToServices(context);
   void _openDepartments() => AppRouter.goToDepartments(context);
- Future<void> _openEmployees() async {
-  AppRouter.goToEmployees(context);
-  await _refreshStats();
-}
+  Future<void> _openEmployees() async {
+    AppRouter.goToEmployees(context);
+    await _refreshStats();
+  }
   void _openInbox() => AppRouter.goToRequests(context);
+  void _openCertificates() => AppRouter.goToCertificates(context);
 
   String _formatCount(int count) => count < 0 ? '-' : '$count';
 
@@ -457,6 +458,12 @@ class _DashboardPageState extends State<DashboardPage> {
                         icon: Icons.badge_outlined,
                         iconColor: colors.primary,
                         onTap: _openEmployees,
+                      ),
+                      _ActionCard(
+                        title: loc.certificate,
+                        icon: Icons.verified_outlined,
+                        iconColor: colors.primary,
+                        onTap: _openCertificates,
                       ),
                     ],
                   ),

@@ -537,5 +537,17 @@
   "locationError": "Could not get location",
   "gpsCoordinatesLabel": "GPS Coordinates",
   "tapToPickLocation": "Tap to pick location",
-  "locationSelected": "Location selected"
+  "locationSelected": "Location selected",
+  "manageCertificates": "Manage municipality certificates",
+  "noCertificates": "No certificates found",
+  "noCertificatesHint": "No certificates have been generated yet.",
+  "signCertificate": "Sign Certificate",
+  "unsignCertificate": "Unsign Certificate",
+  "certificateSigned": "Certificate signed successfully",
+  "certificateUnsigned": "Certificate unsigned successfully",
+  "aiHelp": "AI Help",
+  "aiExplanation": "AI Explanation",
+  "aiHelpLoading": "Getting AI explanation...",
+  "aiHelpError": "Could not get AI explanation",
+  "locationNameLabel": "Selected Location"
 }

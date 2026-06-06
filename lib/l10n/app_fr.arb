@@ -537,5 +537,17 @@
   "locationError": "Impossible d'obtenir la localisation",
   "gpsCoordinatesLabel": "Coordonnées GPS",
   "tapToPickLocation": "Appuyez pour choisir la localisation",
-  "locationSelected": "Localisation sélectionnée"
+  "locationSelected": "Localisation sélectionnée",
+  "manageCertificates": "Gérer les certificats municipaux",
+  "noCertificates": "Aucun certificat trouvé",
+  "noCertificatesHint": "Aucun certificat n'a encore été généré.",
+  "signCertificate": "Signer le certificat",
+  "unsignCertificate": "Désigner le certificat",
+  "certificateSigned": "Certificat signé avec succès",
+  "certificateUnsigned": "Signature annulée avec succès",
+  "aiHelp": "Aide IA",
+  "aiExplanation": "Explication IA",
+  "aiHelpLoading": "Récupération de l'explication...",
+  "aiHelpError": "Impossible d'obtenir l'explication IA",
+  "locationNameLabel": "Emplacement sélectionné"
 }

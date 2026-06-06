@@ -1,6 +1,8 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
 import 'package:file_picker/file_picker.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
@@ -36,6 +38,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
 
   double? _geoLat;
   double? _geoLng;
+  String? _locationName;
 
   final List<File> _selectedFiles = [];
   final List<String> _selectedFileNames = [];
@@ -84,9 +87,15 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
         ),
       );
       if (!mounted) return;
+      final name = await _fetchLocationName(
+        position.latitude,
+        position.longitude,
+      );
+      if (!mounted) return;
       setState(() {
         _geoLat = position.latitude;
         _geoLng = position.longitude;
+        _locationName = name;
         _showLocationError = false;
       });
     } catch (_) {
@@ -97,6 +106,35 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
     } finally {
       if (mounted) setState(() => _gettingLocation = false);
     }
+  }
+
+  Future<String?> _fetchLocationName(double lat, double lng) async {
+    try {
+      final uri = Uri.parse(
+        'https://nominatim.openstreetmap.org/reverse?format=json&lat=$lat&lon=$lng&accept-language=en',
+      );
+      final response = await http.get(uri, headers: {
+        'User-Agent': 'Baladiyati-Municipality-App/1.0',
+      }).timeout(const Duration(seconds: 8));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body) as Map<String, dynamic>;
+        final address = data['address'] as Map<String, dynamic>?;
+        if (address != null) {
+          final city = address['city']?.toString() ??
+              address['town']?.toString() ??
+              address['village']?.toString() ??
+              address['county']?.toString();
+          if (city != null && city.isNotEmpty) return city;
+        }
+        final displayName = data['display_name']?.toString();
+        if (displayName != null && displayName.isNotEmpty) {
+          final parts = displayName.split(',');
+          return parts.take(3).join(',').trim();
+        }
+      }
+    } catch (_) {}
+    return null;
   }
 
   Future<void> _pickFiles() async {
@@ -237,7 +275,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
           description: _descCtrl.text.trim(),
           geoLat: _geoLat,
           geoLng: _geoLng,
-          addressText:
+          addressText: _locationName ??
               '${_geoLat!.toStringAsFixed(6)}, ${_geoLng!.toStringAsFixed(6)}',
           attachmentUrls: uploadedUrls.isEmpty ? null : uploadedUrls,
         ),
@@ -395,12 +433,14 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                     _LocationPickerCard(
                       geoLat: _geoLat,
                       geoLng: _geoLng,
+                      locationName: _locationName,
                       gettingLocation: _gettingLocation,
                       showError: _showLocationError,
                       onGetLocation: _getCurrentLocation,
                       onClear: () => setState(() {
                         _geoLat = null;
                         _geoLng = null;
+                        _locationName = null;
                       }),
                       loc: loc,
                       theme: theme,
@@ -540,6 +580,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
 class _LocationPickerCard extends StatelessWidget {
   final double? geoLat;
   final double? geoLng;
+  final String? locationName;
   final bool gettingLocation;
   final bool showError;
   final VoidCallback onGetLocation;
@@ -551,6 +592,7 @@ class _LocationPickerCard extends StatelessWidget {
   const _LocationPickerCard({
     required this.geoLat,
     required this.geoLng,
+    required this.locationName,
     required this.gettingLocation,
     required this.showError,
     required this.onGetLocation,
@@ -599,12 +641,24 @@ class _LocationPickerCard extends StatelessWidget {
                     Icon(Icons.location_on, color: colors.primary, size: 20),
                     const SizedBox(width: 8),
                     Expanded(
-                      child: Text(
-                        '${geoLat!.toStringAsFixed(5)}, ${geoLng!.toStringAsFixed(5)}',
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: colors.onSurface,
-                          fontWeight: FontWeight.w600,
-                        ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            locationName ?? loc.locationSelected,
+                            style: theme.textTheme.bodyMedium?.copyWith(
+                              color: colors.onSurface,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                          Text(
+                            '${geoLat!.toStringAsFixed(5)}, ${geoLng!.toStringAsFixed(5)}',
+                            style: theme.textTheme.bodySmall?.copyWith(
+                              color: colors.outline,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
                     IconButton(

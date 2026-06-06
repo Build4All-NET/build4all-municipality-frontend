@@ -1554,4 +1554,40 @@ class AppLocalizationsEn extends AppLocalizations {
   @override
   String get locationSelected => 'Location selected';
 
+  @override
+  String get manageCertificates => 'Manage municipality certificates';
+
+  @override
+  String get noCertificates => 'No certificates found';
+
+  @override
+  String get noCertificatesHint => 'No certificates have been generated yet.';
+
+  @override
+  String get signCertificate => 'Sign Certificate';
+
+  @override
+  String get unsignCertificate => 'Unsign Certificate';
+
+  @override
+  String get certificateSigned => 'Certificate signed successfully';
+
+  @override
+  String get certificateUnsigned => 'Certificate unsigned successfully';
+
+  @override
+  String get aiHelp => 'AI Help';
+
+  @override
+  String get aiExplanation => 'AI Explanation';
+
+  @override
+  String get aiHelpLoading => 'Getting AI explanation...';
+
+  @override
+  String get aiHelpError => 'Could not get AI explanation';
+
+  @override
+  String get locationNameLabel => 'Selected Location';
+
 }

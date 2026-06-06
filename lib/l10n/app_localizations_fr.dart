@@ -1554,4 +1554,40 @@ class AppLocalizationsFr extends AppLocalizations {
   @override
   String get locationSelected => 'Localisation sélectionnée';
 
+  @override
+  String get manageCertificates => 'Gérer les certificats municipaux';
+
+  @override
+  String get noCertificates => 'Aucun certificat trouvé';
+
+  @override
+  String get noCertificatesHint => "Aucun certificat n'a encore été généré.";
+
+  @override
+  String get signCertificate => 'Signer le certificat';
+
+  @override
+  String get unsignCertificate => 'Désigner le certificat';
+
+  @override
+  String get certificateSigned => 'Certificat signé avec succès';
+
+  @override
+  String get certificateUnsigned => 'Signature annulée avec succès';
+
+  @override
+  String get aiHelp => 'Aide IA';
+
+  @override
+  String get aiExplanation => 'Explication IA';
+
+  @override
+  String get aiHelpLoading => "Récupération de l'explication...";
+
+  @override
+  String get aiHelpError => "Impossible d'obtenir l'explication IA";
+
+  @override
+  String get locationNameLabel => 'Emplacement sélectionné';
+
 }

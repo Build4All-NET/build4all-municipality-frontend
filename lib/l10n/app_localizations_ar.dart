@@ -1554,4 +1554,40 @@ class AppLocalizationsAr extends AppLocalizations {
   @override
   String get locationSelected => 'تم تحديد الموقع';
 
+  @override
+  String get manageCertificates => 'إدارة شهادات البلدية';
+
+  @override
+  String get noCertificates => 'لا توجد شهادات';
+
+  @override
+  String get noCertificatesHint => 'لم يتم إنشاء أي شهادات بعد.';
+
+  @override
+  String get signCertificate => 'توقيع الشهادة';
+
+  @override
+  String get unsignCertificate => 'إلغاء التوقيع';
+
+  @override
+  String get certificateSigned => 'تم توقيع الشهادة بنجاح';
+
+  @override
+  String get certificateUnsigned => 'تم إلغاء توقيع الشهادة بنجاح';
+
+  @override
+  String get aiHelp => 'مساعدة الذكاء الاصطناعي';
+
+  @override
+  String get aiExplanation => 'شرح ذكي';
+
+  @override
+  String get aiHelpLoading => 'جاري الحصول على الشرح...';
+
+  @override
+  String get aiHelpError => 'تعذر الحصول على الشرح';
+
+  @override
+  String get locationNameLabel => 'الموقع المحدد';
+
 }
