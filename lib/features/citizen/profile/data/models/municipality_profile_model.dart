@@ -64,7 +64,13 @@ class MunicipalityProfileModel {
       ),
       avatarUrl: json['avatarUrl']?.toString() ??
           json['profilePictureUrl']?.toString() ??
-          json['avatar_url']?.toString(),
+          json['avatar_url']?.toString() ??
+          json['imageUrl']?.toString() ??
+          json['profileImageUrl']?.toString() ??
+          json['profileImage']?.toString() ??
+          json['image']?.toString() ??
+          json['photo']?.toString() ??
+          json['userAvatar']?.toString(),
     );
   }
 }

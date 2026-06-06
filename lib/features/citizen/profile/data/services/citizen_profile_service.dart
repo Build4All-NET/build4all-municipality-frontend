@@ -244,7 +244,12 @@ class Build4AllCitizenProfile {
       lastName: (json['lastName'] ?? '').toString(),
       profilePictureUrl: json['profilePictureUrl']?.toString() ??
           json['profileImageUrl']?.toString() ??
-          json['avatarUrl']?.toString(),
+          json['avatarUrl']?.toString() ??
+          json['avatar_url']?.toString() ??
+          json['imageUrl']?.toString() ??
+          json['profileImage']?.toString() ??
+          json['image']?.toString() ??
+          json['photo']?.toString(),
       isPublicProfile: _readBool(json['isPublicProfile']),
       status: _readStatus(json['status']),
     );
