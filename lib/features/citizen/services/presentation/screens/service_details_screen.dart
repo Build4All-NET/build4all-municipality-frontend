@@ -255,8 +255,8 @@ class _AiHelpSheet extends StatelessWidget {
 
                   return SingleChildScrollView(
                     controller: controller,
-                    child: Text(
-                      state.reply ?? '',
+                    child: _MarkdownText(
+                      text: state.reply ?? '',
                       style: theme.textTheme.bodyLarge?.copyWith(height: 1.6),
                     ),
                   );
@@ -267,6 +267,123 @@ class _AiHelpSheet extends StatelessWidget {
         ),
       ),
     );
+  }
+}
+
+/// Renders AI markdown text with **bold**, *italic*, # headings, and - bullets.
+class _MarkdownText extends StatelessWidget {
+  final String text;
+  final TextStyle? style;
+
+  const _MarkdownText({required this.text, this.style});
+
+  @override
+  Widget build(BuildContext context) {
+    final base = style ?? DefaultTextStyle.of(context).style;
+    final lines = text.split('\n');
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: _buildLines(lines, base),
+    );
+  }
+
+  List<Widget> _buildLines(List<String> lines, TextStyle base) {
+    final result = <Widget>[];
+    for (final raw in lines) {
+      final line = raw.trim();
+
+      if (line.isEmpty) {
+        result.add(const SizedBox(height: 6));
+        continue;
+      }
+
+      // Heading: # or ##
+      if (line.startsWith('## ')) {
+        result.add(_richLine(
+          line.substring(3),
+          base.copyWith(fontWeight: FontWeight.w800),
+          bottomPad: 2,
+          topPad: 6,
+        ));
+      } else if (line.startsWith('# ')) {
+        result.add(_richLine(
+          line.substring(2),
+          base.copyWith(
+            fontWeight: FontWeight.w900,
+            fontSize: (base.fontSize ?? 16) + 1,
+          ),
+          bottomPad: 2,
+          topPad: 8,
+        ));
+      } else if (line.startsWith('- ') || line.startsWith('• ')) {
+        // Bullet
+        final content = line.substring(2);
+        result.add(Padding(
+          padding: const EdgeInsets.only(bottom: 3),
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('• ', style: base),
+              Expanded(
+                child: RichText(
+                  text: TextSpan(
+                    children: _parseInline(content),
+                    style: base,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ));
+      } else {
+        result.add(_richLine(line, base, bottomPad: 2));
+      }
+    }
+    return result;
+  }
+
+  Widget _richLine(
+    String text,
+    TextStyle style, {
+    double bottomPad = 0,
+    double topPad = 0,
+  }) {
+    return Padding(
+      padding: EdgeInsets.only(top: topPad, bottom: bottomPad),
+      child: RichText(
+        text: TextSpan(children: _parseInline(text), style: style),
+      ),
+    );
+  }
+
+  /// Splits a line into normal / bold / italic spans.
+  List<InlineSpan> _parseInline(String text) {
+    final spans = <InlineSpan>[];
+    // Match **bold** first, then *italic*
+    final re = RegExp(r'\*\*(.+?)\*\*|\*([^*\n]+?)\*');
+    int cursor = 0;
+    for (final m in re.allMatches(text)) {
+      if (m.start > cursor) {
+        spans.add(TextSpan(text: text.substring(cursor, m.start)));
+      }
+      if (m.group(1) != null) {
+        spans.add(TextSpan(
+          text: m.group(1),
+          style: const TextStyle(fontWeight: FontWeight.bold),
+        ));
+      } else if (m.group(2) != null) {
+        spans.add(TextSpan(
+          text: m.group(2),
+          style: const TextStyle(fontStyle: FontStyle.italic),
+        ));
+      }
+      cursor = m.end;
+    }
+    if (cursor < text.length) {
+      spans.add(TextSpan(text: text.substring(cursor)));
+    }
+    if (spans.isEmpty) spans.add(TextSpan(text: text));
+    return spans;
   }
 }
 
