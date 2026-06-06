@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:baladiyati/common/widgets/shimmer_loading.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 
 class RecentRequestItem {
@@ -19,12 +20,14 @@ class RecentRequestsSection extends StatelessWidget {
   final List<RecentRequestItem> requests;
   final VoidCallback onViewAll;
   final Function(RecentRequestItem) onRequestTap;
+  final bool isLoading;
 
   const RecentRequestsSection({
     super.key,
     required this.requests,
     required this.onViewAll,
     required this.onRequestTap,
+    this.isLoading = false,
   });
 
   @override
@@ -60,16 +63,67 @@ class RecentRequestsSection extends StatelessWidget {
 
         const SizedBox(height: 12),
 
-        ...requests.map(
-          (request) => _RequestCard(
-            request: request,
-            onTap: () => onRequestTap(request),
+        if (isLoading && requests.isEmpty) ...[
+          const _RecentRequestSkeleton(),
+          const _RecentRequestSkeleton(),
+        ] else
+          ...requests.map(
+            (request) => _RequestCard(
+              request: request,
+              onTap: () => onRequestTap(request),
+            ),
           ),
-        ),
       ],
     );
   }
 }
+
+// ── Skeleton ──────────────────────────────────────────────────────────────────
+
+class _RecentRequestSkeleton extends StatelessWidget {
+  const _RecentRequestSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 10),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: cs.surface,
+        borderRadius: BorderRadius.circular(14),
+        boxShadow: [
+          BoxShadow(
+            color: cs.onSurface.withOpacity(0.04),
+            blurRadius: 8,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const ShimmerBox(width: 80, height: 24, radius: 12),
+              const SizedBox(height: 8),
+              Row(children: [
+                const ShimmerBox(width: 12, height: 12, radius: 4),
+                const SizedBox(width: 4),
+                const ShimmerBox(width: 60, height: 11),
+              ]),
+            ],
+          ),
+          const ShimmerBox(width: 100, height: 14),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Real card ─────────────────────────────────────────────────────────────────
 
 class _RequestCard extends StatelessWidget {
   final RecentRequestItem request;

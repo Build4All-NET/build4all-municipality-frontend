@@ -149,6 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     activeRequests: _countActive(requests),
                     awaitingPayment: _countAwaiting(requests),
                     completed: _countCompleted(requests),
+                    isLoading: requestsState.isLoading,
                     onNotificationTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -176,6 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 20),
                         RecentRequestsSection(
+                          isLoading: requestsState.isLoading,
                           requests: requests.take(2).map((r) =>
                             RecentRequestItem(
                               id: r.id,
