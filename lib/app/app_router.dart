@@ -65,6 +65,11 @@ import 'package:baladiyati/features/admin/manage_service/presentation/bloc/Servi
 import 'package:baladiyati/features/admin/manage_service/presentation/bloc/Service_event.dart';
 import 'package:baladiyati/features/admin/manage_service/presentation/screens/Service_screen.dart';
 
+// Certificates
+import 'package:baladiyati/features/admin/certificates/data/services/certificate_api_service.dart';
+import 'package:baladiyati/features/admin/certificates/presentation/cubit/admin_certificate_cubit.dart';
+import 'package:baladiyati/features/admin/certificates/presentation/screens/admin_certificates_screen.dart';
+
 // Employees
 import 'package:baladiyati/features/admin/staff/Domain/Usecase/DeleteEmployee.dart';
 import 'package:baladiyati/features/admin/staff/Domain/Usecase/GetEmploye.dart';
@@ -268,14 +273,42 @@ class AppRouter {
   // ================= ADMIN: EMPLOYEES / STAFF =================
 
   static void goToEmployees(BuildContext context) {
+    final departmentRepository = DepartmentRepositoryImpl(
+      DepartmentApiService(DioClient.muni),
+    );
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => MultiBlocProvider(
+          providers: [
+            BlocProvider(
+              create: (_) => AdminStaffBloc(apiService: AdminUserApiService()),
+            ),
+            BlocProvider(
+              create: (_) => DepartmentCubit(
+                GetDepartments(departmentRepository),
+                AddDepartment(departmentRepository),
+                DeleteDepartment(departmentRepository),
+                UpdateDepartment(departmentRepository),
+              ),
+            ),
+          ],
+          child: const EmployeesScreen(),
+        ),
+      ),
+    );
+  }
+
+  // ================= ADMIN: CERTIFICATES =================
+
+  static void goToCertificates(BuildContext context) {
     Navigator.push(
       context,
       MaterialPageRoute(
         builder: (_) => BlocProvider(
-          create: (_) => AdminStaffBloc(
-            apiService: AdminUserApiService(),
-          ),
-          child: const EmployeesScreen(),
+          create: (_) => AdminCertificateCubit(CertificateApiService())
+            ..loadCertificates(),
+          child: const AdminCertificatesScreen(),
         ),
       ),
     );

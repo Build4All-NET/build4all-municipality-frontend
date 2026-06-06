@@ -444,6 +444,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get filterAll => 'All';
 
   @override
+  String get filterActive => 'Active';
+
+  @override
+  String get filterDone => 'Done';
+
+  @override
   String get statusSubmitted => 'Submitted';
 
   @override
@@ -1553,5 +1559,95 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get locationSelected => 'Location selected';
+
+  @override
+  String get manageCertificates => 'Manage municipality certificates';
+
+  @override
+  String get noCertificates => 'No certificates found';
+
+  @override
+  String get noCertificatesHint => 'No certificates have been generated yet.';
+
+  @override
+  String get signCertificate => 'Sign Certificate';
+
+  @override
+  String get unsignCertificate => 'Unsign Certificate';
+
+  @override
+  String get certificateSigned => 'Certificate signed successfully';
+
+  @override
+  String get certificateUnsigned => 'Certificate unsigned successfully';
+
+  @override
+  String get aiHelp => 'AI Help';
+
+  @override
+  String get aiExplanation => 'AI Explanation';
+
+  @override
+  String get aiHelpLoading => 'Getting AI explanation...';
+
+  @override
+  String get aiHelpError => 'Could not get AI explanation';
+
+  @override
+  String get locationNameLabel => 'Selected Location';
+
+  @override
+  String get aiChatTitle => 'AI Assistant';
+
+  @override
+  String get aiChatHint => 'Type a message...';
+
+  @override
+  String get aiChatWelcome => 'Hello! I\'m your AI assistant. Ask me anything about municipal services.';
+
+  @override
+  String get aiChatClear => 'Clear conversation';
+
+  @override
+  String get aiChatCleared => 'Conversation cleared';
+
+  @override
+  String get aiChatSending => 'Typing...';
+
+  @override
+  String get aiChatError => 'Something went wrong. Please try again.';
+
+  @override
+  String get aiChatEmptyHint => 'Ask me anything about municipal services';
+
+  @override
+  String get chooseOnMap => 'Choose on Map';
+
+  @override
+  String get mapPickerTitle => 'Pick Location';
+
+  @override
+  String get mapPickerConfirm => 'Confirm Location';
+
+  @override
+  String get mapPickerHint => 'Tap on the map to select a location';
+
+  @override
+  String get certFilterSigned => 'Signed';
+
+  @override
+  String get certFilterUnsigned => 'Unsigned';
+
+  @override
+  String get newestFirst => 'Newest first';
+
+  @override
+  String get oldestFirst => 'Oldest first';
+
+  @override
+  String get dateLabel => 'Date';
+
+  @override
+  String get requestIdLabel => 'Request ID';
 
 }

@@ -966,6 +966,8 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All'**
   String get filterAll;
+  String get filterActive;
+  String get filterDone;
 
   /// No description provided for @statusSubmitted.
   ///
@@ -3097,6 +3099,36 @@ abstract class AppLocalizations {
   /// **'Location selected'**
   String get locationSelected;
 
+  String get manageCertificates;
+  String get noCertificates;
+  String get noCertificatesHint;
+  String get signCertificate;
+  String get unsignCertificate;
+  String get certificateSigned;
+  String get certificateUnsigned;
+  String get aiHelp;
+  String get aiExplanation;
+  String get aiHelpLoading;
+  String get aiHelpError;
+  String get locationNameLabel;
+  String get aiChatTitle;
+  String get aiChatHint;
+  String get aiChatWelcome;
+  String get aiChatClear;
+  String get aiChatCleared;
+  String get aiChatSending;
+  String get aiChatError;
+  String get aiChatEmptyHint;
+  String get chooseOnMap;
+  String get mapPickerTitle;
+  String get mapPickerConfirm;
+  String get mapPickerHint;
+  String get certFilterSigned;
+  String get certFilterUnsigned;
+  String get newestFirst;
+  String get oldestFirst;
+  String get dateLabel;
+  String get requestIdLabel;
 }
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();

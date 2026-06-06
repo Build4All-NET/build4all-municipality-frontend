@@ -157,7 +157,10 @@ class AuthRefreshCoordinator {
           .toString()
           .trim();
 
-      if (newAccess.isEmpty || newRefresh.isEmpty) {
+      // Only the new access token is mandatory.
+      // Many backends don't rotate the refresh token — if the server omits it,
+      // we keep the existing one rather than treating it as an error.
+      if (newAccess.isEmpty) {
         throw AuthException(
           'Invalid refresh response.',
           code: 'BAD_REFRESH_RESPONSE',
@@ -168,7 +171,8 @@ class AuthRefreshCoordinator {
 
       await _userStore.saveToken(
         token: cleanAccess,
-        refreshToken: newRefresh,
+        // null = keep the existing refresh token unchanged
+        refreshToken: newRefresh.isNotEmpty ? newRefresh : null,
         tenantId: tenantId,
         wasInactive: false,
       );
@@ -246,7 +250,9 @@ class AuthRefreshCoordinator {
           .toString()
           .trim();
 
-      if (newAccess.isEmpty || newRefresh.isEmpty) {
+      // Only the new access token is mandatory.
+      // Many backends don't rotate the refresh token — keep existing if omitted.
+      if (newAccess.isEmpty) {
         throw AuthException(
           'Invalid refresh response.',
           code: 'BAD_REFRESH_RESPONSE',
@@ -259,7 +265,8 @@ class AuthRefreshCoordinator {
       await _adminStore.save(
         token: cleanAccess,
         role: role,
-        refreshToken: newRefresh,
+        // null = keep existing refresh token unchanged
+        refreshToken: newRefresh.isNotEmpty ? newRefresh : null,
         tenantId: tenantId,
       );
 

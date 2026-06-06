@@ -444,6 +444,12 @@ class AppLocalizationsFr extends AppLocalizations {
   String get filterAll => 'Tout';
 
   @override
+  String get filterActive => 'Actif';
+
+  @override
+  String get filterDone => 'Terminé';
+
+  @override
   String get statusSubmitted => 'Soumise';
 
   @override
@@ -1553,5 +1559,95 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get locationSelected => 'Localisation sélectionnée';
+
+  @override
+  String get manageCertificates => 'Gérer les certificats municipaux';
+
+  @override
+  String get noCertificates => 'Aucun certificat trouvé';
+
+  @override
+  String get noCertificatesHint => "Aucun certificat n'a encore été généré.";
+
+  @override
+  String get signCertificate => 'Signer le certificat';
+
+  @override
+  String get unsignCertificate => 'Désigner le certificat';
+
+  @override
+  String get certificateSigned => 'Certificat signé avec succès';
+
+  @override
+  String get certificateUnsigned => 'Signature annulée avec succès';
+
+  @override
+  String get aiHelp => 'Aide IA';
+
+  @override
+  String get aiExplanation => 'Explication IA';
+
+  @override
+  String get aiHelpLoading => "Récupération de l'explication...";
+
+  @override
+  String get aiHelpError => "Impossible d'obtenir l'explication IA";
+
+  @override
+  String get locationNameLabel => 'Emplacement sélectionné';
+
+  @override
+  String get aiChatTitle => 'Assistant IA';
+
+  @override
+  String get aiChatHint => 'Tapez un message...';
+
+  @override
+  String get aiChatWelcome => 'Bonjour! Je suis votre assistant IA. Posez-moi des questions sur les services municipaux.';
+
+  @override
+  String get aiChatClear => 'Effacer la conversation';
+
+  @override
+  String get aiChatCleared => 'Conversation effacée';
+
+  @override
+  String get aiChatSending => 'Écriture...';
+
+  @override
+  String get aiChatError => 'Une erreur s\'est produite. Veuillez réessayer.';
+
+  @override
+  String get aiChatEmptyHint => 'Posez-moi des questions sur les services municipaux';
+
+  @override
+  String get chooseOnMap => 'Choisir sur la carte';
+
+  @override
+  String get mapPickerTitle => "Choisir l'emplacement";
+
+  @override
+  String get mapPickerConfirm => "Confirmer l'emplacement";
+
+  @override
+  String get mapPickerHint => 'Appuyez sur la carte pour sélectionner un emplacement';
+
+  @override
+  String get certFilterSigned => 'Signé';
+
+  @override
+  String get certFilterUnsigned => 'Non signé';
+
+  @override
+  String get newestFirst => 'Plus récent d\'abord';
+
+  @override
+  String get oldestFirst => 'Plus ancien d\'abord';
+
+  @override
+  String get dateLabel => 'Date';
+
+  @override
+  String get requestIdLabel => 'ID de demande';
 
 }

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/common/widgets/app_search_field.dart';
 import 'package:baladiyati/common/widgets/app_toast.dart';
+import 'package:baladiyati/common/widgets/shimmer_loading.dart';
 import 'package:baladiyati/features/citizen/requests/domain/entities/request_entity.dart';
 import 'package:baladiyati/features/citizen/requests/presentation/bloc/requests_bloc.dart';
 import 'package:baladiyati/features/citizen/requests/presentation/bloc/requests_event.dart';
@@ -145,7 +146,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
                 // List
                 Expanded(
                   child: state.isLoading
-                      ? const Center(child: CircularProgressIndicator())
+                      ? const _RequestsSkeleton()
                       : items.isEmpty
                           ? Center(
                               child: Column(
@@ -183,6 +184,80 @@ class _RequestsScreenState extends State<RequestsScreen> {
           ),
         );
       },
+    );
+  }
+}
+
+// ── Skeleton ──────────────────────────────────────────────────────────────────
+
+class _RequestsSkeleton extends StatelessWidget {
+  const _RequestsSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 6,
+      itemBuilder: (_, __) => const _RequestCardSkeleton(),
+    );
+  }
+}
+
+class _RequestCardSkeleton extends StatelessWidget {
+  const _RequestCardSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.outline.withOpacity(0.12)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(children: [
+                      const Expanded(flex: 6, child: ShimmerBox(height: 14)),
+                      const Spacer(flex: 4),
+                    ]),
+                    const SizedBox(height: 5),
+                    Row(children: [
+                      const Expanded(flex: 4, child: ShimmerBox(height: 11)),
+                      const Spacer(flex: 6),
+                    ]),
+                  ],
+                ),
+              ),
+              const SizedBox(width: 8),
+              const ShimmerBox(width: 72, height: 26, radius: 13),
+            ],
+          ),
+          const SizedBox(height: 9),
+          Row(children: [
+            const ShimmerBox(width: 14, height: 14, radius: 4),
+            const SizedBox(width: 4),
+            const ShimmerBox(width: 110, height: 11),
+          ]),
+          const SizedBox(height: 7),
+          Row(children: [
+            const ShimmerBox(width: 14, height: 14, radius: 4),
+            const SizedBox(width: 4),
+            const ShimmerBox(width: 80, height: 11),
+          ]),
+        ],
+      ),
     );
   }
 }

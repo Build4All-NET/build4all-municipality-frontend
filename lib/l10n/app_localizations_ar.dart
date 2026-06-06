@@ -444,6 +444,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get filterAll => 'الكل';
 
   @override
+  String get filterActive => 'نشط';
+
+  @override
+  String get filterDone => 'منتهي';
+
+  @override
   String get statusSubmitted => 'مُرسَل';
 
   @override
@@ -1553,5 +1559,95 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get locationSelected => 'تم تحديد الموقع';
+
+  @override
+  String get manageCertificates => 'إدارة شهادات البلدية';
+
+  @override
+  String get noCertificates => 'لا توجد شهادات';
+
+  @override
+  String get noCertificatesHint => 'لم يتم إنشاء أي شهادات بعد.';
+
+  @override
+  String get signCertificate => 'توقيع الشهادة';
+
+  @override
+  String get unsignCertificate => 'إلغاء التوقيع';
+
+  @override
+  String get certificateSigned => 'تم توقيع الشهادة بنجاح';
+
+  @override
+  String get certificateUnsigned => 'تم إلغاء توقيع الشهادة بنجاح';
+
+  @override
+  String get aiHelp => 'مساعدة الذكاء الاصطناعي';
+
+  @override
+  String get aiExplanation => 'شرح ذكي';
+
+  @override
+  String get aiHelpLoading => 'جاري الحصول على الشرح...';
+
+  @override
+  String get aiHelpError => 'تعذر الحصول على الشرح';
+
+  @override
+  String get locationNameLabel => 'الموقع المحدد';
+
+  @override
+  String get aiChatTitle => 'المساعد الذكي';
+
+  @override
+  String get aiChatHint => 'اكتب رسالتك...';
+
+  @override
+  String get aiChatWelcome => 'مرحباً! أنا مساعدك الذكي. اسألني أي شيء عن خدمات البلدية.';
+
+  @override
+  String get aiChatClear => 'مسح المحادثة';
+
+  @override
+  String get aiChatCleared => 'تم مسح المحادثة';
+
+  @override
+  String get aiChatSending => 'يكتب...';
+
+  @override
+  String get aiChatError => 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get aiChatEmptyHint => 'اسألني أي شيء عن خدمات البلدية';
+
+  @override
+  String get chooseOnMap => 'اختر على الخريطة';
+
+  @override
+  String get mapPickerTitle => 'اختر الموقع';
+
+  @override
+  String get mapPickerConfirm => 'تأكيد الموقع';
+
+  @override
+  String get mapPickerHint => 'اضغط على الخريطة لاختيار موقع';
+
+  @override
+  String get certFilterSigned => 'موقّع';
+
+  @override
+  String get certFilterUnsigned => 'غير موقّع';
+
+  @override
+  String get newestFirst => 'الأحدث أولاً';
+
+  @override
+  String get oldestFirst => 'الأقدم أولاً';
+
+  @override
+  String get dateLabel => 'التاريخ';
+
+  @override
+  String get requestIdLabel => 'رقم الطلب';
 
 }

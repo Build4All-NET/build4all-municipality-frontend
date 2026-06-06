@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:baladiyati/core/config/env.dart';
+import 'package:baladiyati/features/citizen/ai_chat/presentation/screens/ai_chat_screen.dart';
 
 import 'package:baladiyati/common/widgets/bottom_nav.dart';
 import 'package:baladiyati/features/citizen/payments/presentation/screens/payments_screen.dart';
@@ -103,6 +104,18 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
           ],
         ),
+        floatingActionButton: _currentIndex == 0
+            ? FloatingActionButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AiChatScreen(),
+                  ),
+                ),
+                tooltip: AppLocalizations.of(context)!.aiChatTitle,
+                child: const Icon(Icons.auto_awesome_outlined),
+              )
+            : null,
         bottomNavigationBar: BottomNav(
           currentIndex: _currentIndex,
           onTap: (i) => setState(() => _currentIndex = i),
@@ -136,6 +149,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     activeRequests: _countActive(requests),
                     awaitingPayment: _countAwaiting(requests),
                     completed: _countCompleted(requests),
+                    isLoading: requestsState.isLoading,
                     onNotificationTap: () => Navigator.push(
                       context,
                       MaterialPageRoute(
@@ -163,6 +177,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         ),
                         const SizedBox(height: 20),
                         RecentRequestsSection(
+                          isLoading: requestsState.isLoading,
                           requests: requests.take(2).map((r) =>
                             RecentRequestItem(
                               id: r.id,

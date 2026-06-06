@@ -8,6 +8,7 @@ import 'package:baladiyati/common/widgets/private_profile_avatar.dart';
 import 'package:baladiyati/core/config/jwt_store.dart';
 import 'package:baladiyati/core/l10n/locale_cubit.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
+import 'package:baladiyati/core/network/globals.dart' as globals;
 import 'package:baladiyati/core/theme/theme_cubit.dart';
 import 'package:baladiyati/core/utils/error_message.dart';
 import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
@@ -90,6 +91,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
     if (name != null && name.isNotEmpty && name != 'null') {
       return name;
     }
+
+    // Fall back to the municipality/app name configured via ENV
+    final appName = globals.appName.trim();
+    if (appName.isNotEmpty) return appName;
 
     return _dash();
   }

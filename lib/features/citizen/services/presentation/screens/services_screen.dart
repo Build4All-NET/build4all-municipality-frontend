@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/common/widgets/app_search_field.dart';
 import 'package:baladiyati/common/widgets/app_toast.dart';
+import 'package:baladiyati/common/widgets/shimmer_loading.dart';
 import 'package:baladiyati/features/citizen/services/domain/entities/service_entity.dart';
 import 'package:baladiyati/features/citizen/services/presentation/bloc/services_bloc.dart';
 import 'package:baladiyati/features/citizen/services/presentation/bloc/services_event.dart';
@@ -96,7 +97,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                 ),
                 Expanded(
                   child: state.isLoading
-                      ? const Center(child: CircularProgressIndicator())
+                      ? const _ServicesSkeleton()
                       : items.isEmpty
                           ? Center(
                               child: Column(
@@ -154,6 +155,69 @@ class _ServicesScreenState extends State<ServicesScreen> {
     );
   }
 }
+
+// ── Skeleton ──────────────────────────────────────────────────────────────────
+
+class _ServicesSkeleton extends StatelessWidget {
+  const _ServicesSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 7,
+      itemBuilder: (_, __) => const _ServiceCardSkeleton(),
+    );
+  }
+}
+
+class _ServiceCardSkeleton extends StatelessWidget {
+  const _ServiceCardSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.outline.withOpacity(0.12)),
+      ),
+      child: Row(
+        children: [
+          const ShimmerBox(width: 48, height: 48, radius: 12),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(children: [
+                  const Expanded(flex: 7, child: ShimmerBox(height: 14)),
+                  const Spacer(flex: 3),
+                ]),
+                const SizedBox(height: 7),
+                const ShimmerBox(height: 12),
+                const SizedBox(height: 4),
+                Row(children: [
+                  const Expanded(flex: 6, child: ShimmerBox(height: 12)),
+                  const Spacer(flex: 4),
+                ]),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          const ShimmerBox(width: 18, height: 18, radius: 4),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Real card ──────────────────────────────────────────────────────────────────
 
 class _ServiceCard extends StatelessWidget {
   final ServiceEntity service;

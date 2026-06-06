@@ -94,6 +94,19 @@ class RequestApiService {
           .toList();
     }
 
+    if (data is Map) {
+      final map = Map<String, dynamic>.from(data);
+      for (final key in ['content', 'items', 'data', 'results', 'requests']) {
+        final candidate = map[key];
+        if (candidate is List) {
+          return candidate
+              .whereType<Map>()
+              .map((e) => RequestModel.fromJson(Map<String, dynamic>.from(e)))
+              .toList();
+        }
+      }
+    }
+
     throw AppException('Invalid server response.');
   }
 

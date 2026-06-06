@@ -1,13 +1,21 @@
+import 'dart:io';
+import 'dart:typed_data';
+
 import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/common/widgets/primary_button.dart';
 import 'package:baladiyati/core/config/env.dart';
+import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/admin/Requests/data/model/RequestModel.dart';
+import 'package:baladiyati/features/admin/Requests/domain/entities/request.dart';
 import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_Bloc.dart';
 import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_Event.dart';
 import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_State.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 
 class RequestDetailPage extends StatelessWidget {
   final RequestModel request;
@@ -106,11 +114,22 @@ class RequestDetailPage extends StatelessWidget {
     }
   }
 
-  bool _isClosedStatus(String? status) {
+  bool _isTerminalStatus(String? status) {
     final clean = status?.trim().toUpperCase() ?? '';
     return clean == 'COMPLETED' ||
         clean == 'REJECTED' ||
         clean == 'CANCELLED';
+  }
+
+  // Returns which action buttons to show based on current status
+  _AllowedActions _allowedActions(String? status) {
+    final s = status?.trim().toUpperCase() ?? '';
+    if (_isTerminalStatus(status)) return const _AllowedActions();
+    if (s == 'APPROVED' || s == 'IN_PROGRESS') {
+      return const _AllowedActions(showComplete: true, showReject: true);
+    }
+    // SUBMITTED, PENDING, UNDER_REVIEW, DOCUMENTS_MISSING, etc.
+    return const _AllowedActions(showApprove: true, showReject: true);
   }
 
   void _changeStatus(
@@ -144,7 +163,8 @@ class RequestDetailPage extends StatelessWidget {
     final colors = theme.colorScheme;
     final statusColor = _statusColor(context, request.status);
     final statusText = _localizedStatus(l10n, request.status);
-    final isClosed = _isClosedStatus(request.status);
+    final isClosed = _isTerminalStatus(request.status);
+    final actions = _allowedActions(request.status);
 
     return BlocConsumer<RequestBloc, RequestState>(
       listenWhen: (previous, current) {
@@ -321,10 +341,19 @@ class RequestDetailPage extends StatelessWidget {
                             ),
                           ),
                         ),
+                        if (request.attachments.isNotEmpty) ...[
+                          const SizedBox(height: 14),
+                          _AttachmentsSection(
+                            attachments: request.attachments,
+                          ),
+                        ],
                         const SizedBox(height: 20),
-                        if (!isClosed)
+                        if (isClosed)
+                          _ClosedStatusCard(status: statusText)
+                        else
                           _ActionsCard(
                             isLoading: state.updating,
+                            actions: actions,
                             onReject: () {
                               if (state.updating) return;
                               _changeStatus(context, l10n, 'REJECTED');
@@ -337,9 +366,7 @@ class RequestDetailPage extends StatelessWidget {
                               if (state.updating) return;
                               _changeStatus(context, l10n, 'COMPLETED');
                             },
-                          )
-                        else
-                          _ClosedStatusCard(status: statusText),
+                          ),
                       ],
                     ),
                   ),
@@ -626,18 +653,138 @@ class _DetailRow extends StatelessWidget {
   }
 }
 
+class _AllowedActions {
+  final bool showApprove;
+  final bool showReject;
+  final bool showComplete;
+
+  const _AllowedActions({
+    this.showApprove = false,
+    this.showReject = false,
+    this.showComplete = false,
+  });
+}
+
 class _ActionsCard extends StatelessWidget {
   final bool isLoading;
+  final _AllowedActions actions;
   final VoidCallback onReject;
   final VoidCallback onApprove;
   final VoidCallback onComplete;
 
   const _ActionsCard({
     required this.isLoading,
+    required this.actions,
     required this.onReject,
     required this.onApprove,
     required this.onComplete,
   });
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    final rejectButton = actions.showReject
+        ? PrimaryButton(
+            label: isLoading ? l10n.loading : l10n.reject,
+            backgroundColor: colors.error,
+            textColor: colors.onError,
+            isLoading: isLoading,
+            onPressed: onReject,
+          )
+        : null;
+
+    final approveButton = actions.showApprove
+        ? PrimaryButton(
+            label: isLoading ? l10n.loading : l10n.approve,
+            backgroundColor: colors.primary,
+            textColor: colors.onPrimary,
+            isLoading: isLoading,
+            onPressed: onApprove,
+          )
+        : null;
+
+    final completeButton = actions.showComplete
+        ? PrimaryButton(
+            label: isLoading ? l10n.loading : l10n.complete,
+            backgroundColor: colors.primary,
+            textColor: colors.onPrimary,
+            isLoading: isLoading,
+            onPressed: onComplete,
+          )
+        : null;
+
+    final mainRow = [
+      if (rejectButton != null) rejectButton,
+      if (approveButton != null) approveButton,
+    ];
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: colors.outlineVariant.withOpacity(0.55),
+        ),
+      ),
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final stackButtons = constraints.maxWidth < 340;
+
+          return Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Text(
+                l10n.actions,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: colors.onSurface,
+                ),
+              ),
+              const SizedBox(height: 12),
+              if (mainRow.length == 2)
+                stackButtons
+                    ? Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          mainRow[0],
+                          const SizedBox(height: 10),
+                          mainRow[1],
+                        ],
+                      )
+                    : Row(
+                        children: [
+                          Expanded(child: mainRow[0]),
+                          const SizedBox(width: 10),
+                          Expanded(child: mainRow[1]),
+                        ],
+                      )
+              else if (mainRow.length == 1)
+                mainRow[0],
+              if (completeButton != null) ...[
+                if (mainRow.isNotEmpty) const SizedBox(height: 10),
+                completeButton,
+              ],
+            ],
+          );
+        },
+      ),
+    );
+  }
+}
+
+// ─── Attachments section ──────────────────────────────────────────────────────
+
+class _AttachmentsSection extends StatelessWidget {
+  final List<Attachment> attachments;
+
+  const _AttachmentsSection({required this.attachments});
 
   @override
   Widget build(BuildContext context) {
@@ -654,60 +801,248 @@ class _ActionsCard extends StatelessWidget {
         border: Border.all(
           color: colors.outlineVariant.withOpacity(0.55),
         ),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withOpacity(0.035),
+            blurRadius: 14,
+            offset: const Offset(0, 7),
+          ),
+        ],
       ),
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final stackButtons = constraints.maxWidth < 340;
-
-          final rejectButton = PrimaryButton(
-            label: isLoading ? l10n.loading : l10n.reject,
-            backgroundColor: colors.error,
-            textColor: colors.onError,
-            isLoading: isLoading,
-            onPressed: onReject,
-          );
-
-          final approveButton = PrimaryButton(
-            label: isLoading ? l10n.loading : l10n.approve,
-            backgroundColor: colors.primary,
-            textColor: colors.onPrimary,
-            isLoading: isLoading,
-            onPressed: onApprove,
-          );
-
-          return Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
             children: [
+              Container(
+                height: 34,
+                width: 34,
+                decoration: BoxDecoration(
+                  color: colors.primary.withOpacity(0.10),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Icon(Icons.attach_file, color: colors.primary, size: 18),
+              ),
+              const SizedBox(width: 10),
               Text(
-                l10n.actions,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
+                l10n.requiredAttachments,
                 style: theme.textTheme.titleSmall?.copyWith(
                   fontWeight: FontWeight.w900,
                   color: colors.onSurface,
                 ),
               ),
-              const SizedBox(height: 12),
-              if (stackButtons) ...[rejectButton, const SizedBox(height: 10), approveButton]
-              else
-                Row(
-                  children: [
-                    Expanded(child: rejectButton),
-                    const SizedBox(width: 10),
-                    Expanded(child: approveButton),
-                  ],
+              const SizedBox(width: 8),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                decoration: BoxDecoration(
+                  color: colors.primaryContainer,
+                  borderRadius: BorderRadius.circular(999),
                 ),
-              const SizedBox(height: 10),
-              PrimaryButton(
-                label: isLoading ? l10n.loading : l10n.complete,
-                backgroundColor: colors.primary,
-                textColor: colors.onPrimary,
-                isLoading: isLoading,
-                onPressed: onComplete,
+                child: Text(
+                  '${attachments.length}',
+                  style: theme.textTheme.labelSmall?.copyWith(
+                    color: colors.onPrimaryContainer,
+                    fontWeight: FontWeight.w800,
+                  ),
+                ),
               ),
             ],
-          );
-        },
+          ),
+          const SizedBox(height: 12),
+          ...attachments.map(
+            (a) => _AttachmentCard(attachment: a),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _AttachmentCard extends StatefulWidget {
+  final Attachment attachment;
+
+  const _AttachmentCard({required this.attachment});
+
+  @override
+  State<_AttachmentCard> createState() => _AttachmentCardState();
+}
+
+class _AttachmentCardState extends State<_AttachmentCard> {
+  static const _kImageExts = {'jpg', 'jpeg', 'png', 'gif', 'webp'};
+
+  bool _downloading = false;
+  String? _localPath;
+
+  @override
+  void initState() {
+    super.initState();
+    _checkCache();
+  }
+
+  String get _ext =>
+      widget.attachment.fileName.split('.').last.toLowerCase();
+
+  bool get _isImage => _kImageExts.contains(_ext);
+
+  String _resolveUrl(String url) {
+    if (url.startsWith('http')) return url;
+    final base = Env.overrideBaseUrl.trim().replaceAll(RegExp(r'/+$'), '');
+    return '$base$url';
+  }
+
+  String _cacheKey() {
+    final name = widget.attachment.fileName;
+    if (name.isNotEmpty) return name;
+    return 'attachment_${widget.attachment.fileUrl.hashCode.abs()}';
+  }
+
+  Future<Directory> _cacheDir() async {
+    try {
+      return (await getExternalStorageDirectory())!;
+    } catch (_) {
+      return getApplicationDocumentsDirectory();
+    }
+  }
+
+  Future<void> _checkCache() async {
+    try {
+      final dir = await _cacheDir();
+      final path = '${dir.path}/${_cacheKey()}';
+      if (File(path).existsSync()) {
+        if (mounted) setState(() => _localPath = path);
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _openOrDownload(BuildContext context) async {
+    if (_localPath != null && File(_localPath!).existsSync()) {
+      await OpenFilex.open(_localPath!);
+      return;
+    }
+    await _download(context);
+  }
+
+  Future<void> _download(BuildContext context) async {
+    setState(() => _downloading = true);
+    try {
+      final fullUrl = _resolveUrl(widget.attachment.fileUrl);
+      late Uint8List bytes;
+      try {
+        final response = await DioClient.muni.get<List<int>>(
+          fullUrl,
+          options: Options(responseType: ResponseType.bytes),
+        );
+        bytes = Uint8List.fromList(response.data!);
+      } on DioException catch (_) {
+        final response = await DioClient.muni.get<List<int>>(
+          widget.attachment.fileUrl,
+          options: Options(responseType: ResponseType.bytes),
+        );
+        bytes = Uint8List.fromList(response.data!);
+      }
+
+      final dir = await _cacheDir();
+      final path = '${dir.path}/${_cacheKey()}';
+      await File(path).writeAsBytes(bytes);
+
+      if (mounted) setState(() => _localPath = path);
+      if (!context.mounted) return;
+      await OpenFilex.open(path);
+    } catch (_) {
+      if (!context.mounted) return;
+      AppToast.show(
+        context,
+        message: AppLocalizations.of(context)!.couldNotOpenFile,
+        type: AppToastType.error,
+      );
+    } finally {
+      if (mounted) setState(() => _downloading = false);
+    }
+  }
+
+  IconData get _fileIcon {
+    if (_isImage) return Icons.image_outlined;
+    if (_ext == 'pdf') return Icons.picture_as_pdf_outlined;
+    if (['doc', 'docx'].contains(_ext)) return Icons.description_outlined;
+    return Icons.insert_drive_file_outlined;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+    final isCached = _localPath != null && File(_localPath!).existsSync();
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: isCached
+              ? colors.primary.withOpacity(0.25)
+              : colors.outline.withOpacity(0.15),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          if (isCached && _isImage)
+            ClipRRect(
+              borderRadius:
+                  const BorderRadius.vertical(top: Radius.circular(12)),
+              child: Image.file(
+                File(_localPath!),
+                width: double.infinity,
+                height: 160,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ListTile(
+            dense: true,
+            contentPadding:
+                const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+            leading:
+                Icon(_fileIcon, color: colors.primary, size: 22),
+            title: Text(
+              widget.attachment.fileName.isNotEmpty
+                  ? widget.attachment.fileName
+                  : widget.attachment.fileUrl.split('/').last,
+              style: theme.textTheme.bodySmall
+                  ?.copyWith(fontWeight: FontWeight.w600),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+            subtitle: isCached
+                ? Text(
+                    l10n.openPdf,
+                    style: theme.textTheme.labelSmall
+                        ?.copyWith(color: colors.primary),
+                  )
+                : null,
+            trailing: _downloading
+                ? SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                      strokeWidth: 2,
+                      color: colors.primary,
+                    ),
+                  )
+                : IconButton(
+                    icon: Icon(
+                      isCached ? Icons.open_in_new : Icons.download_outlined,
+                      color: colors.primary,
+                      size: 20,
+                    ),
+                    tooltip: isCached ? l10n.openPdf : l10n.downloadAndOpen,
+                    onPressed: () => _openOrDownload(context),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                  ),
+          ),
+        ],
       ),
     );
   }

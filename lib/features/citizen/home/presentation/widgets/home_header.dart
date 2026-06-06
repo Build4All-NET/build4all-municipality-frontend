@@ -1,6 +1,7 @@
 // lib/features/citizen/home/presentation/widgets/home_header.dart
 
 import 'package:flutter/material.dart';
+import 'package:baladiyati/common/widgets/shimmer_loading.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 
 class HomeHeader extends StatelessWidget {
@@ -11,6 +12,7 @@ class HomeHeader extends StatelessWidget {
   final int awaitingPayment;
   final int completed;
   final VoidCallback onNotificationTap;
+  final bool isLoading;
 
   const HomeHeader({
     super.key,
@@ -21,6 +23,7 @@ class HomeHeader extends StatelessWidget {
     required this.awaitingPayment,
     required this.completed,
     required this.onNotificationTap,
+    this.isLoading = false,
   });
 
   @override
@@ -139,29 +142,73 @@ class HomeHeader extends StatelessWidget {
           const SizedBox(height: 24),
 
           // 📊 Stats row
-          Row(
-            children: [
-              _StatCard(
-                value: '$activeRequests',
-                label: l10n.activeRequests,
-                icon: Icons.description_outlined,
-              ),
-              const SizedBox(width: 10),
-              _StatCard(
-                value: '$awaitingPayment',
-                label: l10n.awaitingPayment,
-                icon: Icons.error_outline,
-              ),
-              const SizedBox(width: 10),
-              _StatCard(
-                value: '$completed',
-                label: l10n.completed,
-                icon: Icons.trending_up,
-              ),
-            ],
-          ),
+          isLoading
+              ? const _StatsRowSkeleton()
+              : Row(
+                  children: [
+                    _StatCard(
+                      value: '$activeRequests',
+                      label: l10n.activeRequests,
+                      icon: Icons.description_outlined,
+                    ),
+                    const SizedBox(width: 10),
+                    _StatCard(
+                      value: '$awaitingPayment',
+                      label: l10n.awaitingPayment,
+                      icon: Icons.error_outline,
+                    ),
+                    const SizedBox(width: 10),
+                    _StatCard(
+                      value: '$completed',
+                      label: l10n.completed,
+                      icon: Icons.trending_up,
+                    ),
+                  ],
+                ),
         ],
       ),
+    );
+  }
+}
+
+// ── Stats skeleton (primary-background aware) ─────────────────────────────────
+
+class _StatsRowSkeleton extends StatelessWidget {
+  const _StatsRowSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final base = cs.onPrimary.withOpacity(0.20);
+    final hi = cs.onPrimary.withOpacity(0.45);
+
+    Widget card() => Expanded(
+          child: Container(
+            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 8),
+            decoration: BoxDecoration(
+              color: cs.onPrimary.withOpacity(0.15),
+              borderRadius: BorderRadius.circular(16),
+            ),
+            child: Column(
+              children: [
+                ShimmerBox(width: 20, height: 20, radius: 4, baseColor: base, highlightColor: hi),
+                const SizedBox(height: 7),
+                ShimmerBox(width: 28, height: 20, radius: 6, baseColor: base, highlightColor: hi),
+                const SizedBox(height: 5),
+                ShimmerBox(height: 10, radius: 5, baseColor: base, highlightColor: hi),
+              ],
+            ),
+          ),
+        );
+
+    return Row(
+      children: [
+        card(),
+        const SizedBox(width: 10),
+        card(),
+        const SizedBox(width: 10),
+        card(),
+      ],
     );
   }
 }

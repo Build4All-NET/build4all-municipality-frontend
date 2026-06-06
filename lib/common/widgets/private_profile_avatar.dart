@@ -30,6 +30,7 @@ class PrivateProfileAvatar extends StatefulWidget {
 
 class _PrivateProfileAvatarState extends State<PrivateProfileAvatar> {
   bool _failed = false;
+  bool _primaryFailed = false;
 
   @override
   void didUpdateWidget(covariant PrivateProfileAvatar oldWidget) {
@@ -38,6 +39,7 @@ class _PrivateProfileAvatarState extends State<PrivateProfileAvatar> {
     if (oldWidget.imageUrl != widget.imageUrl ||
         oldWidget.localImage?.path != widget.localImage?.path) {
       _failed = false;
+      _primaryFailed = false;
     }
   }
 
@@ -54,17 +56,37 @@ class _PrivateProfileAvatarState extends State<PrivateProfileAvatar> {
       return value;
     }
 
+    // Relative path — resolve against the server root (strip /api suffix from
+    // the base URL only; keep the path exactly as returned by the server so we
+    // never accidentally drop an /api segment that belongs in the URL).
     final buildBase = DioClient.build.options.baseUrl.trim();
-    final root = buildBase.replaceFirst(RegExp(r'/api/?$'), '');
+    final serverRoot = buildBase
+        .replaceFirst(RegExp(r'/api/?$'), '')
+        .replaceAll(RegExp(r'/+$'), '');
 
-    var path = value.startsWith('/') ? value : '/$value';
+    final path = value.startsWith('/') ? value : '/$value';
 
-    if (path.startsWith('/api/')) {
-      path = path.substring(4);
+    // Primary candidate: Build4All server root + path
+    final primaryUrl = '$serverRoot$path';
+
+    // Secondary candidate: municipality server root + path (stored for fallback)
+    try {
+      final muniBase = DioClient.muni.options.baseUrl.trim();
+      final muniRoot = muniBase
+          .replaceFirst(RegExp(r'/api/?$'), '')
+          .replaceAll(RegExp(r'/+$'), '');
+      if (muniRoot != serverRoot) {
+        _fallbackResolvedUrl = '$muniRoot$path';
+      }
+    } catch (_) {
+      // DioClient.muni may not be ready yet
     }
 
-    return '$root$path';
+    return primaryUrl;
   }
+
+  /// Secondary URL tried after the primary fails.
+  String? _fallbackResolvedUrl;
 
   Map<String, String> _headers() {
     final auth = globals.readAuthToken().trim();
@@ -102,12 +124,14 @@ class _PrivateProfileAvatarState extends State<PrivateProfileAvatar> {
       provider = FileImage(widget.localImage!);
     } else {
       final resolved = _resolveUrl(widget.imageUrl);
+      final fallback = _fallbackResolvedUrl;
 
-      if (!_failed && resolved != null) {
-        provider = NetworkImage(
-          resolved,
-          headers: _headers(),
-        );
+      if (!_failed) {
+        // If primary URL failed, try the municipality-base fallback URL
+        final useUrl = (_primaryFailed && fallback != null) ? fallback : resolved;
+        if (useUrl != null) {
+          provider = NetworkImage(useUrl, headers: _headers());
+        }
       }
     }
 
@@ -121,7 +145,12 @@ class _PrivateProfileAvatarState extends State<PrivateProfileAvatar> {
           onBackgroundImageError: provider == null
               ? null
               : (_, __) {
-                  if (mounted) {
+                  if (!mounted) return;
+                  if (!_primaryFailed && _fallbackResolvedUrl != null) {
+                    // First failure: try municipality base URL
+                    setState(() => _primaryFailed = true);
+                  } else {
+                    // Both URLs failed: show initials
                     setState(() => _failed = true);
                   }
                 },

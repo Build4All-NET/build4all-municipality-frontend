@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:baladiyati/core/network/auth_refresh_coordinator.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/core/network/globals.dart' as g;
+import 'package:baladiyati/core/utils/jwt_utils.dart';
 import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
 import 'package:dio/dio.dart';
@@ -78,6 +79,51 @@ class RefreshTokenInterceptor extends Interceptor {
         role == 'MANAGER' ||
         role == 'ADMIN' ||
         role == 'STAFF';
+  }
+
+  @override
+  Future<void> onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
+    if (_isAuthCall(options)) {
+      return handler.next(options);
+    }
+
+    final authHeader =
+        (options.headers['Authorization'] ?? '').toString().trim();
+    final globalAuth = g.readAuthToken().trim();
+
+    final raw = _rawTokenFromAuthHeader(
+      authHeader.isNotEmpty ? authHeader : globalAuth,
+    );
+
+    if (raw.isEmpty || !JwtUtils.isExpiredOrExpiringSoon(raw)) {
+      return handler.next(options);
+    }
+
+    final role = _roleFromJwt(raw);
+    final isAdmin = _isAdminRole(role);
+
+    try {
+      final tenantId = g.ownerProjectLinkId;
+
+      final newToken = isAdmin
+          ? await _refresh.refreshAdmin(tenantId: tenantId)
+          : await _refresh.refreshUser(tenantId: tenantId);
+
+      DioClient.setAuthToken(newToken);
+
+      options.headers['Authorization'] =
+          newToken.toLowerCase().startsWith('bearer ')
+              ? newToken
+              : 'Bearer $newToken';
+    } catch (_) {
+      // Proactive refresh failed — let the request proceed with the old token.
+      // The reactive onError handler will catch a 401 if it arrives.
+    }
+
+    return handler.next(options);
   }
 
   @override

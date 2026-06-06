@@ -135,9 +135,7 @@ class _StaffRequestTasksSectionState extends State<StaffRequestTasksSection> {
                       .map(
                         (task) => StaffTaskCard(
                           task: task,
-                          onOpenForm: task.canOpenForm
-                              ? () => widget.onOpenTaskForm?.call(task)
-                              : null,
+                          onOpenForm: () => widget.onOpenTaskForm?.call(task),
                         ),
                       )
                       .toList(),
