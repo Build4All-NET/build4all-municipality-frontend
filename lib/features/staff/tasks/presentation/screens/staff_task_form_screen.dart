@@ -1,8 +1,12 @@
 import 'dart:convert';
+import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:baladiyati/common/widgets/app_text_field.dart';
 import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/common/widgets/primary_button.dart';
+import 'package:baladiyati/core/config/env.dart';
+import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/core/utils/error_message.dart';
 import 'package:baladiyati/features/staff/tasks/data/models/staff_task_model.dart';
 import 'package:baladiyati/features/staff/tasks/data/services/staff_task_api_service.dart';
@@ -10,6 +14,8 @@ import 'package:baladiyati/features/staff/tasks/presentation/screens/staff_certi
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
+import 'package:open_filex/open_filex.dart';
+import 'package:path_provider/path_provider.dart';
 
 class StaffTaskFormScreen extends StatefulWidget {
   final StaffTaskModel task;
@@ -625,16 +631,237 @@ class _TaskInfoCard extends StatelessWidget {
                 .where((e) =>
                     e.value != null &&
                     e.value.toString().trim().isNotEmpty)
-                .map(
-                  (e) => _VarRow(
-                      label: e.key, value: e.value.toString()),
-                ),
+                .map((e) {
+                  final urls = _parseAttachmentUrls(e.key, e.value);
+                  if (urls.isNotEmpty) {
+                    return _AttachmentsVarRow(urls: urls);
+                  }
+                  return _VarRow(label: e.key, value: e.value.toString());
+                }),
           ],
         ],
       ),
     );
   }
 }
+
+// ─── Attachment URL helpers ───────────────────────────────────────────────────
+
+const _kAttachmentKeys = {
+  'attachmentUrls',
+  'attachementUrls',
+  'attachments',
+  'fileUrls',
+  'files',
+};
+
+List<String> _parseAttachmentUrls(String key, dynamic value) {
+  List<String> candidates = [];
+
+  if (value is List) {
+    candidates = value
+        .map((e) => e.toString().trim())
+        .where((s) => s.isNotEmpty)
+        .toList();
+  } else if (value is String) {
+    final trimmed = value.trim();
+    if (trimmed.startsWith('[')) {
+      try {
+        final decoded = jsonDecode(trimmed);
+        if (decoded is List) {
+          candidates = decoded
+              .map((e) => e.toString().trim())
+              .where((s) => s.isNotEmpty)
+              .toList();
+        }
+      } catch (_) {}
+    }
+    if (candidates.isEmpty && trimmed.isNotEmpty) {
+      candidates = [trimmed];
+    }
+  }
+
+  if (candidates.isEmpty) return [];
+
+  // If the key is a known attachment key, accept as-is.
+  if (_kAttachmentKeys.contains(key)) return candidates;
+
+  // Otherwise only treat as attachments if ALL values look like file paths/URLs.
+  final looksLikeUrl = candidates.every(
+    (s) => s.startsWith('http') || s.startsWith('/uploads') || s.startsWith('/files') || s.startsWith('/api/files'),
+  );
+  return looksLikeUrl ? candidates : [];
+}
+
+String _resolveFileUrl(String url) {
+  if (url.startsWith('http')) return url;
+  final base = Env.overrideBaseUrl.trim().replaceAll(RegExp(r'/+$'), '');
+  return '$base$url';
+}
+
+String _fileNameFromUrl(String url) {
+  return url.split('/').last.split('?').first;
+}
+
+// ─── Attachments variable row ─────────────────────────────────────────────────
+
+class _AttachmentsVarRow extends StatelessWidget {
+  final List<String> urls;
+
+  const _AttachmentsVarRow({required this.urls});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 10),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.attach_file, size: 14, color: colors.primary),
+              const SizedBox(width: 4),
+              Text(
+                l10n.requiredAttachments,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  fontWeight: FontWeight.w700,
+                  color: colors.onSurface,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 6),
+          ...urls.map((url) => _FileDownloadCard(url: url)),
+        ],
+      ),
+    );
+  }
+}
+
+// ─── Individual file download card ───────────────────────────────────────────
+
+class _FileDownloadCard extends StatefulWidget {
+  final String url;
+
+  const _FileDownloadCard({required this.url});
+
+  @override
+  State<_FileDownloadCard> createState() => _FileDownloadCardState();
+}
+
+class _FileDownloadCardState extends State<_FileDownloadCard> {
+  bool _downloading = false;
+
+  IconData _iconForFile(String name) {
+    final ext = name.split('.').last.toLowerCase();
+    if (ext == 'pdf') return Icons.picture_as_pdf_outlined;
+    if (['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(ext)) return Icons.image_outlined;
+    if (['doc', 'docx'].contains(ext)) return Icons.description_outlined;
+    return Icons.insert_drive_file_outlined;
+  }
+
+  Future<void> _download(BuildContext context) async {
+    final l10n = AppLocalizations.of(context)!;
+    setState(() => _downloading = true);
+
+    try {
+      final fullUrl = _resolveFileUrl(widget.url);
+      final fileName = _fileNameFromUrl(widget.url).isNotEmpty
+          ? _fileNameFromUrl(widget.url)
+          : 'attachment_${DateTime.now().millisecondsSinceEpoch}';
+
+      final Uint8List bytes;
+      try {
+        // Try with muni client first (includes auth token)
+        final response = await DioClient.muni.get<List<int>>(
+          fullUrl,
+          options: Options(responseType: ResponseType.bytes),
+        );
+        bytes = Uint8List.fromList(response.data!);
+      } on DioException catch (_) {
+        // Fallback: full URL fetch without base prefix
+        final response = await DioClient.muni.get<List<int>>(
+          widget.url,
+          options: Options(responseType: ResponseType.bytes),
+        );
+        bytes = Uint8List.fromList(response.data!);
+      }
+
+      Directory dir;
+      try {
+        dir = (await getExternalStorageDirectory())!;
+      } catch (_) {
+        dir = await getApplicationDocumentsDirectory();
+      }
+
+      final file = File('${dir.path}/$fileName');
+      await file.writeAsBytes(bytes);
+
+      if (!context.mounted) return;
+      await OpenFilex.open(file.path);
+    } catch (e) {
+      if (!context.mounted) return;
+      AppToast.show(
+        context,
+        message: AppLocalizations.of(context)!.couldNotOpenFile,
+        type: AppToastType.error,
+      );
+    } finally {
+      if (mounted) setState(() => _downloading = false);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+    final fileName = _fileNameFromUrl(widget.url);
+    final displayName = fileName.isNotEmpty ? fileName : widget.url;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 6),
+      decoration: BoxDecoration(
+        color: colors.surfaceContainerHighest,
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: colors.outline.withOpacity(0.15)),
+      ),
+      child: ListTile(
+        dense: true,
+        contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 2),
+        leading: Icon(_iconForFile(displayName), color: colors.primary, size: 22),
+        title: Text(
+          displayName,
+          style: theme.textTheme.bodySmall?.copyWith(fontWeight: FontWeight.w600),
+          overflow: TextOverflow.ellipsis,
+          maxLines: 1,
+        ),
+        trailing: _downloading
+            ? SizedBox(
+                width: 20,
+                height: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2,
+                  color: colors.primary,
+                ),
+              )
+            : IconButton(
+                icon: Icon(Icons.download_outlined, color: colors.primary, size: 20),
+                tooltip: l10n.downloadAndOpen,
+                onPressed: () => _download(context),
+                padding: EdgeInsets.zero,
+                constraints: const BoxConstraints(),
+              ),
+      ),
+    );
+  }
+}
+
+// ─── Info chip ────────────────────────────────────────────────────────────────
 
 class _InfoChip extends StatelessWidget {
   final IconData icon;
