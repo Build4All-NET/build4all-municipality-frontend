@@ -1,318 +1,692 @@
 import 'package:baladiyati/app/app_router.dart';
-import 'package:baladiyati/core/network/api_client.dart';
-
+import 'package:baladiyati/core/l10n/locale_cubit.dart';
+import 'package:baladiyati/core/network/dio_client.dart';
+import 'package:baladiyati/features/admin/Departement/data/Service/Departement_Api_Service.dart';
+import 'package:baladiyati/features/admin/Requests/data/Service/Req_Api_Service.dart';
+import 'package:baladiyati/features/admin/announcements/data/services/Announcement_Api_Service.dart';
 import 'package:baladiyati/features/admin/announcements/presentation/screens/announcementscreen.dart';
+import 'package:baladiyati/features/admin/manage_service/Data/service/Service_Api_service.dart';
+import 'package:baladiyati/features/admin/staff/data/Service/AdminUserApiService.dart';
+import 'package:baladiyati/features/admin/staff/data/Service/Employe_Api_Service.dart';
+import 'package:baladiyati/features/admin/violations/data/services/violation_api_services.dart';
 import 'package:baladiyati/features/admin/violations/presentation/screens/violationpage.dart';
 import 'package:baladiyati/features/auth/data/services/auth_api_service.dart';
-import 'package:baladiyati/features/auth/presentation/login/screens/login_screen.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
+class DashboardPage extends StatefulWidget {
+  const DashboardPage({super.key});
 
-class DashboardPage extends StatelessWidget {
-   DashboardPage({super.key});
-  final AuthApiService authApiService = AuthApiService();
+  @override
+  State<DashboardPage> createState() => _DashboardPageState();
+}
+
+// -1 means the count failed to load (shown as "-")
+class _AdminDashboardStats {
+  final int announcementsCount;
+  final int violationsCount;
+  final int departmentsCount;
+  final int servicesCount;
+  final int employeesCount;
+  final int requestsCount;
+
+  const _AdminDashboardStats({
+    required this.announcementsCount,
+    required this.violationsCount,
+    required this.departmentsCount,
+    required this.servicesCount,
+    required this.employeesCount,
+    required this.requestsCount,
+  });
+
+  factory _AdminDashboardStats.empty() {
+    return const _AdminDashboardStats(
+      announcementsCount: -1,
+      violationsCount: -1,
+      departmentsCount: -1,
+      servicesCount: -1,
+      employeesCount: -1,
+      requestsCount: -1,
+    );
+  }
+}
+
+class _DashboardPageState extends State<DashboardPage> {
+  final AuthApiService _authApiService = AuthApiService();
+
+  late final AnnouncementApiService _announcementApiService;
+  late final ViolationApiService _violationApiService;
+  late final DepartmentApiService _departmentApiService;
+  late final ServiceApiService _serviceApiService;
+ late final AdminUserApiService _adminUserApiService;
+  late final RequestApiService _requestApiService;
+
+  late Future<_AdminDashboardStats> _statsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _announcementApiService = AnnouncementApiService(DioClient.muni);
+    _violationApiService = ViolationApiService(dio: DioClient.muni);
+    _departmentApiService = DepartmentApiService(DioClient.muni);
+    _serviceApiService = ServiceApiService(DioClient.muni);
+    _adminUserApiService = AdminUserApiService(dio: DioClient.muni);
+    _requestApiService = RequestApiService(DioClient.muni);
+
+    _statsFuture = _loadStats();
+  }
+
+  // Each API is wrapped independently — one failure never breaks the others.
+  Future<_AdminDashboardStats> _loadStats() async {
+    final counts = await Future.wait([
+      _announcementApiService
+          .getAll()
+          .then<int>((v) => v.length)
+          .catchError((_) => -1),
+      _violationApiService
+          .getAllViolations()
+          .then<int>((v) => v.length)
+          .catchError((_) => -1),
+      _departmentApiService
+          .getAll()
+          .then<int>((v) => v.length)
+          .catchError((_) => -1),
+      _serviceApiService
+          .getServices()
+          .then<int>((v) => v.length)
+          .catchError((_) => -1),
+      _adminUserApiService
+    .getUsersByRole(roleName: 'STAFF')
+    .then<int>((v) => v.length)
+    .catchError((_) => -1),
+      _requestApiService
+          .getAllRequestsAdmin()
+          .then<int>((v) => v.length)
+          .catchError((_) => -1),
+    ]);
+
+    return _AdminDashboardStats(
+      announcementsCount: counts[0],
+      violationsCount: counts[1],
+      departmentsCount: counts[2],
+      servicesCount: counts[3],
+      employeesCount: counts[4],
+      requestsCount: counts[5],
+    );
+  }
+
+  Future<void> _refreshStats() async {
+    setState(() {
+      _statsFuture = _loadStats();
+    });
+
+    await _statsFuture;
+  }
+
+  Future<void> _logout() async {
+    await _authApiService.logout();
+
+    if (!mounted) return;
+
+    AppRouter.goToLogin(context);
+  }
+
+  void _showLanguageSheet() {
+    final loc = AppLocalizations.of(context)!;
+    final localeCubit = context.read<LocaleCubit>();
+    final currentCode = localeCubit.currentLanguageCode;
+
+    showModalBottomSheet(
+      context: context,
+      showDragHandle: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(24),
+        ),
+      ),
+      builder: (sheetContext) {
+        final theme = Theme.of(sheetContext);
+        final colors = theme.colorScheme;
+
+        Widget languageTile({
+          required String code,
+          required String title,
+          required String subtitle,
+          required VoidCallback onTap,
+        }) {
+          final selected = currentCode == code;
+
+          return ListTile(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            leading: CircleAvatar(
+              backgroundColor: selected
+                  ? colors.primary.withOpacity(0.14)
+                  : colors.surfaceContainerHighest,
+              child: Text(
+                code.toUpperCase(),
+                style: theme.textTheme.labelLarge?.copyWith(
+                  color: selected ? colors.primary : colors.onSurface,
+                  fontWeight: FontWeight.w900,
+                ),
+              ),
+            ),
+            title: Text(title),
+            subtitle: Text(subtitle),
+            trailing: selected
+                ? Icon(
+                    Icons.check_circle,
+                    color: colors.primary,
+                  )
+                : null,
+            onTap: () {
+              onTap();
+              Navigator.pop(sheetContext);
+            },
+          );
+        }
+
+        return SafeArea(
+          child: Padding(
+            padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  loc.selectLanguage,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 14),
+                languageTile(
+                  code: 'ar',
+                  title: 'العربية',
+                  subtitle: 'Arabic',
+                  onTap: localeCubit.setArabic,
+                ),
+                languageTile(
+                  code: 'en',
+                  title: 'English',
+                  subtitle: 'English',
+                  onTap: localeCubit.setEnglish,
+                ),
+                languageTile(
+                  code: 'fr',
+                  title: 'Français',
+                  subtitle: 'French',
+                  onTap: localeCubit.setFrench,
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Future<void> _openAnnouncements() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const AnnouncementsPage(),
+      ),
+    );
+
+    await _refreshStats();
+  }
+
+  Future<void> _openViolations() async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => const ViolationsPage(),
+      ),
+    );
+
+    await _refreshStats();
+  }
+
+  void _openServices() => AppRouter.goToServices(context);
+  void _openDepartments() => AppRouter.goToDepartments(context);
+  Future<void> _openEmployees() async {
+    AppRouter.goToEmployees(context);
+    await _refreshStats();
+  }
+  void _openInbox() => AppRouter.goToRequests(context);
+  void _openCertificates() => AppRouter.goToCertificates(context);
+
+  String _formatCount(int count) => count < 0 ? '-' : '$count';
 
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F6FA),
-
-      /// 🔹 APP BAR (Profile + Logout)
+      backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF2F5DA9),
         title: Text(loc.dashboard),
+        centerTitle: false,
         actions: [
           IconButton(
-            icon: const Icon(Icons.person),
-            onPressed: () {
-              Navigator.pushNamed(context, "/profile");
-            },
+            tooltip: loc.selectLanguage,
+            icon: const Icon(Icons.language),
+            onPressed: _showLanguageSheet,
           ),
           IconButton(
-  icon: const Icon(Icons.logout),
-  onPressed: () async {
-    await authApiService.logout();
+            tooltip: loc.profile,
+            icon: const Icon(Icons.person_outline),
+            onPressed: () => AppRouter.goToAdminProfile(context),
+          ),
+          IconButton(
+            tooltip: loc.logout,
+            icon: const Icon(Icons.logout),
+            onPressed: _logout,
+          ),
+        ],
+      ),
+      body: RefreshIndicator(
+        onRefresh: _refreshStats,
+        child: FutureBuilder<_AdminDashboardStats>(
+          future: _statsFuture,
+          builder: (context, snapshot) {
+            final stats = snapshot.data ?? _AdminDashboardStats.empty();
+            final isLoading =
+                snapshot.connectionState == ConnectionState.waiting;
 
-    if (!context.mounted) return;
+            final bool hasNetworkError = !isLoading &&
+                stats.announcementsCount < 0 &&
+                stats.violationsCount < 0 &&
+                stats.departmentsCount < 0 &&
+                stats.servicesCount < 0 &&
+                stats.employeesCount < 0 &&
+                stats.requestsCount < 0;
 
-    AppRouter.goToLogin(context);
-  },
-),
-],
-),
-
-      body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-
-              /// 🔷 HEADER
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(20),
-                decoration: const BoxDecoration(
-                  color: Color(0xFF2F5DA9),
-                  borderRadius: BorderRadius.only(
-                    bottomLeft: Radius.circular(30),
-                    bottomRight: Radius.circular(30),
-                  ),
-                ),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-
-                    Text(
-                      loc.employee,
-                      style: const TextStyle(color: Colors.white70),
-                    ),
-
-                    const SizedBox(height: 20),
-
-                    /// 🔲 STAT CARDS
-                    GridView.count(
-                      shrinkWrap: true,
-                      crossAxisCount: 2,
-                      mainAxisSpacing: 15,
-                      crossAxisSpacing: 15,
-                      physics: const NeverScrollableScrollPhysics(),
-                      children: [
-                        _statCard("28", loc.inProgress, Icons.access_time, Colors.orange),
-                        _statCard("12", loc.newRequests, Icons.inbox, Colors.blue),
-                        _statCard("5", loc.needReview, Icons.warning, Colors.red),
-                        _statCard("15", loc.completedToday, Icons.check_circle, Colors.green),
-                      ],
-                    )
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-
-              /// ⚡ QUICK ACTIONS
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-
-                    Text(
-                      loc.quickActions,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+            return SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (hasNetworkError)
+                    Container(
+                      margin: const EdgeInsets.only(bottom: 12),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 14,
+                        vertical: 10,
+                      ),
+                      decoration: BoxDecoration(
+                        color: colors.errorContainer,
+                        borderRadius: BorderRadius.circular(14),
+                      ),
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.wifi_off,
+                            color: colors.onErrorContainer,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              loc.networkErrorBanner,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colors.onErrorContainer,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ),
 
-                    const SizedBox(height: 15),
+                  _WelcomeHeader(isLoading: isLoading),
 
-                    GridView.count(
-                      shrinkWrap: true,
-                      crossAxisCount: 2,
-                      crossAxisSpacing: 15,
-                      mainAxisSpacing: 15,
-                      physics: const NeverScrollableScrollPhysics(),
-                      children: [
+                  const SizedBox(height: 14),
 
-                        _actionCard(
-                          loc.services,
-                          Icons.description,
-                          Colors.green,
-                          onTap: () {
-                            Navigator.pushNamed(context, "/services");
-                          },
-                        ),
+                  GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    crossAxisSpacing: 8,
+                    mainAxisSpacing: 8,
+                    physics: const NeverScrollableScrollPhysics(),
+                    childAspectRatio: 1.72,
+                    children: [
+                      _StatCard(
+                        title: loc.announcements,
+                        value: isLoading
+                            ? '...'
+                            : _formatCount(stats.announcementsCount),
+                        icon: Icons.campaign_outlined,
+                        iconColor: colors.primary,
+                      ),
+                      _StatCard(
+                        title: loc.violations,
+                        value: isLoading
+                            ? '...'
+                            : _formatCount(stats.violationsCount),
+                        icon: Icons.gavel_outlined,
+                        iconColor: colors.error,
+                      ),
+                      _StatCard(
+                        title: loc.departments,
+                        value: isLoading
+                            ? '...'
+                            : _formatCount(stats.departmentsCount),
+                        icon: Icons.account_tree_outlined,
+                        iconColor: colors.tertiary,
+                      ),
+                      _StatCard(
+                        title: loc.services,
+                        value:
+                            isLoading ? '...' : _formatCount(stats.servicesCount),
+                        icon: Icons.description_outlined,
+                        iconColor: colors.secondary,
+                      ),
+                      _StatCard(
+                        title: loc.employees,
+                        value:
+                            isLoading ? '...' : _formatCount(stats.employeesCount),
+                        icon: Icons.groups_outlined,
+                        iconColor: colors.primary,
+                      ),
+                      _StatCard(
+                        title: loc.requestsCount,
+                        value:
+                            isLoading ? '...' : _formatCount(stats.requestsCount),
+                        icon: Icons.inbox_outlined,
+                        iconColor: colors.outline,
+                      ),
+                    ],
+                  ),
 
-                        _actionCard(
-                          loc.inbox,
-                          Icons.inbox,
-                          Colors.blue,
-                          onTap: () {
-                            Navigator.pushNamed(context, "/inbox");
-                          },
-                        ),
+                  const SizedBox(height: 22),
 
-                       _actionCard(
-  loc.violations,
-  Icons.gavel,
-  Colors.red,
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const ViolationsPage()),
-    );
-  },),
-
-                        _actionCard(
-                          loc.departments,
-                          Icons.account_tree,
-                          Colors.teal,
-                          onTap: () {
-                              AppRouter.goToDepartments(context); 
-
-                          },
-                        ),
-
-                        _actionCard(
-                          loc.employees,
-                          Icons.person,
-                          Colors.indigo,
-                          onTap: () {
-                            Navigator.pushNamed(context, "/staff");
-                          },
-                        ),
-
-                        _actionCard(
-  loc.announcements,
-  Icons.campaign,
-  Colors.orange,
-  onTap: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const AnnouncementsPage()),
-    );
-  },
-),
-                      ],
+                  Text(
+                    loc.quickActions,
+                    style: theme.textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.w900,
                     ),
-                  ],
-                ),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  GridView.count(
+                    crossAxisCount: 2,
+                    shrinkWrap: true,
+                    crossAxisSpacing: 12,
+                    mainAxisSpacing: 12,
+                    physics: const NeverScrollableScrollPhysics(),
+                    childAspectRatio: 1.12,
+                    children: [
+                      _ActionCard(
+                        title: loc.announcements,
+                        icon: Icons.campaign_outlined,
+                        iconColor: colors.primary,
+                        onTap: _openAnnouncements,
+                      ),
+                      _ActionCard(
+                        title: loc.violations,
+                        icon: Icons.gavel_outlined,
+                        iconColor: colors.error,
+                        onTap: _openViolations,
+                      ),
+                      _ActionCard(
+                        title: loc.services,
+                        icon: Icons.description_outlined,
+                        iconColor: colors.secondary,
+                        onTap: _openServices,
+                      ),
+                      _ActionCard(
+                        title: loc.inbox,
+                        icon: Icons.inbox_outlined,
+                        iconColor: colors.primary,
+                        onTap: _openInbox,
+                      ),
+                      _ActionCard(
+                        title: loc.departments,
+                        icon: Icons.account_tree_outlined,
+                        iconColor: colors.tertiary,
+                        onTap: _openDepartments,
+                      ),
+                      _ActionCard(
+                        title: loc.employees,
+                        icon: Icons.badge_outlined,
+                        iconColor: colors.primary,
+                        onTap: _openEmployees,
+                      ),
+                      _ActionCard(
+                        title: loc.certificate,
+                        icon: Icons.verified_outlined,
+                        iconColor: colors.primary,
+                        onTap: _openCertificates,
+                      ),
+                    ],
+                  ),
+                ],
               ),
-
-              const SizedBox(height: 20),
-
-              /// 📋 ACTIVITY
-              _sectionCard(
-                title: loc.recentActivity,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    _activityItem(loc.approvedRequest, Colors.green),
-                    _activityItem(loc.newRequest, Colors.blue),
-                    _activityItem(loc.missingDocs, Colors.orange),
-                  ],
-                ),
-              ),
-
-              /// 📊 PERFORMANCE
-              _sectionCard(
-                title: loc.monthPerformance,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
-                  children: [
-                    _performanceItem("245", loc.completedRequests),
-                    _performanceItem("4.5 ${loc.days}", loc.avgTime),
-                    _performanceItem("92%", loc.satisfaction),
-                  ],
-                ),
-              ),
-
-              const SizedBox(height: 20),
-            ],
-          ),
+            );
+          },
         ),
       ),
     );
   }
+}
 
-  /// 🔲 STAT CARD
-  Widget _statCard(String number, String title, IconData icon, Color color) {
+// ─────────────────────────────────────────────────────────────────────────────
+
+class _WelcomeHeader extends StatelessWidget {
+  final bool isLoading;
+
+  const _WelcomeHeader({required this.isLoading});
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final isRtl = Directionality.of(context) == TextDirection.rtl;
+
     return Container(
-      padding: const EdgeInsets.all(15),
+      width: double.infinity,
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20),
+        color: colors.primary,
+        borderRadius: BorderRadius.circular(24),
       ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
+      child: Row(
+        textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
         children: [
-          Icon(icon, color: color),
-          const SizedBox(height: 10),
-          Text(number,
-              style: const TextStyle(
-                  fontSize: 20,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.white)),
-          Text(title, style: const TextStyle(color: Colors.white70)),
+          Container(
+            height: 54,
+            width: 54,
+            decoration: BoxDecoration(
+              color: colors.onPrimary.withOpacity(0.14),
+              borderRadius: BorderRadius.circular(18),
+            ),
+            child: Icon(
+              Icons.admin_panel_settings_outlined,
+              color: colors.onPrimary,
+            ),
+          ),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment:
+                  isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+              children: [
+                Text(
+                  loc.dashboard,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    color: colors.onPrimary,
+                    fontWeight: FontWeight.w900,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  loc.adminDashboardSubtitle,
+                  style: theme.textTheme.bodyMedium?.copyWith(
+                    color: colors.onPrimary.withOpacity(0.78),
+                  ),
+                ),
+              ],
+            ),
+          ),
+          if (isLoading)
+            SizedBox(
+              height: 22,
+              width: 22,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                color: colors.onPrimary,
+              ),
+            ),
         ],
       ),
     );
   }
+}
 
-  /// ⚡ ACTION CARD (with click)
-  Widget _actionCard(String title, IconData icon, Color color,
-      {VoidCallback? onTap}) {
-    return GestureDetector(
+class _StatCard extends StatelessWidget {
+  final String title;
+  final String value;
+  final IconData icon;
+  final Color iconColor;
+
+  const _StatCard({
+    required this.title,
+    required this.value,
+    required this.icon,
+    required this.iconColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(10),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: colors.outline.withOpacity(0.14),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: colors.shadow.withOpacity(0.04),
+            blurRadius: 9,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            height: 34,
+            width: 34,
+            decoration: BoxDecoration(
+              color: iconColor.withOpacity(0.12),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Icon(
+              icon,
+              color: iconColor,
+              size: 18,
+            ),
+          ),
+          const SizedBox(width: 9),
+          Expanded(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  value,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w900,
+                    fontSize: 17,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontSize: 11,
+                    color: colors.onSurface.withOpacity(0.72),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _ActionCard extends StatelessWidget {
+  final String title;
+  final IconData icon;
+  final Color iconColor;
+  final VoidCallback onTap;
+
+  const _ActionCard({
+    required this.title,
+    required this.icon,
+    required this.iconColor,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return InkWell(
+      borderRadius: BorderRadius.circular(22),
       onTap: onTap,
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
+          color: colors.surface,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(
+            color: colors.outline.withOpacity(0.14),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: colors.shadow.withOpacity(0.04),
+              blurRadius: 12,
+              offset: const Offset(0, 7),
+            ),
+          ],
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(icon, color: color, size: 35),
+            Icon(icon, color: iconColor, size: 34),
             const SizedBox(height: 10),
-            Text(title),
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: theme.textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w800,
+              ),
+            ),
           ],
         ),
-      ),
-    );
-  }
-
-  /// 📦 SECTION CARD
-  Widget _sectionCard({required String title, required Widget child}) {
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: Container(
-        padding: const EdgeInsets.all(15),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(title,
-                style: const TextStyle(
-                    fontSize: 16, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 10),
-            child,
-          ],
-        ),
-      ),
-    );
-  }
-
-  /// 📌 ACTIVITY ITEM
-  Widget _activityItem(String text, Color color) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.end,
-        children: [
-          Text(text),
-          const SizedBox(width: 10),
-          CircleAvatar(radius: 5, backgroundColor: color),
-        ],
-      ),
-    );
-  }
-
-  /// 📊 PERFORMANCE ITEM
-  Widget _performanceItem(String value, String title) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 5),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(value, style: const TextStyle(fontWeight: FontWeight.bold)),
-          Text(title),
-        ],
       ),
     );
   }

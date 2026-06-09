@@ -1,20 +1,53 @@
 import 'package:baladiyati/features/admin/Departement/domain/Entities/Departement.dart';
 
-
-abstract class DepartmentState {}
-
-class DepartmentInitial extends DepartmentState {}
-
-class DepartmentLoading extends DepartmentState {}
-
-class DepartmentLoaded extends DepartmentState {
+class DepartmentState {
   final List<Department> departments;
+  final List<Department> filtered;
+  final bool loading;
+  final bool actionLoading;
+  final String? error;
+  final int? selectedId;
+  final String searchQuery;
 
-  DepartmentLoaded(this.departments);
-}
+  const DepartmentState({
+    required this.departments,
+    required this.filtered,
+    required this.loading,
+    required this.actionLoading,
+    required this.searchQuery,
+    this.error,
+    this.selectedId,
+  });
 
-class DepartmentError extends DepartmentState {
-  final String message;
+  factory DepartmentState.initial() {
+    return const DepartmentState(
+      departments: [],
+      filtered: [],
+      loading: false,
+      actionLoading: false,
+      searchQuery: '',
+    );
+  }
 
-  DepartmentError(this.message);
+  DepartmentState copyWith({
+    List<Department>? departments,
+    List<Department>? filtered,
+    bool? loading,
+    bool? actionLoading,
+    String? error,
+    bool clearError = false,
+    int? selectedId,
+    bool clearSelectedId = false,
+    String? searchQuery,
+  }) {
+    return DepartmentState(
+      departments: departments ?? this.departments,
+      filtered: filtered ?? this.filtered,
+      loading: loading ?? this.loading,
+      actionLoading: actionLoading ?? this.actionLoading,
+      error: clearError ? null : error ?? this.error,
+      selectedId: clearSelectedId ? null : selectedId ?? this.selectedId,
+      searchQuery: searchQuery ?? this.searchQuery,
+    );
+  }
 }

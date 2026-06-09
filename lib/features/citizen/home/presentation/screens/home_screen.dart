@@ -1,14 +1,23 @@
-// lib/features/citizen/home/presentation/screens/home_screen.dart
-
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:baladiyati/core/config/env.dart';
+import 'package:baladiyati/features/citizen/ai_chat/presentation/screens/ai_chat_screen.dart';
 
 import 'package:baladiyati/common/widgets/bottom_nav.dart';
 import 'package:baladiyati/features/citizen/payments/presentation/screens/payments_screen.dart';
 import 'package:baladiyati/features/citizen/profile/presentation/bloc/profile_bloc.dart';
+import 'package:baladiyati/features/citizen/profile/presentation/bloc/profile_event.dart';
+import 'package:baladiyati/features/citizen/profile/presentation/bloc/profile_state.dart';
 import 'package:baladiyati/features/citizen/profile/presentation/screens/profile_screen.dart';
+import 'package:baladiyati/features/citizen/services/presentation/bloc/services_bloc.dart';
+import 'package:baladiyati/features/citizen/services/presentation/bloc/services_event.dart';
 import 'package:baladiyati/features/citizen/services/presentation/screens/services_screen.dart';
 import 'package:baladiyati/features/citizen/notifications/presentation/screens/notifications_screen.dart';
+import 'package:baladiyati/features/citizen/requests/domain/entities/request_entity.dart';
+import 'package:baladiyati/features/citizen/requests/presentation/bloc/requests_bloc.dart';
+import 'package:baladiyati/features/citizen/requests/presentation/bloc/requests_event.dart';
+import 'package:baladiyati/features/citizen/requests/presentation/bloc/requests_state.dart';
 import 'package:baladiyati/features/citizen/requests/presentation/screens/requests_screen.dart';
 
 import '../widgets/home_header.dart';
@@ -27,100 +36,180 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
 
-  final String _userName = 'محمد أحمد';
-  final String _municipality = 'بلدية بيروت';
-  final int _notificationCount = 3;
-  final int _activeRequests = 3;
-  final int _awaitingPayment = 1;
-  final int _completed = 5;
+  late final ProfileBloc _profileBloc;
+  late final RequestsBloc _requestsBloc;
+  late final CitizenServicesBloc _servicesBloc;
 
-  final List<RecentRequestItem> _recentRequests = const [
-    RecentRequestItem(
-      id: '1',
-      nameAr: 'براءة ذمة بلدية',
-      status: 'waiting_payment',
-      date: '١٧-٠٣-٢٠٢٦',
-    ),
-    RecentRequestItem(
-      id: '2',
-      nameAr: 'شكوى - إنارة شارع',
-      status: 'under_review',
-      date: '١٥-٠٣-٢٠٢٦',
-    ),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _profileBloc = ProfileBloc()..add(ProfileLoadRequested());
+    _requestsBloc = RequestsBloc()..add(RequestsLoadRequested());
+    _servicesBloc = CitizenServicesBloc()..add(CitizenServicesLoadRequested());
+  }
+
+  @override
+  void dispose() {
+    _profileBloc.close();
+    _requestsBloc.close();
+    _servicesBloc.close();
+    super.dispose();
+  }
+
+  // Active = still being processed
+  int _countActive(List<RequestEntity> r) => r.where((x) {
+        final s = x.status.toUpperCase();
+        return s == 'SUBMITTED' ||
+            s == 'UNDER_REVIEW' ||
+            s == 'DOCUMENTS_MISSING' ||
+            s == 'IN_PROGRESS';
+      }).length;
+
+  // Awaiting = approved but waiting for tax payment
+  int _countAwaiting(List<RequestEntity> r) => r.where((x) {
+        final s = x.status.toUpperCase();
+        return s == 'APPROVED' || s == 'TAX_PAID';
+      }).length;
+
+  // Completed = fully done
+  int _countCompleted(List<RequestEntity> r) =>
+      r.where((x) => x.status.toUpperCase() == 'COMPLETED').length;
 
   @override
   Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-
-    return Scaffold(
-      backgroundColor: colors.background,
-      body: IndexedStack(
-        index: _currentIndex,
-        children: [
-          _buildHomePage(),
-          const ServicesScreen(),
-          const RequestsScreen(),
-          const PaymentsScreen(),
-          BlocProvider(
-            create: (_) => ProfileBloc(),
-            child: const ProfileScreen(),
-          ),
-        ],
-      ),
-      bottomNavigationBar: BottomNav(
-        currentIndex: _currentIndex,
-        onTap: (index) => setState(() => _currentIndex = index),
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider.value(value: _profileBloc),
+        BlocProvider.value(value: _requestsBloc),
+        BlocProvider.value(value: _servicesBloc),
+      ],
+      child: Scaffold(
+        backgroundColor: Theme.of(context).colorScheme.surface,
+        body: IndexedStack(
+          index: _currentIndex,
+          children: [
+            _buildHomePage(),
+            BlocProvider.value(
+              value: _servicesBloc,
+              child: const ServicesScreen(),
+            ),
+            BlocProvider.value(
+              value: _requestsBloc,
+              child: const RequestsScreen(),
+            ),
+            const PaymentsScreen(),
+            BlocProvider.value(
+              value: _profileBloc,
+              child: const ProfileScreen(),
+            ),
+          ],
+        ),
+        floatingActionButton: _currentIndex == 0
+            ? FloatingActionButton(
+                onPressed: () => Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => const AiChatScreen(),
+                  ),
+                ),
+                tooltip: AppLocalizations.of(context)!.aiChatTitle,
+                child: const Icon(Icons.auto_awesome_outlined),
+              )
+            : null,
+        bottomNavigationBar: BottomNav(
+          currentIndex: _currentIndex,
+          onTap: (i) => setState(() => _currentIndex = i),
+        ),
       ),
     );
   }
 
   Widget _buildHomePage() {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          HomeHeader(
-            userName: _userName,
-            municipality: _municipality,
-            notificationCount: _notificationCount,
-            activeRequests: _activeRequests,
-            awaitingPayment: _awaitingPayment,
-            completed: _completed,
-            onNotificationTap: () => Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (_) => const NotificationsScreen(),
+    return BlocBuilder<ProfileBloc, ProfileState>(
+      builder: (context, profileState) {
+        return BlocBuilder<RequestsBloc, RequestsState>(
+          builder: (context, requestsState) {
+            final userName = profileState.profile?.fullName ?? '...';
+            final municipality =
+                (profileState.profile?.municipalityName?.isNotEmpty ?? false)
+                    ? profileState.profile!.municipalityName!
+                    : profileState.isLoading
+                        ? '...'
+                        : Env.appName;
+
+            final requests = requestsState.requests;
+
+            return SingleChildScrollView(
+              child: Column(
+                children: [
+                  HomeHeader(
+                    userName: userName,
+                    municipality: municipality,
+                    notificationCount: 3,
+                    activeRequests: _countActive(requests),
+                    awaitingPayment: _countAwaiting(requests),
+                    completed: _countCompleted(requests),
+                    isLoading: requestsState.isLoading,
+                    onNotificationTap: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (_) => const NotificationsScreen(),
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        const SizedBox(height: 8),
+                        QuickActions(
+                          onNewRequest: () =>
+                              setState(() => _currentIndex = 1),
+                          onPayments: () =>
+                              setState(() => _currentIndex = 3),
+                        ),
+                        const SizedBox(height: 20),
+                        ServiceCategoriesSection(
+                          onViewAll: () =>
+                              setState(() => _currentIndex = 1),
+                          onCategoryTap: () =>
+                              setState(() => _currentIndex = 1),
+                        ),
+                        const SizedBox(height: 20),
+                        RecentRequestsSection(
+                          isLoading: requestsState.isLoading,
+                          requests: requests.take(2).map((r) =>
+                            RecentRequestItem(
+                              id: r.id,
+                              nameAr: r.title.isNotEmpty
+                                  ? r.title
+                                  : (r.serviceName ?? r.trackingNumber),
+                              status: r.status.toLowerCase(),
+                              date: _formatDate(r.createdAt),
+                            ),
+                          ).toList(),
+                          onViewAll: () =>
+                              setState(() => _currentIndex = 2),
+                          onRequestTap: (_) =>
+                              setState(() => _currentIndex = 2),
+                        ),
+                        const SizedBox(height: 20),
+                        const AnnouncementsCard(),
+                        const SizedBox(height: 20),
+                      ],
+                    ),
+                  ),
+                ],
               ),
-            ),
-          ),
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              children: [
-                const SizedBox(height: 8),
-                QuickActions(
-                  onNewRequest: () => setState(() => _currentIndex = 1),
-                  onPayments: () => setState(() => _currentIndex = 3),
-                ),
-                const SizedBox(height: 20),
-                ServiceCategoriesSection(
-                  onViewAll: () => setState(() => _currentIndex = 1),
-                  onCategoryTap: (_) => setState(() => _currentIndex = 1),
-                ),
-                const SizedBox(height: 20),
-                RecentRequestsSection(
-                  requests: _recentRequests,
-                  onViewAll: () => setState(() => _currentIndex = 2),
-                  onRequestTap: (_) => setState(() => _currentIndex = 2),
-                ),
-                const SizedBox(height: 20),
-                const AnnouncementsCard(),
-                const SizedBox(height: 20),
-              ],
-            ),
-          ),
-        ],
-      ),
+            );
+          },
+        );
+      },
     );
+  }
+
+  String _formatDate(DateTime? dt) {
+    if (dt == null) return '-';
+    return '${dt.day.toString().padLeft(2, '0')}/${dt.month.toString().padLeft(2, '0')}/${dt.year}';
   }
 }

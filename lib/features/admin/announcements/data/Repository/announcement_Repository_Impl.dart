@@ -1,25 +1,37 @@
 import 'package:baladiyati/features/admin/announcements/data/model/announcementModel.dart';
-
 import 'package:baladiyati/features/admin/announcements/data/services/Announcement_Api_Service.dart';
+import 'package:baladiyati/features/admin/announcements/domain/Repository/announcement_Repository.dart';
 import 'package:baladiyati/features/admin/announcements/domain/entities/announcement.dart';
 
-class AnnouncementRepositoryImpl {
+class AnnouncementRepositoryImpl implements AnnouncementRepository {
   final AnnouncementApiService api;
 
   AnnouncementRepositoryImpl(this.api);
 
-  Future<void> create(Announcement a) {
-    final model = AnnouncementModel(
-      title: a.title,
-      content: a.content,
-    );
+  @override
+  Future<List<Announcement>> getAll() async {
+    return api.getAll();
+  }
 
+  @override
+  Future<Announcement> getById(int id) {
+    return api.getById(id);
+  }
+
+  @override
+  Future<Announcement> create(Announcement announcement) {
+    final model = AnnouncementModel.fromEntity(announcement);
     return api.createAnnouncement(model);
   }
 
-  Future<List<Announcement>> getAll() async {
-    final result = await api.getAll();
+  @override
+  Future<Announcement> update(int id, Announcement announcement) {
+    final model = AnnouncementModel.fromEntity(announcement);
+    return api.updateAnnouncement(id, model);
+  }
 
-    return result; // إذا بدك لاحقاً ممكن تحوّل لـ Entity
+  @override
+  Future<void> delete(int id) {
+    return api.deleteAnnouncement(id);
   }
 }

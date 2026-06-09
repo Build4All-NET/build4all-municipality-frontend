@@ -7,6 +7,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import '../core/l10n/locale_cubit.dart';
+import '../core/network/navigation/app_navigator.dart';
 import '../core/theme/theme_cubit.dart';
 import '../core/theme/app_theme_builder.dart';
 import '../features/welcome/presentation/screens/welcome_screen.dart';
@@ -32,6 +33,7 @@ class MyApp extends StatelessWidget {
           return MaterialApp(
             title: 'بلديتي',
             debugShowCheckedModeBanner: false,
+            navigatorKey: AppNavigator.key,
             theme: themeState.themeData,
             locale: locale ?? const Locale('ar'),
             supportedLocales: const [

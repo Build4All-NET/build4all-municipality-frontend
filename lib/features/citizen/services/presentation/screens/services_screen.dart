@@ -1,29 +1,18 @@
-// lib/features/citizen/services/presentation/screens/services_screen.dart
-
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/common/widgets/app_search_field.dart';
+import 'package:baladiyati/common/widgets/app_toast.dart';
+import 'package:baladiyati/common/widgets/shimmer_loading.dart';
+import 'package:baladiyati/features/citizen/services/domain/entities/service_entity.dart';
+import 'package:baladiyati/features/citizen/services/presentation/bloc/services_bloc.dart';
+import 'package:baladiyati/features/citizen/services/presentation/bloc/services_event.dart';
+import 'package:baladiyati/features/citizen/services/presentation/bloc/services_state.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
-import 'services_by_category_screen.dart';
-
-class _Category {
-  final String id;
-  final String nameAr;
-  final IconData icon;
-  final Color color;
-  final int count;
-  const _Category({required this.id, required this.nameAr, required this.icon, required this.color, required this.count});
-}
-
-const List<_Category> _categories = [
-  _Category(id: 'general', nameAr: 'الخدمات العامة', icon: Icons.description_outlined, color: Color(0xFF3B82F6), count: 8),
-  _Category(id: 'commercial', nameAr: 'الخدمات التجارية والمهنية', icon: Icons.storefront_outlined, color: Color(0xFFF59E0B), count: 9),
-  _Category(id: 'engineering', nameAr: 'الخدمات الهندسية', icon: Icons.engineering_outlined, color: Color(0xFF10B981), count: 7),
-  _Category(id: 'realestate', nameAr: 'الخدمات العقارية', icon: Icons.apartment_outlined, color: Color(0xFF8B5CF6), count: 11),
-  _Category(id: 'police', nameAr: 'الشرطة البلدية', icon: Icons.shield_outlined, color: Color(0xFFEF4444), count: 3),
-  _Category(id: 'financial', nameAr: 'الخدمات المالية', icon: Icons.attach_money, color: Color(0xFF22C55E), count: 5),
-];
+import 'service_details_screen.dart';
 
 class ServicesScreen extends StatefulWidget {
   const ServicesScreen({super.key});
+
   @override
   State<ServicesScreen> createState() => _ServicesScreenState();
 }
@@ -31,88 +20,291 @@ class ServicesScreen extends StatefulWidget {
 class _ServicesScreenState extends State<ServicesScreen> {
   final _searchCtrl = TextEditingController();
   String _query = '';
-
-  List<_Category> get _filtered => _query.isEmpty
-      ? _categories
-      : _categories.where((c) => c.nameAr.contains(_query)).toList();
+  String? _lastShownError;
 
   @override
-  void dispose() { _searchCtrl.dispose(); super.dispose(); }
+  void initState() {
+    super.initState();
+    final bloc = context.read<CitizenServicesBloc>();
+    if (!bloc.state.isLoading && bloc.state.services.isEmpty) {
+      bloc.add(CitizenServicesLoadRequested());
+    }
+  }
+
+  @override
+  void dispose() {
+    _searchCtrl.dispose();
+    super.dispose();
+  }
+
+  List<ServiceEntity> _filtered(List<ServiceEntity> all, String langCode) =>
+      all.where((s) {
+        final q = _query.trim().toLowerCase();
+        if (q.isEmpty) return true;
+        return s.localizedName(langCode).toLowerCase().contains(q) ||
+            s.localizedDescription(langCode).toLowerCase().contains(q);
+      }).toList();
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-    return Scaffold(
-      backgroundColor: const Color(0xFFF3F4F6),
-      body: SafeArea(
-        child: Column(
+    final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final langCode = Localizations.localeOf(context).languageCode;
+
+    return BlocConsumer<CitizenServicesBloc, CitizenServicesState>(
+      listener: (context, state) {
+        if (state.errorMessage != null &&
+            state.errorMessage != _lastShownError) {
+          _lastShownError = state.errorMessage;
+          AppToast.show(context,
+              message: state.errorMessage!, type: AppToastType.error);
+        }
+      },
+      builder: (context, state) {
+        final items = _filtered(state.services, langCode);
+
+        return Scaffold(
+          backgroundColor: theme.scaffoldBackgroundColor,
+          body: SafeArea(
+            child: Column(
+              children: [
+                Container(
+                  color: colors.surface,
+                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        loc.services,
+                        style: theme.textTheme.headlineSmall
+                            ?.copyWith(fontWeight: FontWeight.w900),
+                      ),
+                      const SizedBox(height: 12),
+                      AppSearchField(
+                        controller: _searchCtrl,
+                        hint: loc.search,
+                        onChanged: (v) => setState(() => _query = v),
+                        onClear: _query.isEmpty
+                            ? null
+                            : () {
+                                _searchCtrl.clear();
+                                setState(() => _query = '');
+                              },
+                      ),
+                    ],
+                  ),
+                ),
+                Expanded(
+                  child: state.isLoading
+                      ? const _ServicesSkeleton()
+                      : items.isEmpty
+                          ? Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.list_alt_outlined,
+                                      size: 64, color: colors.outline),
+                                  const SizedBox(height: 12),
+                                  Text(
+                                    state.errorMessage != null
+                                        ? loc.loadFailed
+                                        : loc.noData,
+                                    style: theme.textTheme.bodyLarge?.copyWith(
+                                        color: colors.outline),
+                                  ),
+                                  if (state.errorMessage != null) ...[
+                                    const SizedBox(height: 12),
+                                    TextButton(
+                                      onPressed: () => context
+                                          .read<CitizenServicesBloc>()
+                                          .add(CitizenServicesRefreshRequested()),
+                                      child: Text(loc.retry),
+                                    ),
+                                  ],
+                                ],
+                              ),
+                            )
+                          : RefreshIndicator(
+                              onRefresh: () async => context
+                                  .read<CitizenServicesBloc>()
+                                  .add(CitizenServicesRefreshRequested()),
+                              child: ListView.builder(
+                                padding: const EdgeInsets.all(16),
+                                itemCount: items.length,
+                                itemBuilder: (_, i) => _ServiceCard(
+                                  service: items[i],
+                                  langCode: langCode,
+                                  theme: theme,
+                                  onTap: () => Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (_) => ServiceDetailsScreen(
+                                          service: items[i]),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                ),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+// ── Skeleton ──────────────────────────────────────────────────────────────────
+
+class _ServicesSkeleton extends StatelessWidget {
+  const _ServicesSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      padding: const EdgeInsets.all(16),
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: 7,
+      itemBuilder: (_, __) => const _ServiceCardSkeleton(),
+    );
+  }
+}
+
+class _ServiceCardSkeleton extends StatelessWidget {
+  const _ServiceCardSkeleton();
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.outline.withOpacity(0.12)),
+      ),
+      child: Row(
+        children: [
+          const ShimmerBox(width: 48, height: 48, radius: 12),
+          const SizedBox(width: 14),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(children: [
+                  const Expanded(flex: 7, child: ShimmerBox(height: 14)),
+                  const Spacer(flex: 3),
+                ]),
+                const SizedBox(height: 7),
+                const ShimmerBox(height: 12),
+                const SizedBox(height: 4),
+                Row(children: [
+                  const Expanded(flex: 6, child: ShimmerBox(height: 12)),
+                  const Spacer(flex: 4),
+                ]),
+              ],
+            ),
+          ),
+          const SizedBox(width: 10),
+          const ShimmerBox(width: 18, height: 18, radius: 4),
+        ],
+      ),
+    );
+  }
+}
+
+// ── Real card ──────────────────────────────────────────────────────────────────
+
+class _ServiceCard extends StatelessWidget {
+  final ServiceEntity service;
+  final String langCode;
+  final ThemeData theme;
+  final VoidCallback onTap;
+
+  const _ServiceCard({
+    required this.service,
+    required this.langCode,
+    required this.theme,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = theme.colorScheme;
+    final loc = AppLocalizations.of(context)!;
+
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: colors.surface,
+          borderRadius: BorderRadius.circular(16),
+          border: Border.all(color: colors.outline.withOpacity(0.12)),
+          boxShadow: [
+            BoxShadow(
+                color: colors.shadow.withOpacity(0.04),
+                blurRadius: 8,
+                offset: const Offset(0, 2))
+          ],
+        ),
+        child: Row(
           children: [
             Container(
-              color: Colors.white,
-              padding: const EdgeInsets.fromLTRB(8, 16, 16, 16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(l10n.municipalServices, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF1E3A5F))),
-                  const SizedBox(height: 12),
-                  TextField(
-                    controller: _searchCtrl,
-                    textAlign: TextAlign.right,
-                    onChanged: (v) => setState(() => _query = v),
-                    decoration: InputDecoration(
-                      hintText: l10n.searchService,
-                      hintStyle: const TextStyle(color: Colors.grey),
-                      prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                      filled: true, fillColor: const Color(0xFFF3F4F6),
-                      border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
-                      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                    ),
-                  ),
-                ],
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: colors.primary.withOpacity(0.10),
+                borderRadius: BorderRadius.circular(12),
               ),
+              child: Icon(Icons.description_outlined,
+                  color: colors.primary, size: 24),
             ),
+            const SizedBox(width: 14),
             Expanded(
-              child: ListView(
-                padding: const EdgeInsets.all(16),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(l10n.selectCategory, textAlign: TextAlign.right, style: const TextStyle(color: Colors.grey, fontSize: 13)),
-                  const SizedBox(height: 12),
-                  ..._filtered.map((cat) => GestureDetector(
-                    onTap: () => Navigator.push(context, MaterialPageRoute(
-                      builder: (_) => ServicesByCategoryScreen(
-                        categoryId: cat.id, categoryNameAr: cat.nameAr,
-                        categoryColor: cat.color, categoryIcon: cat.icon,
-                      ),
-                    )),
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white, borderRadius: BorderRadius.circular(16),
-                        boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.05), blurRadius: 8, offset: const Offset(0, 2))],
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.arrow_back_ios, size: 16, color: Colors.grey),
-                          const Spacer(),
-                          Column(crossAxisAlignment: CrossAxisAlignment.end, children: [
-                            Text(cat.nameAr, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600)),
-                            const SizedBox(height: 4),
-                            Text('${cat.count} ${l10n.serviceCount}', style: const TextStyle(fontSize: 12, color: Colors.grey)),
-                          ]),
-                          const SizedBox(width: 16),
-                          Container(
-                            width: 56, height: 56,
-                            decoration: BoxDecoration(color: cat.color.withOpacity(0.15), borderRadius: BorderRadius.circular(14)),
-                            child: Icon(cat.icon, color: cat.color, size: 28),
-                          ),
-                        ],
-                      ),
+                  Text(
+                    service.localizedName(langCode),
+                    style: theme.textTheme.titleSmall
+                        ?.copyWith(fontWeight: FontWeight.w700),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    service.localizedDescription(langCode),
+                    style: theme.textTheme.bodySmall
+                        ?.copyWith(color: colors.outline),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (service.hasFees && service.feeAmount != null) ...[
+                    const SizedBox(height: 6),
+                    Row(
+                      children: [
+                        Icon(Icons.attach_money,
+                            size: 14, color: colors.secondary),
+                        const SizedBox(width: 2),
+                        Text(
+                          '${loc.feeLabel} ${service.feeAmount!.toStringAsFixed(0)}',
+                          style: theme.textTheme.bodySmall?.copyWith(
+                              color: colors.secondary,
+                              fontWeight: FontWeight.w600),
+                        ),
+                      ],
                     ),
-                  )),
+                  ],
                 ],
               ),
             ),
+            Icon(Icons.chevron_right, size: 20, color: colors.outline),
           ],
         ),
       ),

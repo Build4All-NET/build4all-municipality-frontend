@@ -1,0 +1,603 @@
+import 'package:baladiyati/common/widgets/app_toast.dart';
+import 'package:baladiyati/features/admin/Departement/presentation/bloc/Departement_State.dart';
+import 'package:baladiyati/features/admin/Departement/presentation/cubit/Departement_cubit.dart';
+import 'package:baladiyati/features/admin/Requests/data/model/RequestModel.dart';
+import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_Bloc.dart';
+import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_Event.dart';
+import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_State.dart';
+import 'package:baladiyati/features/admin/Requests/presentation/screens/Request_Detail.dart';
+import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
+
+class RequestsScreen extends StatefulWidget {
+  const RequestsScreen({super.key});
+
+  @override
+  State<RequestsScreen> createState() => _RequestsScreenState();
+}
+
+class _RequestsScreenState extends State<RequestsScreen> {
+  static const List<String> _statuses = [
+    'SUBMITTED',
+    'UNDER_REVIEW',
+    'DOCUMENTS_MISSING',
+    'IN_PROGRESS',
+    'APPROVED',
+    'REJECTED',
+    'COMPLETED',
+    'CANCELLED',
+  ];
+
+  @override
+  void initState() {
+    super.initState();
+
+    context.read<RequestBloc>().add(LoadRequests());
+    context.read<DepartmentCubit>().fetchDepartments();
+  }
+
+  String _safe(String? value) {
+    final clean = value?.trim() ?? '';
+    return clean.isEmpty || clean == 'null' ? '---' : clean;
+  }
+
+  String _formatStatus(String? status) {
+    final clean = _safe(status);
+    if (clean == '---') return clean;
+
+    return clean.replaceAll('_', ' ');
+  }
+
+  String _formatDate(String? value) {
+    final clean = value?.trim() ?? '';
+    if (clean.isEmpty || clean == 'null') return '---';
+
+    return clean.replaceFirst('T', ' ').split('.').first;
+  }
+
+  Color _statusColor(BuildContext context, String status) {
+    final colors = Theme.of(context).colorScheme;
+
+    switch (status) {
+      case 'APPROVED':
+      case 'COMPLETED':
+        return colors.primary;
+      case 'REJECTED':
+      case 'CANCELLED':
+        return colors.error;
+      case 'IN_PROGRESS':
+      case 'UNDER_REVIEW':
+        return colors.tertiary;
+      default:
+        return colors.secondary;
+    }
+  }
+
+  Future<void> _openDetails(RequestModel request) async {
+    await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (_) => BlocProvider.value(
+          value: context.read<RequestBloc>(),
+          child: RequestDetailPage(request: request),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final colors = Theme.of(context).colorScheme;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: _ResponsiveText(
+          text: l10n.requests,
+          maxFontSize: 20,
+          minFontSize: 12,
+          fontWeight: FontWeight.w900,
+          color: colors.onSurface,
+        ),
+        centerTitle: true,
+      ),
+      body: BlocConsumer<RequestBloc, RequestState>(
+        listener: (context, state) {
+          final error = state.error.trim();
+          if (error.isNotEmpty) {
+            AppToast.show(
+              context,
+              message: error,
+              type: AppToastType.error,
+            );
+          }
+
+          final success = state.success.trim();
+          if (success.isNotEmpty) {
+            AppToast.show(
+              context,
+              message: success,
+              type: AppToastType.success,
+            );
+          }
+        },
+        builder: (context, state) {
+          return RefreshIndicator(
+            onRefresh: () async {
+              context.read<RequestBloc>().add(
+                    LoadRequests(
+                      departmentId: state.selectedDepartmentId,
+                      status: state.selectedStatus,
+                    ),
+                  );
+            },
+            child: ListView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              padding: const EdgeInsets.fromLTRB(14, 12, 14, 24),
+              children: [
+                TextField(
+                  onChanged: (value) {
+                    context.read<RequestBloc>().add(SearchRequests(value));
+                  },
+                  decoration: InputDecoration(
+                    hintText: l10n.search,
+                    prefixIcon: const Icon(Icons.search),
+                    filled: true,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  children: [
+                    Expanded(
+                      child: BlocBuilder<DepartmentCubit, DepartmentState>(
+                        builder: (context, depState) {
+                          return DropdownButtonFormField<int?>(
+                            value: state.selectedDepartmentId,
+                            isExpanded: true,
+                            decoration: InputDecoration(
+                              labelText: l10n.department,
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(14),
+                              ),
+                            ),
+                            items: [
+                              DropdownMenuItem<int?>(
+                                value: null,
+                                child: _ResponsiveText(
+                                  text: l10n.all,
+                                  maxFontSize: 13,
+                                  minFontSize: 8,
+                                  color: colors.onSurface,
+                                ),
+                              ),
+                              ...depState.departments.map(
+                                (department) {
+                                  return DropdownMenuItem<int?>(
+                                    value: department.id,
+                                    child: _ResponsiveText(
+                                      text: department.name,
+                                      maxFontSize: 13,
+                                      minFontSize: 8,
+                                      color: colors.onSurface,
+                                    ),
+                                  );
+                                },
+                              ),
+                            ],
+                            onChanged: (value) {
+                              context.read<RequestBloc>().add(
+                                    FilterRequests(
+                                      departmentId: value,
+                                      status: state.selectedStatus,
+                                    ),
+                                  );
+                            },
+                          );
+                        },
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      child: DropdownButtonFormField<String?>(
+                        value: state.selectedStatus,
+                        isExpanded: true,
+                        decoration: InputDecoration(
+                          labelText: l10n.status,
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(14),
+                          ),
+                        ),
+                        items: [
+                          DropdownMenuItem<String?>(
+                            value: null,
+                            child: _ResponsiveText(
+                              text: l10n.all,
+                              maxFontSize: 13,
+                              minFontSize: 8,
+                              color: colors.onSurface,
+                            ),
+                          ),
+                          ..._statuses.map(
+                            (status) {
+                              return DropdownMenuItem<String?>(
+                                value: status,
+                                child: _ResponsiveText(
+                                  text: _formatStatus(status),
+                                  maxFontSize: 13,
+                                  minFontSize: 8,
+                                  color: colors.onSurface,
+                                ),
+                              );
+                            },
+                          ),
+                        ],
+                        onChanged: (value) {
+                          context.read<RequestBloc>().add(
+                                FilterRequests(
+                                  departmentId: state.selectedDepartmentId,
+                                  status: value,
+                                ),
+                              );
+                        },
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                if (state.loading && state.visibleRequests.isEmpty)
+                  const Padding(
+                    padding: EdgeInsets.only(top: 120),
+                    child: Center(child: CircularProgressIndicator()),
+                  )
+                else if (state.visibleRequests.isEmpty)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 120),
+                    child: Center(
+                      child: _ResponsiveText(
+                        text: l10n.noData,
+                        maxFontSize: 15,
+                        minFontSize: 10,
+                        color: colors.onSurfaceVariant,
+                      ),
+                    ),
+                  )
+                else
+                  ...state.visibleRequests.map(
+                    (request) {
+                      return _RequestCard(
+                        request: request,
+                        statusText: _formatStatus(request.status),
+                        statusColor: _statusColor(context, request.status),
+                        createdAt: _formatDate(request.createdAt),
+                        onTap: () => _openDetails(request),
+                      );
+                    },
+                  ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class _RequestCard extends StatelessWidget {
+  final RequestModel request;
+  final String statusText;
+  final Color statusColor;
+  final String createdAt;
+  final VoidCallback onTap;
+
+  const _RequestCard({
+    required this.request,
+    required this.statusText,
+    required this.statusColor,
+    required this.createdAt,
+    required this.onTap,
+  });
+
+  String _safe(String? value) {
+    final clean = value?.trim() ?? '';
+    return clean.isEmpty || clean.toLowerCase() == 'null' ? '---' : clean;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(22),
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 12),
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: colors.surface,
+          borderRadius: BorderRadius.circular(22),
+          border: Border.all(
+            color: colors.outlineVariant.withOpacity(0.55),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: colors.shadow.withOpacity(0.035),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
+            ),
+          ],
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              height: 44,
+              width: 44,
+              decoration: BoxDecoration(
+                color: statusColor.withOpacity(0.13),
+                borderRadius: BorderRadius.circular(15),
+              ),
+              child: Icon(
+                Icons.assignment_outlined,
+                color: statusColor,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    _safe(request.title),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      color: colors.onSurface,
+                    ),
+                  ),
+                  const SizedBox(height: 6),
+                  _MiniInfoLine(
+                    icon: Icons.miscellaneous_services_outlined,
+                    text: _safe(request.serviceName),
+                  ),
+                  const SizedBox(height: 4),
+                  _MiniInfoLine(
+                    icon: Icons.person_outline,
+                    text: _safe(request.citizenName),
+                  ),
+                  const SizedBox(height: 7),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
+                    children: [
+                      _TinyChip(
+                        icon: Icons.confirmation_number_outlined,
+                        text: _safe(request.trackingNumber),
+                      ),
+                      _TinyChip(
+                        icon: Icons.calendar_today_outlined,
+                        text: createdAt,
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            _StatusBadge(
+              label: statusText,
+              color: statusColor,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _MiniInfoLine extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _MiniInfoLine({
+    required this.icon,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return Row(
+      children: [
+        Icon(
+          icon,
+          size: 14,
+          color: colors.onSurfaceVariant,
+        ),
+        const SizedBox(width: 5),
+        Expanded(
+          child: Text(
+            text,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: colors.onSurfaceVariant,
+                  fontWeight: FontWeight.w600,
+                ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _TinyChip extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const _TinyChip({
+    required this.icon,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final colors = Theme.of(context).colorScheme;
+
+    return ConstrainedBox(
+      constraints: const BoxConstraints(
+        maxWidth: 135,
+      ),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 5),
+        decoration: BoxDecoration(
+          color: colors.surfaceContainerHighest.withOpacity(0.55),
+          borderRadius: BorderRadius.circular(999),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(
+              icon,
+              size: 12,
+              color: colors.onSurfaceVariant,
+            ),
+            const SizedBox(width: 4),
+            Flexible(
+              child: Text(
+                text,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                softWrap: false,
+                style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                      color: colors.onSurfaceVariant,
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class _StatusBadge extends StatelessWidget {
+  final String label;
+  final Color color;
+
+  const _StatusBadge({
+    required this.label,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Flexible(
+      flex: 0,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(
+          maxWidth: 92,
+        ),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 6),
+          decoration: BoxDecoration(
+            color: color.withOpacity(0.12),
+            borderRadius: BorderRadius.circular(999),
+          ),
+          child: Text(
+            label,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+            textAlign: TextAlign.center,
+            style: Theme.of(context).textTheme.labelSmall?.copyWith(
+                  color: color,
+                  fontWeight: FontWeight.w800,
+                ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _ResponsiveText extends StatelessWidget {
+  final String text;
+  final TextAlign textAlign;
+  final double minFontSize;
+  final double maxFontSize;
+  final FontWeight fontWeight;
+  final Color color;
+
+  const _ResponsiveText({
+    required this.text,
+    this.textAlign = TextAlign.start,
+    this.minFontSize = 9,
+    this.maxFontSize = 14,
+    this.fontWeight = FontWeight.normal,
+    required this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final cleanText = text.trim().isEmpty ? '---' : text.trim();
+
+    double fontSize = maxFontSize;
+    final length = cleanText.runes.length;
+
+    if (length > 45) {
+      fontSize = maxFontSize - 6;
+    } else if (length > 38) {
+      fontSize = maxFontSize - 5;
+    } else if (length > 31) {
+      fontSize = maxFontSize - 4;
+    } else if (length > 24) {
+      fontSize = maxFontSize - 3;
+    } else if (length > 17) {
+      fontSize = maxFontSize - 2;
+    } else if (length > 11) {
+      fontSize = maxFontSize - 1;
+    }
+
+    if (fontSize < minFontSize) {
+      fontSize = minFontSize;
+    }
+
+    Alignment alignment;
+
+    if (textAlign == TextAlign.end || textAlign == TextAlign.right) {
+      alignment = Alignment.centerRight;
+    } else if (textAlign == TextAlign.center) {
+      alignment = Alignment.center;
+    } else {
+      alignment = Alignment.centerLeft;
+    }
+
+    return SizedBox(
+      width: double.infinity,
+      child: FittedBox(
+        fit: BoxFit.scaleDown,
+        alignment: alignment,
+        child: Text(
+          cleanText,
+          maxLines: 1,
+          softWrap: false,
+          textAlign: textAlign,
+          style: TextStyle(
+            color: color,
+            fontSize: fontSize,
+            fontWeight: fontWeight,
+            height: 1.15,
+          ),
+        ),
+      ),
+    );
+  }
+}

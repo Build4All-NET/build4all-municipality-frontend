@@ -6,7 +6,7 @@ class CreateAnnouncement {
 
   CreateAnnouncement(this.repo);
 
-  Future<void> call(Announcement a) {
-    return repo.create(a);
+  Future<Announcement> call(Announcement announcement) {
+    return repo.create(announcement);
   }
 }

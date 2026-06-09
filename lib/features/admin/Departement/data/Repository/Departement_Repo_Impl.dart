@@ -9,26 +9,24 @@ class DepartmentRepositoryImpl implements DepartmentRepository {
   DepartmentRepositoryImpl(this.api);
 
   @override
-  Future<List<Department>> getAll() => api.getAll();
+  Future<List<Department>> getAll() async {
+    final result = await api.getAll();
 
-  @override
-  Future<Department> getById(int id) async {
-    final res = await api.dio.get('/api/admin/departments/$id');
-    return DepartmentModel.fromJson(res.data);
+    return result.map((e) => e.toEntity()).toList();
   }
 
   @override
-  Future<void> create(Department department) {
-    return api.create(department as DepartmentModel);
+  Future<void> add(Department dep) async {
+    await api.add(DepartmentModel.fromEntity(dep));
   }
 
   @override
-  Future<void> update(int id, Department department) {
-    return api.update(id, department as DepartmentModel);
+  Future<void> update(Department dep) async {
+    await api.update(dep.id, DepartmentModel.fromEntity(dep));
   }
 
   @override
-  Future<void> delete(int id) {
-    return api.delete(id);
+  Future<void> delete(int id) async {
+    await api.delete(id);
   }
 }

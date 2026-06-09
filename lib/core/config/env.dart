@@ -1,12 +1,12 @@
 class Env {
   static const apiBaseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: ' http://192.168.0.117:8081',
+    defaultValue: '  https://static-sneeze-unfrozen.ngrok-free.dev',
 
   );
  static const String overrideBaseUrl = String.fromEnvironment(
   'OVERRIDE_BASE_URL',
-  defaultValue: 'http://192.168.0.117:8091',
+  defaultValue: ' https://static-sneeze-unfrozen.ngrok-free.dev',
 );
 
   static const wsPath = String.fromEnvironment(

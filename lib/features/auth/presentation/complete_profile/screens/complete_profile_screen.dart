@@ -1,6 +1,7 @@
 // lib/features/auth/presentation/complete_profile/screens/complete_profile_screen.dart
 
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:baladiyati/app/app_router.dart';
 import 'package:baladiyati/common/registration_step_cubit.dart';
@@ -10,10 +11,11 @@ import 'package:baladiyati/common/widgets/primary_button.dart';
 import 'package:baladiyati/core/config/app_sizes.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
-import 'package:baladiyati/features/auth/data/services/auth_api_service.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:image_picker/image_picker.dart';
+
 import 'package:shared_preferences/shared_preferences.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
@@ -31,7 +33,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final _usernameCtrl = TextEditingController();
 
   final _authApi = AuthApi(DioClient.build);
+  final _imagePicker = ImagePicker();
 
+  File? _selectedImage;
   bool _isLoading = false;
 
   @override
@@ -60,6 +64,23 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
   String _cleanError(Object e) {
     return e.toString().replaceAll('Exception:', '').trim();
+  }
+
+  Future<void> _pickImage() async {
+    if (_isLoading) return;
+
+    final picked = await _imagePicker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 80,
+      maxWidth: 900,
+      maxHeight: 900,
+    );
+
+    if (picked == null) return;
+
+    setState(() {
+      _selectedImage = File(picked.path);
+    });
   }
 
   Future<void> _onSubmit(AppLocalizations l10n) async {
@@ -97,6 +118,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         username: username,
         isPublicProfile: false,
         ownerProjectLinkId: ownerProjectLinkId,
+        profileImagePath: _selectedImage?.path,
       );
 
       final updatedBody = {
@@ -104,6 +126,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         'firstName': firstName,
         'lastName': lastName,
         'username': username,
+        'profileImagePath': _selectedImage?.path,
         'build4allProfileCompleted': true,
       };
 
@@ -178,7 +201,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 28),
+                        const SizedBox(height: 24),
+
+                        _buildImagePicker(context),
+
+                        const SizedBox(height: 24),
 
                         AppTextField(
                           controller: _firstNameCtrl,
@@ -271,6 +298,89 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
             ),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildImagePicker(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final cs = theme.colorScheme;
+
+    return Center(
+      child: Column(
+        children: [
+          GestureDetector(
+            onTap: _isLoading ? null : _pickImage,
+            child: Stack(
+              alignment: Alignment.bottomRight,
+              children: [
+                CircleAvatar(
+                  radius: 52,
+                  backgroundColor: cs.primary.withOpacity(0.10),
+                  backgroundImage:
+                      _selectedImage != null ? FileImage(_selectedImage!) : null,
+                  child: _selectedImage == null
+                      ? Icon(
+                          Icons.person_outline,
+                          color: cs.primary,
+                          size: 46,
+                        )
+                      : null,
+                ),
+                Container(
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: cs.primary,
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: cs.surface,
+                      width: 2,
+                    ),
+                  ),
+                  child: Icon(
+                    Icons.camera_alt_outlined,
+                    size: 18,
+                    color: cs.onPrimary,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          const SizedBox(height: 10),
+
+          TextButton(
+            onPressed: _isLoading ? null : _pickImage,
+            child: Text(
+              _selectedImage == null
+                  ? l10n.chooseProfileImage
+                  : l10n.changeProfileImage,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: cs.primary,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+
+          if (_selectedImage != null)
+            TextButton(
+              onPressed: _isLoading
+                  ? null
+                  : () {
+                      setState(() {
+                        _selectedImage = null;
+                      });
+                    },
+              child: Text(
+                l10n.removeProfileImage,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: cs.error,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }

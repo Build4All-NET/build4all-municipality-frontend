@@ -12,9 +12,9 @@ dependencies:
   flutter_localizations:
     sdk: flutter
 
-
   # State Management
   flutter_bloc: ^8.1.3
+  flutter_riverpod: ^2.6.1
 
   # HTTP & API
   http: ^1.1.0
@@ -23,8 +23,12 @@ dependencies:
   # Local Storage
   shared_preferences: ^2.2.2
   flutter_secure_storage: ^9.0.0
+  path_provider: ^2.1.5
+  open_filex: ^4.7.0
   flutter_launcher_icons: ^0.13.1
   flutter_native_splash: ^2.4.1
+  image_picker: ^1.1.2
+  phone_form_field: ^10.0.1
 
   # Utils
   equatable: ^2.0.5
@@ -34,6 +38,14 @@ dependencies:
 
   # UI
   cupertino_icons: ^1.0.2
+
+  # File Upload
+  file_picker: ^8.0.0
+
+  # Location
+  geolocator: ^13.0.2
+  flutter_map: ^7.0.2
+  latlong2: ^0.9.0
 
 dev_dependencies:
   flutter_test:
@@ -63,4 +75,3 @@ flutter:
 
   assets:
     - assets/branding/
-  

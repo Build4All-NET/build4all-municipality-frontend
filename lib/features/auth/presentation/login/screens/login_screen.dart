@@ -8,13 +8,14 @@ import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
 import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
 import 'package:baladiyati/features/auth/data/services/session_role_store.dart';
-import 'package:baladiyati/features/auth/data/services/auth_api_service.dart';
 import 'package:baladiyati/features/auth/domain/facade/dual_login_orchestrator.dart';
 import 'package:baladiyati/features/auth/presentation/municipality_profile/screens/municipality_profile_setup_screen.dart';
 import 'package:baladiyati/features/auth/presentation/register/screens/user_register_screen.dart';
 import 'package:baladiyati/features/citizen/home/presentation/screens/home_screen.dart';
 import 'package:baladiyati/features/forgotpassword/presentation/screens/reset_password_page.dart';
+import 'package:baladiyati/features/staff/dashboard/presentation/screens/staff_dashboard_screen.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -40,6 +41,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   bool _obscurePassword = true;
   bool _isLoading = false;
+
+  // true = Citizen tab, false = Employee tab
   bool isCitizen = true;
 
   static int get ownerProjectLinkId {
@@ -57,6 +60,16 @@ class _LoginScreenState extends State<LoginScreen> {
 
   String _cleanError(Object e) {
     return e.toString().replaceAll('Exception:', '').trim();
+  }
+
+  String _bearer(String token) {
+    final clean = token.trim();
+
+    if (clean.toLowerCase().startsWith('bearer ')) {
+      return clean;
+    }
+
+    return 'Bearer $clean';
   }
 
   Map<String, dynamic> _extractUserMap(DualLoginResult dual) {
@@ -86,7 +99,7 @@ class _LoginScreenState extends State<LoginScreen> {
     return 'municipality_profile_completed_${ownerProjectLinkId}_$userId';
   }
 
-  Future<bool> _isMunicipalityProfileCompleted({
+  Future<bool> _isMunicipalityProfileCompletedLocal({
     required int ownerProjectLinkId,
     required int userId,
   }) async {
@@ -105,25 +118,100 @@ class _LoginScreenState extends State<LoginScreen> {
         false;
   }
 
-  Future<void> _saveCitizenSession({
+  Future<void> _markMunicipalityProfileCompletedLocal({
+    required int ownerProjectLinkId,
+    required int userId,
+  }) async {
+    if (ownerProjectLinkId <= 0 || userId <= 0) {
+      return;
+    }
+
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setBool(
+      _municipalityProfileCompletedKey(
+        ownerProjectLinkId: ownerProjectLinkId,
+        userId: userId,
+      ),
+      true,
+    );
+  }
+
+  Future<bool> _hasMunicipalityProfileOnBackend({
+    required String token,
+  }) async {
+    try {
+      final response = await DioClient.muni.get(
+        '/users/profile',
+        options: Options(
+          headers: {
+            'Authorization': _bearer(token),
+          },
+        ),
+      );
+
+      return response.statusCode == 200;
+    } on DioException catch (e) {
+      final status = e.response?.statusCode ?? 0;
+
+      if (status == 404) {
+        return false;
+      }
+
+      rethrow;
+    }
+  }
+
+ Future<bool> _isStaffOnMunicipality({
+  required String token,
+}) async {
+  try {
+    final response = await DioClient.muni.get(
+      '/users/my-access',
+      options: Options(
+        headers: {
+          'Authorization': _bearer(token),
+        },
+      ),
+    );
+
+    final data = response.data;
+
+    if (data is Map) {
+      final isStaff = data['isStaff'] == true;
+      final roleName = data['roleName']?.toString().trim().toUpperCase();
+
+      return isStaff || roleName == 'STAFF';
+    }
+  } catch (_) {}
+
+  return false;
+}
+
+
+  Future<void> _saveUserSession({
     required DualLoginResult dual,
     required Map<String, dynamic> userMap,
+    required String sessionRole,
   }) async {
     final token = dual.userToken;
+    final refreshToken = dual.userRefreshToken;
 
     if (token == null || token.trim().isEmpty) {
       throw Exception('Missing user token.');
     }
 
+    if (refreshToken == null || refreshToken.trim().isEmpty) {
+      throw Exception('Missing refresh token from Build4All login response.');
+    }
+
     await AdminTokenStore().clear();
-
     await JwtStore.save(token);
-
-    await SessionRoleStore().saveRole('CITIZEN');
+    await SessionRoleStore().saveRole(sessionRole);
 
     await AuthTokenStore().saveToken(
       token: token,
-      refreshToken: dual.userRefreshToken,
+      refreshToken: refreshToken,
       tenantId: ownerProjectLinkId.toString(),
       userJson: userMap,
     );
@@ -131,22 +219,88 @@ class _LoginScreenState extends State<LoginScreen> {
     DioClient.setAuthToken(token);
   }
 
-  Future<void> _goAfterCitizenLogin({
+  Future<void> _clearUserSession() async {
+    await AuthTokenStore().clear();
+    await JwtStore.clear();
+    await SessionRoleStore().clearRole();
+    DioClient.clearAuthToken();
+  }
+
+  Future<void> _goAfterUserLogin({
     required DualLoginResult dual,
     required String email,
   }) async {
     final userMap = _extractUserMap(dual);
     final userId = _extractUserId(userMap);
 
-    await _saveCitizenSession(
+    final wantsEmployee = !isCitizen;
+
+    if (wantsEmployee) {
+     final isStaff = await _isStaffOnMunicipality(
+  token: dual.userToken!,
+);
+
+      if (!isStaff) {
+        await _clearUserSession();
+
+        if (!mounted) return;
+
+        AppToast.show(
+          context,
+          message: 'This account is not registered as a staff member.',
+          type: AppToastType.error,
+        );
+        return;
+      }
+
+      await _saveUserSession(
+        dual: dual,
+        userMap: userMap,
+        sessionRole: 'STAFF',
+      );
+
+      if (!mounted) return;
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (_) => const StaffDashboardScreen(),
+        ),
+        (_) => false,
+      );
+      return;
+    }
+
+    // Citizen tab: even if this user is also employee, keep citizen flow.
+    await _saveUserSession(
       dual: dual,
       userMap: userMap,
+      sessionRole: 'CITIZEN',
     );
 
-    final completed = await _isMunicipalityProfileCompleted(
+    final completedLocal = await _isMunicipalityProfileCompletedLocal(
       ownerProjectLinkId: ownerProjectLinkId,
       userId: userId,
     );
+
+    bool completedRemote = false;
+
+    try {
+      completedRemote = await _hasMunicipalityProfileOnBackend(
+        token: dual.userToken!,
+      );
+    } catch (_) {
+      completedRemote = completedLocal;
+    }
+
+    final completed = completedLocal || completedRemote;
+
+    if (completedRemote) {
+      await _markMunicipalityProfileCompletedLocal(
+        ownerProjectLinkId: ownerProjectLinkId,
+        userId: userId,
+      );
+    }
 
     if (!mounted) return;
 
@@ -168,66 +322,57 @@ class _LoginScreenState extends State<LoginScreen> {
 
     Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      MaterialPageRoute(
+        builder: (_) => const HomeScreen(),
+      ),
       (_) => false,
     );
   }
 
   Future<void> _goAfterAdminLogin(DualLoginResult dual) async {
-    if (dual.admin == null) {
-      throw Exception('Missing admin login data.');
+    try {
+      if (dual.admin == null) {
+        throw Exception('Missing admin login data.');
+      }
+
+      await AuthTokenStore().clear();
+      await JwtStore.clear();
+      await SessionRoleStore().saveRole(dual.admin!.role);
+
+      await AdminTokenStore().save(
+        token: dual.admin!.token,
+        role: dual.admin!.role,
+        refreshToken: dual.admin!.refreshToken,
+        tenantId: ownerProjectLinkId.toString(),
+      );
+
+      DioClient.setAuthToken(dual.admin!.token);
+
+      if (!mounted) return;
+
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(
+          builder: (_) => DashboardPage(),
+        ),
+        (_) => false,
+      );
+    } catch (e) {
+      if (!mounted) return;
+
+      AppToast.show(
+        context,
+        message: _cleanError(e),
+        type: AppToastType.error,
+      );
     }
-
-    await AuthTokenStore().clear();
-    await JwtStore.clear();
-
-    await SessionRoleStore().saveRole(dual.admin!.role);
-
-    await AdminTokenStore().save(
-      token: dual.admin!.token,
-      role: dual.admin!.role,
-      refreshToken: dual.admin!.refreshToken,
-      tenantId: ownerProjectLinkId.toString(),
-    );
-
-
-    // ✅ ADMIN ONLY
-    if (dual.adminOk) {
-  await JwtStore.clear(); 
-
-  await AdminTokenStore().save(
-    token: dual.admin!.token,
-    role: dual.admin!.role,
-    refreshToken: dual.admin!.refreshToken,
-    tenantId: ownerProjectLinkId.toString(),
-  );
-
-  Navigator.pushAndRemoveUntil(
-    context,
-    MaterialPageRoute(
-      builder: (_) =>  DashboardPage(),
-    ),
-    (_) => false,
-  );
-  return;
-}
-  } catch (e) {
-
-    if (!mounted) return;
-
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(
-        builder: (_) => const AdminDashboardPlaceholderScreen(),
-      ),
-      (_) => false,
-    );
   }
 
   Future<void> _onLoginPressed(BuildContext context) async {
     final l10n = AppLocalizations.of(context)!;
 
     if (_isLoading) return;
+
     if (!_formKey.currentState!.validate()) return;
 
     final email = _emailCtrl.text.trim();
@@ -256,6 +401,16 @@ class _LoginScreenState extends State<LoginScreen> {
         return;
       }
 
+      // If Employee tab is selected, user path has priority.
+      // Admin/Owner login should not open from Employee tab unless admin only.
+      if (!isCitizen && dual.userOk) {
+        await _goAfterUserLogin(
+          dual: dual,
+          email: email,
+        );
+        return;
+      }
+
       if (dual.both) {
         setState(() => _isLoading = false);
         _showRoleChooser(context, dual);
@@ -263,7 +418,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       if (dual.userOk) {
-        await _goAfterCitizenLogin(
+        await _goAfterUserLogin(
           dual: dual,
           email: email,
         );
@@ -298,7 +453,9 @@ class _LoginScreenState extends State<LoginScreen> {
       context: context,
       backgroundColor: cs.surface,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(
+          top: Radius.circular(20),
+        ),
       ),
       builder: (_) {
         return SafeArea(
@@ -314,11 +471,12 @@ class _LoginScreenState extends State<LoginScreen> {
                     color: cs.onSurface,
                   ),
                 ),
-
                 const SizedBox(height: 20),
-
                 ListTile(
-                  leading: Icon(Icons.person, color: cs.primary),
+                  leading: Icon(
+                    Icons.person,
+                    color: cs.primary,
+                  ),
                   title: Text(
                     l10n.continueAsCitizen,
                     style: theme.textTheme.bodyMedium?.copyWith(
@@ -328,11 +486,13 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   onTap: () async {
                     Navigator.pop(context);
-
-                    setState(() => _isLoading = true);
+                    setState(() {
+                      isCitizen = true;
+                      _isLoading = true;
+                    });
 
                     try {
-                      await _goAfterCitizenLogin(
+                      await _goAfterUserLogin(
                         dual: dual,
                         email: _emailCtrl.text.trim(),
                       );
@@ -351,42 +511,20 @@ class _LoginScreenState extends State<LoginScreen> {
                     }
                   },
                 ),
-
-                onTap: () async {
-                  Navigator.pop(context);
-
-                 await AuthTokenStore().clear();
-await JwtStore.clear();
-await SessionRoleStore().saveRole(dual.admin!.role);
-
-await AdminTokenStore().save(
-  token: dual.admin!.token,
-  role: dual.admin!.role,
-  refreshToken: dual.admin!.refreshToken,
-  tenantId: ownerProjectLinkId.toString(),
-);
-
-                  if (!mounted) return;
-
-                  Navigator.pushAndRemoveUntil(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) =>  DashboardPage(),
-
-
                 ListTile(
-                  leading: Icon(Icons.admin_panel_settings, color: cs.primary),
+                  leading: Icon(
+                    Icons.admin_panel_settings,
+                    color: cs.primary,
+                  ),
                   title: Text(
                     l10n.continueAsAdmin,
                     style: theme.textTheme.bodyMedium?.copyWith(
                       color: cs.onSurface,
                       fontWeight: FontWeight.w600,
-
                     ),
                   ),
                   onTap: () async {
                     Navigator.pop(context);
-
                     setState(() => _isLoading = true);
 
                     try {
@@ -417,11 +555,9 @@ await AdminTokenStore().save(
   @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
-
     final themeState = context.watch<ThemeCubit>().state;
     final colors = themeState.tokens.colors;
     final card = themeState.tokens.card;
-
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
@@ -456,9 +592,7 @@ await AdminTokenStore().save(
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 8),
-
                         Center(
                           child: Text(
                             l10n.loginSubtitle,
@@ -468,9 +602,7 @@ await AdminTokenStore().save(
                             ),
                           ),
                         ),
-
                         const SizedBox(height: 24),
-
                         Container(
                           height: 50,
                           decoration: BoxDecoration(
@@ -496,9 +628,7 @@ await AdminTokenStore().save(
                             ],
                           ),
                         ),
-
                         const SizedBox(height: 20),
-
                         AppTextField(
                           controller: _emailCtrl,
                           label: l10n.emailLabel,
@@ -507,18 +637,12 @@ await AdminTokenStore().save(
                           keyboardType: TextInputType.emailAddress,
                           textAlign: TextAlign.left,
                           validator: (v) {
-                            final value = v?.trim() ?? '';
-
-                            if (value.isEmpty) {
-                              return l10n.fieldRequired;
-                            }
-
-                            return null;
+                            return (v?.trim().isEmpty ?? true)
+                                ? l10n.fieldRequired
+                                : null;
                           },
                         ),
-
                         const SizedBox(height: 16),
-
                         AppTextField(
                           controller: _passwordCtrl,
                           label: l10n.passwordLabel,
@@ -530,9 +654,10 @@ await AdminTokenStore().save(
                             onPressed: _isLoading
                                 ? null
                                 : () {
-                                    setState(() {
-                                      _obscurePassword = !_obscurePassword;
-                                    });
+                                    setState(
+                                      () =>
+                                          _obscurePassword = !_obscurePassword,
+                                    );
                                   },
                             icon: Icon(
                               _obscurePassword
@@ -542,16 +667,11 @@ await AdminTokenStore().save(
                             ),
                           ),
                           validator: (v) {
-                            final value = v?.trim() ?? '';
-
-                            if (value.isEmpty) {
-                              return l10n.fieldRequired;
-                            }
-
-                            return null;
+                            return (v?.trim().isEmpty ?? true)
+                                ? l10n.fieldRequired
+                                : null;
                           },
                         ),
-
                         Align(
                           alignment: Alignment.centerRight,
                           child: TextButton(
@@ -575,18 +695,12 @@ await AdminTokenStore().save(
                             ),
                           ),
                         ),
-
                         PrimaryButton(
                           label: l10n.loginButton,
                           isLoading: _isLoading,
-                          onPressed: () {
-                            if (_isLoading) return;
-                            _onLoginPressed(context);
-                          },
+                          onPressed: () => _onLoginPressed(context),
                         ),
-
                         const SizedBox(height: 20),
-
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

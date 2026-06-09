@@ -1,9 +1,3 @@
-// lib/features/auth/data/services/session_role_store.dart
-// ─────────────────────────────────────────
-// Saves user role (CITIZEN or EMPLOYEE)
-// Like the doctor's session_role_store.dart
-// ─────────────────────────────────────────
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SessionRoleStore {
@@ -11,12 +5,12 @@ class SessionRoleStore {
 
   Future<void> saveRole(String role) async {
     final sp = await SharedPreferences.getInstance();
-    await sp.setString(_key, role);
+    await sp.setString(_key, role.trim().toUpperCase());
   }
 
   Future<String?> getRole() async {
     final sp = await SharedPreferences.getInstance();
-    return sp.getString(_key);
+    return sp.getString(_key)?.trim().toUpperCase();
   }
 
   Future<void> clearRole() async {
@@ -26,11 +20,16 @@ class SessionRoleStore {
 
   Future<bool> isCitizen() async {
     final role = await getRole();
-    return role?.toUpperCase() == 'CITIZEN';
+    return role == 'CITIZEN' || role == 'USER';
   }
 
-  Future<bool> isEmployee() async {
+  Future<bool> isStaff() async {
     final role = await getRole();
-    return role?.toUpperCase() == 'EMPLOYEE';
+    return role == 'STAFF';
+  }
+
+  Future<bool> isOwner() async {
+    final role = await getRole();
+    return role == 'OWNER';
   }
 }

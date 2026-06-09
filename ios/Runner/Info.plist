@@ -47,5 +47,7 @@
 		<true/>
 		<key>UIStatusBarHidden</key>
 		<false/>
+		<key>NSLocationWhenInUseUsageDescription</key>
+		<string>This app needs location access to set the GPS coordinates for your service request.</string>
 	</dict>
 </plist>

@@ -6,5 +6,7 @@ class GetViolations {
 
   GetViolations(this.repo);
 
-  Future<List<Violation>> call() => repo.getViolations();
+  Future<List<Violation>> call() {
+    return repo.getViolations();
+  }
 }
