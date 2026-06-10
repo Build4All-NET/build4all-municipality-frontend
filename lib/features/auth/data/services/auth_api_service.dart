@@ -13,8 +13,6 @@ class AuthApiService {
   final AuthTokenStore _tokenStore;
   final SessionRoleStore _roleStore;
 
-
-
   AuthApiService({
     AuthTokenStore? tokenStore,
     SessionRoleStore? roleStore,
@@ -48,6 +46,8 @@ class AuthApiService {
   // ============================================================
   // REGISTER — Build4All Core
   // POST /auth/users/register
+  // ownerProjectLinkId is resolved from the JWT on the backend;
+  // no static municipality id is sent.
   // ============================================================
   Future<AuthResponseModel> register({
     required String email,
@@ -55,7 +55,6 @@ class AuthApiService {
     required String fullName,
     required String phone,
     required String role,
-    required int municipalityId,
     int? ownerProjectLinkId,
     int? ownerProjectId,
   }) async {
@@ -71,7 +70,6 @@ class AuthApiService {
           if (ownerProjectLinkId != null)
             'ownerProjectLinkId': ownerProjectLinkId,
           if (ownerProjectId != null) 'ownerProjectId': ownerProjectId,
-          'municipality': {'id': municipalityId},
         },
       );
 
@@ -141,9 +139,7 @@ class AuthApiService {
   Future<void> logout() async {
     try {
       await DioClient.build.post('/auth/logout');
-    } catch (_) {
-      
-    }
+    } catch (_) {}
 
     await _tokenStore.clearToken();
     await _roleStore.clearRole();
@@ -185,13 +181,14 @@ class AuthApiService {
   }
 
   // ============================================================
-  // COMPLETE PROFILE — Build4All Core
+  // COMPLETE PROFILE — Municipality Backend
   // POST /auth/complete-profile
+  // ownerProjectLinkId is extracted server-side from the JWT claim.
+  // The client must NOT send a static municipality id.
   // ============================================================
   Future<String> completeProfile({
     required String address,
     required String username,
-    required int municipalityId,
   }) async {
     try {
       final token = await _tokenStore.getToken();
@@ -200,12 +197,11 @@ class AuthApiService {
         DioClient.setAuthToken(token);
       }
 
-      final response = await DioClient.build.post(
+      final response = await DioClient.muni.post(
         '/auth/complete-profile',
         data: {
           'address': address.trim(),
           'username': username.trim(),
-          'municipality': {'id': municipalityId},
         },
       );
 
