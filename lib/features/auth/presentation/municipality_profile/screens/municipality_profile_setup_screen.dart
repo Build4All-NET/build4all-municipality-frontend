@@ -43,18 +43,9 @@ class _MunicipalityProfileSetupScreenState
 
   bool _isLoading = false;
 
-  static const _staticMunicipality = _MunicipalityOption(
-    id: 3,
-    nameAr: 'بلدية صيدا',
-    nameEn: 'Saida Municipality',
-  );
-
-  _MunicipalityOption? _selectedMunicipality = _staticMunicipality;
-
   @override
   void initState() {
     super.initState();
-
     _phoneCtrl = PhoneController(
       initialValue: _initialPhoneNumber(),
     );
@@ -79,7 +70,6 @@ class _MunicipalityProfileSetupScreenState
         if (phone.startsWith('+')) {
           return PhoneNumber.parse(phone);
         }
-
         return PhoneNumber.parse('+961$phone');
       } catch (_) {
         return PhoneNumber.parse('+961');
@@ -92,33 +82,25 @@ class _MunicipalityProfileSetupScreenState
   String _cleanError(Object e) {
     if (e is DioException) {
       final data = e.response?.data;
-
       if (data is Map) {
         final message = data['message'] ?? data['error'];
         if (message != null) return message.toString();
       }
     }
-
     return e.toString().replaceAll('Exception:', '').trim();
   }
 
   String _bearerToken() {
     final token = widget.build4allToken.trim();
-
-    if (token.toLowerCase().startsWith('bearer ')) {
-      return token;
-    }
-
+    if (token.toLowerCase().startsWith('bearer ')) return token;
     return 'Bearer $token';
   }
 
   String _rawToken() {
     final token = widget.build4allToken.trim();
-
     if (token.toLowerCase().startsWith('bearer ')) {
       return token.substring(7).trim();
     }
-
     return token;
   }
 
@@ -135,40 +117,31 @@ class _MunicipalityProfileSetupScreenState
   String _fullName() {
     final firstName = (widget.build4allUser['firstName'] ?? '').toString();
     final lastName = (widget.build4allUser['lastName'] ?? '').toString();
-
     final fullName = '$firstName $lastName'.trim();
-
     if (fullName.isNotEmpty) return fullName;
-
-    final username = (widget.build4allUser['username'] ?? '').toString().trim();
-
+    final username =
+        (widget.build4allUser['username'] ?? '').toString().trim();
     if (username.isNotEmpty) return username;
-
     return _email().split('@').first;
   }
 
-  /// Derive a username from available build4all user data.
-  /// Falls back to the email prefix (before @) which is always present.
   String _username() {
     final usernameField =
         (widget.build4allUser['username'] ?? '').toString().trim();
     if (usernameField.isNotEmpty) return usernameField;
-
-    final firstName = (widget.build4allUser['firstName'] ?? '').toString().trim();
-    final lastName = (widget.build4allUser['lastName'] ?? '').toString().trim();
+    final firstName =
+        (widget.build4allUser['firstName'] ?? '').toString().trim();
+    final lastName =
+        (widget.build4allUser['lastName'] ?? '').toString().trim();
     final combined = '$firstName$lastName'.trim();
     if (combined.isNotEmpty) return combined;
-
     return _email().split('@').first;
   }
 
   String _phoneForBackend() {
     final phone = _phoneCtrl.value;
-
     final nsn = phone.nsn.trim().replaceAll(RegExp(r'\s+'), '');
-
     if (nsn.isNotEmpty) return nsn;
-
     return phone.international.trim().replaceAll(RegExp(r'[^0-9]'), '');
   }
 
@@ -176,26 +149,18 @@ class _MunicipalityProfileSetupScreenState
     return 'municipality_profile_completed_${widget.ownerProjectLinkId}_${_userId()}';
   }
 
-  /// IMPORTANT:
-  /// Do NOT save AuthTokenStore here with refreshToken: null.
-  /// LoginScreen already saves AuthTokenStore correctly with refresh token.
-  /// Here we only keep JwtStore/Dio fallback updated.
   Future<void> _saveSessionTokenFallbackOnly() async {
     final token = _rawToken();
-
     if (token.isEmpty) return;
-
     await JwtStore.save(token);
     DioClient.setAuthToken(token);
   }
 
   Future<void> _markMunicipalityProfileCompleted() async {
     final prefs = await SharedPreferences.getInstance();
-
     await prefs.setBool(_completionPrefsKey(), true);
 
     final userId = _userId();
-
     if (userId > 0) {
       await prefs.setInt('userId', userId);
       await prefs.setString('build4allUserId', userId.toString());
@@ -209,18 +174,13 @@ class _MunicipalityProfileSetupScreenState
 
   bool _isAlreadyExistsError(Object e) {
     if (e is! DioException) return false;
-
     final status = e.response?.statusCode;
     final data = e.response?.data;
-
     if (status == 409) return true;
-
     if (data is Map) {
       final code = (data['code'] ?? '').toString().toUpperCase();
-      final message = (data['message'] ?? data['error'] ?? '')
-          .toString()
-          .toLowerCase();
-
+      final message =
+          (data['message'] ?? data['error'] ?? '').toString().toLowerCase();
       return code.contains('EMAIL_ALREADY_EXISTS') ||
           code.contains('USER_ALREADY_EXISTS') ||
           code.contains('PROFILE_ALREADY_EXISTS') ||
@@ -228,24 +188,12 @@ class _MunicipalityProfileSetupScreenState
           message.contains('email already') ||
           message.contains('profile already');
     }
-
     return false;
   }
 
   Future<void> _submit(AppLocalizations l10n) async {
     if (_isLoading) return;
     if (!_formKey.currentState!.validate()) return;
-
-    final selectedMunicipality = _selectedMunicipality;
-
-    if (selectedMunicipality == null) {
-      AppToast.show(
-        context,
-        message: l10n.selectMunicipalityWarning,
-        type: AppToastType.error,
-      );
-      return;
-    }
 
     if (widget.build4allToken.trim().isEmpty) {
       AppToast.show(
@@ -285,9 +233,10 @@ class _MunicipalityProfileSetupScreenState
           'phone': _phoneForBackend(),
           'address': _addressCtrl.text.trim(),
           'role': 'USER',
-          'municipality': {
-            'id': selectedMunicipality.id,
-          },
+          // ownerProjectLinkId is the real municipality tenant id.
+          // The backend also reads it from the JWT claim.
+          // We pass it explicitly here as a safety fallback.
+          'ownerProjectLinkId': widget.ownerProjectLinkId,
         },
       );
 
@@ -328,7 +277,8 @@ class _MunicipalityProfileSetupScreenState
 
       AppToast.show(
         context,
-        message: message.isEmpty ? l10n.municipalityProfileSaveFailed : message,
+        message:
+            message.isEmpty ? l10n.municipalityProfileSaveFailed : message,
         type: AppToastType.error,
       );
     } finally {
@@ -336,14 +286,6 @@ class _MunicipalityProfileSetupScreenState
         setState(() => _isLoading = false);
       }
     }
-  }
-
-  String _municipalityLabel(_MunicipalityOption item, AppLocalizations l10n) {
-    if (l10n.localeName == 'ar') {
-      return item.nameAr;
-    }
-
-    return item.nameEn;
   }
 
   @override
@@ -414,15 +356,11 @@ class _MunicipalityProfileSetupScreenState
                           textAlign: TextAlign.left,
                           validator: (v) {
                             final value = v?.trim() ?? '';
-
                             if (value.isEmpty) return l10n.fieldRequired;
                             if (value.length < 6) return l10n.addressTooShort;
-
                             return null;
                           },
                         ),
-                        const SizedBox(height: 16),
-                        _buildMunicipalityDropdown(context, l10n),
                         const SizedBox(height: 28),
                         PrimaryButton(
                           label: l10n.completeMunicipalityProfileButton,
@@ -518,78 +456,4 @@ class _MunicipalityProfileSetupScreenState
       ),
     );
   }
-
-  Widget _buildMunicipalityDropdown(
-    BuildContext context,
-    AppLocalizations l10n,
-  ) {
-    final theme = Theme.of(context);
-    final cs = theme.colorScheme;
-
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
-      children: [
-        Text(
-          l10n.municipalityLabel,
-          style: theme.textTheme.bodyMedium?.copyWith(
-            color: cs.onSurface,
-            fontWeight: FontWeight.w600,
-          ),
-        ),
-        const SizedBox(height: 8),
-        DropdownButtonFormField<_MunicipalityOption>(
-          value: _selectedMunicipality,
-          isExpanded: true,
-          decoration: InputDecoration(
-            filled: true,
-            fillColor: cs.surface,
-            border: OutlineInputBorder(
-              borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
-            ),
-          ),
-          hint: Text(
-            l10n.selectMunicipality,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: cs.outline,
-            ),
-          ),
-          dropdownColor: cs.surface,
-          items: const [_staticMunicipality]
-              .map(
-                (item) => DropdownMenuItem<_MunicipalityOption>(
-                  value: item,
-                  child: Text(
-                    _municipalityLabel(item, l10n),
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: cs.onSurface,
-                    ),
-                  ),
-                ),
-              )
-              .toList(),
-          onChanged: _isLoading
-              ? null
-              : (value) {
-                  setState(() => _selectedMunicipality = value);
-                },
-          validator: (value) {
-            if (value == null) return l10n.selectMunicipalityWarning;
-            return null;
-          },
-        ),
-      ],
-    );
-  }
-}
-
-class _MunicipalityOption {
-  final int id;
-  final String nameAr;
-  final String nameEn;
-
-  const _MunicipalityOption({
-    required this.id,
-    required this.nameAr,
-    required this.nameEn,
-  });
 }

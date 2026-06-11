@@ -18,36 +18,36 @@ class ApiAuthMunicipalityService {
     if (data is Map) {
       final message = data['message'] ?? data['error'] ?? fallback;
       final code = data['code']?.toString();
-
-      return AppException(
-        message.toString(),
-        code: code,
-        original: e,
-      );
+      return AppException(message.toString(), code: code, original: e);
     }
 
-    return AppException(
-      fallback,
-      original: e,
-    );
+    return AppException(fallback, original: e);
   }
 
+  /// Sync / register the Build4All user into the municipality local DB.
+  /// ownerProjectLinkId is the real municipality tenant id — it is read
+  /// server-side from the JWT claim. We also send it in the headers as
+  /// a safe fallback for backends that support it.
   Future<AuthResponseModel?> syncUserAfterBuild4AllLogin({
     required String build4allToken,
     required String email,
     required String password,
     required String fullName,
     required String phone,
-    required int municipalityId,
+    required int ownerProjectLinkId,
   }) async {
     try {
+      final bearer = build4allToken.toLowerCase().startsWith('bearer ')
+          ? build4allToken
+          : 'Bearer $build4allToken';
+
       final response = await _dio.post(
         '/auth/users/register',
         options: Options(
           headers: {
-            'Authorization': build4allToken.toLowerCase().startsWith('bearer ')
-                ? build4allToken
-                : 'Bearer $build4allToken',
+            'Authorization': bearer,
+            'Owner-Project-Link-Id': ownerProjectLinkId.toString(),
+            'X-Owner-Project-Link-Id': ownerProjectLinkId.toString(),
           },
         ),
         data: {
@@ -56,7 +56,9 @@ class ApiAuthMunicipalityService {
           'fullName': fullName.trim(),
           'phone': phone.trim(),
           'role': 'USER',
-          'municipality': {'id': municipalityId},
+          // ownerProjectLinkId is the municipality tenant id.
+          // Backend also reads it from the JWT ownerProjectLinkId claim.
+          'ownerProjectLinkId': ownerProjectLinkId,
         },
       );
 

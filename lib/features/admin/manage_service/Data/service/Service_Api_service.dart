@@ -7,6 +7,19 @@ class ServiceApiService {
 
   ServiceApiService(this.dio);
 
+  /// Seed default services for this municipality tenant.
+  /// Idempotent — safe to call on every dashboard open.
+  Future<void> initDefaults() async {
+    try {
+      final res = await dio.post('/api/admin/services/init-defaults');
+      print('[ServiceApiService] initDefaults success: ${res.statusCode} ${res.data}');
+    } on DioException catch (e) {
+      print('[ServiceApiService] initDefaults FAILED: status=${e.response?.statusCode} body=${e.response?.data} msg=${e.message}');
+    } catch (e) {
+      print('[ServiceApiService] initDefaults ERROR: $e');
+    }
+  }
+
   Future<List<ServiceModel>> getServices() async {
     try {
       final res = await dio.get('/api/admin/services');
