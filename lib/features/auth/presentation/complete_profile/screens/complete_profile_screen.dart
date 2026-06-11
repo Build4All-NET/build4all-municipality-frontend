@@ -96,12 +96,11 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         throw Exception(l10n.missingRegistrationData);
       }
 
-      final pendingId = (body['pendingId'] ?? body['userId'] ?? '').toString();
+      // pendingId may be 0 or missing when Build4All verify-email-code
+      // doesn't return a userId (e.g. "already verified" response).
+      // Send it as-is; the Build4All API accepts 0 or ignores it.
+      final pendingId = (body['pendingId'] ?? body['userId'] ?? '0').toString();
       final ownerProjectLinkId = (body['ownerProjectLinkId'] ?? '').toString();
-
-      if (pendingId.isEmpty || pendingId == 'null') {
-        throw Exception(l10n.missingUserIdVerifyAgain);
-      }
 
       if (ownerProjectLinkId.isEmpty || ownerProjectLinkId == 'null') {
         throw Exception(l10n.missingOwnerProjectLinkId);
