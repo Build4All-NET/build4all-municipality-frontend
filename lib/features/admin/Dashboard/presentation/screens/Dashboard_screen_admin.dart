@@ -75,6 +75,9 @@ class _DashboardPageState extends State<DashboardPage> {
     _adminUserApiService = AdminUserApiService(dio: DioClient.muni);
     _requestApiService = RequestApiService(DioClient.muni);
 
+    // Seed default services for this tenant — idempotent, fire-and-forget.
+    _serviceApiService.initDefaults();
+
     _statsFuture = _loadStats();
   }
 

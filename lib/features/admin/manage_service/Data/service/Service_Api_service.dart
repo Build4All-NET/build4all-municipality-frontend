@@ -7,6 +7,16 @@ class ServiceApiService {
 
   ServiceApiService(this.dio);
 
+  /// Seed default services for this municipality tenant.
+  /// Idempotent — safe to call on every dashboard open.
+  Future<void> initDefaults() async {
+    try {
+      await dio.post('/api/admin/services/init-defaults');
+    } catch (_) {
+      // Silent — never block the dashboard if seed fails
+    }
+  }
+
   Future<List<ServiceModel>> getServices() async {
     try {
       final res = await dio.get('/api/admin/services');
