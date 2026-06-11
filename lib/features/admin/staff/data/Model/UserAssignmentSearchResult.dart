@@ -1,6 +1,7 @@
 class UserAssignmentSearchResult {
   final bool exists;
   final bool alreadyAssigned;
+  final bool isOwnerAccount;
 
   final int? userId;
   final int? ownerProjectLinkId;
@@ -18,6 +19,7 @@ class UserAssignmentSearchResult {
   const UserAssignmentSearchResult({
     required this.exists,
     required this.alreadyAssigned,
+    required this.isOwnerAccount,
     this.userId,
     this.ownerProjectLinkId,
     required this.fullName,
@@ -34,6 +36,7 @@ class UserAssignmentSearchResult {
     return UserAssignmentSearchResult(
       exists: _toBool(json['exists']),
       alreadyAssigned: _toBool(json['alreadyAssigned'] ?? json['already_assigned']),
+      isOwnerAccount: _toBool(json['isOwnerAccount'] ?? json['is_owner_account']),
       userId: _toNullableInt(json['userId'] ?? json['user_id']),
       ownerProjectLinkId: _toNullableInt(
         json['ownerProjectLinkId'] ??

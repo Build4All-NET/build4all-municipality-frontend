@@ -569,5 +569,8 @@
   "newestFirst": "Newest first",
   "oldestFirst": "Oldest first",
   "dateLabel": "Date",
-  "requestIdLabel": "Request ID"
+  "requestIdLabel": "Request ID",
+  "selectDepartmentsLabel": "Select departments",
+  "selectAtLeastOneDepartment": "Select at least one department",
+  "ownerEmailNotAssignable": "This email belongs to the owner account and cannot be assigned as staff"
 }

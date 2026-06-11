@@ -135,12 +135,17 @@ class ServiceDetailsScreen extends StatelessWidget {
 
             PrimaryButton(
               label: loc.startRequest,
-              onPressed: () => Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (_) => NewRequestScreen(service: service),
-                ),
-              ),
+              onPressed: () async {
+                final submitted = await Navigator.push<bool>(
+                  context,
+                  MaterialPageRoute(
+                    builder: (_) => NewRequestScreen(service: service),
+                  ),
+                );
+                if (submitted == true && context.mounted) {
+                  Navigator.pop(context, true);
+                }
+              },
             ),
 
             const SizedBox(height: 12),

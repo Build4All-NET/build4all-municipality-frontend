@@ -569,5 +569,8 @@
   "newestFirst": "Plus récent d'abord",
   "oldestFirst": "Plus ancien d'abord",
   "dateLabel": "Date",
-  "requestIdLabel": "ID de demande"
+  "requestIdLabel": "ID de demande",
+  "selectDepartmentsLabel": "Sélectionner les départements",
+  "selectAtLeastOneDepartment": "Sélectionnez au moins un département",
+  "ownerEmailNotAssignable": "Cet e-mail appartient au compte propriétaire et ne peut pas être affecté comme personnel"
 }
