@@ -11,9 +11,12 @@ class ServiceApiService {
   /// Idempotent — safe to call on every dashboard open.
   Future<void> initDefaults() async {
     try {
-      await dio.post('/api/admin/services/init-defaults');
-    } catch (_) {
-      // Silent — never block the dashboard if seed fails
+      final res = await dio.post('/api/admin/services/init-defaults');
+      print('[ServiceApiService] initDefaults success: ${res.statusCode} ${res.data}');
+    } on DioException catch (e) {
+      print('[ServiceApiService] initDefaults FAILED: status=${e.response?.statusCode} body=${e.response?.data} msg=${e.message}');
+    } catch (e) {
+      print('[ServiceApiService] initDefaults ERROR: $e');
     }
   }
 
