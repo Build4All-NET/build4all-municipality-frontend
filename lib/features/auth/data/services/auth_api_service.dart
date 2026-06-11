@@ -45,9 +45,7 @@ class AuthApiService {
 
   // ============================================================
   // REGISTER — Build4All Core
-  // POST /auth/users/register
-  // ownerProjectLinkId is resolved from the JWT on the backend;
-  // no static municipality id is sent.
+  // POST /auth/users/register  (goes to Build4All API, not municipality)
   // ============================================================
   Future<AuthResponseModel> register({
     required String email,
@@ -55,6 +53,7 @@ class AuthApiService {
     required String fullName,
     required String phone,
     required String role,
+    required int municipalityId,
     int? ownerProjectLinkId,
     int? ownerProjectId,
   }) async {
@@ -70,6 +69,7 @@ class AuthApiService {
           if (ownerProjectLinkId != null)
             'ownerProjectLinkId': ownerProjectLinkId,
           if (ownerProjectId != null) 'ownerProjectId': ownerProjectId,
+          'municipality': {'id': municipalityId},
         },
       );
 
@@ -184,7 +184,6 @@ class AuthApiService {
   // COMPLETE PROFILE — Municipality Backend
   // POST /auth/complete-profile
   // ownerProjectLinkId is extracted server-side from the JWT claim.
-  // The client must NOT send a static municipality id.
   // ============================================================
   Future<String> completeProfile({
     required String address,
