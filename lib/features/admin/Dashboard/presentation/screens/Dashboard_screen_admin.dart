@@ -1,4 +1,5 @@
 import 'package:baladiyati/app/app_router.dart';
+import 'package:baladiyati/core/config/jwt_store.dart';
 import 'package:baladiyati/core/l10n/locale_cubit.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/admin/Departement/data/Service/Departement_Api_Service.dart';
@@ -10,6 +11,7 @@ import 'package:baladiyati/features/admin/staff/data/Service/AdminUserApiService
 import 'package:baladiyati/features/admin/staff/data/Service/Employe_Api_Service.dart';
 import 'package:baladiyati/features/admin/violations/data/services/violation_api_services.dart';
 import 'package:baladiyati/features/admin/violations/presentation/screens/violationpage.dart';
+import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/auth_api_service.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -134,6 +136,10 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future<void> _logout() async {
+    // Clear the admin secure-storage token so AuthGate does not
+    // re-enter the dashboard on the next app start.
+    await AdminTokenStore().clear();
+    await JwtStore.clear();
     await _authApiService.logout();
 
     if (!mounted) return;
