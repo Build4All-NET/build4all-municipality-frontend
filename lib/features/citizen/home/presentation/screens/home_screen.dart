@@ -118,7 +118,12 @@ class _HomeScreenState extends State<HomeScreen> {
             : null,
         bottomNavigationBar: BottomNav(
           currentIndex: _currentIndex,
-          onTap: (i) => setState(() => _currentIndex = i),
+          onTap: (i) {
+            if (i == 2) {
+              _requestsBloc.add(RequestsRefreshRequested());
+            }
+            setState(() => _currentIndex = i);
+          },
         ),
       ),
     );

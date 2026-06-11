@@ -395,9 +395,11 @@ class _AssignStaffDialogState extends State<_AssignStaffDialog> {
                       isLoading: state.searchLoading,
                       onPressed: _search,
                     ),
-                    if (result != null) ...[  
+                    if (result != null) ...[
                       const SizedBox(height: 16),
-                      if (result.exists)
+                      if (result.isOwnerAccount)
+                        _OwnerNotAssignableCard(email: result.email)
+                      else if (result.exists)
                         _FoundUserCard(
                           result: result,
                           selectedDepartmentIds: _selectedDepartmentIds,
@@ -426,6 +428,61 @@ class _AssignStaffDialogState extends State<_AssignStaffDialog> {
           ],
         );
       },
+    );
+  }
+}
+
+class _OwnerNotAssignableCard extends StatelessWidget {
+  final String email;
+
+  const _OwnerNotAssignableCard({required this.email});
+
+  @override
+  Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: colors.error.withOpacity(0.07),
+        borderRadius: BorderRadius.circular(18),
+        border: Border.all(
+          color: colors.error.withOpacity(0.18),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.block_outlined, color: colors.error),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  email,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  l10n.ownerEmailNotAssignable,
+                  style: theme.textTheme.bodySmall?.copyWith(
+                    color: colors.error,
+                    fontWeight: FontWeight.w600,
+                    height: 1.35,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -534,7 +591,7 @@ class _FoundUserCard extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    'Select departments',
+                    l10n.selectDepartmentsLabel,
                     style: theme.textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.w700,
                       color: colors.onSurfaceVariant,
@@ -563,7 +620,7 @@ class _FoundUserCard extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.only(top: 6),
                       child: Text(
-                        'Select at least one department',
+                        l10n.selectAtLeastOneDepartment,
                         style: theme.textTheme.labelSmall?.copyWith(
                           color: colors.error,
                         ),
@@ -897,7 +954,7 @@ class _StaffCard extends StatelessWidget {
                     ),
                   ],
                 ),
-                if (user.assignedDepartments.isNotEmpty) ...[  
+                if (user.assignedDepartments.isNotEmpty) ...[
                   const SizedBox(height: 6),
                   Wrap(
                     spacing: 6,
