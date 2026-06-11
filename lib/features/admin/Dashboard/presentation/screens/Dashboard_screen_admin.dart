@@ -59,7 +59,7 @@ class _DashboardPageState extends State<DashboardPage> {
   late final ViolationApiService _violationApiService;
   late final DepartmentApiService _departmentApiService;
   late final ServiceApiService _serviceApiService;
- late final AdminUserApiService _adminUserApiService;
+  late final AdminUserApiService _adminUserApiService;
   late final RequestApiService _requestApiService;
 
   late Future<_AdminDashboardStats> _statsFuture;
@@ -75,10 +75,15 @@ class _DashboardPageState extends State<DashboardPage> {
     _adminUserApiService = AdminUserApiService(dio: DioClient.muni);
     _requestApiService = RequestApiService(DioClient.muni);
 
-    // Seed default services for this tenant — idempotent, fire-and-forget.
-    _serviceApiService.initDefaults();
+    // Seed first, then load stats so the service count is correct.
+    _statsFuture = _seedThenLoadStats();
+  }
 
-    _statsFuture = _loadStats();
+  /// Seeds default services for this tenant, then loads dashboard stats.
+  /// initDefaults() swallows all errors so this never throws.
+  Future<_AdminDashboardStats> _seedThenLoadStats() async {
+    await _serviceApiService.initDefaults();
+    return _loadStats();
   }
 
   // Each API is wrapped independently — one failure never breaks the others.
@@ -101,9 +106,9 @@ class _DashboardPageState extends State<DashboardPage> {
           .then<int>((v) => v.length)
           .catchError((_) => -1),
       _adminUserApiService
-    .getUsersByRole(roleName: 'STAFF')
-    .then<int>((v) => v.length)
-    .catchError((_) => -1),
+          .getUsersByRole(roleName: 'STAFF')
+          .then<int>((v) => v.length)
+          .catchError((_) => -1),
       _requestApiService
           .getAllRequestsAdmin()
           .then<int>((v) => v.length)
