@@ -101,6 +101,9 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
       // Send it as-is; the Build4All API accepts 0 or ignores it.
       final pendingId = (body['pendingId'] ?? body['userId'] ?? '0').toString();
       final ownerProjectLinkId = (body['ownerProjectLinkId'] ?? '').toString();
+      // email is forwarded so the backend can fall back to email lookup
+      // when pendingId == 0 (already-verified flow).
+      final email = (body['email'] as String?)?.trim();
 
       if (ownerProjectLinkId.isEmpty || ownerProjectLinkId == 'null') {
         throw Exception(l10n.missingOwnerProjectLinkId);
@@ -117,6 +120,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         username: username,
         isPublicProfile: false,
         ownerProjectLinkId: ownerProjectLinkId,
+        email: email,
         profileImagePath: _selectedImage?.path,
       );
 

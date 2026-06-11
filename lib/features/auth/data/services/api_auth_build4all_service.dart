@@ -96,6 +96,7 @@ class AuthApi {
     required String lastName,
     required bool isPublicProfile,
     required String ownerProjectLinkId,
+    String? email,
     String? profileImagePath,
   }) async {
     try {
@@ -106,6 +107,7 @@ class AuthApi {
         'lastName': lastName.trim(),
         'isPublicProfile': isPublicProfile.toString(),
         'ownerProjectLinkId': ownerProjectLinkId.trim(),
+        if (email != null && email.trim().isNotEmpty) 'email': email.trim(),
         if (profileImagePath != null && profileImagePath.trim().isNotEmpty)
           'profileImage': await MultipartFile.fromFile(profileImagePath),
       });
