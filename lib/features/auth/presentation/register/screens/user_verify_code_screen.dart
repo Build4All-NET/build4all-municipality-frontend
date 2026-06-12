@@ -61,9 +61,7 @@ class _UserVerifyCodeScreenState extends State<UserVerifyCodeScreen> {
     super.dispose();
   }
 
-  Future<void> _saveVerifiedUserToPrefs({
-    required int userId,
-  }) async {
+  Future<void> _saveVerifiedUserToPrefs({required int userId}) async {
     final prefs = await SharedPreferences.getInstance();
     final existing = prefs.getString('register_body');
 
@@ -77,8 +75,6 @@ class _UserVerifyCodeScreenState extends State<UserVerifyCodeScreen> {
       'sharedReference': widget.sharedReference,
       'ownerProjectLinkId': widget.ownerProjectLinkId,
       'otpVerified': true,
-
-      // Keep both keys because different screens/services may use either one.
       'userId': userId,
       'pendingId': userId,
     };
@@ -86,30 +82,28 @@ class _UserVerifyCodeScreenState extends State<UserVerifyCodeScreen> {
     await prefs.setString('register_body', jsonEncode(body));
   }
 
-  int? _extractUserId(dynamic responseData) {
-    if (responseData is! Map) return null;
-
-    final user = responseData['user'];
-
-    if (user is Map && user['id'] != null) {
-      return int.tryParse(user['id'].toString());
+  int _extractUserId(dynamic responseData) {
+    if (responseData is Map) {
+      final user = responseData['user'];
+      if (user is Map && user['id'] != null) {
+        return int.tryParse(user['id'].toString()) ?? 0;
+      }
+      if (responseData['id'] != null) {
+        return int.tryParse(responseData['id'].toString()) ?? 0;
+      }
+      if (responseData['userId'] != null) {
+        return int.tryParse(responseData['userId'].toString()) ?? 0;
+      }
     }
-
-    if (responseData['id'] != null) {
-      return int.tryParse(responseData['id'].toString());
-    }
-
-    if (responseData['userId'] != null) {
-      return int.tryParse(responseData['userId'].toString());
-    }
-
-    return null;
+    // userId not in response (e.g. "already verified" response) — use 0 as fallback
+    return 0;
   }
 
   Future<void> _verify(AppLocalizations l10n) async {
     if (_isLoading) return;
 
-    final code = _controllers.map((controller) => controller.text.trim()).join();
+    final code =
+        _controllers.map((controller) => controller.text.trim()).join();
 
     if (code.length < 6) {
       AppToast.show(
@@ -129,11 +123,6 @@ class _UserVerifyCodeScreenState extends State<UserVerifyCodeScreen> {
       );
 
       final userId = _extractUserId(response.data);
-
-      if (userId == null || userId <= 0) {
-       throw Exception(l10n.verificationUserIdMissing);
-      }
-
       await _saveVerifiedUserToPrefs(userId: userId);
 
       if (!mounted) return;

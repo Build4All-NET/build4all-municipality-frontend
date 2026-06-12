@@ -95,7 +95,7 @@ class AdminUserApiService {
     };
 
     if (departmentIds.isNotEmpty) {
-      body['departmentIds'] = departmentIds;
+      body['departmentAccessIds'] = departmentIds;
     }
 
     final response = await dio.post(

@@ -2,12 +2,14 @@
 
 import 'dart:convert';
 
+import 'package:baladiyati/app/app_router.dart';
 import 'package:baladiyati/common/registration_step_cubit.dart';
 import 'package:baladiyati/common/registration_step_indicator.dart';
 import 'package:baladiyati/common/widgets/app_text_field.dart';
 import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/common/widgets/primary_button.dart';
 import 'package:baladiyati/core/config/env.dart';
+import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/core/theme/theme_cubit.dart';
 import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
@@ -95,6 +97,28 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
       if (!mounted) return;
 
       setState(() => _isLoading = false);
+
+      // If Build4All says the email is already verified, skip OTP and go
+      // straight to complete-profile so the user is not blocked.
+      final isAlreadyVerified = (e is AppException &&
+              (e.code?.toLowerCase().contains('verified') == true ||
+                  e.message.toLowerCase().contains('already verified'))) ||
+          e.toString().toLowerCase().contains('already verified');
+
+      if (isAlreadyVerified) {
+        await _saveToPrefs({
+          'email': email,
+          'sharedReference': sharedReference,
+          'ownerProjectLinkId': _ownerProjectLinkId,
+          'otpVerified': true,
+          'userId': 0,
+          'pendingId': 0,
+        });
+        if (!mounted) return;
+        context.read<RegistrationStepCubit>().nextStep();
+        AppRouter.gotoCompleteProfile(context);
+        return;
+      }
 
       final msg = e.toString().replaceAll('Exception:', '').trim();
 

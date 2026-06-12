@@ -3,6 +3,8 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/common/widgets/app_search_field.dart';
 import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/common/widgets/shimmer_loading.dart';
+import 'package:baladiyati/features/citizen/requests/presentation/bloc/requests_bloc.dart';
+import 'package:baladiyati/features/citizen/requests/presentation/bloc/requests_event.dart';
 import 'package:baladiyati/features/citizen/services/domain/entities/service_entity.dart';
 import 'package:baladiyati/features/citizen/services/presentation/bloc/services_bloc.dart';
 import 'package:baladiyati/features/citizen/services/presentation/bloc/services_event.dart';
@@ -136,13 +138,22 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                   service: items[i],
                                   langCode: langCode,
                                   theme: theme,
-                                  onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => ServiceDetailsScreen(
-                                          service: items[i]),
-                                    ),
-                                  ),
+                                  onTap: () async {
+                                    final submitted =
+                                        await Navigator.push<bool>(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => ServiceDetailsScreen(
+                                            service: items[i]),
+                                      ),
+                                    );
+                                    if (submitted == true &&
+                                        context.mounted) {
+                                      context
+                                          .read<RequestsBloc>()
+                                          .add(RequestsRefreshRequested());
+                                    }
+                                  },
                                 ),
                               ),
                             ),
@@ -156,7 +167,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
   }
 }
 
-// ── Skeleton ──────────────────────────────────────────────────────────────────
+// ── Skeleton ───────────────────────────────────────────────────────────────────────────────
 
 class _ServicesSkeleton extends StatelessWidget {
   const _ServicesSkeleton();
@@ -217,7 +228,7 @@ class _ServiceCardSkeleton extends StatelessWidget {
   }
 }
 
-// ── Real card ──────────────────────────────────────────────────────────────────
+// ── Real card ──────────────────────────────────────────────────────────────────────────────
 
 class _ServiceCard extends StatelessWidget {
   final ServiceEntity service;

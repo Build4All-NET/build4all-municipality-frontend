@@ -60,7 +60,7 @@ class AuthRepositoryImpl implements AuthRepository {
     await _api.completeProfile(
       address: '',
       username: username,
-      municipalityId: 1
+  
     );
     return UserEntity(
       id: pendingId,

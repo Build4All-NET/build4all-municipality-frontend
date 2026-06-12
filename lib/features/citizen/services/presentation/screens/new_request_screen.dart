@@ -343,8 +343,10 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
               const SizedBox(height: 20),
               PrimaryButton(
                 label: loc.ok,
-                onPressed: () =>
-                    Navigator.popUntil(context, (route) => route.isFirst),
+                onPressed: () {
+                  Navigator.pop(context); // dismiss dialog
+                  Navigator.pop(context, true); // pop screen with result
+                },
               ),
             ],
           ),

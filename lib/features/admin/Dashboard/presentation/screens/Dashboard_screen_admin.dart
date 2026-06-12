@@ -1,4 +1,5 @@
 import 'package:baladiyati/app/app_router.dart';
+import 'package:baladiyati/core/config/jwt_store.dart';
 import 'package:baladiyati/core/l10n/locale_cubit.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/admin/Departement/data/Service/Departement_Api_Service.dart';
@@ -10,6 +11,7 @@ import 'package:baladiyati/features/admin/staff/data/Service/AdminUserApiService
 import 'package:baladiyati/features/admin/staff/data/Service/Employe_Api_Service.dart';
 import 'package:baladiyati/features/admin/violations/data/services/violation_api_services.dart';
 import 'package:baladiyati/features/admin/violations/presentation/screens/violationpage.dart';
+import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/auth_api_service.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
@@ -59,7 +61,7 @@ class _DashboardPageState extends State<DashboardPage> {
   late final ViolationApiService _violationApiService;
   late final DepartmentApiService _departmentApiService;
   late final ServiceApiService _serviceApiService;
- late final AdminUserApiService _adminUserApiService;
+  late final AdminUserApiService _adminUserApiService;
   late final RequestApiService _requestApiService;
 
   late Future<_AdminDashboardStats> _statsFuture;
@@ -75,7 +77,15 @@ class _DashboardPageState extends State<DashboardPage> {
     _adminUserApiService = AdminUserApiService(dio: DioClient.muni);
     _requestApiService = RequestApiService(DioClient.muni);
 
-    _statsFuture = _loadStats();
+    // Seed first, then load stats so the service count is correct.
+    _statsFuture = _seedThenLoadStats();
+  }
+
+  /// Seeds default services for this tenant, then loads dashboard stats.
+  /// initDefaults() swallows all errors so this never throws.
+  Future<_AdminDashboardStats> _seedThenLoadStats() async {
+    await _serviceApiService.initDefaults();
+    return _loadStats();
   }
 
   // Each API is wrapped independently — one failure never breaks the others.
@@ -98,9 +108,9 @@ class _DashboardPageState extends State<DashboardPage> {
           .then<int>((v) => v.length)
           .catchError((_) => -1),
       _adminUserApiService
-    .getUsersByRole(roleName: 'STAFF')
-    .then<int>((v) => v.length)
-    .catchError((_) => -1),
+          .getUsersByRole(roleName: 'STAFF')
+          .then<int>((v) => v.length)
+          .catchError((_) => -1),
       _requestApiService
           .getAllRequestsAdmin()
           .then<int>((v) => v.length)
@@ -126,6 +136,10 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future<void> _logout() async {
+    // Clear the admin secure-storage token so AuthGate does not
+    // re-enter the dashboard on the next app start.
+    await AdminTokenStore().clear();
+    await JwtStore.clear();
     await _authApiService.logout();
 
     if (!mounted) return;

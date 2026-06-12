@@ -13,8 +13,6 @@ class AuthApiService {
   final AuthTokenStore _tokenStore;
   final SessionRoleStore _roleStore;
 
-
-
   AuthApiService({
     AuthTokenStore? tokenStore,
     SessionRoleStore? roleStore,
@@ -47,7 +45,7 @@ class AuthApiService {
 
   // ============================================================
   // REGISTER — Build4All Core
-  // POST /auth/users/register
+  // POST /auth/users/register  (goes to Build4All API, not municipality)
   // ============================================================
   Future<AuthResponseModel> register({
     required String email,
@@ -141,9 +139,7 @@ class AuthApiService {
   Future<void> logout() async {
     try {
       await DioClient.build.post('/auth/logout');
-    } catch (_) {
-      
-    }
+    } catch (_) {}
 
     await _tokenStore.clearToken();
     await _roleStore.clearRole();
@@ -185,13 +181,13 @@ class AuthApiService {
   }
 
   // ============================================================
-  // COMPLETE PROFILE — Build4All Core
+  // COMPLETE PROFILE — Municipality Backend
   // POST /auth/complete-profile
+  // ownerProjectLinkId is extracted server-side from the JWT claim.
   // ============================================================
   Future<String> completeProfile({
     required String address,
     required String username,
-    required int municipalityId,
   }) async {
     try {
       final token = await _tokenStore.getToken();
@@ -200,12 +196,11 @@ class AuthApiService {
         DioClient.setAuthToken(token);
       }
 
-      final response = await DioClient.build.post(
+      final response = await DioClient.muni.post(
         '/auth/complete-profile',
         data: {
           'address': address.trim(),
           'username': username.trim(),
-          'municipality': {'id': municipalityId},
         },
       );
 
