@@ -1651,4 +1651,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get requestIdLabel => 'رقم الطلب';
   String get ownerEmailNotAssignable => 'هذا البريد الإلكتروني ينتمي إلى حساب المالك ولا يمكن تعيينه كموظف';
 
+  String get selectDepartmentsLabel => 'اختر الأقسام';
+  String get selectAtLeastOneDepartment => 'اختر قسماً واحداً على الأقل';
+
 }

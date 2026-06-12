@@ -1651,4 +1651,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get requestIdLabel => 'ID de demande';
   String get ownerEmailNotAssignable => 'Cet e-mail appartient au compte propriétaire et ne peut pas être attribué au personnel';
 
+  String get selectDepartmentsLabel => 'Sélectionner les départements';
+  String get selectAtLeastOneDepartment => 'Sélectionnez au moins un département';
+
 }
