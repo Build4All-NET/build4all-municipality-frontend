@@ -1649,5 +1649,6 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get requestIdLabel => 'Request ID';
+  String get ownerEmailNotAssignable => 'This email belongs to the owner account and cannot be assigned as staff';
 
 }
