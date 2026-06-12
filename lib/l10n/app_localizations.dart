@@ -3130,6 +3130,8 @@ abstract class AppLocalizations {
   String get dateLabel;
   String get requestIdLabel;
   String get ownerEmailNotAssignable;
+  String get selectDepartmentsLabel;
+  String get selectAtLeastOneDepartment;
 }
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
