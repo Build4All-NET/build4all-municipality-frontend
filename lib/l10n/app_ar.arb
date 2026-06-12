@@ -569,5 +569,8 @@
   "newestFirst": "الأحدث أولاً",
   "oldestFirst": "الأقدم أولاً",
   "dateLabel": "التاريخ",
-  "requestIdLabel": "رقم الطلب"
+  "requestIdLabel": "رقم الطلب",
+  "selectDepartmentsLabel": "اختر الأقسام",
+  "selectAtLeastOneDepartment": "اختر قسماً واحداً على الأقل",
+  "ownerEmailNotAssignable": "هذا البريد الإلكتروني ينتمي إلى حساب المالك ولا يمكن تعيينه كموظف"
 }

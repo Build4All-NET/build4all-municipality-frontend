@@ -1649,5 +1649,6 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get requestIdLabel => 'ID de demande';
+  String get ownerEmailNotAssignable => 'Cet e-mail appartient au compte propriétaire et ne peut pas être attribué au personnel';
 
 }

@@ -1649,5 +1649,6 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get requestIdLabel => 'رقم الطلب';
+  String get ownerEmailNotAssignable => 'هذا البريد الإلكتروني ينتمي إلى حساب المالك ولا يمكن تعيينه كموظف';
 
 }
