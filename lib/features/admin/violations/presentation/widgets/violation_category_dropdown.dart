@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:baladiyati/l10n/app_localizations.dart';
 
 // Backend enum values — must be sent exactly as listed here.
 const List<String> kViolationTypes = [
@@ -28,6 +29,7 @@ class ViolationCategoryDropdown extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return DropdownButtonFormField<String>(
       value: value,
@@ -47,7 +49,14 @@ class ViolationCategoryDropdown extends StatelessWidget {
           .map(
             (type) => DropdownMenuItem(
               value: type,
-              child: Text(type),
+              child: Text(switch (type) {
+                'TRAFFIC' => l10n.violationTraffic,
+                'ENVIRONMENTAL' => l10n.violationEnvironmental,
+                'URBANISM' => l10n.violationUrbanism,
+                'COMMERCIAL' => l10n.violationCommercial,
+                'OTHER' => l10n.violationOther,
+                _ => type,
+              }),
             ),
           )
           .toList(),

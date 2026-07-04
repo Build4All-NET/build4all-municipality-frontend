@@ -966,7 +966,17 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'All'**
   String get filterAll;
+
+  /// No description provided for @filterActive.
+  ///
+  /// In en, this message translates to:
+  /// **'Active'**
   String get filterActive;
+
+  /// No description provided for @filterDone.
+  ///
+  /// In en, this message translates to:
+  /// **'Done'**
   String get filterDone;
 
   /// No description provided for @statusSubmitted.
@@ -3027,112 +3037,505 @@ abstract class AppLocalizations {
   /// **'This field is required'**
   String get requiredField;
 
+  /// No description provided for @certificate.
+  ///
+  /// In en, this message translates to:
   /// **'Certificate'**
   String get certificate;
 
+  /// No description provided for @taskAlreadyCompleted.
+  ///
+  /// In en, this message translates to:
   /// **'This task has already been completed.'**
   String get taskAlreadyCompleted;
 
+  /// No description provided for @viewCertificate.
+  ///
+  /// In en, this message translates to:
   /// **'View Certificate'**
   String get viewCertificate;
 
+  /// No description provided for @generatingCertificate.
+  ///
+  /// In en, this message translates to:
   /// **'Generating certificate...'**
   String get generatingCertificate;
 
+  /// No description provided for @certificateTakingTime.
+  ///
+  /// In en, this message translates to:
   /// **'This may take a moment'**
   String get certificateTakingTime;
 
+  /// No description provided for @certificateNotReady.
+  ///
+  /// In en, this message translates to:
   /// **'Certificate is not ready yet'**
   String get certificateNotReady;
 
+  /// No description provided for @certificateReady.
+  ///
+  /// In en, this message translates to:
   /// **'Certificate ready'**
   String get certificateReady;
 
+  /// No description provided for @pdfDocument.
+  ///
+  /// In en, this message translates to:
   /// **'PDF Document'**
   String get pdfDocument;
 
+  /// No description provided for @openPdf.
+  ///
+  /// In en, this message translates to:
   /// **'Open PDF'**
   String get openPdf;
 
+  /// No description provided for @downloadAgain.
+  ///
+  /// In en, this message translates to:
   /// **'Download Again'**
   String get downloadAgain;
 
+  /// No description provided for @downloadAndOpen.
+  ///
+  /// In en, this message translates to:
   /// **'Download & Open'**
   String get downloadAndOpen;
 
+  /// No description provided for @backToTasks.
+  ///
+  /// In en, this message translates to:
   /// **'Back to Tasks'**
   String get backToTasks;
 
+  /// No description provided for @done.
+  ///
+  /// In en, this message translates to:
   /// **'Done'**
   String get done;
 
+  /// No description provided for @couldNotOpenFile.
+  ///
+  /// In en, this message translates to:
   /// **'Could not open the file'**
   String get couldNotOpenFile;
 
+  /// No description provided for @noInputRequired.
+  ///
+  /// In en, this message translates to:
   /// **'No input required for this task'**
   String get noInputRequired;
 
+  /// No description provided for @fillRequiredFields.
+  ///
+  /// In en, this message translates to:
   /// **'Fill Required Fields'**
   String get fillRequiredFields;
 
+  /// No description provided for @useCurrentLocation.
+  ///
+  /// In en, this message translates to:
   /// **'Use Current Location'**
   String get useCurrentLocation;
 
+  /// No description provided for @locationRequired.
+  ///
+  /// In en, this message translates to:
   /// **'Location is required'**
   String get locationRequired;
 
+  /// No description provided for @locationPermissionDenied.
+  ///
+  /// In en, this message translates to:
   /// **'Location permission denied'**
   String get locationPermissionDenied;
 
+  /// No description provided for @locationServiceDisabled.
+  ///
+  /// In en, this message translates to:
   /// **'Location services are disabled'**
   String get locationServiceDisabled;
 
+  /// No description provided for @locationError.
+  ///
+  /// In en, this message translates to:
   /// **'Could not get location'**
   String get locationError;
 
+  /// No description provided for @gpsCoordinatesLabel.
+  ///
+  /// In en, this message translates to:
   /// **'GPS Coordinates'**
   String get gpsCoordinatesLabel;
 
+  /// No description provided for @tapToPickLocation.
+  ///
+  /// In en, this message translates to:
   /// **'Tap to pick location'**
   String get tapToPickLocation;
 
+  /// No description provided for @locationSelected.
+  ///
+  /// In en, this message translates to:
   /// **'Location selected'**
   String get locationSelected;
 
+  /// No description provided for @manageCertificates.
+  ///
+  /// In en, this message translates to:
+  /// **'Manage municipality certificates'**
   String get manageCertificates;
+
+  /// No description provided for @noCertificates.
+  ///
+  /// In en, this message translates to:
+  /// **'No certificates found'**
   String get noCertificates;
+
+  /// No description provided for @noCertificatesHint.
+  ///
+  /// In en, this message translates to:
+  /// **'No certificates have been generated yet.'**
   String get noCertificatesHint;
+
+  /// No description provided for @signCertificate.
+  ///
+  /// In en, this message translates to:
+  /// **'Sign Certificate'**
   String get signCertificate;
+
+  /// No description provided for @unsignCertificate.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsign Certificate'**
   String get unsignCertificate;
+
+  /// No description provided for @certificateSigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Certificate signed successfully'**
   String get certificateSigned;
+
+  /// No description provided for @certificateUnsigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Certificate unsigned successfully'**
   String get certificateUnsigned;
+
+  /// No description provided for @aiHelp.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Help'**
   String get aiHelp;
+
+  /// No description provided for @aiExplanation.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Explanation'**
   String get aiExplanation;
+
+  /// No description provided for @aiHelpLoading.
+  ///
+  /// In en, this message translates to:
+  /// **'Getting AI explanation...'**
   String get aiHelpLoading;
+
+  /// No description provided for @aiHelpError.
+  ///
+  /// In en, this message translates to:
+  /// **'Could not get AI explanation'**
   String get aiHelpError;
+
+  /// No description provided for @locationNameLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Selected Location'**
   String get locationNameLabel;
+
+  /// No description provided for @aiChatTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'AI Assistant'**
   String get aiChatTitle;
+
+  /// No description provided for @aiChatHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Type a message...'**
   String get aiChatHint;
+
+  /// No description provided for @aiChatWelcome.
+  ///
+  /// In en, this message translates to:
+  /// **'Hello! I\'m your AI assistant. Ask me anything about municipal services.'**
   String get aiChatWelcome;
+
+  /// No description provided for @aiChatClear.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear conversation'**
   String get aiChatClear;
+
+  /// No description provided for @aiChatCleared.
+  ///
+  /// In en, this message translates to:
+  /// **'Conversation cleared'**
   String get aiChatCleared;
+
+  /// No description provided for @aiChatSending.
+  ///
+  /// In en, this message translates to:
+  /// **'Typing...'**
   String get aiChatSending;
+
+  /// No description provided for @aiChatError.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
   String get aiChatError;
+
+  /// No description provided for @aiChatEmptyHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Ask me anything about municipal services'**
   String get aiChatEmptyHint;
+
+  /// No description provided for @chooseOnMap.
+  ///
+  /// In en, this message translates to:
+  /// **'Choose on Map'**
   String get chooseOnMap;
+
+  /// No description provided for @mapPickerTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Pick Location'**
   String get mapPickerTitle;
+
+  /// No description provided for @mapPickerConfirm.
+  ///
+  /// In en, this message translates to:
+  /// **'Confirm Location'**
   String get mapPickerConfirm;
+
+  /// No description provided for @mapPickerHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Tap on the map to select a location'**
   String get mapPickerHint;
+
+  /// No description provided for @certFilterSigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Signed'**
   String get certFilterSigned;
+
+  /// No description provided for @certFilterUnsigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Unsigned'**
   String get certFilterUnsigned;
+
+  /// No description provided for @newestFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Newest first'**
   String get newestFirst;
+
+  /// No description provided for @oldestFirst.
+  ///
+  /// In en, this message translates to:
+  /// **'Oldest first'**
   String get oldestFirst;
+
+  /// No description provided for @dateLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Date'**
   String get dateLabel;
+
+  /// No description provided for @requestIdLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Request ID'**
   String get requestIdLabel;
-  String get ownerEmailNotAssignable;
+
+  /// No description provided for @selectDepartmentsLabel.
+  ///
+  /// In en, this message translates to:
+  /// **'Select departments'**
   String get selectDepartmentsLabel;
+
+  /// No description provided for @selectAtLeastOneDepartment.
+  ///
+  /// In en, this message translates to:
+  /// **'Select at least one department'**
   String get selectAtLeastOneDepartment;
+
+  /// No description provided for @ownerEmailNotAssignable.
+  ///
+  /// In en, this message translates to:
+  /// **'This email belongs to the owner account and cannot be assigned as staff'**
+  String get ownerEmailNotAssignable;
+
+  /// No description provided for @deptEngineering.
+  ///
+  /// In en, this message translates to:
+  /// **'Engineering'**
+  String get deptEngineering;
+
+  /// No description provided for @deptFinance.
+  ///
+  /// In en, this message translates to:
+  /// **'Finance'**
+  String get deptFinance;
+
+  /// No description provided for @deptPolice.
+  ///
+  /// In en, this message translates to:
+  /// **'Police'**
+  String get deptPolice;
+
+  /// No description provided for @deptCivilStatus.
+  ///
+  /// In en, this message translates to:
+  /// **'Civil Status'**
+  String get deptCivilStatus;
+
+  /// No description provided for @deptPublicWorks.
+  ///
+  /// In en, this message translates to:
+  /// **'Public Works'**
+  String get deptPublicWorks;
+
+  /// No description provided for @violationTraffic.
+  ///
+  /// In en, this message translates to:
+  /// **'Traffic'**
+  String get violationTraffic;
+
+  /// No description provided for @violationEnvironmental.
+  ///
+  /// In en, this message translates to:
+  /// **'Environmental'**
+  String get violationEnvironmental;
+
+  /// No description provided for @violationUrbanism.
+  ///
+  /// In en, this message translates to:
+  /// **'Urbanism'**
+  String get violationUrbanism;
+
+  /// No description provided for @violationCommercial.
+  ///
+  /// In en, this message translates to:
+  /// **'Commercial'**
+  String get violationCommercial;
+
+  /// No description provided for @violationOther.
+  ///
+  /// In en, this message translates to:
+  /// **'Other'**
+  String get violationOther;
+
+  /// No description provided for @roleOwner.
+  ///
+  /// In en, this message translates to:
+  /// **'Owner / Admin'**
+  String get roleOwner;
+
+  /// No description provided for @roleStaff.
+  ///
+  /// In en, this message translates to:
+  /// **'Staff'**
+  String get roleStaff;
+
+  /// No description provided for @roleUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Citizen'**
+  String get roleUser;
+
+  /// No description provided for @serviceBuildingPermit.
+  ///
+  /// In en, this message translates to:
+  /// **'Building Permit'**
+  String get serviceBuildingPermit;
+
+  /// No description provided for @serviceLargerBuildingPermit.
+  ///
+  /// In en, this message translates to:
+  /// **'Larger Building Permit'**
+  String get serviceLargerBuildingPermit;
+
+  /// No description provided for @serviceHousingPermit.
+  ///
+  /// In en, this message translates to:
+  /// **'Housing Permit'**
+  String get serviceHousingPermit;
+
+  /// No description provided for @serviceExternalWorks.
+  ///
+  /// In en, this message translates to:
+  /// **'External Works'**
+  String get serviceExternalWorks;
+
+  /// No description provided for @serviceIllegalConstruction.
+  ///
+  /// In en, this message translates to:
+  /// **'Illegal Construction'**
+  String get serviceIllegalConstruction;
+
+  /// No description provided for @serviceValuationCertificate.
+  ///
+  /// In en, this message translates to:
+  /// **'Valuation Certificate'**
+  String get serviceValuationCertificate;
+
+  /// No description provided for @serviceClearanceCertificate.
+  ///
+  /// In en, this message translates to:
+  /// **'Clearance Certificate'**
+  String get serviceClearanceCertificate;
+
+  /// No description provided for @serviceTentPermit.
+  ///
+  /// In en, this message translates to:
+  /// **'Tent Permit'**
+  String get serviceTentPermit;
+
+  /// No description provided for @servicePropertyAccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Property Access'**
+  String get servicePropertyAccess;
+
+  /// No description provided for @serviceResidenceCertificate.
+  ///
+  /// In en, this message translates to:
+  /// **'Residence Certificate'**
+  String get serviceResidenceCertificate;
+
+  /// No description provided for @serviceContentsCertificate.
+  ///
+  /// In en, this message translates to:
+  /// **'Contents Certificate'**
+  String get serviceContentsCertificate;
+
+  /// No description provided for @serviceWorkCertificate.
+  ///
+  /// In en, this message translates to:
+  /// **'Work Certificate'**
+  String get serviceWorkCertificate;
+
+  /// No description provided for @serviceLeaseRegistration.
+  ///
+  /// In en, this message translates to:
+  /// **'Lease Registration'**
+  String get serviceLeaseRegistration;
 }
+
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
   const _AppLocalizationsDelegate();
 

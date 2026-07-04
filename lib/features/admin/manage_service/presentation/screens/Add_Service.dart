@@ -508,7 +508,14 @@ class _DepartmentDropdown extends StatelessWidget {
       items: departments.map((department) {
         return DropdownMenuItem<int>(
           value: department.id,
-          child: Text(department.name),
+          child: Text(switch (department.name) {
+            'Engineering' => loc.deptEngineering,
+            'Finance' => loc.deptFinance,
+            'Police' => loc.deptPolice,
+            'Civil Status' => loc.deptCivilStatus,
+            'Public Works' => loc.deptPublicWorks,
+            _ => department.name,
+          }),
         );
       }).toList(),
       onChanged: onChanged,

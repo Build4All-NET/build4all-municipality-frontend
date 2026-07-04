@@ -1504,7 +1504,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get certificateTakingTime => 'Cela peut prendre un moment';
 
   @override
-  String get certificateNotReady => "Le certificat n'est pas encore prêt";
+  String get certificateNotReady => 'Le certificat n\'est pas encore prêt';
 
   @override
   String get certificateReady => 'Certificat prêt';
@@ -1528,7 +1528,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get done => 'Terminé';
 
   @override
-  String get couldNotOpenFile => "Impossible d'ouvrir le fichier";
+  String get couldNotOpenFile => 'Impossible d\'ouvrir le fichier';
 
   @override
   String get noInputRequired => 'Aucune saisie requise pour cette tâche';
@@ -1567,7 +1567,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get noCertificates => 'Aucun certificat trouvé';
 
   @override
-  String get noCertificatesHint => "Aucun certificat n'a encore été généré.";
+  String get noCertificatesHint => 'Aucun certificat n\'a encore été généré.';
 
   @override
   String get signCertificate => 'Signer le certificat';
@@ -1588,10 +1588,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get aiExplanation => 'Explication IA';
 
   @override
-  String get aiHelpLoading => "Récupération de l'explication...";
+  String get aiHelpLoading => 'Récupération de l\'explication...';
 
   @override
-  String get aiHelpError => "Impossible d'obtenir l'explication IA";
+  String get aiHelpError => 'Impossible d\'obtenir l\'explication IA';
 
   @override
   String get locationNameLabel => 'Emplacement sélectionné';
@@ -1624,10 +1624,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get chooseOnMap => 'Choisir sur la carte';
 
   @override
-  String get mapPickerTitle => "Choisir l'emplacement";
+  String get mapPickerTitle => 'Choisir l\'emplacement';
 
   @override
-  String get mapPickerConfirm => "Confirmer l'emplacement";
+  String get mapPickerConfirm => 'Confirmer l\'emplacement';
 
   @override
   String get mapPickerHint => 'Appuyez sur la carte pour sélectionner un emplacement';
@@ -1649,9 +1649,91 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get requestIdLabel => 'ID de demande';
-  String get ownerEmailNotAssignable => 'Cet e-mail appartient au compte propriétaire et ne peut pas être attribué au personnel';
 
+  @override
   String get selectDepartmentsLabel => 'Sélectionner les départements';
+
+  @override
   String get selectAtLeastOneDepartment => 'Sélectionnez au moins un département';
 
+  @override
+  String get ownerEmailNotAssignable => 'Cet e-mail appartient au compte propriétaire et ne peut pas être affecté comme personnel';
+
+  @override
+  String get deptEngineering => 'Ingénierie';
+
+  @override
+  String get deptFinance => 'Finances';
+
+  @override
+  String get deptPolice => 'Police';
+
+  @override
+  String get deptCivilStatus => 'État civil';
+
+  @override
+  String get deptPublicWorks => 'Travaux publics';
+
+  @override
+  String get violationTraffic => 'Circulation';
+
+  @override
+  String get violationEnvironmental => 'Environnementale';
+
+  @override
+  String get violationUrbanism => 'Urbanisme';
+
+  @override
+  String get violationCommercial => 'Commerciale';
+
+  @override
+  String get violationOther => 'Autre';
+
+  @override
+  String get roleOwner => 'Propriétaire / Administrateur';
+
+  @override
+  String get roleStaff => 'Agent municipal';
+
+  @override
+  String get roleUser => 'Citoyen';
+
+  @override
+  String get serviceBuildingPermit => 'Permis de construire';
+
+  @override
+  String get serviceLargerBuildingPermit => 'Permis de construire (grande superficie)';
+
+  @override
+  String get serviceHousingPermit => 'Permis d\'habitation';
+
+  @override
+  String get serviceExternalWorks => 'Travaux extérieurs';
+
+  @override
+  String get serviceIllegalConstruction => 'Régularisation de construction illégale';
+
+  @override
+  String get serviceValuationCertificate => 'Certificat d\'évaluation';
+
+  @override
+  String get serviceClearanceCertificate => 'Certificat de non-redevance';
+
+  @override
+  String get serviceTentPermit => 'Permis de tente';
+
+  @override
+  String get servicePropertyAccess => 'Autorisation d\'accès à la propriété';
+
+  @override
+  String get serviceResidenceCertificate => 'Certificat de résidence';
+
+  @override
+  String get serviceContentsCertificate => 'Attestation de contenu';
+
+  @override
+  String get serviceWorkCertificate => 'Attestation de travaux';
+
+  @override
+  String get serviceLeaseRegistration => 'Enregistrement de bail';
 }
