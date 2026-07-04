@@ -553,7 +553,7 @@ class _CertificateCard extends StatelessWidget {
                   _InfoRow(
                     icon: Icons.info_outline,
                     label: loc.status,
-                    value: _humaniseStatus(certificate.requestStatus),
+                    value: _humaniseStatus(loc, certificate.requestStatus),
                     theme: theme,
                     colors: colors,
                     valueColor:
@@ -646,13 +646,20 @@ class _CertificateCard extends StatelessWidget {
     );
   }
 
-  String _humaniseStatus(String status) {
-    return status
-        .replaceAll('_', ' ')
-        .split(' ')
-        .map((w) =>
-            w.isEmpty ? '' : '${w[0].toUpperCase()}${w.substring(1).toLowerCase()}')
-        .join(' ');
+  String _humaniseStatus(AppLocalizations loc, String status) {
+    final clean = status.trim().toUpperCase();
+    return switch (clean) {
+      'SUBMITTED' => loc.statusSubmitted,
+      'PENDING' => loc.statusPending,
+      'UNDER_REVIEW' => loc.statusUnderReview,
+      'DOCUMENTS_MISSING' => loc.statusDocumentsMissing,
+      'IN_PROGRESS' => loc.statusInProgress,
+      'APPROVED' => loc.statusApproved,
+      'REJECTED' => loc.statusRejected,
+      'COMPLETED' => loc.statusCompleted,
+      'CANCELLED' => loc.statusCancelled,
+      _ => status.replaceAll('_', ' '),
+    };
   }
 
   Color _statusColor(String status, ColorScheme colors) {

@@ -50,7 +50,14 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
         return AlertDialog(
           title: Text(loc.confirmDelete),
           content: Text(
-            loc.deleteDepartmentConfirm(department.name),
+            loc.deleteDepartmentConfirm(switch (department.name) {
+              'Engineering' => loc.deptEngineering,
+              'Finance' => loc.deptFinance,
+              'Police' => loc.deptPolice,
+              'Civil Status' => loc.deptCivilStatus,
+              'Public Works' => loc.deptPublicWorks,
+              _ => department.name,
+            }),
           ),
           actions: [
             TextButton(
@@ -329,7 +336,14 @@ class _FilterCard extends StatelessWidget {
             ...departments.map(
               (d) => DropdownMenuItem<int?>(
                 value: d.id,
-                child: Text(d.name),
+                child: Text(switch (d.name) {
+                  'Engineering' => loc.deptEngineering,
+                  'Finance' => loc.deptFinance,
+                  'Police' => loc.deptPolice,
+                  'Civil Status' => loc.deptCivilStatus,
+                  'Public Works' => loc.deptPublicWorks,
+                  _ => d.name,
+                }),
               ),
             ),
           ],
@@ -449,7 +463,14 @@ class _DepartmentCard extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                department.name,
+                switch (department.name) {
+                  'Engineering' => loc.deptEngineering,
+                  'Finance' => loc.deptFinance,
+                  'Police' => loc.deptPolice,
+                  'Civil Status' => loc.deptCivilStatus,
+                  'Public Works' => loc.deptPublicWorks,
+                  _ => department.name,
+                },
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),

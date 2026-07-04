@@ -42,11 +42,20 @@ class _RequestsScreenState extends State<RequestsScreen> {
     return clean.isEmpty || clean == 'null' ? '---' : clean;
   }
 
-  String _formatStatus(String? status) {
-    final clean = _safe(status);
-    if (clean == '---') return clean;
-
-    return clean.replaceAll('_', ' ');
+  String _formatStatus(AppLocalizations l10n, String? status) {
+    final clean = status?.trim().toUpperCase() ?? '';
+    return switch (clean) {
+      'SUBMITTED' => l10n.statusSubmitted,
+      'PENDING' => l10n.statusPending,
+      'UNDER_REVIEW' => l10n.statusUnderReview,
+      'DOCUMENTS_MISSING' => l10n.statusDocumentsMissing,
+      'IN_PROGRESS' => l10n.statusInProgress,
+      'APPROVED' => l10n.statusApproved,
+      'REJECTED' => l10n.statusRejected,
+      'COMPLETED' => l10n.statusCompleted,
+      'CANCELLED' => l10n.statusCancelled,
+      _ => _safe(status).replaceAll('_', ' '),
+    };
   }
 
   String _formatDate(String? value) {
@@ -179,7 +188,14 @@ class _RequestsScreenState extends State<RequestsScreen> {
                                   return DropdownMenuItem<int?>(
                                     value: department.id,
                                     child: _ResponsiveText(
-                                      text: department.name,
+                                      text: switch (department.name) {
+                                        'Engineering' => l10n.deptEngineering,
+                                        'Finance' => l10n.deptFinance,
+                                        'Police' => l10n.deptPolice,
+                                        'Civil Status' => l10n.deptCivilStatus,
+                                        'Public Works' => l10n.deptPublicWorks,
+                                        _ => department.name,
+                                      },
                                       maxFontSize: 13,
                                       minFontSize: 8,
                                       color: colors.onSurface,
@@ -226,7 +242,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
                               return DropdownMenuItem<String?>(
                                 value: status,
                                 child: _ResponsiveText(
-                                  text: _formatStatus(status),
+                                  text: _formatStatus(l10n, status),
                                   maxFontSize: 13,
                                   minFontSize: 8,
                                   color: colors.onSurface,
@@ -270,7 +286,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
                     (request) {
                       return _RequestCard(
                         request: request,
-                        statusText: _formatStatus(request.status),
+                        statusText: _formatStatus(l10n, request.status),
                         statusColor: _statusColor(context, request.status),
                         createdAt: _formatDate(request.createdAt),
                         onTap: () => _openDetails(request),
@@ -310,6 +326,7 @@ class _RequestCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
 
     return InkWell(
       onTap: onTap,
@@ -364,7 +381,22 @@ class _RequestCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   _MiniInfoLine(
                     icon: Icons.miscellaneous_services_outlined,
-                    text: _safe(request.serviceName),
+                    text: switch (request.serviceName) {
+                      'Building Permit' => l10n.serviceBuildingPermit,
+                      'Larger Building Permit' => l10n.serviceLargerBuildingPermit,
+                      'Housing Permit' => l10n.serviceHousingPermit,
+                      'External Works' => l10n.serviceExternalWorks,
+                      'Illegal Construction' => l10n.serviceIllegalConstruction,
+                      'Valuation Certificate' => l10n.serviceValuationCertificate,
+                      'Clearance Certificate' => l10n.serviceClearanceCertificate,
+                      'Tent Permit' => l10n.serviceTentPermit,
+                      'Property Access' => l10n.servicePropertyAccess,
+                      'Residence Certificate' => l10n.serviceResidenceCertificate,
+                      'Contents Certificate' => l10n.serviceContentsCertificate,
+                      'Work Certificate' => l10n.serviceWorkCertificate,
+                      'Lease Registration' => l10n.serviceLeaseRegistration,
+                      _ => _safe(request.serviceName),
+                    },
                   ),
                   const SizedBox(height: 4),
                   _MiniInfoLine(

@@ -1649,9 +1649,91 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get requestIdLabel => 'Request ID';
-  String get ownerEmailNotAssignable => 'This email belongs to the owner account and cannot be assigned as staff';
 
+  @override
   String get selectDepartmentsLabel => 'Select departments';
+
+  @override
   String get selectAtLeastOneDepartment => 'Select at least one department';
 
+  @override
+  String get ownerEmailNotAssignable => 'This email belongs to the owner account and cannot be assigned as staff';
+
+  @override
+  String get deptEngineering => 'Engineering';
+
+  @override
+  String get deptFinance => 'Finance';
+
+  @override
+  String get deptPolice => 'Police';
+
+  @override
+  String get deptCivilStatus => 'Civil Status';
+
+  @override
+  String get deptPublicWorks => 'Public Works';
+
+  @override
+  String get violationTraffic => 'Traffic';
+
+  @override
+  String get violationEnvironmental => 'Environmental';
+
+  @override
+  String get violationUrbanism => 'Urbanism';
+
+  @override
+  String get violationCommercial => 'Commercial';
+
+  @override
+  String get violationOther => 'Other';
+
+  @override
+  String get roleOwner => 'Owner / Admin';
+
+  @override
+  String get roleStaff => 'Staff';
+
+  @override
+  String get roleUser => 'Citizen';
+
+  @override
+  String get serviceBuildingPermit => 'Building Permit';
+
+  @override
+  String get serviceLargerBuildingPermit => 'Larger Building Permit';
+
+  @override
+  String get serviceHousingPermit => 'Housing Permit';
+
+  @override
+  String get serviceExternalWorks => 'External Works';
+
+  @override
+  String get serviceIllegalConstruction => 'Illegal Construction';
+
+  @override
+  String get serviceValuationCertificate => 'Valuation Certificate';
+
+  @override
+  String get serviceClearanceCertificate => 'Clearance Certificate';
+
+  @override
+  String get serviceTentPermit => 'Tent Permit';
+
+  @override
+  String get servicePropertyAccess => 'Property Access';
+
+  @override
+  String get serviceResidenceCertificate => 'Residence Certificate';
+
+  @override
+  String get serviceContentsCertificate => 'Contents Certificate';
+
+  @override
+  String get serviceWorkCertificate => 'Work Certificate';
+
+  @override
+  String get serviceLeaseRegistration => 'Lease Registration';
 }

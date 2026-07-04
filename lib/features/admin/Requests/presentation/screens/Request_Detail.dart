@@ -249,7 +249,22 @@ class RequestDetailPage extends StatelessWidget {
                               _DetailRow(
                                 icon: Icons.miscellaneous_services_outlined,
                                 label: l10n.service,
-                                value: _safe(request.serviceName),
+                                value: switch (request.serviceName) {
+                                  'Building Permit' => l10n.serviceBuildingPermit,
+                                  'Larger Building Permit' => l10n.serviceLargerBuildingPermit,
+                                  'Housing Permit' => l10n.serviceHousingPermit,
+                                  'External Works' => l10n.serviceExternalWorks,
+                                  'Illegal Construction' => l10n.serviceIllegalConstruction,
+                                  'Valuation Certificate' => l10n.serviceValuationCertificate,
+                                  'Clearance Certificate' => l10n.serviceClearanceCertificate,
+                                  'Tent Permit' => l10n.serviceTentPermit,
+                                  'Property Access' => l10n.servicePropertyAccess,
+                                  'Residence Certificate' => l10n.serviceResidenceCertificate,
+                                  'Contents Certificate' => l10n.serviceContentsCertificate,
+                                  'Work Certificate' => l10n.serviceWorkCertificate,
+                                  'Lease Registration' => l10n.serviceLeaseRegistration,
+                                  _ => _safe(request.serviceName),
+                                },
                               ),
                               _DetailRow(
                                 icon: Icons.person_outline,

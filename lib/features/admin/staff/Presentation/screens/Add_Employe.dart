@@ -148,12 +148,24 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
                   if (_isEditing && (widget.employee!.departmentName?.isNotEmpty == true))
                     _InfoRow(
                       label: loc.department,
-                      value: widget.employee!.departmentName!,
+                      value: switch (widget.employee!.departmentName) {
+                        'Engineering' => loc.deptEngineering,
+                        'Finance' => loc.deptFinance,
+                        'Police' => loc.deptPolice,
+                        'Civil Status' => loc.deptCivilStatus,
+                        'Public Works' => loc.deptPublicWorks,
+                        _ => widget.employee!.departmentName!,
+                      },
                     ),
                   if (_isEditing && (widget.employee!.roleName?.isNotEmpty == true))
                     _InfoRow(
                       label: loc.role,
-                      value: widget.employee!.roleName!,
+                      value: switch (widget.employee!.roleName) {
+                        'OWNER' => loc.roleOwner,
+                        'STAFF' => loc.roleStaff,
+                        'USER' => loc.roleUser,
+                        _ => widget.employee!.roleName!,
+                      },
                     ),
                   if (_isEditing) const Divider(height: 24),
                   _InputField(
@@ -202,7 +214,14 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
                         items: state.departments.map((department) {
                           return DropdownMenuItem<int>(
                             value: department.id,
-                            child: Text(department.name),
+                            child: Text(switch (department.name) {
+                              'Engineering' => loc.deptEngineering,
+                              'Finance' => loc.deptFinance,
+                              'Police' => loc.deptPolice,
+                              'Civil Status' => loc.deptCivilStatus,
+                              'Public Works' => loc.deptPublicWorks,
+                              _ => department.name,
+                            }),
                           );
                         }).toList(),
                         onChanged: submitting

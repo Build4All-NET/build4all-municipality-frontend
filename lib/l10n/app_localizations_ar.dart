@@ -1649,9 +1649,91 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get requestIdLabel => 'رقم الطلب';
-  String get ownerEmailNotAssignable => 'هذا البريد الإلكتروني ينتمي إلى حساب المالك ولا يمكن تعيينه كموظف';
 
+  @override
   String get selectDepartmentsLabel => 'اختر الأقسام';
+
+  @override
   String get selectAtLeastOneDepartment => 'اختر قسماً واحداً على الأقل';
 
+  @override
+  String get ownerEmailNotAssignable => 'هذا البريد الإلكتروني ينتمي إلى حساب المالك ولا يمكن تعيينه كموظف';
+
+  @override
+  String get deptEngineering => 'الهندسة';
+
+  @override
+  String get deptFinance => 'المالية';
+
+  @override
+  String get deptPolice => 'الشرطة';
+
+  @override
+  String get deptCivilStatus => 'الأحوال الشخصية';
+
+  @override
+  String get deptPublicWorks => 'الأشغال العامة';
+
+  @override
+  String get violationTraffic => 'مخالفة مرورية';
+
+  @override
+  String get violationEnvironmental => 'مخالفة بيئية';
+
+  @override
+  String get violationUrbanism => 'مخالفة تنظيم مدني';
+
+  @override
+  String get violationCommercial => 'مخالفة تجارية';
+
+  @override
+  String get violationOther => 'أخرى';
+
+  @override
+  String get roleOwner => 'مالك / إداري';
+
+  @override
+  String get roleStaff => 'موظف بلدي';
+
+  @override
+  String get roleUser => 'مواطن';
+
+  @override
+  String get serviceBuildingPermit => 'رخصة بناء';
+
+  @override
+  String get serviceLargerBuildingPermit => 'رخصة بناء كبيرة';
+
+  @override
+  String get serviceHousingPermit => 'رخصة إسكان';
+
+  @override
+  String get serviceExternalWorks => 'أشغال خارجية';
+
+  @override
+  String get serviceIllegalConstruction => 'تسوية بناء مخالف';
+
+  @override
+  String get serviceValuationCertificate => 'إفادة تخمين';
+
+  @override
+  String get serviceClearanceCertificate => 'براءة ذمة مالية';
+
+  @override
+  String get serviceTentPermit => 'رخصة خيمة';
+
+  @override
+  String get servicePropertyAccess => 'إذن دخول عقار';
+
+  @override
+  String get serviceResidenceCertificate => 'إفادة سكن';
+
+  @override
+  String get serviceContentsCertificate => 'إفادة محتويات';
+
+  @override
+  String get serviceWorkCertificate => 'إفادة اشغال';
+
+  @override
+  String get serviceLeaseRegistration => 'تسجيل عقد إيجار';
 }
