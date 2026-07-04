@@ -606,7 +606,12 @@ class _TaskInfoCard extends StatelessWidget {
                   borderRadius: BorderRadius.circular(999),
                 ),
                 child: Text(
-                  isDone ? l10n.completed : (task.state.isEmpty ? l10n.statusPending : task.state),
+                  isDone ? l10n.completed : switch (task.state.toUpperCase()) {
+                    'CREATED' => l10n.statusPending,
+                    'ASSIGNED' => l10n.statusAssigned,
+                    '' => l10n.statusPending,
+                    _ => task.state,
+                  },
                   style: theme.textTheme.labelSmall?.copyWith(
                     color: stateFg,
                     fontWeight: FontWeight.w800,

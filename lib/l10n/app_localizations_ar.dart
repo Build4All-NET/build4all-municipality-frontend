@@ -1736,4 +1736,7 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get serviceLeaseRegistration => 'تسجيل عقد إيجار';
+
+  @override
+  String get statusAssigned => 'تم التعيين';
 }

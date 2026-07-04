@@ -197,6 +197,7 @@ class _StatusChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).colorScheme;
+    final l10n = AppLocalizations.of(context)!;
     final upper = state.toUpperCase();
 
     final Color bg;
@@ -206,15 +207,15 @@ class _StatusChip extends StatelessWidget {
     if (upper == 'COMPLETED' || upper == 'DONE') {
       bg = colors.surfaceVariant;
       fg = colors.onSurfaceVariant;
-      label = 'Done';
+      label = l10n.statusCompleted;
     } else if (upper == 'CREATED' || upper == 'PENDING') {
       bg = colors.primaryContainer;
       fg = colors.onPrimaryContainer;
-      label = 'Pending';
+      label = l10n.statusPending;
     } else if (upper == 'ASSIGNED') {
       bg = colors.tertiaryContainer;
       fg = colors.onTertiaryContainer;
-      label = 'Assigned';
+      label = l10n.statusAssigned;
     } else {
       bg = colors.surfaceVariant;
       fg = colors.onSurfaceVariant;

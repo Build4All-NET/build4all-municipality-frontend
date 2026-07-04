@@ -301,8 +301,17 @@ class _ViolationCard extends StatelessWidget {
     );
   }
 
-  String _departmentText() {
-    if ((violation.departmentName ?? '').trim().isNotEmpty) return violation.departmentName!;
+  String _departmentText(AppLocalizations loc) {
+    if ((violation.departmentName ?? '').trim().isNotEmpty) {
+      return switch (violation.departmentName) {
+        'Engineering' => loc.deptEngineering,
+        'Finance' => loc.deptFinance,
+        'Police' => loc.deptPolice,
+        'Civil Status' => loc.deptCivilStatus,
+        'Public Works' => loc.deptPublicWorks,
+        _ => violation.departmentName!,
+      };
+    }
     return '${violation.departmentId}';
   }
 
@@ -351,7 +360,7 @@ class _ViolationCard extends StatelessWidget {
             _InfoRow(label: loc.description, value: violation.description),
             _InfoRow(label: loc.location, value: violation.location),
             _InfoRow(label: loc.date, value: violation.violationDate),
-            _InfoRow(label: loc.department, value: _departmentText()),
+            _InfoRow(label: loc.department, value: _departmentText(loc)),
             _InfoRow(label: loc.citizenName, value: violation.citizenName),
             _InfoRow(label: loc.amount, value: '${violation.amount.toStringAsFixed(2)} \$'),
             if ((violation.identityNumber ?? '').isNotEmpty)
@@ -359,7 +368,14 @@ class _ViolationCard extends StatelessWidget {
             if ((violation.carPlate ?? '').isNotEmpty)
               _InfoRow(label: loc.carPlate, value: violation.carPlate!),
             if ((violation.type ?? '').isNotEmpty)
-              _InfoRow(label: loc.violationTypeLabel, value: violation.type!),
+              _InfoRow(label: loc.violationTypeLabel, value: switch (violation.type) {
+                'TRAFFIC' => loc.violationTraffic,
+                'ENVIRONMENTAL' => loc.violationEnvironmental,
+                'URBANISM' => loc.violationUrbanism,
+                'COMMERCIAL' => loc.violationCommercial,
+                'OTHER' => loc.violationOther,
+                _ => violation.type!,
+              }),
             if ((violation.municipalityName ?? '').trim().isNotEmpty)
               _InfoRow(label: loc.municipalityName, value: violation.municipalityName!),
             const SizedBox(height: 14),

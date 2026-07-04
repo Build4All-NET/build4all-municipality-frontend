@@ -675,7 +675,14 @@ class _TypeDropdown extends StatelessWidget {
         ),
       ),
       items: _kViolationTypes
-          .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+          .map((t) => DropdownMenuItem(value: t, child: Text(switch (t) {
+                'TRAFFIC' => loc.violationTraffic,
+                'ENVIRONMENTAL' => loc.violationEnvironmental,
+                'URBANISM' => loc.violationUrbanism,
+                'COMMERCIAL' => loc.violationCommercial,
+                'OTHER' => loc.violationOther,
+                _ => t,
+              })))
           .toList(),
       onChanged: enabled ? onChanged : null,
       validator: validator,
@@ -836,8 +843,16 @@ class _DepartmentDropdown extends StatelessWidget {
           ),
         ),
         items: departments
-            .map((d) =>
-                DropdownMenuItem<int>(value: d.id, child: Text(d.name)))
+            .map((d) => DropdownMenuItem<int>(
+                value: d.id,
+                child: Text(switch (d.name) {
+                  'Engineering' => loc.deptEngineering,
+                  'Finance' => loc.deptFinance,
+                  'Police' => loc.deptPolice,
+                  'Civil Status' => loc.deptCivilStatus,
+                  'Public Works' => loc.deptPublicWorks,
+                  _ => d.name,
+                })))
             .toList(),
         onChanged: enabled ? onChanged : null,
         validator: (v) =>

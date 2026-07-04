@@ -1736,4 +1736,7 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get serviceLeaseRegistration => 'Enregistrement de bail';
+
+  @override
+  String get statusAssigned => 'Assignée';
 }

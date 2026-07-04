@@ -598,5 +598,6 @@
   "serviceResidenceCertificate": "إفادة سكن",
   "serviceContentsCertificate": "إفادة محتويات",
   "serviceWorkCertificate": "إفادة اشغال",
-  "serviceLeaseRegistration": "تسجيل عقد إيجار"
+  "serviceLeaseRegistration": "تسجيل عقد إيجار",
+  "statusAssigned": "تم التعيين"
 }

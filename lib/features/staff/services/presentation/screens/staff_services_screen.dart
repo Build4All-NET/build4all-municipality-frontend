@@ -266,9 +266,27 @@ class _ServiceReadOnlyCard extends StatelessWidget {
     final colors = theme.colorScheme;
     final isRtl = Directionality.of(context) == TextDirection.rtl;
 
+    final langCode = Localizations.localeOf(context).languageCode;
     final title = isRtl
         ? (service.nameAr.trim().isNotEmpty ? service.nameAr : service.nameEn)
-        : (service.nameEn.trim().isNotEmpty ? service.nameEn : service.nameAr);
+        : langCode == 'fr'
+            ? switch (service.nameEn.trim()) {
+                'Building Permit' => "Permis de construire",
+                'Larger Building Permit' => "Permis de construire (grande superficie)",
+                'Housing Permit' => "Permis d'habitation",
+                'External Works' => 'Travaux extérieurs',
+                'Illegal Construction' => 'Régularisation de construction illégale',
+                'Valuation Certificate' => "Certificat d'évaluation",
+                'Clearance Certificate' => 'Certificat de non-redevance',
+                'Tent Permit' => 'Permis de tente',
+                'Property Access' => "Autorisation d'accès à la propriété",
+                'Residence Certificate' => 'Certificat de résidence',
+                'Contents Certificate' => 'Attestation de contenu',
+                'Work Certificate' => 'Attestation de travaux',
+                'Lease Registration' => 'Enregistrement de bail',
+                _ => service.nameEn,
+              }
+            : (service.nameEn.trim().isNotEmpty ? service.nameEn : service.nameAr);
 
     final subtitle = isRtl
         ? (service.descriptionAr.trim().isNotEmpty

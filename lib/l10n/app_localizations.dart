@@ -3534,6 +3534,12 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Lease Registration'**
   String get serviceLeaseRegistration;
+
+  /// No description provided for @statusAssigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Assigned'**
+  String get statusAssigned;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

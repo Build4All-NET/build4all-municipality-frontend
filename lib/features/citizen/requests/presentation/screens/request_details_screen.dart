@@ -249,7 +249,22 @@ class RequestDetailsScreen extends StatelessWidget {
                   ],
                   if (request.serviceName != null && request.serviceName!.isNotEmpty) ...[
                     const Divider(height: 20),
-                    _DetailRow(icon: Icons.description_outlined, label: loc.services, value: request.serviceName!, theme: theme, colors: colors),
+                    _DetailRow(icon: Icons.description_outlined, label: loc.services, value: switch (request.serviceName!) {
+                      'Building Permit' => loc.serviceBuildingPermit,
+                      'Larger Building Permit' => loc.serviceLargerBuildingPermit,
+                      'Housing Permit' => loc.serviceHousingPermit,
+                      'External Works' => loc.serviceExternalWorks,
+                      'Illegal Construction' => loc.serviceIllegalConstruction,
+                      'Valuation Certificate' => loc.serviceValuationCertificate,
+                      'Clearance Certificate' => loc.serviceClearanceCertificate,
+                      'Tent Permit' => loc.serviceTentPermit,
+                      'Property Access' => loc.servicePropertyAccess,
+                      'Residence Certificate' => loc.serviceResidenceCertificate,
+                      'Contents Certificate' => loc.serviceContentsCertificate,
+                      'Work Certificate' => loc.serviceWorkCertificate,
+                      'Lease Registration' => loc.serviceLeaseRegistration,
+                      _ => request.serviceName!,
+                    }, theme: theme, colors: colors),
                   ],
                   if (request.addressText != null && request.addressText!.isNotEmpty) ...[
                     const Divider(height: 20),

@@ -134,6 +134,7 @@ class _HomeScreenState extends State<HomeScreen> {
       builder: (context, profileState) {
         return BlocBuilder<RequestsBloc, RequestsState>(
           builder: (context, requestsState) {
+            final l10n = AppLocalizations.of(context)!;
             final userName = profileState.profile?.fullName ?? '...';
             final municipality =
                 (profileState.profile?.municipalityName?.isNotEmpty ?? false)
@@ -188,7 +189,24 @@ class _HomeScreenState extends State<HomeScreen> {
                               id: r.id,
                               nameAr: r.title.isNotEmpty
                                   ? r.title
-                                  : (r.serviceName ?? r.trackingNumber),
+                                  : (r.serviceName == null
+                                      ? r.trackingNumber
+                                      : switch (r.serviceName) {
+                                          'Building Permit' => l10n.serviceBuildingPermit,
+                                          'Larger Building Permit' => l10n.serviceLargerBuildingPermit,
+                                          'Housing Permit' => l10n.serviceHousingPermit,
+                                          'External Works' => l10n.serviceExternalWorks,
+                                          'Illegal Construction' => l10n.serviceIllegalConstruction,
+                                          'Valuation Certificate' => l10n.serviceValuationCertificate,
+                                          'Clearance Certificate' => l10n.serviceClearanceCertificate,
+                                          'Tent Permit' => l10n.serviceTentPermit,
+                                          'Property Access' => l10n.servicePropertyAccess,
+                                          'Residence Certificate' => l10n.serviceResidenceCertificate,
+                                          'Contents Certificate' => l10n.serviceContentsCertificate,
+                                          'Work Certificate' => l10n.serviceWorkCertificate,
+                                          'Lease Registration' => l10n.serviceLeaseRegistration,
+                                          _ => r.serviceName!,
+                                        }),
                               status: r.status.toLowerCase(),
                               date: _formatDate(r.createdAt),
                             ),

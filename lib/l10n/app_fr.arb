@@ -598,5 +598,6 @@
   "serviceResidenceCertificate": "Certificat de résidence",
   "serviceContentsCertificate": "Attestation de contenu",
   "serviceWorkCertificate": "Attestation de travaux",
-  "serviceLeaseRegistration": "Enregistrement de bail"
+  "serviceLeaseRegistration": "Enregistrement de bail",
+  "statusAssigned": "Assignée"
 }

@@ -598,5 +598,6 @@
   "serviceResidenceCertificate": "Residence Certificate",
   "serviceContentsCertificate": "Contents Certificate",
   "serviceWorkCertificate": "Work Certificate",
-  "serviceLeaseRegistration": "Lease Registration"
+  "serviceLeaseRegistration": "Lease Registration",
+  "statusAssigned": "Assigned"
 }
