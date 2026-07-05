@@ -32,6 +32,7 @@ class AnnouncementBloc extends Bloc<AnnouncementEvent, AnnouncementState> {
     emit(AnnouncementLoading());
 
     try {
+    
       final list = await getAnnouncements();
       emit(AnnouncementLoaded(list));
     } catch (e) {

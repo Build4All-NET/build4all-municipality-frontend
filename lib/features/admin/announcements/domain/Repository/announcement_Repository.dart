@@ -10,4 +10,5 @@ abstract class AnnouncementRepository {
   Future<Announcement> update(int id, Announcement announcement);
 
   Future<void> delete(int id);
+  //CRUD operations for announcements
 }

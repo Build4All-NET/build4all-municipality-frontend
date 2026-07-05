@@ -35,8 +35,7 @@ class AppToast {
       ..hideCurrentSnackBar()
       ..showSnackBar(
         SnackBar(
-          behavior: SnackBarBehavior.floating,
-          margin: const EdgeInsets.fromLTRB(16, 0, 16, 24),
+          behavior: SnackBarBehavior.floating, // ✅ fixed: was .fixed, conflicted with theme margin
           elevation: 0,
           backgroundColor: Colors.transparent,
           content: Container(

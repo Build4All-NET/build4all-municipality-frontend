@@ -342,6 +342,12 @@ class AppLocalizationsAr extends AppLocalizations {
   String get notifications => 'الإشعارات';
 
   @override
+  String get markAllRead => 'تحديد الكل كمقروء';
+
+  @override
+  String get noNotifications => 'لا توجد إشعارات';
+
+  @override
   String get municipalServices => 'الخدمات البلدية';
 
   @override
