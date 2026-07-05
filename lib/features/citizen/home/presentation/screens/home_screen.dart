@@ -14,6 +14,7 @@ import 'package:baladiyati/features/citizen/services/presentation/bloc/services_
 import 'package:baladiyati/features/citizen/services/presentation/bloc/services_event.dart';
 import 'package:baladiyati/features/citizen/services/presentation/screens/services_screen.dart';
 import 'package:baladiyati/features/citizen/notifications/presentation/screens/notifications_screen.dart';
+import 'package:baladiyati/features/citizen/notifications/data/services/notification_api_service.dart';
 import 'package:baladiyati/features/citizen/requests/domain/entities/request_entity.dart';
 import 'package:baladiyati/features/citizen/requests/presentation/bloc/requests_bloc.dart';
 import 'package:baladiyati/features/citizen/requests/presentation/bloc/requests_event.dart';
@@ -35,6 +36,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentIndex = 0;
+  int _notificationCount = 0;
 
   late final ProfileBloc _profileBloc;
   late final RequestsBloc _requestsBloc;
@@ -46,6 +48,15 @@ class _HomeScreenState extends State<HomeScreen> {
     _profileBloc = ProfileBloc()..add(ProfileLoadRequested());
     _requestsBloc = RequestsBloc()..add(RequestsLoadRequested());
     _servicesBloc = CitizenServicesBloc()..add(CitizenServicesLoadRequested());
+    _loadNotificationCount();
+  }
+
+  void _loadNotificationCount() async {
+    try {
+      final api = NotificationApiService();
+      final notifs = await api.getMyNotifications(unreadOnly: true);
+      if (mounted) setState(() => _notificationCount = notifs.length);
+    } catch (_) {}
   }
 
   @override
@@ -150,17 +161,20 @@ class _HomeScreenState extends State<HomeScreen> {
                   HomeHeader(
                     userName: userName,
                     municipality: municipality,
-                    notificationCount: 3,
+                    notificationCount: _notificationCount,
                     activeRequests: _countActive(requests),
                     awaitingPayment: _countAwaiting(requests),
                     completed: _countCompleted(requests),
                     isLoading: requestsState.isLoading,
-                    onNotificationTap: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const NotificationsScreen(),
-                      ),
-                    ),
+                    onNotificationTap: () async {
+                      await Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const NotificationsScreen(),
+                        ),
+                      );
+                      _loadNotificationCount();
+                    },
                   ),
                   Padding(
                     padding: const EdgeInsets.all(16),

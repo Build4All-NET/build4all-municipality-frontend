@@ -111,6 +111,8 @@
   "latestNews": "Dernières nouvelles et mises à jour",
   "workingHours": "Nouveaux horaires : du lundi au vendredi, 8h - 14h",
   "notifications": "Notifications",
+  "markAllRead": "Tout marquer comme lu",
+  "noNotifications": "Aucune notification",
   "municipalServices": "Services municipaux",
   "searchService": "Rechercher un service...",
   "selectCategory": "Sélectionnez la catégorie",

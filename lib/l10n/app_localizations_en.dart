@@ -342,6 +342,12 @@ class AppLocalizationsEn extends AppLocalizations {
   String get notifications => 'Notifications';
 
   @override
+  String get markAllRead => 'Mark all as read';
+
+  @override
+  String get noNotifications => 'No notifications';
+
+  @override
   String get municipalServices => 'Municipal Services';
 
   @override

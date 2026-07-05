@@ -111,6 +111,8 @@
   "latestNews": "آخر الأخبار والتحديثات",
   "workingHours": "ساعات العمل الجديدة: من الاثنين إلى الجمعة، 8 صباحًا - 2 ظهرًا",
   "notifications": "الإشعارات",
+  "markAllRead": "تحديد الكل كمقروء",
+  "noNotifications": "لا توجد إشعارات",
   "municipalServices": "الخدمات البلدية",
   "searchService": "ابحث عن خدمة...",
   "selectCategory": "اختر القسم",

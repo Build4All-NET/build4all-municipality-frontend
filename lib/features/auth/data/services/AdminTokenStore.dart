@@ -5,7 +5,9 @@ class AdminTokenStore {
   final FlutterSecureStorage _storage;
 
   const AdminTokenStore({FlutterSecureStorage? storage})
-      : _storage = storage ?? const FlutterSecureStorage();
+      : _storage = storage ?? const FlutterSecureStorage(
+          aOptions: AndroidOptions(resetOnError: true),
+        );
 
   static const _keyToken = 'admin_token';
   static const _keyRole = 'admin_role';
@@ -24,6 +26,31 @@ class AdminTokenStore {
   void _log(String msg) {
     if (kDebugMode && debugLogs) {
       debugPrint('🧾 AdminTokenStore | $msg');
+    }
+  }
+
+  Future<void> _safeWrite({required String key, required String value}) async {
+    try {
+      await _storage.write(key: key, value: value);
+    } catch (e) {
+      _log('write failed for $key: $e');
+    }
+  }
+
+  Future<String?> _safeRead({required String key}) async {
+    try {
+      return await _storage.read(key: key);
+    } catch (e) {
+      _log('read failed for $key: $e');
+      return null;
+    }
+  }
+
+  Future<void> _safeDelete({required String key}) async {
+    try {
+      await _storage.delete(key: key);
+    } catch (e) {
+      _log('delete failed for $key: $e');
     }
   }
 
@@ -61,16 +88,16 @@ class AdminTokenStore {
     _log('stored token (after bug toggle) startsWithBearer=${safeToken.toLowerCase().startsWith("bearer ")}');
     _log('role="$safeRole" tenantId="${tenantId ?? ""}" refreshToken="${refreshToken ?? ""}"');
 
-    await _storage.write(key: _keyToken, value: safeToken);
-    await _storage.write(key: _keyRole, value: safeRole);
+    await _safeWrite(key: _keyToken, value: safeToken);
+    await _safeWrite(key: _keyRole, value: safeRole);
 
     if (refreshToken != null) {
       final v = refreshToken.trim();
       if (v.isEmpty) {
-        await _storage.delete(key: _keyRefreshToken);
+        await _safeDelete(key: _keyRefreshToken);
         _log('refreshToken deleted (empty)');
       } else {
-        await _storage.write(key: _keyRefreshToken, value: v);
+        await _safeWrite(key: _keyRefreshToken, value: v);
         _log('refreshToken saved (len=${v.length})');
       }
     }
@@ -78,10 +105,10 @@ class AdminTokenStore {
     if (tenantId != null) {
       final t = tenantId.trim();
       if (t.isEmpty) {
-        await _storage.delete(key: _keyTenantId);
+        await _safeDelete(key: _keyTenantId);
         _log('tenantId deleted (empty)');
       } else {
-        await _storage.write(key: _keyTenantId, value: t);
+        await _safeWrite(key: _keyTenantId, value: t);
         _log('tenantId saved="$t"');
       }
     }
@@ -96,25 +123,25 @@ class AdminTokenStore {
   // ===========================
 
   Future<String?> getToken() async {
-    final t = await _storage.read(key: _keyToken);
+    final t = await _safeRead(key: _keyToken);
     _log('getToken() -> ${t == null ? "null" : "len=${t.length} startsWithBearer=${t.toLowerCase().startsWith("bearer ")}"}');
     return t;
   }
 
   Future<String?> getRole() async {
-    final r = await _storage.read(key: _keyRole);
+    final r = await _safeRead(key: _keyRole);
     _log('getRole() -> ${r ?? "null"}');
     return r;
   }
 
   Future<String?> getRefreshToken() async {
-    final r = await _storage.read(key: _keyRefreshToken);
+    final r = await _safeRead(key: _keyRefreshToken);
     _log('getRefreshToken() -> ${r == null ? "null" : "len=${r.length}"}');
     return r;
   }
 
   Future<String?> getTenantId() async {
-    final t = await _storage.read(key: _keyTenantId);
+    final t = await _safeRead(key: _keyTenantId);
     _log('getTenantId() -> ${t ?? "null"}');
     return t;
   }
@@ -125,10 +152,10 @@ class AdminTokenStore {
 
   Future<void> clear() async {
     _log('CLEAR() called -> deleting token/role/refresh/tenant');
-    await _storage.delete(key: _keyToken);
-    await _storage.delete(key: _keyRole);
-    await _storage.delete(key: _keyRefreshToken);
-    await _storage.delete(key: _keyTenantId);
+    await _safeDelete(key: _keyToken);
+    await _safeDelete(key: _keyRole);
+    await _safeDelete(key: _keyRefreshToken);
+    await _safeDelete(key: _keyTenantId);
 
     // verify cleared
     final after = await getToken();
