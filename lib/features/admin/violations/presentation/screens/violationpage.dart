@@ -306,6 +306,23 @@ class _ViolationCard extends StatelessWidget {
     return '${violation.departmentId}';
   }
 
+  String _localizedType(AppLocalizations loc, String type) {
+    switch (type) {
+      case 'TRAFFIC':
+        return loc.violationTraffic;
+      case 'ENVIRONMENTAL':
+        return loc.violationEnvironmental;
+      case 'URBANISM':
+        return loc.violationUrbanism;
+      case 'COMMERCIAL':
+        return loc.violationCommercial;
+      case 'OTHER':
+        return loc.violationOther;
+      default:
+        return type;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
@@ -359,7 +376,10 @@ class _ViolationCard extends StatelessWidget {
             if ((violation.carPlate ?? '').isNotEmpty)
               _InfoRow(label: loc.carPlate, value: violation.carPlate!),
             if ((violation.type ?? '').isNotEmpty)
-              _InfoRow(label: loc.violationTypeLabel, value: violation.type!),
+              _InfoRow(
+                label: loc.violationTypeLabel,
+                value: _localizedType(loc, violation.type!),
+              ),
             if ((violation.municipalityName ?? '').trim().isNotEmpty)
               _InfoRow(label: loc.municipalityName, value: violation.municipalityName!),
             const SizedBox(height: 14),
