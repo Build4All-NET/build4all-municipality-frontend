@@ -1337,6 +1337,56 @@ class AppLocalizationsFr extends AppLocalizations {
   }
 
   @override
+  String get staffActions => 'Actions du personnel';
+
+  @override
+  String get accept => 'Accepter';
+
+  @override
+  String get rejectionReason => 'Raison du rejet';
+
+  @override
+  String get enterRejectionReason => 'Entrez la raison du rejet';
+
+  @override
+  String get rejectionReasonRequired => 'La raison du rejet est obligatoire';
+
+  @override
+  String get confirmApproveRequest =>
+      'Êtes-vous sûr de vouloir approuver cette demande ?';
+
+  @override
+  String get confirmRejectRequest =>
+      'Êtes-vous sûr de vouloir rejeter cette demande ?';
+
+  @override
+  String get confirmPayRequest =>
+      'Êtes-vous sûr de vouloir marquer cette demande comme payée ?';
+
+  @override
+  String get requestApprovedSuccess => 'Demande approuvée avec succès';
+
+  @override
+  String get requestRejectedSuccess => 'Demande rejetée avec succès';
+
+  @override
+  String get requestPaidSuccess =>
+      'Demande marquée comme payée avec succès';
+
+  @override
+  String get requestCompletedSuccess =>
+      'Demande marquée comme terminée avec succès';
+
+  @override
+  String get pay => 'Payer';
+
+  @override
+  String get payRequest => 'Payer la demande';
+
+  @override
+  String get alreadyPaid => 'Déjà payé';
+
+  @override
   String get statusPending => 'En attente';
 
   @override

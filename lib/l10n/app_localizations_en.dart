@@ -1337,6 +1337,55 @@ class AppLocalizationsEn extends AppLocalizations {
   }
 
   @override
+  String get staffActions => 'Staff Actions';
+
+  @override
+  String get accept => 'Accept';
+
+  @override
+  String get rejectionReason => 'Rejection reason';
+
+  @override
+  String get enterRejectionReason => 'Enter rejection reason';
+
+  @override
+  String get rejectionReasonRequired => 'Rejection reason is required';
+
+  @override
+  String get confirmApproveRequest =>
+      'Are you sure you want to approve this request?';
+
+  @override
+  String get confirmRejectRequest =>
+      'Are you sure you want to reject this request?';
+
+  @override
+  String get confirmPayRequest =>
+      'Are you sure you want to mark this request as paid?';
+
+  @override
+  String get requestApprovedSuccess => 'Request approved successfully';
+
+  @override
+  String get requestRejectedSuccess => 'Request rejected successfully';
+
+  @override
+  String get requestPaidSuccess => 'Request marked as paid successfully';
+
+  @override
+  String get requestCompletedSuccess =>
+      'Request marked as completed successfully';
+
+  @override
+  String get pay => 'Pay';
+
+  @override
+  String get payRequest => 'Pay Request';
+
+  @override
+  String get alreadyPaid => 'Already Paid';
+
+  @override
   String get statusPending => 'Pending';
 
   @override

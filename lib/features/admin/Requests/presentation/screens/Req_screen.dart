@@ -58,6 +58,19 @@ class _RequestsScreenState extends State<RequestsScreen> {
     };
   }
 
+  String _statusUpdateSuccessMessage(AppLocalizations l10n, String status) {
+    switch (status.trim().toUpperCase()) {
+      case 'APPROVED':
+        return l10n.requestApprovedSuccess;
+      case 'REJECTED':
+        return l10n.requestRejectedSuccess;
+      case 'COMPLETED':
+        return l10n.requestCompletedSuccess;
+      default:
+        return l10n.updated;
+    }
+  }
+
   String _formatDate(String? value) {
     final clean = value?.trim() ?? '';
     if (clean.isEmpty || clean == 'null') return '---';
@@ -126,7 +139,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
           if (success.isNotEmpty) {
             AppToast.show(
               context,
-              message: success,
+              message: _statusUpdateSuccessMessage(l10n, success),
               type: AppToastType.success,
             );
           }

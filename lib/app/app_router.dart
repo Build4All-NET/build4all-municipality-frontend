@@ -5,6 +5,7 @@ import 'package:baladiyati/features/admin/Requests/data/Repository/Request_Repo_
 import 'package:baladiyati/features/admin/Requests/domain/Repository/Request_Repo.dart';
 import 'package:baladiyati/features/admin/Requests/data/Service/Req_Api_Service.dart';
 import 'package:baladiyati/features/admin/Requests/domain/usecases/Get_Request.dart';
+import 'package:baladiyati/features/admin/Requests/domain/usecases/MarkRequestPaid.dart';
 import 'package:baladiyati/features/admin/Requests/domain/usecases/UpdateRequestStatus.dart';
 import 'package:baladiyati/features/admin/Requests/domain/usecases/getAll_Req_Admin.dart';
 import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_Bloc.dart';
@@ -359,6 +360,7 @@ class AppRouter {
               create: (_) => RequestBloc(
                 getAllRequestsAdmin: GetAllRequestsAdmin(requestRepository),
                 updateRequestStatus: UpdateRequestStatus(requestRepository),
+                markRequestPaid: MarkRequestPaid(requestRepository),
               )..add(LoadRequests()),
             ),
             BlocProvider(

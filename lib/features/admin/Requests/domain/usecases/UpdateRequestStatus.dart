@@ -8,7 +8,8 @@ class UpdateRequestStatus {
   Future<void> call({
     required int id,
     required String status,
+    String? message,
   }) {
-    return repo.updateStatus(id, status);
+    return repo.updateStatus(id, status, message: message);
   }
 }

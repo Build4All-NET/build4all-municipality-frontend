@@ -2737,6 +2737,96 @@ abstract class AppLocalizations {
   /// **'This request is {status}. No more actions are available.'**
   String requestClosedMessage(Object status);
 
+  /// No description provided for @staffActions.
+  ///
+  /// In en, this message translates to:
+  /// **'Staff Actions'**
+  String get staffActions;
+
+  /// No description provided for @accept.
+  ///
+  /// In en, this message translates to:
+  /// **'Accept'**
+  String get accept;
+
+  /// No description provided for @rejectionReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejection reason'**
+  String get rejectionReason;
+
+  /// No description provided for @enterRejectionReason.
+  ///
+  /// In en, this message translates to:
+  /// **'Enter rejection reason'**
+  String get enterRejectionReason;
+
+  /// No description provided for @rejectionReasonRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Rejection reason is required'**
+  String get rejectionReasonRequired;
+
+  /// No description provided for @confirmApproveRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to approve this request?'**
+  String get confirmApproveRequest;
+
+  /// No description provided for @confirmRejectRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to reject this request?'**
+  String get confirmRejectRequest;
+
+  /// No description provided for @confirmPayRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Are you sure you want to mark this request as paid?'**
+  String get confirmPayRequest;
+
+  /// No description provided for @requestApprovedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Request approved successfully'**
+  String get requestApprovedSuccess;
+
+  /// No description provided for @requestRejectedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Request rejected successfully'**
+  String get requestRejectedSuccess;
+
+  /// No description provided for @requestPaidSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Request marked as paid successfully'**
+  String get requestPaidSuccess;
+
+  /// No description provided for @requestCompletedSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Request marked as completed successfully'**
+  String get requestCompletedSuccess;
+
+  /// No description provided for @pay.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay'**
+  String get pay;
+
+  /// No description provided for @payRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Pay Request'**
+  String get payRequest;
+
+  /// No description provided for @alreadyPaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Already Paid'**
+  String get alreadyPaid;
+
   /// No description provided for @statusPending.
   ///
   /// In en, this message translates to:
