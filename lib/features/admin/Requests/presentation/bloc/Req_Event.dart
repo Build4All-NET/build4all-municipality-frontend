@@ -29,9 +29,17 @@ class FilterRequests extends RequestEvent {
 class UpdateRequestStatusRequested extends RequestEvent {
   final int id;
   final String status;
+  final String? message;
 
   UpdateRequestStatusRequested({
     required this.id,
     required this.status,
+    this.message,
   });
+}
+
+class MarkRequestPaidRequested extends RequestEvent {
+  final int id;
+
+  MarkRequestPaidRequested(this.id);
 }

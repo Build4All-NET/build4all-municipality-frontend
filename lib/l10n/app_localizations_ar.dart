@@ -1337,6 +1337,51 @@ class AppLocalizationsAr extends AppLocalizations {
   }
 
   @override
+  String get staffActions => 'إجراءات الموظف';
+
+  @override
+  String get accept => 'قبول';
+
+  @override
+  String get rejectionReason => 'سبب الرفض';
+
+  @override
+  String get enterRejectionReason => 'أدخل سبب الرفض';
+
+  @override
+  String get rejectionReasonRequired => 'سبب الرفض مطلوب';
+
+  @override
+  String get confirmApproveRequest => 'هل أنت متأكد من قبول هذا الطلب؟';
+
+  @override
+  String get confirmRejectRequest => 'هل أنت متأكد من رفض هذا الطلب؟';
+
+  @override
+  String get confirmPayRequest => 'هل أنت متأكد من تسجيل الدفع؟';
+
+  @override
+  String get requestApprovedSuccess => 'تم قبول الطلب بنجاح';
+
+  @override
+  String get requestRejectedSuccess => 'تم رفض الطلب بنجاح';
+
+  @override
+  String get requestPaidSuccess => 'تم تسجيل الدفع بنجاح';
+
+  @override
+  String get requestCompletedSuccess => 'تم تسجيل الطلب كمكتمل بنجاح';
+
+  @override
+  String get pay => 'دفع';
+
+  @override
+  String get payRequest => 'دفع الطلب';
+
+  @override
+  String get alreadyPaid => 'تم الدفع';
+
+  @override
   String get statusPending => 'قيد الانتظار';
 
   @override

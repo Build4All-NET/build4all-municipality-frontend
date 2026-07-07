@@ -65,25 +65,19 @@ class RequestApiService {
     return _parseOne(res.data);
   }
 
-  Future<void> updateStatus(int id, String status) async {
-    try {
-      await dio.put(
-        '/api/admin/requests/$id',
-        data: {'status': status},
-      );
-    } on DioException catch (e) {
-      // fallback if backend endpoint is PUT /api/admin/requests/{id}
-      final code = e.response?.statusCode;
-      if (code == 404 || code == 405) {
-        await dio.put(
-          '/api/admin/requests/$id',
-          data: {'status': status},
-        );
-        return;
-      }
+  Future<void> updateStatus(int id, String status, {String? message}) async {
+    await dio.put(
+      '/api/admin/requests/$id',
+      data: {
+        'status': status,
+        if (message != null && message.trim().isNotEmpty)
+          'message': message.trim(),
+      },
+    );
+  }
 
-      rethrow;
-    }
+  Future<void> markPaid(int id) async {
+    await dio.put('/api/admin/requests/$id/pay');
   }
 
   List<RequestModel> _parseList(dynamic data) {

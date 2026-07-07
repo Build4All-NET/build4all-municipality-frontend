@@ -10,6 +10,7 @@ class PrimaryButton extends StatelessWidget {
   final Color? backgroundColor;
   final Color? textColor;
   final bool isLoading;
+  final bool enabled;
 
   const PrimaryButton({
     super.key,
@@ -19,6 +20,7 @@ class PrimaryButton extends StatelessWidget {
     this.backgroundColor,
     this.textColor,
     this.isLoading = false,
+    this.enabled = true,
   });
 
   @override
@@ -33,7 +35,7 @@ class PrimaryButton extends StatelessWidget {
       width: width ?? double.infinity,
       height: AppSizes.buttonHeight,
       child: ElevatedButton(
-        onPressed: isLoading ? null : onPressed,
+        onPressed: (isLoading || !enabled) ? null : onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: resolvedBackground,
           foregroundColor: resolvedTextColor,

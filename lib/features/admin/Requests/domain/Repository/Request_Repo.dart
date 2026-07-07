@@ -21,5 +21,7 @@ abstract class RequestRepository {
 
   Future<RequestEntity> getRequestAdmin(int id);
 
-  Future<void> updateStatus(int id, String status);
+  Future<void> updateStatus(int id, String status, {String? message});
+
+  Future<void> markPaid(int id);
 }

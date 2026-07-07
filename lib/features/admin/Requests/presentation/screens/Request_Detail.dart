@@ -10,6 +10,7 @@ import 'package:baladiyati/features/admin/Requests/domain/entities/request.dart'
 import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_Bloc.dart';
 import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_Event.dart';
 import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_State.dart';
+import 'package:baladiyati/features/auth/data/services/session_role_store.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -17,13 +18,49 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 
-class RequestDetailPage extends StatelessWidget {
+class RequestDetailPage extends StatefulWidget {
   final RequestModel request;
 
   const RequestDetailPage({
     super.key,
     required this.request,
   });
+
+  @override
+  State<RequestDetailPage> createState() => _RequestDetailPageState();
+}
+
+class _RequestDetailPageState extends State<RequestDetailPage> {
+  late String? _status;
+  final TextEditingController _rejectionController = TextEditingController();
+  bool _isStaffOrOwner = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _status = widget.request.status;
+    _rejectionController.addListener(_onRejectionTextChanged);
+    _loadRole();
+  }
+
+  @override
+  void dispose() {
+    _rejectionController.removeListener(_onRejectionTextChanged);
+    _rejectionController.dispose();
+    super.dispose();
+  }
+
+  void _onRejectionTextChanged() {
+    if (mounted) setState(() {});
+  }
+
+  Future<void> _loadRole() async {
+    final role = await SessionRoleStore().getRole();
+    final allowed = role == 'STAFF' || role == 'OWNER';
+    if (mounted && allowed != _isStaffOrOwner) {
+      setState(() => _isStaffOrOwner = allowed);
+    }
+  }
 
   String _safe(String? value) {
     final clean = value?.trim() ?? '';
@@ -63,6 +100,8 @@ class RequestDetailPage extends StatelessWidget {
         return l10n.statusCompleted;
       case 'CANCELLED':
         return l10n.statusCancelled;
+      case 'TAX_PAID':
+        return l10n.statusTaxPaid;
       default:
         return _safe(status).replaceAll('_', ' ');
     }
@@ -75,6 +114,7 @@ class RequestDetailPage extends StatelessWidget {
     switch (clean) {
       case 'APPROVED':
       case 'COMPLETED':
+      case 'TAX_PAID':
         return colors.primary;
       case 'REJECTED':
       case 'CANCELLED':
@@ -107,6 +147,8 @@ class RequestDetailPage extends StatelessWidget {
         return Icons.timelapse_outlined;
       case 'DOCUMENTS_MISSING':
         return Icons.folder_off_outlined;
+      case 'TAX_PAID':
+        return Icons.payments_outlined;
       case 'SUBMITTED':
       case 'PENDING':
       default:
@@ -118,7 +160,8 @@ class RequestDetailPage extends StatelessWidget {
     final clean = status?.trim().toUpperCase() ?? '';
     return clean == 'COMPLETED' ||
         clean == 'REJECTED' ||
-        clean == 'CANCELLED';
+        clean == 'CANCELLED' ||
+        clean == 'TAX_PAID';
   }
 
   // Returns which action buttons to show based on current status
@@ -126,18 +169,35 @@ class RequestDetailPage extends StatelessWidget {
     final s = status?.trim().toUpperCase() ?? '';
     if (_isTerminalStatus(status)) return const _AllowedActions();
     if (s == 'APPROVED' || s == 'IN_PROGRESS') {
-      return const _AllowedActions(showComplete: true, showReject: true);
+      return _AllowedActions(
+        showComplete: true,
+        showReject: true,
+        showPay: s == 'APPROVED' && _isStaffOrOwner,
+      );
     }
     // SUBMITTED, PENDING, UNDER_REVIEW, DOCUMENTS_MISSING, etc.
     return const _AllowedActions(showApprove: true, showReject: true);
   }
 
-  void _changeStatus(
+  String _successMessage(AppLocalizations l10n, String status) {
+    switch (status.trim().toUpperCase()) {
+      case 'APPROVED':
+        return l10n.requestApprovedSuccess;
+      case 'REJECTED':
+        return l10n.requestRejectedSuccess;
+      case 'COMPLETED':
+        return l10n.requestCompletedSuccess;
+      default:
+        return l10n.updated;
+    }
+  }
+
+  Future<void> _changeStatus(
     BuildContext context,
     AppLocalizations l10n,
     String status,
-  ) {
-    final id = request.id;
+  ) async {
+    final id = widget.request.id;
 
     if (id == null) {
       AppToast.show(
@@ -148,12 +208,94 @@ class RequestDetailPage extends StatelessWidget {
       return;
     }
 
+    String? message;
+    if (status == 'REJECTED') {
+      message = _rejectionController.text.trim();
+      if (message.isEmpty) {
+        AppToast.show(
+          context,
+          message: l10n.rejectionReasonRequired,
+          type: AppToastType.error,
+        );
+        return;
+      }
+    }
+
+    final confirmTitle = status == 'REJECTED' ? l10n.reject : l10n.approve;
+    final confirmMessage = status == 'REJECTED'
+        ? l10n.confirmRejectRequest
+        : (status == 'APPROVED' ? l10n.confirmApproveRequest : null);
+
+    if (confirmMessage != null) {
+      final confirmed = await showDialog<bool>(
+        context: context,
+        builder: (dialogContext) {
+          return AlertDialog(
+            title: Text(confirmTitle),
+            content: Text(confirmMessage),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.pop(dialogContext, false),
+                child: Text(l10n.cancel),
+              ),
+              ElevatedButton(
+                onPressed: () => Navigator.pop(dialogContext, true),
+                child: Text(confirmTitle),
+              ),
+            ],
+          );
+        },
+      );
+
+      if (confirmed != true) return;
+    }
+
+    if (!context.mounted) return;
+
     context.read<RequestBloc>().add(
           UpdateRequestStatusRequested(
             id: id,
             status: status,
+            message: message,
           ),
         );
+  }
+
+  Future<void> _payRequest(BuildContext context, AppLocalizations l10n) async {
+    final id = widget.request.id;
+
+    if (id == null) {
+      AppToast.show(
+        context,
+        message: l10n.invalidRequestId,
+        type: AppToastType.error,
+      );
+      return;
+    }
+
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(l10n.payRequest),
+          content: Text(l10n.confirmPayRequest),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(l10n.cancel),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: Text(l10n.pay),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true || !context.mounted) return;
+
+    context.read<RequestBloc>().add(MarkRequestPaidRequested(id));
   }
 
   @override
@@ -161,15 +303,17 @@ class RequestDetailPage extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
-    final statusColor = _statusColor(context, request.status);
-    final statusText = _localizedStatus(l10n, request.status);
-    final isClosed = _isTerminalStatus(request.status);
-    final actions = _allowedActions(request.status);
+    final statusColor = _statusColor(context, _status);
+    final statusText = _localizedStatus(l10n, _status);
+    final isClosed = _isTerminalStatus(_status);
+    final actions = _allowedActions(_status);
 
     return BlocConsumer<RequestBloc, RequestState>(
       listenWhen: (previous, current) {
         return previous.success != current.success ||
-            previous.error != current.error;
+            previous.error != current.error ||
+            previous.paidRequestId != current.paidRequestId ||
+            previous.payError != current.payError;
       },
       listener: (context, state) {
         final success = state.success.trim();
@@ -178,7 +322,7 @@ class RequestDetailPage extends StatelessWidget {
         if (success.isNotEmpty) {
           AppToast.show(
             context,
-            message: success,
+            message: _successMessage(l10n, success),
             type: AppToastType.success,
           );
           Navigator.pop(context, true);
@@ -188,6 +332,25 @@ class RequestDetailPage extends StatelessWidget {
           AppToast.show(
             context,
             message: error,
+            type: AppToastType.error,
+          );
+        }
+
+        if (state.paidRequestId != null &&
+            state.paidRequestId == widget.request.id) {
+          setState(() => _status = 'TAX_PAID');
+          AppToast.show(
+            context,
+            message: l10n.requestPaidSuccess,
+            type: AppToastType.success,
+          );
+        }
+
+        final payError = state.payError.trim();
+        if (payError.isNotEmpty) {
+          AppToast.show(
+            context,
+            message: payError,
             type: AppToastType.error,
           );
         }
@@ -229,11 +392,11 @@ class RequestDetailPage extends StatelessWidget {
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
                         _HeaderCard(
-                          title: _safe(request.title),
-                          trackingNumber: _safe(request.trackingNumber),
+                          title: _safe(widget.request.title),
+                          trackingNumber: _safe(widget.request.trackingNumber),
                           status: statusText,
                           statusColor: statusColor,
-                          statusIcon: _statusIcon(request.status),
+                          statusIcon: _statusIcon(_status),
                         ),
                         const SizedBox(height: 14),
                         _SectionCard(
@@ -249,7 +412,7 @@ class RequestDetailPage extends StatelessWidget {
                               _DetailRow(
                                 icon: Icons.miscellaneous_services_outlined,
                                 label: l10n.service,
-                                value: switch (request.serviceName) {
+                                value: switch (widget.request.serviceName) {
                                   'Building Permit' => l10n.serviceBuildingPermit,
                                   'Larger Building Permit' => l10n.serviceLargerBuildingPermit,
                                   'Housing Permit' => l10n.serviceHousingPermit,
@@ -263,30 +426,30 @@ class RequestDetailPage extends StatelessWidget {
                                   'Contents Certificate' => l10n.serviceContentsCertificate,
                                   'Work Certificate' => l10n.serviceWorkCertificate,
                                   'Lease Registration' => l10n.serviceLeaseRegistration,
-                                  _ => _safe(request.serviceName),
+                                  _ => _safe(widget.request.serviceName),
                                 },
                               ),
                               _DetailRow(
                                 icon: Icons.person_outline,
                                 label: l10n.citizen,
-                                value: _safe(request.citizenName),
+                                value: _safe(widget.request.citizenName),
                               ),
                               _DetailRow(
                                 icon: Icons.confirmation_number_outlined,
                                 label: l10n.tracking,
-                                value: _safe(request.trackingNumber),
+                                value: _safe(widget.request.trackingNumber),
                               ),
                               _DetailRow(
                                 icon: Icons.account_tree_outlined,
                                 label: 'Process Key',
-                                value: request.processInstanceKey == null
+                                value: widget.request.processInstanceKey == null
                                     ? '—'
-                                    : request.processInstanceKey.toString(),
+                                    : widget.request.processInstanceKey.toString(),
                               ),
                               _DetailRow(
                                 icon: Icons.category_outlined,
                                 label: l10n.category,
-                                value: _safe(request.category),
+                                value: _safe(widget.request.category),
                                 showDivider: false,
                               ),
                             ],
@@ -301,17 +464,17 @@ class RequestDetailPage extends StatelessWidget {
                               _DetailRow(
                                 icon: Icons.home_outlined,
                                 label: l10n.address,
-                                value: _safe(request.addressText),
+                                value: _safe(widget.request.addressText),
                               ),
                               _DetailRow(
                                 icon: Icons.map_outlined,
                                 label: l10n.latitude,
-                                value: _formatCoordinate(request.geoLat),
+                                value: _formatCoordinate(widget.request.geoLat),
                               ),
                               _DetailRow(
                                 icon: Icons.map_outlined,
                                 label: l10n.longitude,
-                                value: _formatCoordinate(request.geoLng),
+                                value: _formatCoordinate(widget.request.geoLng),
                                 showDivider: false,
                               ),
                             ],
@@ -326,17 +489,17 @@ class RequestDetailPage extends StatelessWidget {
                               _DetailRow(
                                 icon: Icons.calendar_today_outlined,
                                 label: l10n.created,
-                                value: _formatDate(request.createdAt),
+                                value: _formatDate(widget.request.createdAt),
                               ),
                               _DetailRow(
                                 icon: Icons.update_outlined,
                                 label: l10n.updated,
-                                value: _formatDate(request.updatedAt),
+                                value: _formatDate(widget.request.updatedAt),
                               ),
                               _DetailRow(
                                 icon: Icons.event_available_outlined,
                                 label: l10n.closed,
-                                value: _formatDate(request.closedAt),
+                                value: _formatDate(widget.request.closedAt),
                                 showDivider: false,
                               ),
                             ],
@@ -347,7 +510,7 @@ class RequestDetailPage extends StatelessWidget {
                           title: l10n.description,
                           icon: Icons.notes_outlined,
                           child: Text(
-                            _safe(request.description),
+                            _safe(widget.request.description),
                             softWrap: true,
                             style: theme.textTheme.bodyMedium?.copyWith(
                               color: colors.onSurfaceVariant,
@@ -356,19 +519,25 @@ class RequestDetailPage extends StatelessWidget {
                             ),
                           ),
                         ),
-                        if (request.attachments.isNotEmpty) ...[
+                        if (widget.request.attachments.isNotEmpty) ...[
                           const SizedBox(height: 14),
                           _AttachmentsSection(
-                            attachments: request.attachments,
+                            attachments: widget.request.attachments,
                           ),
                         ],
                         const SizedBox(height: 20),
                         if (isClosed)
-                          _ClosedStatusCard(status: statusText)
+                          _status?.trim().toUpperCase() == 'TAX_PAID'
+                              ? _PaidBadgeCard(label: l10n.alreadyPaid)
+                              : _ClosedStatusCard(status: statusText)
                         else
                           _ActionsCard(
                             isLoading: state.updating,
+                            isPayLoading: state.payUpdating,
                             actions: actions,
+                            rejectionController: _rejectionController,
+                            rejectDisabled:
+                                _rejectionController.text.trim().isEmpty,
                             onReject: () {
                               if (state.updating) return;
                               _changeStatus(context, l10n, 'REJECTED');
@@ -380,6 +549,10 @@ class RequestDetailPage extends StatelessWidget {
                             onComplete: () {
                               if (state.updating) return;
                               _changeStatus(context, l10n, 'COMPLETED');
+                            },
+                            onPay: () {
+                              if (state.payUpdating) return;
+                              _payRequest(context, l10n);
                             },
                           ),
                       ],
@@ -672,27 +845,37 @@ class _AllowedActions {
   final bool showApprove;
   final bool showReject;
   final bool showComplete;
+  final bool showPay;
 
   const _AllowedActions({
     this.showApprove = false,
     this.showReject = false,
     this.showComplete = false,
+    this.showPay = false,
   });
 }
 
 class _ActionsCard extends StatelessWidget {
   final bool isLoading;
+  final bool isPayLoading;
   final _AllowedActions actions;
+  final TextEditingController rejectionController;
+  final bool rejectDisabled;
   final VoidCallback onReject;
   final VoidCallback onApprove;
   final VoidCallback onComplete;
+  final VoidCallback onPay;
 
   const _ActionsCard({
     required this.isLoading,
+    required this.isPayLoading,
     required this.actions,
+    required this.rejectionController,
+    required this.rejectDisabled,
     required this.onReject,
     required this.onApprove,
     required this.onComplete,
+    required this.onPay,
   });
 
   @override
@@ -707,6 +890,7 @@ class _ActionsCard extends StatelessWidget {
             backgroundColor: colors.error,
             textColor: colors.onError,
             isLoading: isLoading,
+            enabled: !rejectDisabled,
             onPressed: onReject,
           )
         : null;
@@ -728,6 +912,16 @@ class _ActionsCard extends StatelessWidget {
             textColor: colors.onPrimary,
             isLoading: isLoading,
             onPressed: onComplete,
+          )
+        : null;
+
+    final payButton = actions.showPay
+        ? PrimaryButton(
+            label: isPayLoading ? l10n.loading : l10n.pay,
+            backgroundColor: colors.primary,
+            textColor: colors.onPrimary,
+            isLoading: isPayLoading,
+            onPressed: onPay,
           )
         : null;
 
@@ -754,7 +948,7 @@ class _ActionsCard extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               Text(
-                l10n.actions,
+                l10n.staffActions,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: theme.textTheme.titleSmall?.copyWith(
@@ -763,6 +957,20 @@ class _ActionsCard extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 12),
+              if (actions.showReject) ...[
+                TextField(
+                  controller: rejectionController,
+                  textAlign: TextAlign.start,
+                  decoration: InputDecoration(
+                    labelText: l10n.rejectionReason,
+                    hintText: l10n.enterRejectionReason,
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(14),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 12),
+              ],
               if (mainRow.length == 2)
                 stackButtons
                     ? Column(
@@ -786,9 +994,55 @@ class _ActionsCard extends StatelessWidget {
                 if (mainRow.isNotEmpty) const SizedBox(height: 10),
                 completeButton,
               ],
+              if (payButton != null) ...[
+                if (mainRow.isNotEmpty || completeButton != null)
+                  const SizedBox(height: 10),
+                payButton,
+              ],
             ],
           );
         },
+      ),
+    );
+  }
+}
+
+class _PaidBadgeCard extends StatelessWidget {
+  final String label;
+
+  const _PaidBadgeCard({required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: colors.primaryContainer.withOpacity(0.35),
+        borderRadius: BorderRadius.circular(22),
+        border: Border.all(
+          color: colors.outlineVariant.withOpacity(0.55),
+        ),
+      ),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(Icons.verified_outlined, color: colors.primary),
+          const SizedBox(width: 10),
+          Expanded(
+            child: Text(
+              label,
+              softWrap: true,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: colors.onSurface,
+                fontWeight: FontWeight.w800,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

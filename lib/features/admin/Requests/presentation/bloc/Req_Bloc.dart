@@ -1,5 +1,6 @@
 import 'package:baladiyati/core/utils/error_message.dart';
 import 'package:baladiyati/features/admin/Requests/data/model/RequestModel.dart';
+import 'package:baladiyati/features/admin/Requests/domain/usecases/MarkRequestPaid.dart';
 import 'package:baladiyati/features/admin/Requests/domain/usecases/UpdateRequestStatus.dart';
 import 'package:baladiyati/features/admin/Requests/domain/usecases/getAll_Req_Admin.dart';
 import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_Event.dart';
@@ -9,15 +10,18 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 class RequestBloc extends Bloc<RequestEvent, RequestState> {
   final GetAllRequestsAdmin getAllRequestsAdmin;
   final UpdateRequestStatus updateRequestStatus;
+  final MarkRequestPaid markRequestPaid;
 
   RequestBloc({
     required this.getAllRequestsAdmin,
     required this.updateRequestStatus,
+    required this.markRequestPaid,
   }) : super(RequestState.initial()) {
     on<LoadRequests>(_onLoad);
     on<SearchRequests>(_onSearch);
     on<FilterRequests>(_onFilter);
     on<UpdateRequestStatusRequested>(_onUpdateStatus);
+    on<MarkRequestPaidRequested>(_onMarkPaid);
   }
 
   Future<void> _onLoad(
@@ -95,12 +99,16 @@ class RequestBloc extends Bloc<RequestEvent, RequestState> {
     ));
 
     try {
-      await updateRequestStatus(id: event.id, status: event.status);
+      await updateRequestStatus(
+        id: event.id,
+        status: event.status,
+        message: event.message,
+      );
       emit(state.copyWith(
         updating: false,
         selectedDepartmentId: state.selectedDepartmentId,
         selectedStatus: state.selectedStatus,
-        success: 'Request status updated successfully',
+        success: event.status,
       ));
       add(LoadRequests(
         departmentId: state.selectedDepartmentId,
@@ -113,6 +121,20 @@ class RequestBloc extends Bloc<RequestEvent, RequestState> {
         selectedStatus: state.selectedStatus,
         error: errorMessage(e),
       ));
+    }
+  }
+
+  Future<void> _onMarkPaid(
+    MarkRequestPaidRequested event,
+    Emitter<RequestState> emit,
+  ) async {
+    emit(state.copyWith(payUpdating: true, clearPayMessages: true));
+
+    try {
+      await markRequestPaid(event.id);
+      emit(state.copyWith(payUpdating: false, paidRequestId: event.id));
+    } catch (e) {
+      emit(state.copyWith(payUpdating: false, payError: errorMessage(e)));
     }
   }
 

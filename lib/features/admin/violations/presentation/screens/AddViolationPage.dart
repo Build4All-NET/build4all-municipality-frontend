@@ -22,6 +22,23 @@ const _kViolationTypes = [
   'OTHER',
 ];
 
+String _localizedViolationType(AppLocalizations loc, String type) {
+  switch (type) {
+    case 'TRAFFIC':
+      return loc.violationTraffic;
+    case 'ENVIRONMENTAL':
+      return loc.violationEnvironmental;
+    case 'URBANISM':
+      return loc.violationUrbanism;
+    case 'COMMERCIAL':
+      return loc.violationCommercial;
+    case 'OTHER':
+      return loc.violationOther;
+    default:
+      return type;
+  }
+}
+
 class CreateViolationScreen extends StatefulWidget {
   final Violation? violation;
 
@@ -675,7 +692,12 @@ class _TypeDropdown extends StatelessWidget {
         ),
       ),
       items: _kViolationTypes
-          .map((t) => DropdownMenuItem(value: t, child: Text(t)))
+          .map(
+            (t) => DropdownMenuItem(
+              value: t,
+              child: Text(_localizedViolationType(loc, t)),
+            ),
+          )
           .toList(),
       onChanged: enabled ? onChanged : null,
       validator: validator,

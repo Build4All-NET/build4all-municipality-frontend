@@ -56,7 +56,12 @@ class RequestRepositoryImpl implements RequestRepository {
   }
 
   @override
-  Future<void> updateStatus(int id, String status) {
-    return api.updateStatus(id, status);
+  Future<void> updateStatus(int id, String status, {String? message}) {
+    return api.updateStatus(id, status, message: message);
+  }
+
+  @override
+  Future<void> markPaid(int id) {
+    return api.markPaid(id);
   }
 }

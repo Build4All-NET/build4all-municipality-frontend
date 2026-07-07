@@ -6,6 +6,10 @@ class RequestState {
   final String error;
   final String success;
 
+  final bool payUpdating;
+  final String payError;
+  final int? paidRequestId;
+
   final List<RequestModel> allRequests;
   final List<RequestModel> visibleRequests;
 
@@ -18,6 +22,9 @@ class RequestState {
     required this.updating,
     required this.error,
     required this.success,
+    required this.payUpdating,
+    required this.payError,
+    required this.paidRequestId,
     required this.allRequests,
     required this.visibleRequests,
     required this.query,
@@ -31,6 +38,9 @@ class RequestState {
       updating: false,
       error: '',
       success: '',
+      payUpdating: false,
+      payError: '',
+      paidRequestId: null,
       allRequests: [],
       visibleRequests: [],
       query: '',
@@ -44,18 +54,25 @@ class RequestState {
     bool? updating,
     String? error,
     String? success,
+    bool? payUpdating,
+    String? payError,
+    int? paidRequestId,
     List<RequestModel>? allRequests,
     List<RequestModel>? visibleRequests,
     String? query,
     int? selectedDepartmentId,
     String? selectedStatus,
     bool clearMessages = false,
+    bool clearPayMessages = false,
   }) {
     return RequestState(
       loading: loading ?? this.loading,
       updating: updating ?? this.updating,
       error: clearMessages ? '' : (error ?? this.error),
       success: clearMessages ? '' : (success ?? this.success),
+      payUpdating: payUpdating ?? this.payUpdating,
+      payError: clearPayMessages ? '' : (payError ?? this.payError),
+      paidRequestId: clearPayMessages ? null : (paidRequestId ?? this.paidRequestId),
       allRequests: allRequests ?? this.allRequests,
       visibleRequests: visibleRequests ?? this.visibleRequests,
       query: query ?? this.query,
