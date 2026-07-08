@@ -11,6 +11,7 @@ import 'package:baladiyati/core/utils/error_message.dart';
 import 'package:baladiyati/features/staff/tasks/data/models/staff_task_model.dart';
 import 'package:baladiyati/features/staff/tasks/data/services/staff_task_api_service.dart';
 import 'package:baladiyati/features/staff/tasks/presentation/screens/staff_certificate_screen.dart';
+import 'package:baladiyati/features/staff/tasks/presentation/widgets/staff_request_details.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
@@ -446,6 +447,8 @@ class _StaffTaskFormScreenState extends State<StaffTaskFormScreen> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
+                      _RequestDetailsCard(task: widget.task),
+                      const SizedBox(height: 16),
                       _TaskInfoCard(
                         task: widget.task,
                         detail: _taskDetail,
@@ -489,6 +492,78 @@ class _StaffTaskFormScreenState extends State<StaffTaskFormScreen> {
                   ),
                 ),
               ),
+      ),
+    );
+  }
+}
+
+// ─── Request details card ──────────────────────────────────────────────────
+
+class _RequestDetailsCard extends StatelessWidget {
+  final StaffTaskModel task;
+
+  const _RequestDetailsCard({required this.task});
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+    final l10n = AppLocalizations.of(context)!;
+    final entries = buildRequestDetailEntries(context, task);
+
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: colors.primaryContainer.withOpacity(0.28),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: colors.primary.withOpacity(0.18)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              Icon(Icons.description_outlined,
+                  color: colors.primary, size: 20),
+              const SizedBox(width: 8),
+              Text(
+                l10n.requestDetails,
+                style: theme.textTheme.titleSmall?.copyWith(
+                  fontWeight: FontWeight.w900,
+                  color: colors.onSurface,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 12),
+          ...entries.map((e) => Padding(
+                padding: const EdgeInsets.only(bottom: 8),
+                child: Row(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(
+                      width: 130,
+                      child: Text(
+                        e.key,
+                        style: theme.textTheme.bodySmall?.copyWith(
+                          fontWeight: FontWeight.w700,
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                    ),
+                    Expanded(
+                      child: Text(
+                        e.value,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colors.onSurface,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              )),
+        ],
       ),
     );
   }

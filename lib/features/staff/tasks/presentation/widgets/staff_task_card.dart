@@ -1,8 +1,9 @@
 import 'package:baladiyati/features/staff/tasks/data/models/staff_task_model.dart';
+import 'package:baladiyati/features/staff/tasks/presentation/widgets/staff_request_details.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 
-class StaffTaskCard extends StatelessWidget {
+class StaffTaskCard extends StatefulWidget {
   final StaffTaskModel task;
   final VoidCallback? onOpenForm;
   final VoidCallback? onAssign;
@@ -17,10 +18,21 @@ class StaffTaskCard extends StatelessWidget {
   });
 
   @override
+  State<StaffTaskCard> createState() => _StaffTaskCardState();
+}
+
+class _StaffTaskCardState extends State<StaffTaskCard> {
+  bool _detailsExpanded = false;
+
+  @override
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
+    final task = widget.task;
+    final onOpenForm = widget.onOpenForm;
+    final onAssign = widget.onAssign;
+    final onUnassign = widget.onUnassign;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
@@ -121,6 +133,83 @@ class StaffTaskCard extends StatelessWidget {
                       );
                     }).toList(),
                   ),
+                ],
+              if (task.hasRequestDetails) ...
+                [
+                  const SizedBox(height: 10),
+                  InkWell(
+                    borderRadius: BorderRadius.circular(10),
+                    onTap: () =>
+                        setState(() => _detailsExpanded = !_detailsExpanded),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(vertical: 4),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            _detailsExpanded
+                                ? Icons.expand_less
+                                : Icons.expand_more,
+                            size: 18,
+                            color: colors.primary,
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            _detailsExpanded
+                                ? l10n.hideRequestDetails
+                                : l10n.viewRequestDetails,
+                            style: theme.textTheme.labelMedium?.copyWith(
+                              color: colors.primary,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                  if (_detailsExpanded)
+                    Container(
+                      margin: const EdgeInsets.only(top: 4),
+                      padding: const EdgeInsets.all(12),
+                      decoration: BoxDecoration(
+                        color: colors.surfaceVariant.withOpacity(0.4),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: buildRequestDetailEntries(context, task)
+                            .map((e) => Padding(
+                                  padding: const EdgeInsets.only(bottom: 6),
+                                  child: Row(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      SizedBox(
+                                        width: 110,
+                                        child: Text(
+                                          e.key,
+                                          style: theme.textTheme.labelSmall
+                                              ?.copyWith(
+                                            fontWeight: FontWeight.w700,
+                                            color: colors.onSurfaceVariant,
+                                          ),
+                                        ),
+                                      ),
+                                      Expanded(
+                                        child: Text(
+                                          e.value,
+                                          style: theme.textTheme.bodySmall
+                                              ?.copyWith(
+                                            color: colors.onSurface,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ))
+                            .toList(),
+                      ),
+                    ),
                 ],
               if (!task.isCompleted &&
                   (task.canOpenForm ||

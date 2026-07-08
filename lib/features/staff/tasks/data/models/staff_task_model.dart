@@ -13,6 +13,15 @@ class StaffTaskModel {
   final int? rootProcessInstanceKey;
   final Map<String, dynamic> variables;
 
+  // Request details enriched by the backend from the linked citizen request.
+  final int? requestId;
+  final String requestName;
+  final String requesterName;
+  final String serviceType;
+  final String department;
+  final String trackingNumber;
+  final String requestStatus;
+
   const StaffTaskModel({
     required this.id,
     required this.taskId,
@@ -27,6 +36,13 @@ class StaffTaskModel {
     required this.processInstanceKey,
     this.rootProcessInstanceKey,
     this.variables = const {},
+    this.requestId,
+    this.requestName = '',
+    this.requesterName = '',
+    this.serviceType = '',
+    this.department = '',
+    this.trackingNumber = '',
+    this.requestStatus = '',
   });
 
   factory StaffTaskModel.fromJson(Map<String, dynamic> json) {
@@ -103,8 +119,23 @@ class StaffTaskModel {
         json['rootProcessInstanceKey'] ?? json['root_process_instance_key'],
       ),
       variables: asVariables(json['variables']),
+      requestId: asNullableInt(json['requestId']),
+      requestName: asString(json['requestName']),
+      requesterName: asString(json['requesterName']),
+      serviceType: asString(json['serviceType']),
+      department: asString(json['department']),
+      trackingNumber: asString(json['trackingNumber']),
+      requestStatus: asString(json['requestStatus']),
     );
   }
+
+  bool get hasRequestDetails =>
+      requestId != null ||
+      requestName.isNotEmpty ||
+      requesterName.isNotEmpty ||
+      serviceType.isNotEmpty ||
+      department.isNotEmpty ||
+      trackingNumber.isNotEmpty;
 
   /// The key to use when looking up the certificate.
   /// Camunda stores the root key in Request, so prefer rootProcessInstanceKey.

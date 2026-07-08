@@ -492,7 +492,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get amountDue => 'Amount Due';
 
   @override
-  String get requestDetails => 'Request details';
+  String get requestDetails => 'Request Details';
 
   @override
   String get titleLabel => 'Title';
@@ -1352,16 +1352,13 @@ class AppLocalizationsEn extends AppLocalizations {
   String get rejectionReasonRequired => 'Rejection reason is required';
 
   @override
-  String get confirmApproveRequest =>
-      'Are you sure you want to approve this request?';
+  String get confirmApproveRequest => 'Are you sure you want to approve this request?';
 
   @override
-  String get confirmRejectRequest =>
-      'Are you sure you want to reject this request?';
+  String get confirmRejectRequest => 'Are you sure you want to reject this request?';
 
   @override
-  String get confirmPayRequest =>
-      'Are you sure you want to mark this request as paid?';
+  String get confirmPayRequest => 'Are you sure you want to mark this request as paid?';
 
   @override
   String get requestApprovedSuccess => 'Request approved successfully';
@@ -1373,8 +1370,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get requestPaidSuccess => 'Request marked as paid successfully';
 
   @override
-  String get requestCompletedSuccess =>
-      'Request marked as completed successfully';
+  String get requestCompletedSuccess => 'Request marked as completed successfully';
 
   @override
   String get pay => 'Pay';
@@ -1503,6 +1499,27 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get workflowTasks => 'Workflow Tasks';
+
+  @override
+  String get requestTitle => 'Request Title';
+
+  @override
+  String get taskType => 'Task Type';
+
+  @override
+  String get viewRequestDetails => 'View request details';
+
+  @override
+  String get hideRequestDetails => 'Hide request details';
+
+  @override
+  String get searchTasksHint => 'Search by request or requester name';
+
+  @override
+  String get clearFilters => 'Clear';
+
+  @override
+  String get noMatchingTasks => 'No matching tasks found';
 
   @override
   String get loadTasks => 'Load Tasks';
