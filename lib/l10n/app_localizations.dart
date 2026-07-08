@@ -1066,7 +1066,7 @@ abstract class AppLocalizations {
   /// No description provided for @requestDetails.
   ///
   /// In en, this message translates to:
-  /// **'Request details'**
+  /// **'Request Details'**
   String get requestDetails;
 
   /// No description provided for @titleLabel.
@@ -3060,6 +3060,48 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Workflow Tasks'**
   String get workflowTasks;
+
+  /// No description provided for @requestTitle.
+  ///
+  /// In en, this message translates to:
+  /// **'Request Title'**
+  String get requestTitle;
+
+  /// No description provided for @taskType.
+  ///
+  /// In en, this message translates to:
+  /// **'Task Type'**
+  String get taskType;
+
+  /// No description provided for @viewRequestDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'View request details'**
+  String get viewRequestDetails;
+
+  /// No description provided for @hideRequestDetails.
+  ///
+  /// In en, this message translates to:
+  /// **'Hide request details'**
+  String get hideRequestDetails;
+
+  /// No description provided for @searchTasksHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Search by request or requester name'**
+  String get searchTasksHint;
+
+  /// No description provided for @clearFilters.
+  ///
+  /// In en, this message translates to:
+  /// **'Clear'**
+  String get clearFilters;
+
+  /// No description provided for @noMatchingTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'No matching tasks found'**
+  String get noMatchingTasks;
 
   /// No description provided for @loadTasks.
   ///

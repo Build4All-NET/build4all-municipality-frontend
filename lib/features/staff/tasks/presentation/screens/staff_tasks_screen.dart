@@ -31,6 +31,14 @@ class _StaffTasksBody extends StatefulWidget {
 
 class _StaffTasksBodyState extends State<_StaffTasksBody> {
   _TaskFilter _filter = _TaskFilter.all;
+  final _searchController = TextEditingController();
+  String _searchQuery = '';
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
 
   Future<void> _openTask(BuildContext context, StaffTaskModel task) async {
     final refreshed = await Navigator.push<bool>(
@@ -44,12 +52,37 @@ class _StaffTasksBodyState extends State<_StaffTasksBody> {
     }
   }
 
+  void _resetFilters() {
+    setState(() {
+      _filter = _TaskFilter.all;
+      _searchController.clear();
+      _searchQuery = '';
+    });
+  }
+
+  bool get _hasActiveFilters =>
+      _filter != _TaskFilter.all || _searchQuery.isNotEmpty;
+
   List<StaffTaskModel> _applyFilter(List<StaffTaskModel> tasks) {
-    return switch (_filter) {
+    final statusFiltered = switch (_filter) {
       _TaskFilter.all => tasks,
       _TaskFilter.active => tasks.where((t) => !t.isCompleted).toList(),
       _TaskFilter.done => tasks.where((t) => t.isCompleted).toList(),
     };
+
+    final query = _searchQuery.trim().toLowerCase();
+    if (query.isEmpty) return statusFiltered;
+
+    return statusFiltered.where((t) {
+      final requestName = t.requestName.toLowerCase();
+      final taskName = t.name.toLowerCase();
+      final requesterName = t.requesterName.toLowerCase();
+      final trackingNumber = t.trackingNumber.toLowerCase();
+      return requestName.contains(query) ||
+          taskName.contains(query) ||
+          requesterName.contains(query) ||
+          trackingNumber.contains(query);
+    }).toList();
   }
 
   @override
@@ -229,16 +262,50 @@ class _StaffTasksBodyState extends State<_StaffTasksBody> {
                   ),
                   SliverToBoxAdapter(
                     child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-                      child: _FilterChips(
-                        selected: _filter,
-                        activeCount: activeCount,
-                        doneCount: doneCount,
-                        totalCount: state.tasks.length,
-                        onChanged: (f) => setState(() => _filter = f),
-                        l10n: l10n,
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                      child: _SearchField(
+                        controller: _searchController,
+                        hintText: l10n.searchTasksHint,
+                        onChanged: (v) => setState(() => _searchQuery = v),
+                        onClear: () =>
+                            setState(() => _searchQuery = ''),
                         colors: colors,
                         theme: theme,
+                      ),
+                    ),
+                  ),
+                  SliverToBoxAdapter(
+                    child: Padding(
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _FilterChips(
+                              selected: _filter,
+                              activeCount: activeCount,
+                              doneCount: doneCount,
+                              totalCount: state.tasks.length,
+                              onChanged: (f) => setState(() => _filter = f),
+                              l10n: l10n,
+                              colors: colors,
+                              theme: theme,
+                            ),
+                          ),
+                          if (_hasActiveFilters) ...[
+                            const SizedBox(width: 8),
+                            TextButton.icon(
+                              onPressed: _resetFilters,
+                              icon: const Icon(Icons.filter_alt_off_outlined,
+                                  size: 16),
+                              label: Text(l10n.clearFilters),
+                              style: TextButton.styleFrom(
+                                foregroundColor: colors.error,
+                                padding: const EdgeInsets.symmetric(
+                                    horizontal: 8),
+                              ),
+                            ),
+                          ],
+                        ],
                       ),
                     ),
                   ),
@@ -248,18 +315,32 @@ class _StaffTasksBodyState extends State<_StaffTasksBody> {
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(Icons.check_circle_outline,
+                            Icon(
+                                _searchQuery.isNotEmpty
+                                    ? Icons.search_off
+                                    : Icons.check_circle_outline,
                                 size: 48,
                                 color: colors.primary.withOpacity(0.4)),
                             const SizedBox(height: 14),
                             Text(
-                              _filter == _TaskFilter.active
-                                  ? 'No active tasks'
-                                  : 'No completed tasks',
+                              _searchQuery.isNotEmpty
+                                  ? l10n.noMatchingTasks
+                                  : _filter == _TaskFilter.active
+                                      ? 'No active tasks'
+                                      : 'No completed tasks',
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: colors.onSurfaceVariant,
                               ),
                             ),
+                            if (_hasActiveFilters) ...[
+                              const SizedBox(height: 14),
+                              OutlinedButton.icon(
+                                onPressed: _resetFilters,
+                                icon: const Icon(Icons.filter_alt_off_outlined,
+                                    size: 16),
+                                label: Text(l10n.clearFilters),
+                              ),
+                            ],
                           ],
                         ),
                       ),
@@ -287,6 +368,60 @@ class _StaffTasksBodyState extends State<_StaffTasksBody> {
 
           return const SizedBox.shrink();
         },
+      ),
+    );
+  }
+}
+
+// ─── Search field ─────────────────────────────────────────────────────────────
+
+class _SearchField extends StatelessWidget {
+  final TextEditingController controller;
+  final String hintText;
+  final ValueChanged<String> onChanged;
+  final VoidCallback onClear;
+  final ColorScheme colors;
+  final ThemeData theme;
+
+  const _SearchField({
+    required this.controller,
+    required this.hintText,
+    required this.onChanged,
+    required this.onClear,
+    required this.colors,
+    required this.theme,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return TextField(
+      controller: controller,
+      onChanged: onChanged,
+      textInputAction: TextInputAction.search,
+      style: theme.textTheme.bodyMedium,
+      decoration: InputDecoration(
+        hintText: hintText,
+        prefixIcon: Icon(Icons.search, color: colors.onSurfaceVariant),
+        suffixIcon: ValueListenableBuilder<TextEditingValue>(
+          valueListenable: controller,
+          builder: (context, value, _) {
+            if (value.text.isEmpty) return const SizedBox.shrink();
+            return IconButton(
+              icon: Icon(Icons.close, color: colors.onSurfaceVariant),
+              onPressed: () {
+                controller.clear();
+                onClear();
+              },
+            );
+          },
+        ),
+        filled: true,
+        fillColor: colors.surfaceVariant.withOpacity(0.5),
+        contentPadding: const EdgeInsets.symmetric(vertical: 12),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(14),
+          borderSide: BorderSide.none,
+        ),
       ),
     );
   }

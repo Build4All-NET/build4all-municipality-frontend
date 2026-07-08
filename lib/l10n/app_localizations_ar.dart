@@ -1501,6 +1501,27 @@ class AppLocalizationsAr extends AppLocalizations {
   String get workflowTasks => 'مهام سير العمل';
 
   @override
+  String get requestTitle => 'عنوان الطلب';
+
+  @override
+  String get taskType => 'نوع المهمة';
+
+  @override
+  String get viewRequestDetails => 'عرض تفاصيل الطلب';
+
+  @override
+  String get hideRequestDetails => 'إخفاء تفاصيل الطلب';
+
+  @override
+  String get searchTasksHint => 'ابحث باسم الطلب أو اسم مقدم الطلب';
+
+  @override
+  String get clearFilters => 'مسح';
+
+  @override
+  String get noMatchingTasks => 'لا توجد مهام مطابقة';
+
+  @override
   String get loadTasks => 'تحميل المهام';
 
   @override

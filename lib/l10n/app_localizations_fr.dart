@@ -1352,16 +1352,13 @@ class AppLocalizationsFr extends AppLocalizations {
   String get rejectionReasonRequired => 'La raison du rejet est obligatoire';
 
   @override
-  String get confirmApproveRequest =>
-      'Êtes-vous sûr de vouloir approuver cette demande ?';
+  String get confirmApproveRequest => 'Êtes-vous sûr de vouloir approuver cette demande ?';
 
   @override
-  String get confirmRejectRequest =>
-      'Êtes-vous sûr de vouloir rejeter cette demande ?';
+  String get confirmRejectRequest => 'Êtes-vous sûr de vouloir rejeter cette demande ?';
 
   @override
-  String get confirmPayRequest =>
-      'Êtes-vous sûr de vouloir marquer cette demande comme payée ?';
+  String get confirmPayRequest => 'Êtes-vous sûr de vouloir marquer cette demande comme payée ?';
 
   @override
   String get requestApprovedSuccess => 'Demande approuvée avec succès';
@@ -1370,12 +1367,10 @@ class AppLocalizationsFr extends AppLocalizations {
   String get requestRejectedSuccess => 'Demande rejetée avec succès';
 
   @override
-  String get requestPaidSuccess =>
-      'Demande marquée comme payée avec succès';
+  String get requestPaidSuccess => 'Demande marquée comme payée avec succès';
 
   @override
-  String get requestCompletedSuccess =>
-      'Demande marquée comme terminée avec succès';
+  String get requestCompletedSuccess => 'Demande marquée comme terminée avec succès';
 
   @override
   String get pay => 'Payer';
@@ -1504,6 +1499,27 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get workflowTasks => 'Tâches de flux de travail';
+
+  @override
+  String get requestTitle => 'Titre de la demande';
+
+  @override
+  String get taskType => 'Type de tâche';
+
+  @override
+  String get viewRequestDetails => 'Afficher les détails de la demande';
+
+  @override
+  String get hideRequestDetails => 'Masquer les détails de la demande';
+
+  @override
+  String get searchTasksHint => 'Rechercher par nom de la demande ou du demandeur';
+
+  @override
+  String get clearFilters => 'Effacer';
+
+  @override
+  String get noMatchingTasks => 'Aucune tâche correspondante';
 
   @override
   String get loadTasks => 'Charger les tâches';
