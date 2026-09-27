@@ -6,6 +6,7 @@ import 'package:baladiyati/features/admin/manage_service/Data/model/service_Mode
 import 'package:baladiyati/features/staff/services/data/staff_service_api.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class StaffServicesScreen extends StatefulWidget {
   const StaffServicesScreen({super.key});
@@ -124,47 +125,49 @@ class _StaffServicesScreenState extends State<StaffServicesScreen> {
           ),
         ],
       ),
-      body: RefreshIndicator(
-        onRefresh: _refresh,
-        child: ListView(
-          physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-          children: [
-            _HeaderCard(
-              title: loc.services,
-              subtitle: loc.manageServices,
-              count: _allServices.length,
-            ),
-            const SizedBox(height: 16),
-            AppSearchField(
-              controller: _searchController,
-              hint: loc.search,
-              onChanged: _onSearch,
-              onClear: _searchController.text.trim().isEmpty
-                  ? null
-                  : _clearSearch,
-            ),
-            const SizedBox(height: 16),
-            if (_loading && _allServices.isEmpty)
-              const Padding(
-                padding: EdgeInsets.only(top: 120),
-                child: Center(child: CircularProgressIndicator()),
-              )
-            else if (_error != null && _allServices.isEmpty)
-              _ErrorState(
-                message: _error!,
-                onRetry: _loadServices,
-              )
-            else if (_visibleServices.isEmpty)
-              _EmptyState(
-                title: loc.noData,
-                subtitle: loc.noServicesHint,
-              )
-            else
-              ..._visibleServices.map(
-                (service) => _ServiceReadOnlyCard(service: service),
+      body: ResponsiveCenter.detail(
+        child: RefreshIndicator(
+          onRefresh: _refresh,
+          child: ListView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+            children: [
+              _HeaderCard(
+                title: loc.services,
+                subtitle: loc.manageServices,
+                count: _allServices.length,
               ),
-          ],
+              const SizedBox(height: 16),
+              AppSearchField(
+                controller: _searchController,
+                hint: loc.search,
+                onChanged: _onSearch,
+                onClear: _searchController.text.trim().isEmpty
+                    ? null
+                    : _clearSearch,
+              ),
+              const SizedBox(height: 16),
+              if (_loading && _allServices.isEmpty)
+                const Padding(
+                  padding: EdgeInsets.only(top: 120),
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else if (_error != null && _allServices.isEmpty)
+                _ErrorState(
+                  message: _error!,
+                  onRetry: _loadServices,
+                )
+              else if (_visibleServices.isEmpty)
+                _EmptyState(
+                  title: loc.noData,
+                  subtitle: loc.noServicesHint,
+                )
+              else
+                ..._visibleServices.map(
+                  (service) => _ServiceReadOnlyCard(service: service),
+                ),
+            ],
+          ),
         ),
       ),
     );

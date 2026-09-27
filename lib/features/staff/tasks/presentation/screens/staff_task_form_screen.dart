@@ -17,6 +17,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class StaffTaskFormScreen extends StatefulWidget {
   final StaffTaskModel task;
@@ -423,75 +424,77 @@ class _StaffTaskFormScreenState extends State<StaffTaskFormScreen> {
           overflow: TextOverflow.ellipsis,
         ),
       ),
-      body: SafeArea(
-        child: isLoading
-            ? Center(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const CircularProgressIndicator(),
-                    const SizedBox(height: 12),
-                    Text(
-                      l10n.loadingForm,
-                      style: theme.textTheme.bodyMedium
-                          ?.copyWith(color: colors.onSurfaceVariant),
-                    ),
-                  ],
-                ),
-              )
-            : SingleChildScrollView(
-                padding:
-                    const EdgeInsets.fromLTRB(16, 12, 16, 32),
-                child: Form(
-                  key: _formKey,
+      body: ResponsiveCenter.form(
+        child: SafeArea(
+          child: isLoading
+              ? Center(
                   child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    mainAxisSize: MainAxisSize.min,
                     children: [
-                      _RequestDetailsCard(task: widget.task),
-                      const SizedBox(height: 16),
-                      _TaskInfoCard(
-                        task: widget.task,
-                        detail: _taskDetail,
+                      const CircularProgressIndicator(),
+                      const SizedBox(height: 12),
+                      Text(
+                        l10n.loadingForm,
+                        style: theme.textTheme.bodyMedium
+                            ?.copyWith(color: colors.onSurfaceVariant),
                       ),
-                      const SizedBox(height: 16),
-                      if (widget.task.isCompleted)
-                        _CompletedBanner(
-                          onViewCertificate: widget.task.certificateLookupKey != null
-                              ? _openCertificate
-                              : null,
-                        )
-                      else ...[
-                        if (_fields.isEmpty)
-                          _NoFormCard(
-                            onComplete: _submit,
-                            submitting: _submitting,
-                          )
-                        else ...[
-                          _FormCard(
-                            fields: _fields,
-                            textControllers: _textControllers,
-                            checkboxValues: _checkboxValues,
-                            selectValues: _selectValues,
-                            dateValues: _dateValues,
-                            onCheckboxChanged: (key, val) => setState(
-                                () => _checkboxValues[key] = val),
-                            onSelectChanged: (key, val) =>
-                                setState(() => _selectValues[key] = val),
-                            onDateChanged: (key, val) =>
-                                setState(() => _dateValues[key] = val),
-                          ),
-                          const SizedBox(height: 20),
-                          PrimaryButton(
-                            label: l10n.submitTaskForm,
-                            isLoading: _submitting,
-                            onPressed: _submit,
-                          ),
-                        ],
-                      ],
                     ],
                   ),
+                )
+              : SingleChildScrollView(
+                  padding:
+                      const EdgeInsets.fromLTRB(16, 12, 16, 32),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.stretch,
+                      children: [
+                        _RequestDetailsCard(task: widget.task),
+                        const SizedBox(height: 16),
+                        _TaskInfoCard(
+                          task: widget.task,
+                          detail: _taskDetail,
+                        ),
+                        const SizedBox(height: 16),
+                        if (widget.task.isCompleted)
+                          _CompletedBanner(
+                            onViewCertificate: widget.task.certificateLookupKey != null
+                                ? _openCertificate
+                                : null,
+                          )
+                        else ...[
+                          if (_fields.isEmpty)
+                            _NoFormCard(
+                              onComplete: _submit,
+                              submitting: _submitting,
+                            )
+                          else ...[
+                            _FormCard(
+                              fields: _fields,
+                              textControllers: _textControllers,
+                              checkboxValues: _checkboxValues,
+                              selectValues: _selectValues,
+                              dateValues: _dateValues,
+                              onCheckboxChanged: (key, val) => setState(
+                                  () => _checkboxValues[key] = val),
+                              onSelectChanged: (key, val) =>
+                                  setState(() => _selectValues[key] = val),
+                              onDateChanged: (key, val) =>
+                                  setState(() => _dateValues[key] = val),
+                            ),
+                            const SizedBox(height: 20),
+                            PrimaryButton(
+                              label: l10n.submitTaskForm,
+                              isLoading: _submitting,
+                              onPressed: _submit,
+                            ),
+                          ],
+                        ],
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+        ),
       ),
     );
   }

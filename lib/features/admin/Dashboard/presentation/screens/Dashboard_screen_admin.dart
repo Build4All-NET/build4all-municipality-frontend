@@ -17,6 +17,7 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/core/config/app_breakpoints.dart';
 import 'package:baladiyati/core/utils/responsive.dart';
 
 // Dashboard grid layout per window size (see AppBreakpoints).
@@ -24,8 +25,6 @@ const int _statColumnsCompact = 2;
 const int _statColumnsMedium = 3;
 const int _statColumnsExpanded = 6; // all six stats in one row on desktop
 const double _statAspectRatio = 1.72;
-const double _actionAspectRatioCompact = 1.12;
-const double _actionAspectRatioWide = 1.6;
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -451,8 +450,8 @@ class _DashboardPageState extends State<DashboardPage> {
                       mainAxisSpacing: 12,
                       physics: const NeverScrollableScrollPhysics(),
                       childAspectRatio: context.responsive(
-                        compact: _actionAspectRatioCompact,
-                        medium: _actionAspectRatioWide,
+                        compact: AppLayout.actionTileAspectRatioCompact,
+                        medium: AppLayout.actionTileAspectRatioWide,
                       ),
                       children: [
                         _ActionCard(

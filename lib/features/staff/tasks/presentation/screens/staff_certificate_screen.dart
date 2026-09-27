@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class StaffCertificateScreen extends StatefulWidget {
   final int processInstanceKey;
@@ -195,14 +196,16 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
           onPressed: () => Navigator.pop(context, true),
         ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: _polling
-              ? _buildPolling(theme, colors, l10n)
-              : _error != null
-                  ? _buildError(theme, colors, l10n)
-                  : _buildCertificate(theme, colors, l10n),
+      body: ResponsiveCenter.detail(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: _polling
+                ? _buildPolling(theme, colors, l10n)
+                : _error != null
+                    ? _buildError(theme, colors, l10n)
+                    : _buildCertificate(theme, colors, l10n),
+          ),
         ),
       ),
     );
