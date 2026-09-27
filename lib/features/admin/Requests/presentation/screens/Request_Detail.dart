@@ -1,10 +1,11 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/common/widgets/primary_button.dart';
+import 'package:baladiyati/core/config/app_file_types.dart';
 import 'package:baladiyati/core/config/env.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
+import 'package:baladiyati/core/utils/file_store/file_store.dart';
 import 'package:baladiyati/features/admin/Requests/data/model/RequestModel.dart';
 import 'package:baladiyati/features/admin/Requests/domain/entities/request.dart';
 import 'package:baladiyati/features/admin/Requests/presentation/bloc/Req_Bloc.dart';
@@ -15,8 +16,6 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:open_filex/open_filex.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class RequestDetailPage extends StatefulWidget {
@@ -1140,10 +1139,16 @@ class _AttachmentCard extends StatefulWidget {
 }
 
 class _AttachmentCardState extends State<_AttachmentCard> {
-  static const _kImageExts = {'jpg', 'jpeg', 'png', 'gif', 'webp'};
+  // Disk on mobile, browser session on web.
+  static const _store = FileStore();
 
   bool _downloading = false;
-  String? _localPath;
+
+  /// Handle of the saved file once downloaded (see [FileStore]).
+  String? _savedHandle;
+
+  /// Bytes of a saved image attachment, for the inline preview.
+  Uint8List? _imageBytes;
 
   @override
   void initState() {
@@ -1151,10 +1156,9 @@ class _AttachmentCardState extends State<_AttachmentCard> {
     _checkCache();
   }
 
-  String get _ext =>
-      widget.attachment.fileName.split('.').last.toLowerCase();
+  String get _ext => AppFileTypes.extensionOf(widget.attachment.fileName);
 
-  bool get _isImage => _kImageExts.contains(_ext);
+  bool get _isImage => AppFileTypes.isImage(widget.attachment.fileName);
 
   String _resolveUrl(String url) {
     if (url.startsWith('http')) return url;
@@ -1168,29 +1172,27 @@ class _AttachmentCardState extends State<_AttachmentCard> {
     return 'attachment_${widget.attachment.fileUrl.hashCode.abs()}';
   }
 
-  Future<Directory> _cacheDir() async {
-    try {
-      return (await getExternalStorageDirectory())!;
-    } catch (_) {
-      return getApplicationDocumentsDirectory();
-    }
-  }
-
   Future<void> _checkCache() async {
     try {
-      final dir = await _cacheDir();
-      final path = '${dir.path}/${_cacheKey()}';
-      if (File(path).existsSync()) {
-        if (mounted) setState(() => _localPath = path);
+      final handle = await _store.find(_cacheKey());
+      if (handle == null) return;
+      final preview = _isImage ? await _store.read(handle) : null;
+      if (mounted) {
+        setState(() {
+          _savedHandle = handle;
+          _imageBytes = preview;
+        });
       }
     } catch (_) {}
   }
 
   Future<void> _openOrDownload(BuildContext context) async {
-    if (_localPath != null && File(_localPath!).existsSync()) {
-      await OpenFilex.open(_localPath!);
+    final handle = _savedHandle;
+    if (handle != null && await _store.exists(handle)) {
+      await _store.open(handle);
       return;
     }
+    if (!context.mounted) return;
     await _download(context);
   }
 
@@ -1213,13 +1215,16 @@ class _AttachmentCardState extends State<_AttachmentCard> {
         bytes = Uint8List.fromList(response.data!);
       }
 
-      final dir = await _cacheDir();
-      final path = '${dir.path}/${_cacheKey()}';
-      await File(path).writeAsBytes(bytes);
+      final handle = await _store.save(_cacheKey(), bytes);
 
-      if (mounted) setState(() => _localPath = path);
+      if (mounted) {
+        setState(() {
+          _savedHandle = handle;
+          _imageBytes = _isImage ? bytes : null;
+        });
+      }
       if (!context.mounted) return;
-      await OpenFilex.open(path);
+      await _store.open(handle);
     } catch (_) {
       if (!context.mounted) return;
       AppToast.show(
@@ -1235,7 +1240,9 @@ class _AttachmentCardState extends State<_AttachmentCard> {
   IconData get _fileIcon {
     if (_isImage) return Icons.image_outlined;
     if (_ext == 'pdf') return Icons.picture_as_pdf_outlined;
-    if (['doc', 'docx'].contains(_ext)) return Icons.description_outlined;
+    if (AppFileTypes.documentExtensions.contains(_ext)) {
+      return Icons.description_outlined;
+    }
     return Icons.insert_drive_file_outlined;
   }
 
@@ -1244,7 +1251,7 @@ class _AttachmentCardState extends State<_AttachmentCard> {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
     final l10n = AppLocalizations.of(context)!;
-    final isCached = _localPath != null && File(_localPath!).existsSync();
+    final isCached = _savedHandle != null;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 8),
@@ -1260,12 +1267,12 @@ class _AttachmentCardState extends State<_AttachmentCard> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          if (isCached && _isImage)
+          if (isCached && _imageBytes != null)
             ClipRRect(
               borderRadius:
                   const BorderRadius.vertical(top: Radius.circular(12)),
-              child: Image.file(
-                File(_localPath!),
+              child: Image.memory(
+                _imageBytes!,
                 width: double.infinity,
                 height: 160,
                 fit: BoxFit.cover,

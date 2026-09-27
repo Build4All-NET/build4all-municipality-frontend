@@ -1,9 +1,7 @@
-import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:open_filex/open_filex.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:baladiyati/core/utils/file_store/file_store.dart';
 import 'package:baladiyati/features/citizen/payments/domain/usecases/get_my_payments.dart';
 import 'package:baladiyati/features/citizen/payments/domain/usecases/download_receipt.dart';
 import 'package:baladiyati/features/citizen/payments/data/repositories/payment_repository_impl.dart';
@@ -50,10 +48,9 @@ class PaymentsBloc extends Bloc<PaymentsEvent, PaymentsState> {
     ));
     try {
       final Uint8List bytes = await _downloadReceipt.call(id);
-      final dir = await getTemporaryDirectory();
-      final file = File('${dir.path}/receipt_$id.pdf');
-      await file.writeAsBytes(bytes);
-      await OpenFilex.open(file.path);
+      // Temp file on mobile; new browser tab / download on web.
+      await const FileStore(temporary: true)
+          .saveAndOpen('receipt_$id.pdf', bytes);
     } catch (e) {
       emit(state.copyWith(
         errorMessage: e.toString().replaceAll('Exception:', '').trim(),
