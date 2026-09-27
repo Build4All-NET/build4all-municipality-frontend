@@ -1,4 +1,5 @@
 import '../../domain/entities/request_entity.dart';
+import 'package:baladiyati/core/config/app_file_types.dart';
 
 class RequestModel extends RequestEntity {
   const RequestModel({
@@ -56,8 +57,8 @@ class RequestModel extends RequestEntity {
     if (attachmentUrls != null && attachmentUrls.isNotEmpty) {
       attachments = attachmentUrls.map((url) {
         final fileName = url.split('/').last;
-        final ext = fileName.split('.').last.toLowerCase();
-        final fileType = ['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(ext)
+        final ext = AppFileTypes.extensionOf(fileName);
+        final fileType = AppFileTypes.imageExtensions.contains(ext)
             ? 'image'
             : ext == 'pdf'
                 ? 'pdf'

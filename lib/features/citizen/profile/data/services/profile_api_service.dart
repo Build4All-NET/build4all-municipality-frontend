@@ -11,6 +11,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/build4all_profile_model.dart';
 import '../models/municipality_profile_model.dart';
+import 'package:baladiyati/core/utils/picked_file.dart';
 
 class ProfileApiService {
   final Dio _buildDio;
@@ -227,7 +228,7 @@ class ProfileApiService {
     required String lastName,
     required String username,
     required String email,
-    String? profileImagePath,
+    PickedFileData? profileImage,
     bool imageRemoved = false,
   }) async {
     try {
@@ -240,8 +241,7 @@ class ProfileApiService {
         'username': username.trim(),
         if (email.trim().isNotEmpty) 'email': email.trim(),
         'imageRemoved': imageRemoved.toString(),
-        if (profileImagePath != null && profileImagePath.trim().isNotEmpty)
-          'profileImage': await MultipartFile.fromFile(profileImagePath),
+        if (profileImage != null) 'profileImage': profileImage.toDioMultipart(),
       });
 
       final response = await _buildDio.put(

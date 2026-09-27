@@ -19,6 +19,9 @@ dependencies:
   # HTTP & API
   http: ^1.1.0
   dio: ^5.9.2
+  http_parser: ^4.1.2   # MediaType for multipart uploads
+  mime: ^2.0.0          # detect file MIME types (uploads, web downloads)
+  web: ^1.1.1           # browser APIs for opening / downloading files on web
 
   # Local Storage
   shared_preferences: ^2.2.2

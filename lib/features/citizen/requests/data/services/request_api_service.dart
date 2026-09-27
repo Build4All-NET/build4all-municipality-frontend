@@ -2,6 +2,7 @@ import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:dio/dio.dart';
 import '../models/request_model.dart';
+import 'package:baladiyati/core/config/app_file_types.dart';
 
 class RequestApiService {
   final Dio _dio;
@@ -55,8 +56,8 @@ class RequestApiService {
       if (attachmentUrls != null && attachmentUrls.isNotEmpty) {
         attachments = attachmentUrls.map((url) {
           final fileName = url.split('/').last;
-          final ext = fileName.split('.').last.toLowerCase();
-          final fileType = ['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(ext)
+          final ext = AppFileTypes.extensionOf(fileName);
+          final fileType = AppFileTypes.imageExtensions.contains(ext)
               ? 'image'
               : ext == 'pdf'
                   ? 'pdf'

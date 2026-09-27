@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
@@ -15,6 +14,8 @@ import 'package:baladiyati/features/citizen/services/data/services/file_upload_s
 import 'package:baladiyati/features/citizen/services/domain/entities/service_entity.dart';
 import 'map_picker_screen.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/core/config/app_file_types.dart';
+import 'package:baladiyati/core/utils/picked_file.dart';
 
 class NewRequestScreen extends StatefulWidget {
   final ServiceEntity service;
@@ -42,7 +43,7 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
   double? _geoLng;
   String? _locationName;
 
-  final List<File> _selectedFiles = [];
+  final List<PickedFileData> _selectedFiles = [];
   final List<String> _selectedFileNames = [];
 
   @override
@@ -183,9 +184,11 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                     imageQuality: 80,
                   );
                   if (picked != null) {
+                    final file = await PickedFileData.fromXFile(picked);
+                    if (!mounted) return;
                     setState(() {
-                      _selectedFiles.add(File(picked.path));
-                      _selectedFileNames.add(picked.name);
+                      _selectedFiles.add(file);
+                      _selectedFileNames.add(file.name);
                     });
                   }
                 },
@@ -199,10 +202,14 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                   final picked =
                       await _imagePicker.pickMultiImage(imageQuality: 80);
                   if (picked.isNotEmpty) {
+                    final files = await Future.wait(
+                      picked.map(PickedFileData.fromXFile),
+                    );
+                    if (!mounted) return;
                     setState(() {
-                      for (final xf in picked) {
-                        _selectedFiles.add(File(xf.path));
-                        _selectedFileNames.add(xf.name);
+                      for (final file in files) {
+                        _selectedFiles.add(file);
+                        _selectedFileNames.add(file.name);
                       }
                     });
                   }
@@ -217,16 +224,17 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
                   final result = await FilePicker.platform.pickFiles(
                     allowMultiple: true,
                     type: FileType.custom,
-                    allowedExtensions: [
-                      'pdf', 'doc', 'docx', 'jpg', 'jpeg', 'png',
-                    ],
+                    allowedExtensions: AppFileTypes.attachmentExtensions,
+                    // Load bytes: browsers don't expose file paths.
+                    withData: true,
                   );
                   if (result != null && result.files.isNotEmpty) {
                     setState(() {
                       for (final pf in result.files) {
-                        if (pf.path != null) {
-                          _selectedFiles.add(File(pf.path!));
-                          _selectedFileNames.add(pf.name);
+                        final file = PickedFileData.fromPlatformFile(pf);
+                        if (file != null) {
+                          _selectedFiles.add(file);
+                          _selectedFileNames.add(file.name);
                         }
                       }
                     });
@@ -248,19 +256,19 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
   }
 
   Widget _fileIcon(String fileName) {
-    final ext = fileName.split('.').last.toLowerCase();
+    final ext = AppFileTypes.extensionOf(fileName);
     final colors = Theme.of(context).colorScheme;
     if (ext == 'pdf') {
       return Icon(Icons.picture_as_pdf, color: colors.error, size: 36);
-    } else if (['doc', 'docx'].contains(ext)) {
+    } else if (AppFileTypes.documentExtensions.contains(ext)) {
       return Icon(Icons.description, color: colors.primary, size: 36);
     } else {
       final idx = _selectedFileNames.indexOf(fileName);
       if (idx >= 0 && idx < _selectedFiles.length) {
         return ClipRRect(
           borderRadius: BorderRadius.circular(6),
-          child: Image.file(
-            _selectedFiles[idx],
+          child: Image.memory(
+            _selectedFiles[idx].bytes,
             width: 60,
             height: 60,
             fit: BoxFit.cover,

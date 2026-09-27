@@ -1,6 +1,7 @@
 import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:dio/dio.dart';
+import 'package:baladiyati/core/utils/picked_file.dart';
 
 class CitizenProfileService {
   final Dio _buildDio;
@@ -97,7 +98,7 @@ class CitizenProfileService {
     String? email,
     bool? isPublicProfile,
     bool? imageRemoved,
-    String? profileImagePath,
+    PickedFileData? profileImage,
   }) async {
     try {
       final formData = FormData.fromMap({
@@ -109,8 +110,7 @@ class CitizenProfileService {
         if (isPublicProfile != null)
           'isPublicProfile': isPublicProfile.toString(),
         if (imageRemoved != null) 'imageRemoved': imageRemoved.toString(),
-        if (profileImagePath != null && profileImagePath.trim().isNotEmpty)
-          'profileImage': await MultipartFile.fromFile(profileImagePath),
+        if (profileImage != null) 'profileImage': profileImage.toDioMultipart(),
       });
 
       final response = await _buildDio.put(

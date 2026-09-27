@@ -2,6 +2,7 @@ import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/core/exceptions/auth_exception.dart';
 import 'package:baladiyati/features/auth/data/models/admin_login_response.dart';
 import 'package:dio/dio.dart';
+import 'package:baladiyati/core/utils/picked_file.dart';
 
 class AuthApi {
   final Dio _dio;
@@ -97,7 +98,7 @@ class AuthApi {
     required bool isPublicProfile,
     required String ownerProjectLinkId,
     String? email,
-    String? profileImagePath,
+    PickedFileData? profileImage,
   }) async {
     try {
       final formData = FormData.fromMap({
@@ -108,8 +109,7 @@ class AuthApi {
         'isPublicProfile': isPublicProfile.toString(),
         'ownerProjectLinkId': ownerProjectLinkId.trim(),
         if (email != null && email.trim().isNotEmpty) 'email': email.trim(),
-        if (profileImagePath != null && profileImagePath.trim().isNotEmpty)
-          'profileImage': await MultipartFile.fromFile(profileImagePath),
+        if (profileImage != null) 'profileImage': profileImage.toDioMultipart(),
       });
 
       return await _dio.post(

@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:baladiyati/app/app_router.dart';
 import 'package:baladiyati/common/widgets/app_text_field.dart';
@@ -23,6 +22,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/core/utils/picked_file.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -41,7 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   final _imagePicker = ImagePicker();
 
-  File? _selectedImage;
+  PickedFileData? _selectedImage;
   bool _imageRemoved = false;
   bool _isLoggingOut = false;
 
@@ -161,8 +161,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
 
+    final image = await PickedFileData.fromXFile(picked);
+
     dialogSetState(() {
-      _selectedImage = File(picked.path);
+      _selectedImage = image;
       _imageRemoved = false;
     });
 
@@ -406,7 +408,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   email: _emailCtrl.text.trim(),
                                   phone: _phoneCtrl.text.trim(),
                                   address: _addressCtrl.text.trim(),
-                                  profileImagePath: _selectedImage?.path,
+                                  profileImage: _selectedImage,
                                   imageRemoved: _imageRemoved,
                                 ),
                               );

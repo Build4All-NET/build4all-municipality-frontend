@@ -1,6 +1,7 @@
 import 'package:baladiyati/features/citizen/profile/domain/repository/profile_repository.dart';
 
 import '../entities/profile_entity.dart';
+import 'package:baladiyati/core/utils/picked_file.dart';
 
 
 class UpdateProfileUseCase {
@@ -13,7 +14,7 @@ class UpdateProfileUseCase {
     required String lastName,
     required String username,
     required String email,
-    String? profileImagePath,
+    PickedFileData? profileImage,
     bool imageRemoved = false,
     required String phone,
     required String address,
@@ -23,7 +24,7 @@ class UpdateProfileUseCase {
       lastName: lastName,
       username: username,
       email: email,
-      profileImagePath: profileImagePath,
+      profileImage: profileImage,
       imageRemoved: imageRemoved,
       phone: phone,
       address: address,

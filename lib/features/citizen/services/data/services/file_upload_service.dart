@@ -1,15 +1,15 @@
 // lib/features/citizen/services/data/services/file_upload_service.dart
 
-import 'dart:io';
 import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
 import 'package:baladiyati/core/network/api_client.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:baladiyati/core/utils/picked_file.dart';
 
 class FileUploadService {
   /// Upload multiple files to /api/files/upload
   /// Returns list of file URLs from server
-  Future<List<String>> uploadFiles(List<File> files) async {
+  Future<List<String>> uploadFiles(List<PickedFileData> files) async {
     final baseUrl = ApiClient.baseUrl;
     final token = await AuthTokenStore().getToken();
 
@@ -22,14 +22,9 @@ class FileUploadService {
     }
 
     // Add all files with key "files"
+    // Sent from memory (not file paths) so uploads also work on web.
     for (final file in files) {
-      final fileName = file.path.split('/').last;
-      final multipartFile = await http.MultipartFile.fromPath(
-        'files',
-        file.path,
-        filename: fileName,
-      );
-      request.files.add(multipartFile);
+      request.files.add(file.toHttpMultipart('files'));
     }
 
     final streamedResponse = await request.send().timeout(

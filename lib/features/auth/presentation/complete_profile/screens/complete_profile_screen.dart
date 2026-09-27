@@ -1,7 +1,6 @@
 // lib/features/auth/presentation/complete_profile/screens/complete_profile_screen.dart
 
 import 'dart:convert';
-import 'dart:io';
 
 import 'package:baladiyati/app/app_router.dart';
 import 'package:baladiyati/common/registration_step_cubit.dart';
@@ -18,6 +17,7 @@ import 'package:image_picker/image_picker.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/core/utils/picked_file.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
   const CompleteProfileScreen({super.key});
@@ -36,7 +36,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
   final _authApi = AuthApi(DioClient.build);
   final _imagePicker = ImagePicker();
 
-  File? _selectedImage;
+  PickedFileData? _selectedImage;
   bool _isLoading = false;
 
   @override
@@ -79,8 +79,10 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
     if (picked == null) return;
 
+    final image = await PickedFileData.fromXFile(picked);
+    if (!mounted) return;
     setState(() {
-      _selectedImage = File(picked.path);
+      _selectedImage = image;
     });
   }
 
@@ -122,7 +124,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
         isPublicProfile: false,
         ownerProjectLinkId: ownerProjectLinkId,
         email: email,
-        profileImagePath: _selectedImage?.path,
+        profileImage: _selectedImage,
       );
 
       final updatedBody = {
@@ -325,7 +327,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
                   radius: 52,
                   backgroundColor: cs.primary.withOpacity(0.10),
                   backgroundImage:
-                      _selectedImage != null ? FileImage(_selectedImage!) : null,
+                      _selectedImage != null ? MemoryImage(_selectedImage!.bytes) : null,
                   child: _selectedImage == null
                       ? Icon(
                           Icons.person_outline,
