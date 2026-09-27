@@ -12,6 +12,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:phone_form_field/phone_form_field.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class MunicipalityProfileSetupScreen extends StatefulWidget {
   final String build4allToken;
@@ -301,82 +302,84 @@ class _MunicipalityProfileSetupScreenState
 
     return Scaffold(
       backgroundColor: colors.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(context),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppSizes.paddingLarge),
-                child: Container(
-                  padding: EdgeInsets.all(card.padding),
-                  decoration: BoxDecoration(
-                    color: colors.surface,
-                    borderRadius: BorderRadius.circular(card.radius),
-                    boxShadow: [
-                      BoxShadow(
-                        color: cs.onSurface.withOpacity(0.07),
-                        blurRadius: 20,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Center(
-                          child: Text(
-                            l10n.municipalityProfileTitle,
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: cs.onSurface,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 8),
-                        Center(
-                          child: Text(
-                            l10n.municipalityProfileSubtitle,
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.bodySmall?.copyWith(
-                              color: cs.outline,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 24),
-                        _buildPhoneField(context, l10n),
-                        const SizedBox(height: 16),
-                        AppTextField(
-                          controller: _addressCtrl,
-                          label: l10n.addressLabel,
-                          hint: l10n.addressHint,
-                          icon: Icons.location_on_outlined,
-                          textAlign: TextAlign.left,
-                          validator: (v) {
-                            final value = v?.trim() ?? '';
-                            if (value.isEmpty) return l10n.fieldRequired;
-                            if (value.length < 6) return l10n.addressTooShort;
-                            return null;
-                          },
-                        ),
-                        const SizedBox(height: 28),
-                        PrimaryButton(
-                          label: l10n.completeMunicipalityProfileButton,
-                          isLoading: _isLoading,
-                          onPressed: () {
-                            if (_isLoading) return;
-                            _submit(l10n);
-                          },
+      body: ResponsiveCenter.auth(
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildHeader(context),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(AppSizes.paddingLarge),
+                  child: Container(
+                    padding: EdgeInsets.all(card.padding),
+                    decoration: BoxDecoration(
+                      color: colors.surface,
+                      borderRadius: BorderRadius.circular(card.radius),
+                      boxShadow: [
+                        BoxShadow(
+                          color: cs.onSurface.withOpacity(0.07),
+                          blurRadius: 20,
+                          offset: const Offset(0, 4),
                         ),
                       ],
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Center(
+                            child: Text(
+                              l10n.municipalityProfileTitle,
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: cs.onSurface,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 8),
+                          Center(
+                            child: Text(
+                              l10n.municipalityProfileSubtitle,
+                              textAlign: TextAlign.center,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: cs.outline,
+                              ),
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          _buildPhoneField(context, l10n),
+                          const SizedBox(height: 16),
+                          AppTextField(
+                            controller: _addressCtrl,
+                            label: l10n.addressLabel,
+                            hint: l10n.addressHint,
+                            icon: Icons.location_on_outlined,
+                            textAlign: TextAlign.left,
+                            validator: (v) {
+                              final value = v?.trim() ?? '';
+                              if (value.isEmpty) return l10n.fieldRequired;
+                              if (value.length < 6) return l10n.addressTooShort;
+                              return null;
+                            },
+                          ),
+                          const SizedBox(height: 28),
+                          PrimaryButton(
+                            label: l10n.completeMunicipalityProfileButton,
+                            isLoading: _isLoading,
+                            onPressed: () {
+                              if (_isLoading) return;
+                              _submit(l10n);
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

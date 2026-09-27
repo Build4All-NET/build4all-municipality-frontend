@@ -14,6 +14,7 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class UserVerifyCodeScreen extends StatefulWidget {
   final String email;
@@ -172,132 +173,134 @@ class _UserVerifyCodeScreenState extends State<UserVerifyCodeScreen> {
 
     return Scaffold(
       backgroundColor: cs.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            const RegistrationStepIndicator(),
-            Expanded(
-              child: Center(
-                child: Container(
-                  margin: const EdgeInsets.all(20),
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: cs.surface,
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: cs.onSurface.withOpacity(0.06),
-                        blurRadius: 18,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      CircleAvatar(
-                        radius: 30,
-                        backgroundColor: cs.primary.withOpacity(0.10),
-                        child: Icon(
-                          Icons.lock,
-                          color: cs.primary,
+      body: ResponsiveCenter.auth(
+        child: SafeArea(
+          child: Column(
+            children: [
+              const RegistrationStepIndicator(),
+              Expanded(
+                child: Center(
+                  child: Container(
+                    margin: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(20),
+                    decoration: BoxDecoration(
+                      color: cs.surface,
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: cs.onSurface.withOpacity(0.06),
+                          blurRadius: 18,
+                          offset: const Offset(0, 4),
                         ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      Text(
-                        l10n.verifyTitle,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: cs.onSurface,
+                      ],
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircleAvatar(
+                          radius: 30,
+                          backgroundColor: cs.primary.withOpacity(0.10),
+                          child: Icon(
+                            Icons.lock,
+                            color: cs.primary,
+                          ),
                         ),
-                      ),
 
-                      const SizedBox(height: 10),
+                        const SizedBox(height: 20),
 
-                      Text(
-                        l10n.verifySubtitle,
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: cs.outline,
+                        Text(
+                          l10n.verifyTitle,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: cs.onSurface,
+                          ),
                         ),
-                      ),
 
-                      const SizedBox(height: 8),
+                        const SizedBox(height: 10),
 
-                      Text(
-                        widget.email,
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodyMedium?.copyWith(
-                          color: cs.primary,
-                          fontWeight: FontWeight.bold,
+                        Text(
+                          l10n.verifySubtitle,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: cs.outline,
+                          ),
                         ),
-                      ),
 
-                      const SizedBox(height: 20),
+                        const SizedBox(height: 8),
 
-                      Directionality(
-                        textDirection: TextDirection.ltr,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: List.generate(6, (index) {
-                            return SizedBox(
-                              width: 45,
-                              child: TextField(
-                                controller: _controllers[index],
-                                focusNode: _focusNodes[index],
-                                textAlign: TextAlign.center,
-                                maxLength: 1,
-                                keyboardType: TextInputType.number,
-                                enabled: !_isLoading,
-                                decoration: InputDecoration(
-                                  counterText: '',
-                                  enabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(
-                                      color: cs.outline.withOpacity(0.35),
+                        Text(
+                          widget.email,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodyMedium?.copyWith(
+                            color: cs.primary,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        Directionality(
+                          textDirection: TextDirection.ltr,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: List.generate(6, (index) {
+                              return SizedBox(
+                                width: 45,
+                                child: TextField(
+                                  controller: _controllers[index],
+                                  focusNode: _focusNodes[index],
+                                  textAlign: TextAlign.center,
+                                  maxLength: 1,
+                                  keyboardType: TextInputType.number,
+                                  enabled: !_isLoading,
+                                  decoration: InputDecoration(
+                                    counterText: '',
+                                    enabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: cs.outline.withOpacity(0.35),
+                                      ),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: cs.primary,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    disabledBorder: OutlineInputBorder(
+                                      borderRadius: BorderRadius.circular(10),
+                                      borderSide: BorderSide(
+                                        color: cs.outline.withOpacity(0.20),
+                                      ),
                                     ),
                                   ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(
-                                      color: cs.primary,
-                                      width: 2,
-                                    ),
-                                  ),
-                                  disabledBorder: OutlineInputBorder(
-                                    borderRadius: BorderRadius.circular(10),
-                                    borderSide: BorderSide(
-                                      color: cs.outline.withOpacity(0.20),
-                                    ),
-                                  ),
+                                  onChanged: (value) {
+                                    _handleOtpChanged(value, index);
+                                  },
                                 ),
-                                onChanged: (value) {
-                                  _handleOtpChanged(value, index);
-                                },
-                              ),
-                            );
-                          }),
+                              );
+                            }),
+                          ),
                         ),
-                      ),
 
-                      const SizedBox(height: 25),
+                        const SizedBox(height: 25),
 
-                      PrimaryButton(
-                        label: l10n.verifyButton,
-                        isLoading: _isLoading,
-                        onPressed: () {
-                          if (_isLoading) return;
-                          _verify(l10n);
-                        },
-                      ),
-                    ],
+                        PrimaryButton(
+                          label: l10n.verifyButton,
+                          isLoading: _isLoading,
+                          onPressed: () {
+                            if (_isLoading) return;
+                            _verify(l10n);
+                          },
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

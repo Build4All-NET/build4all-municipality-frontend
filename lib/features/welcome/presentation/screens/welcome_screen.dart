@@ -8,6 +8,7 @@ import 'package:baladiyati/app/app_router.dart';
 
 import '../../../../core/l10n/locale_cubit.dart';
 import '../../../../common/widgets/primary_button.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class WelcomeScreen extends StatelessWidget {
   const WelcomeScreen({super.key});
@@ -35,65 +36,68 @@ class WelcomeScreen extends StatelessWidget {
           child: Stack(
             children: [
               Center(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 32),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Container(
-                        width: 150,
-                        height: 150,
-                        decoration: BoxDecoration(
-                          color: cs.onPrimary.withOpacity(0.18),
-                          borderRadius: BorderRadius.circular(32),
+                child: ResponsiveCenter.auth(
+                  alignment: Alignment.center,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 32),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Container(
+                          width: 150,
+                          height: 150,
+                          decoration: BoxDecoration(
+                            color: cs.onPrimary.withOpacity(0.18),
+                            borderRadius: BorderRadius.circular(32),
+                          ),
+                          child: Icon(
+                            Icons.apartment,
+                            size: 85,
+                            color: cs.onPrimary,
+                          ),
                         ),
-                        child: Icon(
-                          Icons.apartment,
-                          size: 85,
-                          color: cs.onPrimary,
+                        const SizedBox(height: 36),
+
+                        Text(
+                          l10n.appTitle,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.displaySmall?.copyWith(
+                            fontWeight: FontWeight.bold,
+                            color: cs.onPrimary,
+                          ),
                         ),
-                      ),
-                      const SizedBox(height: 36),
 
-                      Text(
-                        l10n.appTitle,
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.displaySmall?.copyWith(
-                          fontWeight: FontWeight.bold,
-                          color: cs.onPrimary,
+                        const SizedBox(height: 10),
+
+                        Text(
+                          l10n.appSubtitle,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.titleMedium?.copyWith(
+                            color: cs.onPrimary,
+                          ),
                         ),
-                      ),
 
-                      const SizedBox(height: 10),
+                        const SizedBox(height: 14),
 
-                      Text(
-                        l10n.appSubtitle,
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.titleMedium?.copyWith(
-                          color: cs.onPrimary,
+                        Text(
+                          l10n.appDescription,
+                          textAlign: TextAlign.center,
+                          style: theme.textTheme.bodySmall?.copyWith(
+                            color: cs.onPrimary.withOpacity(0.70),
+                          ),
                         ),
-                      ),
 
-                      const SizedBox(height: 14),
+                        const SizedBox(height: 48),
 
-                      Text(
-                        l10n.appDescription,
-                        textAlign: TextAlign.center,
-                        style: theme.textTheme.bodySmall?.copyWith(
-                          color: cs.onPrimary.withOpacity(0.70),
+                        PrimaryButton(
+                          label: l10n.getStarted,
+                          width: 220,
+                          backgroundColor: cs.onPrimary,
+                          textColor: cs.primary,
+                          onPressed: () => AppRouter.goToLogin(context),
                         ),
-                      ),
-
-                      const SizedBox(height: 48),
-
-                      PrimaryButton(
-                        label: l10n.getStarted,
-                        width: 220,
-                        backgroundColor: cs.onPrimary,
-                        textColor: cs.primary,
-                        onPressed: () => AppRouter.goToLogin(context),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
                 ),
               ),

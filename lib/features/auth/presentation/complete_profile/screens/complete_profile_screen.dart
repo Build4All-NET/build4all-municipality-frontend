@@ -17,6 +17,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
 
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class CompleteProfileScreen extends StatefulWidget {
   const CompleteProfileScreen({super.key});
@@ -169,137 +170,139 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
 
     return Scaffold(
       backgroundColor: cs.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            _buildHeader(context),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(AppSizes.paddingLarge),
-                child: Container(
+      body: ResponsiveCenter.auth(
+        child: SafeArea(
+          child: Column(
+            children: [
+              _buildHeader(context),
+              Expanded(
+                child: SingleChildScrollView(
                   padding: const EdgeInsets.all(AppSizes.paddingLarge),
-                  decoration: BoxDecoration(
-                    color: cs.surface,
-                    borderRadius: BorderRadius.circular(AppSizes.radiusLarge),
-                    boxShadow: [
-                      BoxShadow(
-                        color: cs.onSurface.withOpacity(0.07),
-                        blurRadius: 20,
-                        offset: const Offset(0, 4),
-                      ),
-                    ],
-                  ),
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Center(
-                          child: Text(
-                            l10n.completeProfileTitle,
-                            style: theme.textTheme.titleLarge?.copyWith(
-                              fontWeight: FontWeight.bold,
-                              color: cs.onSurface,
-                            ),
-                          ),
-                        ),
-
-                        const SizedBox(height: 24),
-
-                        _buildImagePicker(context),
-
-                        const SizedBox(height: 24),
-
-                        AppTextField(
-                          controller: _firstNameCtrl,
-                          label: l10n.firstNameLabel,
-                          hint: l10n.firstNameHint,
-                          icon: Icons.badge_outlined,
-                          textAlign: TextAlign.left,
-                          validator: (v) {
-                            final value = v?.trim() ?? '';
-
-                            if (value.isEmpty) {
-                              return l10n.fieldRequired;
-                            }
-
-                            if (value.length < 2) {
-                              return l10n.firstNameTooShort;
-                            }
-
-                            return null;
-                          },
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        AppTextField(
-                          controller: _lastNameCtrl,
-                          label: l10n.lastNameLabel,
-                          hint: l10n.lastNameHint,
-                          icon: Icons.badge_outlined,
-                          textAlign: TextAlign.left,
-                          validator: (v) {
-                            final value = v?.trim() ?? '';
-
-                            if (value.isEmpty) {
-                              return l10n.fieldRequired;
-                            }
-
-                            if (value.length < 2) {
-                              return l10n.lastNameTooShort;
-                            }
-
-                            return null;
-                          },
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        AppTextField(
-                          controller: _usernameCtrl,
-                          label: l10n.usernameLabel,
-                          hint: l10n.usernameHint,
-                          icon: Icons.person_outline,
-                          textAlign: TextAlign.left,
-                          validator: (v) {
-                            final value = v?.trim() ?? '';
-
-                            if (value.isEmpty) {
-                              return l10n.fieldRequired;
-                            }
-
-                            if (value.length < 3) {
-                              return l10n.usernameTooShort;
-                            }
-
-                            final usernameRegex = RegExp(r'^[a-zA-Z0-9_\.]+$');
-
-                            if (!usernameRegex.hasMatch(value)) {
-                              return l10n.usernameInvalidChars;
-                            }
-
-                            return null;
-                          },
-                        ),
-
-                        const SizedBox(height: 28),
-
-                        PrimaryButton(
-                          label: l10n.completeProfileButton,
-                          isLoading: _isLoading,
-                          onPressed: () {
-                            if (_isLoading) return;
-                            _onSubmit(l10n);
-                          },
+                  child: Container(
+                    padding: const EdgeInsets.all(AppSizes.paddingLarge),
+                    decoration: BoxDecoration(
+                      color: cs.surface,
+                      borderRadius: BorderRadius.circular(AppSizes.radiusLarge),
+                      boxShadow: [
+                        BoxShadow(
+                          color: cs.onSurface.withOpacity(0.07),
+                          blurRadius: 20,
+                          offset: const Offset(0, 4),
                         ),
                       ],
+                    ),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.end,
+                        children: [
+                          Center(
+                            child: Text(
+                              l10n.completeProfileTitle,
+                              style: theme.textTheme.titleLarge?.copyWith(
+                                fontWeight: FontWeight.bold,
+                                color: cs.onSurface,
+                              ),
+                            ),
+                          ),
+
+                          const SizedBox(height: 24),
+
+                          _buildImagePicker(context),
+
+                          const SizedBox(height: 24),
+
+                          AppTextField(
+                            controller: _firstNameCtrl,
+                            label: l10n.firstNameLabel,
+                            hint: l10n.firstNameHint,
+                            icon: Icons.badge_outlined,
+                            textAlign: TextAlign.left,
+                            validator: (v) {
+                              final value = v?.trim() ?? '';
+
+                              if (value.isEmpty) {
+                                return l10n.fieldRequired;
+                              }
+
+                              if (value.length < 2) {
+                                return l10n.firstNameTooShort;
+                              }
+
+                              return null;
+                            },
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          AppTextField(
+                            controller: _lastNameCtrl,
+                            label: l10n.lastNameLabel,
+                            hint: l10n.lastNameHint,
+                            icon: Icons.badge_outlined,
+                            textAlign: TextAlign.left,
+                            validator: (v) {
+                              final value = v?.trim() ?? '';
+
+                              if (value.isEmpty) {
+                                return l10n.fieldRequired;
+                              }
+
+                              if (value.length < 2) {
+                                return l10n.lastNameTooShort;
+                              }
+
+                              return null;
+                            },
+                          ),
+
+                          const SizedBox(height: 16),
+
+                          AppTextField(
+                            controller: _usernameCtrl,
+                            label: l10n.usernameLabel,
+                            hint: l10n.usernameHint,
+                            icon: Icons.person_outline,
+                            textAlign: TextAlign.left,
+                            validator: (v) {
+                              final value = v?.trim() ?? '';
+
+                              if (value.isEmpty) {
+                                return l10n.fieldRequired;
+                              }
+
+                              if (value.length < 3) {
+                                return l10n.usernameTooShort;
+                              }
+
+                              final usernameRegex = RegExp(r'^[a-zA-Z0-9_\.]+$');
+
+                              if (!usernameRegex.hasMatch(value)) {
+                                return l10n.usernameInvalidChars;
+                              }
+
+                              return null;
+                            },
+                          ),
+
+                          const SizedBox(height: 28),
+
+                          PrimaryButton(
+                            label: l10n.completeProfileButton,
+                            isLoading: _isLoading,
+                            onPressed: () {
+                              if (_isLoading) return;
+                              _onSubmit(l10n);
+                            },
+                          ),
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
