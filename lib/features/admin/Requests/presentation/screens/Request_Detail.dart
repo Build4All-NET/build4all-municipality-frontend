@@ -17,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:open_filex/open_filex.dart';
 import 'package:path_provider/path_provider.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class RequestDetailPage extends StatefulWidget {
   final RequestModel request;
@@ -369,197 +370,199 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
               ),
             ),
           ),
-          body: SafeArea(
-            child: LayoutBuilder(
-              builder: (context, constraints) {
-                final horizontalPadding =
-                    constraints.maxWidth < 360 ? 12.0 : 16.0;
+          body: ResponsiveCenter.detail(
+            child: SafeArea(
+              child: LayoutBuilder(
+                builder: (context, constraints) {
+                  final horizontalPadding =
+                      constraints.maxWidth < 360 ? 12.0 : 16.0;
 
-                return SingleChildScrollView(
-                  keyboardDismissBehavior:
-                      ScrollViewKeyboardDismissBehavior.onDrag,
-                  padding: EdgeInsets.fromLTRB(
-                    horizontalPadding,
-                    12,
-                    horizontalPadding,
-                    24,
-                  ),
-                  child: ConstrainedBox(
-                    constraints: BoxConstraints(
-                      minWidth: constraints.maxWidth,
+                  return SingleChildScrollView(
+                    keyboardDismissBehavior:
+                        ScrollViewKeyboardDismissBehavior.onDrag,
+                    padding: EdgeInsets.fromLTRB(
+                      horizontalPadding,
+                      12,
+                      horizontalPadding,
+                      24,
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _HeaderCard(
-                          title: _safe(widget.request.title),
-                          trackingNumber: _safe(widget.request.trackingNumber),
-                          status: statusText,
-                          statusColor: statusColor,
-                          statusIcon: _statusIcon(_status),
-                        ),
-                        const SizedBox(height: 14),
-                        _SectionCard(
-                          title: l10n.requestInformation,
-                          icon: Icons.info_outline,
-                          child: Column(
-                            children: [
-                              _DetailRow(
-                                icon: Icons.location_city_outlined,
-                                label: l10n.municipality,
-                                value: Env.appName,
-                              ),
-                              _DetailRow(
-                                icon: Icons.miscellaneous_services_outlined,
-                                label: l10n.service,
-                                value: switch (widget.request.serviceName) {
-                                  'Building Permit' => l10n.serviceBuildingPermit,
-                                  'Larger Building Permit' => l10n.serviceLargerBuildingPermit,
-                                  'Housing Permit' => l10n.serviceHousingPermit,
-                                  'External Works' => l10n.serviceExternalWorks,
-                                  'Illegal Construction' => l10n.serviceIllegalConstruction,
-                                  'Valuation Certificate' => l10n.serviceValuationCertificate,
-                                  'Clearance Certificate' => l10n.serviceClearanceCertificate,
-                                  'Tent Permit' => l10n.serviceTentPermit,
-                                  'Property Access' => l10n.servicePropertyAccess,
-                                  'Residence Certificate' => l10n.serviceResidenceCertificate,
-                                  'Contents Certificate' => l10n.serviceContentsCertificate,
-                                  'Work Certificate' => l10n.serviceWorkCertificate,
-                                  'Lease Registration' => l10n.serviceLeaseRegistration,
-                                  _ => _safe(widget.request.serviceName),
-                                },
-                              ),
-                              _DetailRow(
-                                icon: Icons.person_outline,
-                                label: l10n.citizen,
-                                value: _safe(widget.request.citizenName),
-                              ),
-                              _DetailRow(
-                                icon: Icons.confirmation_number_outlined,
-                                label: l10n.tracking,
-                                value: _safe(widget.request.trackingNumber),
-                              ),
-                              _DetailRow(
-                                icon: Icons.account_tree_outlined,
-                                label: 'Process Key',
-                                value: widget.request.processInstanceKey == null
-                                    ? '—'
-                                    : widget.request.processInstanceKey.toString(),
-                              ),
-                              _DetailRow(
-                                icon: Icons.category_outlined,
-                                label: l10n.category,
-                                value: _safe(widget.request.category),
-                                showDivider: false,
-                              ),
-                            ],
+                    child: ConstrainedBox(
+                      constraints: BoxConstraints(
+                        minWidth: constraints.maxWidth,
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _HeaderCard(
+                            title: _safe(widget.request.title),
+                            trackingNumber: _safe(widget.request.trackingNumber),
+                            status: statusText,
+                            statusColor: statusColor,
+                            statusIcon: _statusIcon(_status),
                           ),
-                        ),
-                        const SizedBox(height: 14),
-                        _SectionCard(
-                          title: l10n.location,
-                          icon: Icons.location_on_outlined,
-                          child: Column(
-                            children: [
-                              _DetailRow(
-                                icon: Icons.home_outlined,
-                                label: l10n.address,
-                                value: _safe(widget.request.addressText),
-                              ),
-                              _DetailRow(
-                                icon: Icons.map_outlined,
-                                label: l10n.latitude,
-                                value: _formatCoordinate(widget.request.geoLat),
-                              ),
-                              _DetailRow(
-                                icon: Icons.map_outlined,
-                                label: l10n.longitude,
-                                value: _formatCoordinate(widget.request.geoLng),
-                                showDivider: false,
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        _SectionCard(
-                          title: l10n.timeline,
-                          icon: Icons.timeline_outlined,
-                          child: Column(
-                            children: [
-                              _DetailRow(
-                                icon: Icons.calendar_today_outlined,
-                                label: l10n.created,
-                                value: _formatDate(widget.request.createdAt),
-                              ),
-                              _DetailRow(
-                                icon: Icons.update_outlined,
-                                label: l10n.updated,
-                                value: _formatDate(widget.request.updatedAt),
-                              ),
-                              _DetailRow(
-                                icon: Icons.event_available_outlined,
-                                label: l10n.closed,
-                                value: _formatDate(widget.request.closedAt),
-                                showDivider: false,
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 14),
-                        _SectionCard(
-                          title: l10n.description,
-                          icon: Icons.notes_outlined,
-                          child: Text(
-                            _safe(widget.request.description),
-                            softWrap: true,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: colors.onSurfaceVariant,
-                              height: 1.45,
-                              fontWeight: FontWeight.w500,
+                          const SizedBox(height: 14),
+                          _SectionCard(
+                            title: l10n.requestInformation,
+                            icon: Icons.info_outline,
+                            child: Column(
+                              children: [
+                                _DetailRow(
+                                  icon: Icons.location_city_outlined,
+                                  label: l10n.municipality,
+                                  value: Env.appName,
+                                ),
+                                _DetailRow(
+                                  icon: Icons.miscellaneous_services_outlined,
+                                  label: l10n.service,
+                                  value: switch (widget.request.serviceName) {
+                                    'Building Permit' => l10n.serviceBuildingPermit,
+                                    'Larger Building Permit' => l10n.serviceLargerBuildingPermit,
+                                    'Housing Permit' => l10n.serviceHousingPermit,
+                                    'External Works' => l10n.serviceExternalWorks,
+                                    'Illegal Construction' => l10n.serviceIllegalConstruction,
+                                    'Valuation Certificate' => l10n.serviceValuationCertificate,
+                                    'Clearance Certificate' => l10n.serviceClearanceCertificate,
+                                    'Tent Permit' => l10n.serviceTentPermit,
+                                    'Property Access' => l10n.servicePropertyAccess,
+                                    'Residence Certificate' => l10n.serviceResidenceCertificate,
+                                    'Contents Certificate' => l10n.serviceContentsCertificate,
+                                    'Work Certificate' => l10n.serviceWorkCertificate,
+                                    'Lease Registration' => l10n.serviceLeaseRegistration,
+                                    _ => _safe(widget.request.serviceName),
+                                  },
+                                ),
+                                _DetailRow(
+                                  icon: Icons.person_outline,
+                                  label: l10n.citizen,
+                                  value: _safe(widget.request.citizenName),
+                                ),
+                                _DetailRow(
+                                  icon: Icons.confirmation_number_outlined,
+                                  label: l10n.tracking,
+                                  value: _safe(widget.request.trackingNumber),
+                                ),
+                                _DetailRow(
+                                  icon: Icons.account_tree_outlined,
+                                  label: 'Process Key',
+                                  value: widget.request.processInstanceKey == null
+                                      ? '—'
+                                      : widget.request.processInstanceKey.toString(),
+                                ),
+                                _DetailRow(
+                                  icon: Icons.category_outlined,
+                                  label: l10n.category,
+                                  value: _safe(widget.request.category),
+                                  showDivider: false,
+                                ),
+                              ],
                             ),
                           ),
-                        ),
-                        if (widget.request.attachments.isNotEmpty) ...[
                           const SizedBox(height: 14),
-                          _AttachmentsSection(
-                            attachments: widget.request.attachments,
+                          _SectionCard(
+                            title: l10n.location,
+                            icon: Icons.location_on_outlined,
+                            child: Column(
+                              children: [
+                                _DetailRow(
+                                  icon: Icons.home_outlined,
+                                  label: l10n.address,
+                                  value: _safe(widget.request.addressText),
+                                ),
+                                _DetailRow(
+                                  icon: Icons.map_outlined,
+                                  label: l10n.latitude,
+                                  value: _formatCoordinate(widget.request.geoLat),
+                                ),
+                                _DetailRow(
+                                  icon: Icons.map_outlined,
+                                  label: l10n.longitude,
+                                  value: _formatCoordinate(widget.request.geoLng),
+                                  showDivider: false,
+                                ),
+                              ],
+                            ),
                           ),
+                          const SizedBox(height: 14),
+                          _SectionCard(
+                            title: l10n.timeline,
+                            icon: Icons.timeline_outlined,
+                            child: Column(
+                              children: [
+                                _DetailRow(
+                                  icon: Icons.calendar_today_outlined,
+                                  label: l10n.created,
+                                  value: _formatDate(widget.request.createdAt),
+                                ),
+                                _DetailRow(
+                                  icon: Icons.update_outlined,
+                                  label: l10n.updated,
+                                  value: _formatDate(widget.request.updatedAt),
+                                ),
+                                _DetailRow(
+                                  icon: Icons.event_available_outlined,
+                                  label: l10n.closed,
+                                  value: _formatDate(widget.request.closedAt),
+                                  showDivider: false,
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 14),
+                          _SectionCard(
+                            title: l10n.description,
+                            icon: Icons.notes_outlined,
+                            child: Text(
+                              _safe(widget.request.description),
+                              softWrap: true,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: colors.onSurfaceVariant,
+                                height: 1.45,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                          if (widget.request.attachments.isNotEmpty) ...[
+                            const SizedBox(height: 14),
+                            _AttachmentsSection(
+                              attachments: widget.request.attachments,
+                            ),
+                          ],
+                          const SizedBox(height: 20),
+                          if (isClosed)
+                            _status?.trim().toUpperCase() == 'TAX_PAID'
+                                ? _PaidBadgeCard(label: l10n.alreadyPaid)
+                                : _ClosedStatusCard(status: statusText)
+                          else
+                            _ActionsCard(
+                              isLoading: state.updating,
+                              isPayLoading: state.payUpdating,
+                              actions: actions,
+                              rejectionController: _rejectionController,
+                              rejectDisabled:
+                                  _rejectionController.text.trim().isEmpty,
+                              onReject: () {
+                                if (state.updating) return;
+                                _changeStatus(context, l10n, 'REJECTED');
+                              },
+                              onApprove: () {
+                                if (state.updating) return;
+                                _changeStatus(context, l10n, 'APPROVED');
+                              },
+                              onComplete: () {
+                                if (state.updating) return;
+                                _changeStatus(context, l10n, 'COMPLETED');
+                              },
+                              onPay: () {
+                                if (state.payUpdating) return;
+                                _payRequest(context, l10n);
+                              },
+                            ),
                         ],
-                        const SizedBox(height: 20),
-                        if (isClosed)
-                          _status?.trim().toUpperCase() == 'TAX_PAID'
-                              ? _PaidBadgeCard(label: l10n.alreadyPaid)
-                              : _ClosedStatusCard(status: statusText)
-                        else
-                          _ActionsCard(
-                            isLoading: state.updating,
-                            isPayLoading: state.payUpdating,
-                            actions: actions,
-                            rejectionController: _rejectionController,
-                            rejectDisabled:
-                                _rejectionController.text.trim().isEmpty,
-                            onReject: () {
-                              if (state.updating) return;
-                              _changeStatus(context, l10n, 'REJECTED');
-                            },
-                            onApprove: () {
-                              if (state.updating) return;
-                              _changeStatus(context, l10n, 'APPROVED');
-                            },
-                            onComplete: () {
-                              if (state.updating) return;
-                              _changeStatus(context, l10n, 'COMPLETED');
-                            },
-                            onPay: () {
-                              if (state.payUpdating) return;
-                              _payRequest(context, l10n);
-                            },
-                          ),
-                      ],
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
         );

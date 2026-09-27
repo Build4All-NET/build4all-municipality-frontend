@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
 import '../cubit/admin_profile_cubit.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class AdminProfileScreen extends StatefulWidget {
   const AdminProfileScreen({super.key});
@@ -104,72 +105,74 @@ class _AdminProfileScreenState extends State<AdminProfileScreen> {
               ),
             ],
           ),
-          body: state.isLoading && profile == null
-              ? const Center(child: CircularProgressIndicator())
-              : RefreshIndicator(
-                  onRefresh: () {
-                    return context.read<AdminProfileCubit>().loadProfile();
-                  },
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.stretch,
-                      children: [
-                        _HeaderCard(
-                          title: _safeValue(profile?.fullName),
-                          subtitle: _safeValue(profile?.role),
-                        ),
-                        const SizedBox(height: 18),
-                        _SectionCard(
-                          title: loc.accountInformation,
-                          child: Column(
-                            children: [
-                              _InfoRow(
-                                icon: Icons.person_outline,
-                                label: loc.firstName,
-                                value: _safeValue(profile?.firstName),
-                              ),
-                              _DividerLine(color: colors.outlineVariant),
-                              _InfoRow(
-                                icon: Icons.person_outline,
-                                label: loc.lastName,
-                                value: _safeValue(profile?.lastName),
-                              ),
-                              _DividerLine(color: colors.outlineVariant),
-                              _InfoRow(
-                                icon: Icons.alternate_email,
-                                label: loc.usernameLabel,
-                                value: _safeValue(profile?.username),
-                              ),
-                              _DividerLine(color: colors.outlineVariant),
-                              _InfoRow(
-                                icon: Icons.email_outlined,
-                                label: loc.email,
-                                value: _safeValue(profile?.email),
-                              ),
-                              _DividerLine(color: colors.outlineVariant),
-                              _InfoRow(
-                                icon: Icons.phone_outlined,
-                                label: loc.phone,
-                                value: _safeValue(profile?.phoneNumber),
-                              ),
-                            ],
+          body: ResponsiveCenter.detail(
+            child: state.isLoading && profile == null
+                ? const Center(child: CircularProgressIndicator())
+                : RefreshIndicator(
+                    onRefresh: () {
+                      return context.read<AdminProfileCubit>().loadProfile();
+                    },
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          _HeaderCard(
+                            title: _safeValue(profile?.fullName),
+                            subtitle: _safeValue(profile?.role),
                           ),
-                        ),
-                        const SizedBox(height: 16),
-                        _SectionCard(
-                          title: loc.profileDetails,
-                          child: _InfoRow(
-                            icon: Icons.verified_user_outlined,
-                            label: loc.role,
-                            value: _safeValue(profile?.role),
+                          const SizedBox(height: 18),
+                          _SectionCard(
+                            title: loc.accountInformation,
+                            child: Column(
+                              children: [
+                                _InfoRow(
+                                  icon: Icons.person_outline,
+                                  label: loc.firstName,
+                                  value: _safeValue(profile?.firstName),
+                                ),
+                                _DividerLine(color: colors.outlineVariant),
+                                _InfoRow(
+                                  icon: Icons.person_outline,
+                                  label: loc.lastName,
+                                  value: _safeValue(profile?.lastName),
+                                ),
+                                _DividerLine(color: colors.outlineVariant),
+                                _InfoRow(
+                                  icon: Icons.alternate_email,
+                                  label: loc.usernameLabel,
+                                  value: _safeValue(profile?.username),
+                                ),
+                                _DividerLine(color: colors.outlineVariant),
+                                _InfoRow(
+                                  icon: Icons.email_outlined,
+                                  label: loc.email,
+                                  value: _safeValue(profile?.email),
+                                ),
+                                _DividerLine(color: colors.outlineVariant),
+                                _InfoRow(
+                                  icon: Icons.phone_outlined,
+                                  label: loc.phone,
+                                  value: _safeValue(profile?.phoneNumber),
+                                ),
+                              ],
+                            ),
                           ),
-                        ),
-                      ],
+                          const SizedBox(height: 16),
+                          _SectionCard(
+                            title: loc.profileDetails,
+                            child: _InfoRow(
+                              icon: Icons.verified_user_outlined,
+                              label: loc.role,
+                              value: _safeValue(profile?.role),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
+          ),
         );
       },
     );

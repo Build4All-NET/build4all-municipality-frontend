@@ -5,6 +5,7 @@ import 'package:baladiyati/features/admin/certificates/presentation/cubit/admin_
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 enum _CertFilter { all, signed, unsigned }
 
@@ -109,95 +110,97 @@ class _AdminCertificatesScreenState extends State<AdminCertificatesScreen> {
               ),
             ],
           ),
-          body: RefreshIndicator(
-            onRefresh: cubit.loadCertificates,
-            child: state.loading
-                ? const Center(child: CircularProgressIndicator())
-                : state.certificates.isEmpty
-                    ? _EmptyView(loc: loc, theme: theme, colors: colors)
-                    : CustomScrollView(
-                        physics: const AlwaysScrollableScrollPhysics(),
-                        slivers: [
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                              child: _Header(
-                                total: state.certificates.length,
-                                signedCount: signedCount,
-                                unsignedCount: unsignedCount,
-                                theme: theme,
-                                colors: colors,
-                              ),
-                            ),
-                          ),
-                          SliverToBoxAdapter(
-                            child: Padding(
-                              padding:
-                                  const EdgeInsets.fromLTRB(16, 12, 16, 4),
-                              child: _FilterChips(
-                                selected: _filter,
-                                total: state.certificates.length,
-                                signedCount: signedCount,
-                                unsignedCount: unsignedCount,
-                                onChanged: (f) =>
-                                    setState(() => _filter = f),
-                                loc: loc,
-                                theme: theme,
-                                colors: colors,
-                              ),
-                            ),
-                          ),
-                          if (filtered.isEmpty)
-                            SliverFillRemaining(
-                              child: Center(
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    Icon(
-                                      Icons.filter_list_off,
-                                      size: 48,
-                                      color: colors.outline,
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Text(
-                                      _filter == _CertFilter.signed
-                                          ? loc.certFilterSigned
-                                          : loc.certFilterUnsigned,
-                                      style: theme.textTheme.bodyMedium
-                                          ?.copyWith(
-                                              color: colors.onSurfaceVariant),
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      'No certificates in this category.',
-                                      style: theme.textTheme.bodySmall
-                                          ?.copyWith(color: colors.outline),
-                                    ),
-                                  ],
+          body: ResponsiveCenter.detail(
+            child: RefreshIndicator(
+              onRefresh: cubit.loadCertificates,
+              child: state.loading
+                  ? const Center(child: CircularProgressIndicator())
+                  : state.certificates.isEmpty
+                      ? _EmptyView(loc: loc, theme: theme, colors: colors)
+                      : CustomScrollView(
+                          physics: const AlwaysScrollableScrollPhysics(),
+                          slivers: [
+                            SliverToBoxAdapter(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                                child: _Header(
+                                  total: state.certificates.length,
+                                  signedCount: signedCount,
+                                  unsignedCount: unsignedCount,
+                                  theme: theme,
+                                  colors: colors,
                                 ),
                               ),
-                            )
-                          else
-                            SliverPadding(
-                              padding:
-                                  const EdgeInsets.fromLTRB(16, 4, 16, 96),
-                              sliver: SliverList(
-                                delegate: SliverChildBuilderDelegate(
-                                  (context, index) => _CertificateCard(
-                                    certificate: filtered[index],
-                                    loc: loc,
-                                    theme: theme,
-                                    colors: colors,
-                                    actionLoading: state.actionLoading,
-                                    cubit: cubit,
+                            ),
+                            SliverToBoxAdapter(
+                              child: Padding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                                child: _FilterChips(
+                                  selected: _filter,
+                                  total: state.certificates.length,
+                                  signedCount: signedCount,
+                                  unsignedCount: unsignedCount,
+                                  onChanged: (f) =>
+                                      setState(() => _filter = f),
+                                  loc: loc,
+                                  theme: theme,
+                                  colors: colors,
+                                ),
+                              ),
+                            ),
+                            if (filtered.isEmpty)
+                              SliverFillRemaining(
+                                child: Center(
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.filter_list_off,
+                                        size: 48,
+                                        color: colors.outline,
+                                      ),
+                                      const SizedBox(height: 12),
+                                      Text(
+                                        _filter == _CertFilter.signed
+                                            ? loc.certFilterSigned
+                                            : loc.certFilterUnsigned,
+                                        style: theme.textTheme.bodyMedium
+                                            ?.copyWith(
+                                                color: colors.onSurfaceVariant),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        'No certificates in this category.',
+                                        style: theme.textTheme.bodySmall
+                                            ?.copyWith(color: colors.outline),
+                                      ),
+                                    ],
                                   ),
-                                  childCount: filtered.length,
+                                ),
+                              )
+                            else
+                              SliverPadding(
+                                padding:
+                                    const EdgeInsets.fromLTRB(16, 4, 16, 96),
+                                sliver: SliverList(
+                                  delegate: SliverChildBuilderDelegate(
+                                    (context, index) => _CertificateCard(
+                                      certificate: filtered[index],
+                                      loc: loc,
+                                      theme: theme,
+                                      colors: colors,
+                                      actionLoading: state.actionLoading,
+                                      cubit: cubit,
+                                    ),
+                                    childCount: filtered.length,
+                                  ),
                                 ),
                               ),
-                            ),
-                        ],
-                      ),
+                          ],
+                        ),
+            ),
           ),
         );
       },

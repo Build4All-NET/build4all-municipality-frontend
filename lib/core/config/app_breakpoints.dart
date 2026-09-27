@@ -13,7 +13,7 @@ class AppLayout {
   // Max content widths per screen type.
   static const double maxWidthAuth   = 480;   // login, register, OTP, reset password
   static const double maxWidthForm   = 760;   // create / edit forms
-  static const double maxWidthDetail = 960;   // detail pages, chat, settings
+  static const double maxWidthDetail = 960;   // single-column content: lists, details, chat, profile
   static const double maxWidthPage   = 1200;  // dashboards, lists
 
   // Grid columns per window size.

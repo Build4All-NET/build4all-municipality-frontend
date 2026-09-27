@@ -12,6 +12,7 @@ import 'package:baladiyati/features/admin/staff/data/Model/UserAssignmentSearchR
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class EmployeesScreen extends StatefulWidget {
   const EmployeesScreen({super.key});
@@ -187,56 +188,58 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
             icon: const Icon(Icons.person_add_alt_1_outlined),
             label: Text(l10n.assignStaff),
           ),
-          body: SafeArea(
-            child: RefreshIndicator(
-              onRefresh: _refresh,
-              child: ListView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
-                children: [
-                  _HeaderCard(
-                    title: l10n.staff,
-                    subtitle: l10n.manageStaff,
-                    count: state.allStaffUsers.length,
-                  ),
-                  const SizedBox(height: 16),
-                  AppSearchField(
-                    controller: _searchController,
-                    hint: l10n.search,
-                    onChanged: (value) {
-                      context
-                          .read<AdminStaffBloc>()
-                          .add(SearchStaffUsersLocally(value));
-                      setState(() {});
-                    },
-                    onClear: _searchController.text.trim().isEmpty
-                        ? null
-                        : _clearSearch,
-                  ),
-                  const SizedBox(height: 16),
-                  if (state.actionLoading)
-                    const Padding(
-                      padding: EdgeInsets.only(bottom: 12),
-                      child: LinearProgressIndicator(),
+          body: ResponsiveCenter.detail(
+            child: SafeArea(
+              child: RefreshIndicator(
+                onRefresh: _refresh,
+                child: ListView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
+                  children: [
+                    _HeaderCard(
+                      title: l10n.staff,
+                      subtitle: l10n.manageStaff,
+                      count: state.allStaffUsers.length,
                     ),
-                  if (state.loading && state.allStaffUsers.isEmpty)
-                    const Padding(
-                      padding: EdgeInsets.only(top: 120),
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  else if (state.visibleStaffUsers.isEmpty)
-                    _EmptyState(
-                      title: l10n.noData,
-                      subtitle: l10n.noStaffHint,
-                    )
-                  else
-                    ...state.visibleStaffUsers.map(
-                      (user) => _StaffCard(
-                        user: user,
-                        onRemove: () => _confirmRemoveRole(user),
+                    const SizedBox(height: 16),
+                    AppSearchField(
+                      controller: _searchController,
+                      hint: l10n.search,
+                      onChanged: (value) {
+                        context
+                            .read<AdminStaffBloc>()
+                            .add(SearchStaffUsersLocally(value));
+                        setState(() {});
+                      },
+                      onClear: _searchController.text.trim().isEmpty
+                          ? null
+                          : _clearSearch,
+                    ),
+                    const SizedBox(height: 16),
+                    if (state.actionLoading)
+                      const Padding(
+                        padding: EdgeInsets.only(bottom: 12),
+                        child: LinearProgressIndicator(),
                       ),
-                    ),
-                ],
+                    if (state.loading && state.allStaffUsers.isEmpty)
+                      const Padding(
+                        padding: EdgeInsets.only(top: 120),
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else if (state.visibleStaffUsers.isEmpty)
+                      _EmptyState(
+                        title: l10n.noData,
+                        subtitle: l10n.noStaffHint,
+                      )
+                    else
+                      ...state.visibleStaffUsers.map(
+                        (user) => _StaffCard(
+                          user: user,
+                          onRemove: () => _confirmRemoveRole(user),
+                        ),
+                      ),
+                  ],
+                ),
               ),
             ),
           ),

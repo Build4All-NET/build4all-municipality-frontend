@@ -16,6 +16,16 @@ import 'package:baladiyati/features/auth/data/services/auth_api_service.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/core/utils/responsive.dart';
+
+// Dashboard grid layout per window size (see AppBreakpoints).
+const int _statColumnsCompact = 2;
+const int _statColumnsMedium = 3;
+const int _statColumnsExpanded = 6; // all six stats in one row on desktop
+const double _statAspectRatio = 1.72;
+const double _actionAspectRatioCompact = 1.12;
+const double _actionAspectRatioWide = 1.6;
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -321,167 +331,176 @@ class _DashboardPageState extends State<DashboardPage> {
                 stats.employeesCount < 0 &&
                 stats.requestsCount < 0;
 
-            return SingleChildScrollView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (hasNetworkError)
-                    Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 14,
-                        vertical: 10,
-                      ),
-                      decoration: BoxDecoration(
-                        color: colors.errorContainer,
-                        borderRadius: BorderRadius.circular(14),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            Icons.wifi_off,
-                            color: colors.onErrorContainer,
-                            size: 18,
-                          ),
-                          const SizedBox(width: 8),
-                          Expanded(
-                            child: Text(
-                              loc.networkErrorBanner,
-                              style: theme.textTheme.bodySmall?.copyWith(
-                                color: colors.onErrorContainer,
+            return ResponsiveCenter(
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (hasNetworkError)
+                      Container(
+                        margin: const EdgeInsets.only(bottom: 12),
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 10,
+                        ),
+                        decoration: BoxDecoration(
+                          color: colors.errorContainer,
+                          borderRadius: BorderRadius.circular(14),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(
+                              Icons.wifi_off,
+                              color: colors.onErrorContainer,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 8),
+                            Expanded(
+                              child: Text(
+                                loc.networkErrorBanner,
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  color: colors.onErrorContainer,
+                                ),
                               ),
                             ),
-                          ),
-                        ],
+                          ],
+                        ),
+                      ),
+
+                    _WelcomeHeader(isLoading: isLoading),
+
+                    const SizedBox(height: 14),
+
+                    GridView.count(
+                      crossAxisCount: context.responsive(
+                        compact: _statColumnsCompact,
+                        medium: _statColumnsMedium,
+                        expanded: _statColumnsExpanded,
+                      ),
+                      shrinkWrap: true,
+                      crossAxisSpacing: 8,
+                      mainAxisSpacing: 8,
+                      physics: const NeverScrollableScrollPhysics(),
+                      childAspectRatio: _statAspectRatio,
+                      children: [
+                        _StatCard(
+                          title: loc.announcements,
+                          value: isLoading
+                              ? '...'
+                              : _formatCount(stats.announcementsCount),
+                          icon: Icons.campaign_outlined,
+                          iconColor: colors.primary,
+                        ),
+                        _StatCard(
+                          title: loc.violations,
+                          value: isLoading
+                              ? '...'
+                              : _formatCount(stats.violationsCount),
+                          icon: Icons.gavel_outlined,
+                          iconColor: colors.error,
+                        ),
+                        _StatCard(
+                          title: loc.departments,
+                          value: isLoading
+                              ? '...'
+                              : _formatCount(stats.departmentsCount),
+                          icon: Icons.account_tree_outlined,
+                          iconColor: colors.tertiary,
+                        ),
+                        _StatCard(
+                          title: loc.services,
+                          value:
+                              isLoading ? '...' : _formatCount(stats.servicesCount),
+                          icon: Icons.description_outlined,
+                          iconColor: colors.secondary,
+                        ),
+                        _StatCard(
+                          title: loc.employees,
+                          value:
+                              isLoading ? '...' : _formatCount(stats.employeesCount),
+                          icon: Icons.groups_outlined,
+                          iconColor: colors.primary,
+                        ),
+                        _StatCard(
+                          title: loc.requestsCount,
+                          value:
+                              isLoading ? '...' : _formatCount(stats.requestsCount),
+                          icon: Icons.inbox_outlined,
+                          iconColor: colors.outline,
+                        ),
+                      ],
+                    ),
+
+                    const SizedBox(height: 22),
+
+                    Text(
+                      loc.quickActions,
+                      style: theme.textTheme.titleLarge?.copyWith(
+                        fontWeight: FontWeight.w900,
                       ),
                     ),
 
-                  _WelcomeHeader(isLoading: isLoading),
+                    const SizedBox(height: 12),
 
-                  const SizedBox(height: 14),
-
-                  GridView.count(
-                    crossAxisCount: 2,
-                    shrinkWrap: true,
-                    crossAxisSpacing: 8,
-                    mainAxisSpacing: 8,
-                    physics: const NeverScrollableScrollPhysics(),
-                    childAspectRatio: 1.72,
-                    children: [
-                      _StatCard(
-                        title: loc.announcements,
-                        value: isLoading
-                            ? '...'
-                            : _formatCount(stats.announcementsCount),
-                        icon: Icons.campaign_outlined,
-                        iconColor: colors.primary,
+                    GridView.count(
+                      crossAxisCount: context.gridColumns,
+                      shrinkWrap: true,
+                      crossAxisSpacing: 12,
+                      mainAxisSpacing: 12,
+                      physics: const NeverScrollableScrollPhysics(),
+                      childAspectRatio: context.responsive(
+                        compact: _actionAspectRatioCompact,
+                        medium: _actionAspectRatioWide,
                       ),
-                      _StatCard(
-                        title: loc.violations,
-                        value: isLoading
-                            ? '...'
-                            : _formatCount(stats.violationsCount),
-                        icon: Icons.gavel_outlined,
-                        iconColor: colors.error,
-                      ),
-                      _StatCard(
-                        title: loc.departments,
-                        value: isLoading
-                            ? '...'
-                            : _formatCount(stats.departmentsCount),
-                        icon: Icons.account_tree_outlined,
-                        iconColor: colors.tertiary,
-                      ),
-                      _StatCard(
-                        title: loc.services,
-                        value:
-                            isLoading ? '...' : _formatCount(stats.servicesCount),
-                        icon: Icons.description_outlined,
-                        iconColor: colors.secondary,
-                      ),
-                      _StatCard(
-                        title: loc.employees,
-                        value:
-                            isLoading ? '...' : _formatCount(stats.employeesCount),
-                        icon: Icons.groups_outlined,
-                        iconColor: colors.primary,
-                      ),
-                      _StatCard(
-                        title: loc.requestsCount,
-                        value:
-                            isLoading ? '...' : _formatCount(stats.requestsCount),
-                        icon: Icons.inbox_outlined,
-                        iconColor: colors.outline,
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 22),
-
-                  Text(
-                    loc.quickActions,
-                    style: theme.textTheme.titleLarge?.copyWith(
-                      fontWeight: FontWeight.w900,
+                      children: [
+                        _ActionCard(
+                          title: loc.announcements,
+                          icon: Icons.campaign_outlined,
+                          iconColor: colors.primary,
+                          onTap: _openAnnouncements,
+                        ),
+                        _ActionCard(
+                          title: loc.violations,
+                          icon: Icons.gavel_outlined,
+                          iconColor: colors.error,
+                          onTap: _openViolations,
+                        ),
+                        _ActionCard(
+                          title: loc.services,
+                          icon: Icons.description_outlined,
+                          iconColor: colors.secondary,
+                          onTap: _openServices,
+                        ),
+                        _ActionCard(
+                          title: loc.inbox,
+                          icon: Icons.inbox_outlined,
+                          iconColor: colors.primary,
+                          onTap: _openInbox,
+                        ),
+                        _ActionCard(
+                          title: loc.departments,
+                          icon: Icons.account_tree_outlined,
+                          iconColor: colors.tertiary,
+                          onTap: _openDepartments,
+                        ),
+                        _ActionCard(
+                          title: loc.employees,
+                          icon: Icons.badge_outlined,
+                          iconColor: colors.primary,
+                          onTap: _openEmployees,
+                        ),
+                        _ActionCard(
+                          title: loc.certificate,
+                          icon: Icons.verified_outlined,
+                          iconColor: colors.primary,
+                          onTap: _openCertificates,
+                        ),
+                      ],
                     ),
-                  ),
-
-                  const SizedBox(height: 12),
-
-                  GridView.count(
-                    crossAxisCount: 2,
-                    shrinkWrap: true,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                    physics: const NeverScrollableScrollPhysics(),
-                    childAspectRatio: 1.12,
-                    children: [
-                      _ActionCard(
-                        title: loc.announcements,
-                        icon: Icons.campaign_outlined,
-                        iconColor: colors.primary,
-                        onTap: _openAnnouncements,
-                      ),
-                      _ActionCard(
-                        title: loc.violations,
-                        icon: Icons.gavel_outlined,
-                        iconColor: colors.error,
-                        onTap: _openViolations,
-                      ),
-                      _ActionCard(
-                        title: loc.services,
-                        icon: Icons.description_outlined,
-                        iconColor: colors.secondary,
-                        onTap: _openServices,
-                      ),
-                      _ActionCard(
-                        title: loc.inbox,
-                        icon: Icons.inbox_outlined,
-                        iconColor: colors.primary,
-                        onTap: _openInbox,
-                      ),
-                      _ActionCard(
-                        title: loc.departments,
-                        icon: Icons.account_tree_outlined,
-                        iconColor: colors.tertiary,
-                        onTap: _openDepartments,
-                      ),
-                      _ActionCard(
-                        title: loc.employees,
-                        icon: Icons.badge_outlined,
-                        iconColor: colors.primary,
-                        onTap: _openEmployees,
-                      ),
-                      _ActionCard(
-                        title: loc.certificate,
-                        icon: Icons.verified_outlined,
-                        iconColor: colors.primary,
-                        onTap: _openCertificates,
-                      ),
-                    ],
-                  ),
-                ],
+                  ],
+                ),
               ),
             );
           },

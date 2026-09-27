@@ -29,7 +29,7 @@ class ResponsiveCenter extends StatelessWidget {
   const ResponsiveCenter.form({super.key, required this.child, this.alignment = Alignment.topCenter})
       : maxWidth = AppLayout.maxWidthForm;
 
-  /// Detail pages, chat, settings.
+  /// Single-column content: lists, details, chat, profile.
   const ResponsiveCenter.detail({super.key, required this.child, this.alignment = Alignment.topCenter})
       : maxWidth = AppLayout.maxWidthDetail;
 
