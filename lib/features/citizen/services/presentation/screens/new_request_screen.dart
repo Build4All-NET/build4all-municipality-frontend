@@ -14,6 +14,7 @@ import 'package:baladiyati/features/citizen/services/data/services/request_servi
 import 'package:baladiyati/features/citizen/services/data/services/file_upload_service.dart';
 import 'package:baladiyati/features/citizen/services/domain/entities/service_entity.dart';
 import 'map_picker_screen.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class NewRequestScreen extends StatefulWidget {
   final ServiceEntity service;
@@ -388,212 +389,214 @@ class _NewRequestScreenState extends State<NewRequestScreen> {
           ],
         ),
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Form(
-          key: _formKey,
-          child: Column(
-            children: [
-              // Service info card
-              if (s.slaDays != null || s.hasFees)
+      body: ResponsiveCenter.form(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              children: [
+                // Service info card
+                if (s.slaDays != null || s.hasFees)
+                  _InfoCard(
+                    title: loc.serviceInfo,
+                    theme: theme,
+                    colors: colors,
+                    child: Column(
+                      children: [
+                        if (s.hasFees)
+                          _InfoRow(
+                            label: loc.feeLabel,
+                            value: s.feeAmount != null
+                                ? s.feeAmount!.toStringAsFixed(0)
+                                : loc.free,
+                            theme: theme,
+                            colors: colors,
+                          ),
+                        if (s.hasFees && s.slaDays != null)
+                          const SizedBox(height: 8),
+                        if (s.slaDays != null)
+                          _InfoRow(
+                            label: loc.processingTime,
+                            value: '${s.slaDays} ${loc.days}',
+                            theme: theme,
+                            colors: colors,
+                          ),
+                      ],
+                    ),
+                  ),
+                if (s.slaDays != null || s.hasFees) const SizedBox(height: 12),
+
+                // Request details card
                 _InfoCard(
-                  title: loc.serviceInfo,
+                  title: loc.requestDetails,
                   theme: theme,
                   colors: colors,
                   child: Column(
                     children: [
-                      if (s.hasFees)
-                        _InfoRow(
-                          label: loc.feeLabel,
-                          value: s.feeAmount != null
-                              ? s.feeAmount!.toStringAsFixed(0)
-                              : loc.free,
-                          theme: theme,
-                          colors: colors,
-                        ),
-                      if (s.hasFees && s.slaDays != null)
-                        const SizedBox(height: 8),
-                      if (s.slaDays != null)
-                        _InfoRow(
-                          label: loc.processingTime,
-                          value: '${s.slaDays} ${loc.days}',
-                          theme: theme,
-                          colors: colors,
-                        ),
+                      AppTextField(
+                        controller: _titleCtrl,
+                        label: loc.titleLabel,
+                        hint: loc.titleHint,
+                        validator: (v) =>
+                            (v == null || v.trim().isEmpty)
+                                ? loc.fieldRequired
+                                : null,
+                      ),
+                      const SizedBox(height: 12),
+                      AppTextField(
+                        controller: _descCtrl,
+                        label: loc.descriptionLabel,
+                        hint: loc.descriptionHint,
+                        maxLines: 4,
+                        validator: (v) =>
+                            (v == null || v.trim().isEmpty)
+                                ? loc.fieldRequired
+                                : null,
+                      ),
+                      const SizedBox(height: 12),
+                      _LocationPickerCard(
+                        geoLat: _geoLat,
+                        geoLng: _geoLng,
+                        locationName: _locationName,
+                        gettingLocation: _gettingLocation,
+                        showError: _showLocationError,
+                        onGetLocation: _getCurrentLocation,
+                        onOpenMap: _openMapPicker,
+                        onClear: () => setState(() {
+                          _geoLat = null;
+                          _geoLng = null;
+                          _locationName = null;
+                        }),
+                        loc: loc,
+                        theme: theme,
+                        colors: colors,
+                      ),
                     ],
                   ),
                 ),
-              if (s.slaDays != null || s.hasFees) const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-              // Request details card
-              _InfoCard(
-                title: loc.requestDetails,
-                theme: theme,
-                colors: colors,
-                child: Column(
-                  children: [
-                    AppTextField(
-                      controller: _titleCtrl,
-                      label: loc.titleLabel,
-                      hint: loc.titleHint,
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty)
-                              ? loc.fieldRequired
-                              : null,
-                    ),
-                    const SizedBox(height: 12),
-                    AppTextField(
-                      controller: _descCtrl,
-                      label: loc.descriptionLabel,
-                      hint: loc.descriptionHint,
-                      maxLines: 4,
-                      validator: (v) =>
-                          (v == null || v.trim().isEmpty)
-                              ? loc.fieldRequired
-                              : null,
-                    ),
-                    const SizedBox(height: 12),
-                    _LocationPickerCard(
-                      geoLat: _geoLat,
-                      geoLng: _geoLng,
-                      locationName: _locationName,
-                      gettingLocation: _gettingLocation,
-                      showError: _showLocationError,
-                      onGetLocation: _getCurrentLocation,
-                      onOpenMap: _openMapPicker,
-                      onClear: () => setState(() {
-                        _geoLat = null;
-                        _geoLng = null;
-                        _locationName = null;
-                      }),
-                      loc: loc,
-                      theme: theme,
-                      colors: colors,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 12),
-
-              // Attachments card
-              _InfoCard(
-                title: loc.requiredAttachments,
-                theme: theme,
-                colors: colors,
-                child: Column(
-                  children: [
-                    if (_selectedFiles.isNotEmpty) ...[
-                      ListView.builder(
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemCount: _selectedFiles.length,
-                        itemBuilder: (_, i) => Container(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          padding: const EdgeInsets.all(10),
-                          decoration: BoxDecoration(
-                            color: colors.surfaceContainerHighest,
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          child: Row(
-                            children: [
-                              GestureDetector(
-                                onTap: () => _removeFile(i),
-                                child: Icon(Icons.close,
-                                    color: colors.error, size: 20),
-                              ),
-                              const SizedBox(width: 8),
-                              Expanded(
-                                child: Text(
-                                  _selectedFileNames[i],
-                                  style: theme.textTheme.bodySmall,
-                                  overflow: TextOverflow.ellipsis,
+                // Attachments card
+                _InfoCard(
+                  title: loc.requiredAttachments,
+                  theme: theme,
+                  colors: colors,
+                  child: Column(
+                    children: [
+                      if (_selectedFiles.isNotEmpty) ...[
+                        ListView.builder(
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: _selectedFiles.length,
+                          itemBuilder: (_, i) => Container(
+                            margin: const EdgeInsets.only(bottom: 8),
+                            padding: const EdgeInsets.all(10),
+                            decoration: BoxDecoration(
+                              color: colors.surfaceContainerHighest,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () => _removeFile(i),
+                                  child: Icon(Icons.close,
+                                      color: colors.error, size: 20),
                                 ),
+                                const SizedBox(width: 8),
+                                Expanded(
+                                  child: Text(
+                                    _selectedFileNames[i],
+                                    style: theme.textTheme.bodySmall,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                ),
+                                const SizedBox(width: 8),
+                                SizedBox(
+                                  width: 60,
+                                  height: 60,
+                                  child: _fileIcon(_selectedFileNames[i]),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 12),
+                      ],
+
+                      GestureDetector(
+                        onTap: _isLoading ? null : _pickFiles,
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            border: Border.all(
+                                color: colors.outline.withOpacity(0.3)),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: Column(
+                            children: [
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(Icons.upload_outlined,
+                                      size: 28, color: colors.outline),
+                                  const SizedBox(width: 8),
+                                  Icon(Icons.camera_alt_outlined,
+                                      size: 28, color: colors.outline),
+                                  const SizedBox(width: 8),
+                                  Icon(Icons.picture_as_pdf_outlined,
+                                      size: 28, color: colors.outline),
+                                ],
                               ),
-                              const SizedBox(width: 8),
-                              SizedBox(
-                                width: 60,
-                                height: 60,
-                                child: _fileIcon(_selectedFileNames[i]),
+                              const SizedBox(height: 8),
+                              Text(
+                                _selectedFiles.isEmpty
+                                    ? loc.tapToUpload
+                                    : '${_selectedFiles.length} ${loc.filesSelected}',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  fontWeight: FontWeight.w500,
+                                  color: _selectedFiles.isEmpty
+                                      ? colors.onSurface
+                                      : colors.primary,
+                                ),
                               ),
                             ],
                           ),
                         ),
                       ),
-                      const SizedBox(height: 12),
-                    ],
 
-                    GestureDetector(
-                      onTap: _isLoading ? null : _pickFiles,
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                              color: colors.outline.withOpacity(0.3)),
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                        child: Column(
+                      if (_isUploading) ...[
+                        const SizedBox(height: 12),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Icon(Icons.upload_outlined,
-                                    size: 28, color: colors.outline),
-                                const SizedBox(width: 8),
-                                Icon(Icons.camera_alt_outlined,
-                                    size: 28, color: colors.outline),
-                                const SizedBox(width: 8),
-                                Icon(Icons.picture_as_pdf_outlined,
-                                    size: 28, color: colors.outline),
-                              ],
+                            const SizedBox(
+                              width: 16,
+                              height: 16,
+                              child: CircularProgressIndicator(strokeWidth: 2),
                             ),
-                            const SizedBox(height: 8),
-                            Text(
-                              _selectedFiles.isEmpty
-                                  ? loc.tapToUpload
-                                  : '${_selectedFiles.length} ${loc.filesSelected}',
-                              style: theme.textTheme.bodyMedium?.copyWith(
-                                fontWeight: FontWeight.w500,
-                                color: _selectedFiles.isEmpty
-                                    ? colors.onSurface
-                                    : colors.primary,
-                              ),
-                            ),
+                            const SizedBox(width: 8),
+                            Text(loc.uploadingFiles,
+                                style: theme.textTheme.bodySmall
+                                    ?.copyWith(color: colors.outline)),
                           ],
                         ),
-                      ),
-                    ),
-
-                    if (_isUploading) ...[
-                      const SizedBox(height: 12),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const SizedBox(
-                            width: 16,
-                            height: 16,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                          const SizedBox(width: 8),
-                          Text(loc.uploadingFiles,
-                              style: theme.textTheme.bodySmall
-                                  ?.copyWith(color: colors.outline)),
-                        ],
-                      ),
+                      ],
                     ],
-                  ],
+                  ),
                 ),
-              ),
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-              PrimaryButton(
-                label: loc.submitRequest,
-                onPressed: _submit,
-                isLoading: _isLoading,
-              ),
+                PrimaryButton(
+                  label: loc.submitRequest,
+                  onPressed: _submit,
+                  isLoading: _isLoading,
+                ),
 
-              const SizedBox(height: 24),
-            ],
+                const SizedBox(height: 24),
+              ],
+            ),
           ),
         ),
       ),

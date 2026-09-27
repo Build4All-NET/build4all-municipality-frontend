@@ -10,6 +10,7 @@ import 'package:baladiyati/features/citizen/notifications/data/repositories/noti
 import 'package:baladiyati/features/citizen/notifications/domain/usecases/get_my_notifications.dart';
 import 'package:baladiyati/features/citizen/notifications/domain/usecases/mark_notification_read.dart';
 import 'package:baladiyati/features/citizen/notifications/domain/usecases/mark_all_notifications_read.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class NotificationsScreen extends StatelessWidget {
   const NotificationsScreen({super.key});
@@ -32,41 +33,43 @@ class NotificationsScreen extends StatelessWidget {
         builder: (context, state) {
           return Scaffold(
             backgroundColor: const Color(0xFFF3F4F6),
-            body: SafeArea(
-              child: Column(
-                children: [
-                  _buildHeader(context, state),
-                  if (state.isLoading && state.notifications.isEmpty)
-                    const Expanded(
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  else if (state.errorMessage != null &&
-                      state.notifications.isEmpty)
-                    _buildError(context)
-                  else if (state.notifications.isEmpty)
-                    _buildEmpty(context)
-                  else
-                    Expanded(
-                      child: RefreshIndicator(
-                        onRefresh: () async => context
-                            .read<NotificationsBloc>()
-                            .add(NotificationsRefreshRequested()),
-                        child: ListView.builder(
-                          padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
-                          itemCount: state.notifications.length,
-                          itemBuilder: (_, i) => _NotifCard(
-                            item: state.notifications[i],
-                            onTap: state.notifications[i].isRead
-                                ? null
-                                : () => context
-                                    .read<NotificationsBloc>()
-                                    .add(NotificationMarkReadRequested(
-                                        state.notifications[i].id)),
+            body: ResponsiveCenter.detail(
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    _buildHeader(context, state),
+                    if (state.isLoading && state.notifications.isEmpty)
+                      const Expanded(
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else if (state.errorMessage != null &&
+                        state.notifications.isEmpty)
+                      _buildError(context)
+                    else if (state.notifications.isEmpty)
+                      _buildEmpty(context)
+                    else
+                      Expanded(
+                        child: RefreshIndicator(
+                          onRefresh: () async => context
+                              .read<NotificationsBloc>()
+                              .add(NotificationsRefreshRequested()),
+                          child: ListView.builder(
+                            padding: const EdgeInsets.fromLTRB(16, 8, 16, 16),
+                            itemCount: state.notifications.length,
+                            itemBuilder: (_, i) => _NotifCard(
+                              item: state.notifications[i],
+                              onTap: state.notifications[i].isRead
+                                  ? null
+                                  : () => context
+                                      .read<NotificationsBloc>()
+                                      .add(NotificationMarkReadRequested(
+                                          state.notifications[i].id)),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           );

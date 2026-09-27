@@ -5,6 +5,7 @@ import 'package:baladiyati/features/citizen/ai_chat/data/services/ai_chat_servic
 import 'package:baladiyati/l10n/app_localizations.dart';
 import '../cubit/ai_chat_cubit.dart';
 import '../cubit/ai_chat_state.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class AiChatScreen extends StatelessWidget {
   const AiChatScreen({super.key});
@@ -102,51 +103,53 @@ class _AiChatViewState extends State<_AiChatView> {
           ),
         ],
       ),
-      body: Column(
-        children: [
-          Expanded(
-            child: BlocConsumer<AiChatCubit, AiChatState>(
-              listener: (context, state) {
-                if (state.status == AiChatStatus.error && state.error != null) {
-                  AppToast.show(context, message: loc.aiChatError, type: AppToastType.error);
-                }
-                if (state.messages.isNotEmpty) _scrollToBottom();
-              },
-              builder: (context, state) {
-                final messages = state.messages;
+      body: ResponsiveCenter.detail(
+        child: Column(
+          children: [
+            Expanded(
+              child: BlocConsumer<AiChatCubit, AiChatState>(
+                listener: (context, state) {
+                  if (state.status == AiChatStatus.error && state.error != null) {
+                    AppToast.show(context, message: loc.aiChatError, type: AppToastType.error);
+                  }
+                  if (state.messages.isNotEmpty) _scrollToBottom();
+                },
+                builder: (context, state) {
+                  final messages = state.messages;
 
-                if (messages.isEmpty) {
-                  return _EmptyState(loc: loc, colors: colors, theme: theme);
-                }
+                  if (messages.isEmpty) {
+                    return _EmptyState(loc: loc, colors: colors, theme: theme);
+                  }
 
-                return ListView.builder(
-                  controller: _scrollController,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  itemCount: messages.length + (state.status == AiChatStatus.sending ? 1 : 0),
-                  itemBuilder: (context, index) {
-                    if (index == messages.length) {
-                      return _TypingIndicator(colors: colors, loc: loc);
-                    }
-                    final msg = messages[index];
-                    return _ChatBubble(
-                      message: msg,
-                      colors: colors,
-                      theme: theme,
-                      isRtl: isRtl,
-                    );
-                  },
-                );
-              },
+                  return ListView.builder(
+                    controller: _scrollController,
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    itemCount: messages.length + (state.status == AiChatStatus.sending ? 1 : 0),
+                    itemBuilder: (context, index) {
+                      if (index == messages.length) {
+                        return _TypingIndicator(colors: colors, loc: loc);
+                      }
+                      final msg = messages[index];
+                      return _ChatBubble(
+                        message: msg,
+                        colors: colors,
+                        theme: theme,
+                        isRtl: isRtl,
+                      );
+                    },
+                  );
+                },
+              ),
             ),
-          ),
-          _InputBar(
-            controller: _controller,
-            loc: loc,
-            colors: colors,
-            theme: theme,
-            onSend: () => _send(context),
-          ),
-        ],
+            _InputBar(
+              controller: _controller,
+              loc: loc,
+              colors: colors,
+              theme: theme,
+              onSend: () => _send(context),
+            ),
+          ],
+        ),
       ),
     );
   }

@@ -2,6 +2,12 @@
 
 import 'package:flutter/material.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:baladiyati/core/config/app_breakpoints.dart';
+import 'package:baladiyati/core/utils/responsive.dart';
+
+// Tile width/height ratio: wider tiles on web / tablet so the row stays compact.
+const double _tileAspectRatioCompact = 1.3;
+const double _tileAspectRatioWide = 1.8;
 
 class _CategoryData {
   final String name;
@@ -63,12 +69,19 @@ class ServiceCategoriesSection extends StatelessWidget {
         const SizedBox(height: 12),
 
         GridView.count(
-          crossAxisCount: 2,
+          // All categories fit in one row on web / tablet.
+          crossAxisCount: context.responsive(
+            compact: AppLayout.gridColumnsCompact,
+            medium: AppLayout.gridColumnsExpanded,
+          ),
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
           crossAxisSpacing: 12,
           mainAxisSpacing: 12,
-          childAspectRatio: 1.3,
+          childAspectRatio: context.responsive(
+            compact: _tileAspectRatioCompact,
+            medium: _tileAspectRatioWide,
+          ),
           children: categories.map((category) {
             return GestureDetector(
               onTap: onCategoryTap,

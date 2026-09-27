@@ -9,6 +9,7 @@ import 'package:baladiyati/features/citizen/requests/presentation/bloc/requests_
 import 'package:baladiyati/features/citizen/requests/presentation/bloc/requests_state.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'request_details_screen.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class RequestsScreen extends StatefulWidget {
   const RequestsScreen({super.key});
@@ -89,97 +90,99 @@ class _RequestsScreenState extends State<RequestsScreen> {
 
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          body: SafeArea(
-            child: Column(
-              children: [
-                // Header
-                Container(
-                  color: colors.surface,
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        loc.myRequests,
-                        style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900),
-                      ),
-                      const SizedBox(height: 12),
-                      AppSearchField(
-                        controller: _searchCtrl,
-                        hint: loc.searchRequest,
-                        onChanged: (v) => setState(() => _query = v),
-                        onClear: _query.isEmpty
-                            ? null
-                            : () {
-                                _searchCtrl.clear();
-                                setState(() => _query = '');
-                              },
-                      ),
-                      const SizedBox(height: 10),
-                      // Status filter
-                      Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: colors.surfaceContainerHighest,
-                          borderRadius: BorderRadius.circular(10),
+          body: ResponsiveCenter.detail(
+            child: SafeArea(
+              child: Column(
+                children: [
+                  // Header
+                  Container(
+                    color: colors.surface,
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          loc.myRequests,
+                          style: theme.textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.w900),
                         ),
-                        child: DropdownButtonHideUnderline(
-                          child: DropdownButton<String?>(
-                            value: _filterStatus,
-                            isExpanded: true,
-                            hint: Text(loc.filterAll),
-                            items: [
-                              DropdownMenuItem<String?>(value: null, child: Text(loc.filterAll)),
-                              ..._allStatuses.map((s) => DropdownMenuItem<String?>(
-                                    value: s,
-                                    child: Text(_statusLabel(loc, s)),
-                                  )),
-                            ],
-                            onChanged: (v) => setState(() => _filterStatus = v),
+                        const SizedBox(height: 12),
+                        AppSearchField(
+                          controller: _searchCtrl,
+                          hint: loc.searchRequest,
+                          onChanged: (v) => setState(() => _query = v),
+                          onClear: _query.isEmpty
+                              ? null
+                              : () {
+                                  _searchCtrl.clear();
+                                  setState(() => _query = '');
+                                },
+                        ),
+                        const SizedBox(height: 10),
+                        // Status filter
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: colors.surfaceContainerHighest,
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                          child: DropdownButtonHideUnderline(
+                            child: DropdownButton<String?>(
+                              value: _filterStatus,
+                              isExpanded: true,
+                              hint: Text(loc.filterAll),
+                              items: [
+                                DropdownMenuItem<String?>(value: null, child: Text(loc.filterAll)),
+                                ..._allStatuses.map((s) => DropdownMenuItem<String?>(
+                                      value: s,
+                                      child: Text(_statusLabel(loc, s)),
+                                    )),
+                              ],
+                              onChanged: (v) => setState(() => _filterStatus = v),
+                            ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
 
-                // List
-                Expanded(
-                  child: state.isLoading
-                      ? const _RequestsSkeleton()
-                      : items.isEmpty
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.description_outlined, size: 64, color: colors.outline),
-                                  const SizedBox(height: 12),
-                                  Text(loc.noRequests,
-                                      style: theme.textTheme.bodyLarge?.copyWith(color: colors.outline)),
-                                ],
-                              ),
-                            )
-                          : RefreshIndicator(
-                              onRefresh: () async =>
-                                  context.read<RequestsBloc>().add(RequestsRefreshRequested()),
-                              child: ListView.builder(
-                                padding: const EdgeInsets.all(16),
-                                itemCount: items.length,
-                                itemBuilder: (_, i) => _RequestCard(
-                                  request: items[i],
-                                  loc: loc,
-                                  theme: theme,
-                                  onTap: () => Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (_) => RequestDetailsScreen(request: items[i]),
+                  // List
+                  Expanded(
+                    child: state.isLoading
+                        ? const _RequestsSkeleton()
+                        : items.isEmpty
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.description_outlined, size: 64, color: colors.outline),
+                                    const SizedBox(height: 12),
+                                    Text(loc.noRequests,
+                                        style: theme.textTheme.bodyLarge?.copyWith(color: colors.outline)),
+                                  ],
+                                ),
+                              )
+                            : RefreshIndicator(
+                                onRefresh: () async =>
+                                    context.read<RequestsBloc>().add(RequestsRefreshRequested()),
+                                child: ListView.builder(
+                                  padding: const EdgeInsets.all(16),
+                                  itemCount: items.length,
+                                  itemBuilder: (_, i) => _RequestCard(
+                                    request: items[i],
+                                    loc: loc,
+                                    theme: theme,
+                                    onTap: () => Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (_) => RequestDetailsScreen(request: items[i]),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         );

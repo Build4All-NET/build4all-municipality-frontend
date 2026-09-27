@@ -11,6 +11,7 @@ import 'package:baladiyati/features/citizen/services/presentation/bloc/services_
 import 'package:baladiyati/features/citizen/services/presentation/bloc/services_state.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'service_details_screen.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class ServicesScreen extends StatefulWidget {
   const ServicesScreen({super.key});
@@ -68,97 +69,99 @@ class _ServicesScreenState extends State<ServicesScreen> {
 
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          body: SafeArea(
-            child: Column(
-              children: [
-                Container(
-                  color: colors.surface,
-                  padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        loc.services,
-                        style: theme.textTheme.headlineSmall
-                            ?.copyWith(fontWeight: FontWeight.w900),
-                      ),
-                      const SizedBox(height: 12),
-                      AppSearchField(
-                        controller: _searchCtrl,
-                        hint: loc.search,
-                        onChanged: (v) => setState(() => _query = v),
-                        onClear: _query.isEmpty
-                            ? null
-                            : () {
-                                _searchCtrl.clear();
-                                setState(() => _query = '');
-                              },
-                      ),
-                    ],
+          body: ResponsiveCenter.detail(
+            child: SafeArea(
+              child: Column(
+                children: [
+                  Container(
+                    color: colors.surface,
+                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 12),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          loc.services,
+                          style: theme.textTheme.headlineSmall
+                              ?.copyWith(fontWeight: FontWeight.w900),
+                        ),
+                        const SizedBox(height: 12),
+                        AppSearchField(
+                          controller: _searchCtrl,
+                          hint: loc.search,
+                          onChanged: (v) => setState(() => _query = v),
+                          onClear: _query.isEmpty
+                              ? null
+                              : () {
+                                  _searchCtrl.clear();
+                                  setState(() => _query = '');
+                                },
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-                Expanded(
-                  child: state.isLoading
-                      ? const _ServicesSkeleton()
-                      : items.isEmpty
-                          ? Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(Icons.list_alt_outlined,
-                                      size: 64, color: colors.outline),
-                                  const SizedBox(height: 12),
-                                  Text(
-                                    state.errorMessage != null
-                                        ? loc.loadFailed
-                                        : loc.noData,
-                                    style: theme.textTheme.bodyLarge?.copyWith(
-                                        color: colors.outline),
-                                  ),
-                                  if (state.errorMessage != null) ...[
+                  Expanded(
+                    child: state.isLoading
+                        ? const _ServicesSkeleton()
+                        : items.isEmpty
+                            ? Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(Icons.list_alt_outlined,
+                                        size: 64, color: colors.outline),
                                     const SizedBox(height: 12),
-                                    TextButton(
-                                      onPressed: () => context
-                                          .read<CitizenServicesBloc>()
-                                          .add(CitizenServicesRefreshRequested()),
-                                      child: Text(loc.retry),
+                                    Text(
+                                      state.errorMessage != null
+                                          ? loc.loadFailed
+                                          : loc.noData,
+                                      style: theme.textTheme.bodyLarge?.copyWith(
+                                          color: colors.outline),
                                     ),
-                                  ],
-                                ],
-                              ),
-                            )
-                          : RefreshIndicator(
-                              onRefresh: () async => context
-                                  .read<CitizenServicesBloc>()
-                                  .add(CitizenServicesRefreshRequested()),
-                              child: ListView.builder(
-                                padding: const EdgeInsets.all(16),
-                                itemCount: items.length,
-                                itemBuilder: (_, i) => _ServiceCard(
-                                  service: items[i],
-                                  langCode: langCode,
-                                  theme: theme,
-                                  onTap: () async {
-                                    final submitted =
-                                        await Navigator.push<bool>(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (_) => ServiceDetailsScreen(
-                                            service: items[i]),
+                                    if (state.errorMessage != null) ...[
+                                      const SizedBox(height: 12),
+                                      TextButton(
+                                        onPressed: () => context
+                                            .read<CitizenServicesBloc>()
+                                            .add(CitizenServicesRefreshRequested()),
+                                        child: Text(loc.retry),
                                       ),
-                                    );
-                                    if (submitted == true &&
-                                        context.mounted) {
-                                      context
-                                          .read<RequestsBloc>()
-                                          .add(RequestsRefreshRequested());
-                                    }
-                                  },
+                                    ],
+                                  ],
+                                ),
+                              )
+                            : RefreshIndicator(
+                                onRefresh: () async => context
+                                    .read<CitizenServicesBloc>()
+                                    .add(CitizenServicesRefreshRequested()),
+                                child: ListView.builder(
+                                  padding: const EdgeInsets.all(16),
+                                  itemCount: items.length,
+                                  itemBuilder: (_, i) => _ServiceCard(
+                                    service: items[i],
+                                    langCode: langCode,
+                                    theme: theme,
+                                    onTap: () async {
+                                      final submitted =
+                                          await Navigator.push<bool>(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (_) => ServiceDetailsScreen(
+                                              service: items[i]),
+                                        ),
+                                      );
+                                      if (submitted == true &&
+                                          context.mounted) {
+                                        context
+                                            .read<RequestsBloc>()
+                                            .add(RequestsRefreshRequested());
+                                      }
+                                    },
+                                  ),
                                 ),
                               ),
-                            ),
-                ),
-              ],
+                  ),
+                ],
+              ),
             ),
           ),
         );
