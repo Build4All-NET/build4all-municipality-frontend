@@ -14,6 +14,7 @@ import 'package:baladiyati/features/admin/announcements/presentation/screens/cre
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class AnnouncementsPage extends StatelessWidget {
   const AnnouncementsPage({super.key});
@@ -179,79 +180,81 @@ class _AnnouncementsBodyState extends State<AnnouncementsBody> {
         icon: const Icon(Icons.add),
         label: Text(loc.newAnnouncement),
       ),
-      body: BlocConsumer<AnnouncementBloc, AnnouncementState>(
-        listener: (context, state) {
-          if (state is AnnouncementError) {
-            AppToast.show(
-              context,
-              message: state.message,
-              type: AppToastType.error,
-            );
-          }
-        },
-        builder: (context, state) {
-          if (state is AnnouncementLoading) {
-            return const Center(child: CircularProgressIndicator());
-          }
+      body: ResponsiveCenter.detail(
+        child: BlocConsumer<AnnouncementBloc, AnnouncementState>(
+          listener: (context, state) {
+            if (state is AnnouncementError) {
+              AppToast.show(
+                context,
+                message: state.message,
+                type: AppToastType.error,
+              );
+            }
+          },
+          builder: (context, state) {
+            if (state is AnnouncementLoading) {
+              return const Center(child: CircularProgressIndicator());
+            }
 
-          // Operation error (delete/update/create): keep list visible, toast shown in listener.
-          if (state is AnnouncementError && _cachedList == null) {
-            return _ErrorState(message: state.message, onRetry: _reload);
-          }
+            // Operation error (delete/update/create): keep list visible, toast shown in listener.
+            if (state is AnnouncementError && _cachedList == null) {
+              return _ErrorState(message: state.message, onRetry: _reload);
+            }
 
-          final announcements = state is AnnouncementLoaded
-              ? state.list
-              : _cachedList ?? [];
+            final announcements = state is AnnouncementLoaded
+                ? state.list
+                : _cachedList ?? [];
 
-          if (state is AnnouncementLoaded) {
-            _cachedList = state.list;
-          }
+            if (state is AnnouncementLoaded) {
+              _cachedList = state.list;
+            }
 
-          final filtered = _filter(announcements);
+            final filtered = _filter(announcements);
 
-          return RefreshIndicator(
-            onRefresh: () async => _reload(),
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
-              children: [
-                _SearchField(
-                  controller: _searchController,
-                  hint: loc.search,
-                  onChanged: (value) {
-                    setState(() {
-                      _query = value;
-                    });
-                  },
-                ),
-
-                const SizedBox(height: 14),
-
-                _SummaryStrip(
-                  total: announcements.length,
-                  shown: filtered.length,
-                ),
-
-                const SizedBox(height: 14),
-
-                if (filtered.isEmpty)
-                  _EmptyState(
-                    title: loc.noAnnouncements,
-                    subtitle: loc.noAnnouncementsHint,
-                  )
-                else
-                  ...filtered.map(
-                    (announcement) => _AnnouncementCard(
-                      announcement: announcement,
-                      createdAt: _formatDate(context, announcement.createdAt),
-                      onEdit: () => _openEditScreen(announcement),
-                      onDelete: () => _confirmDelete(announcement),
-                    ),
+            return RefreshIndicator(
+              onRefresh: () async => _reload(),
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
+                children: [
+                  _SearchField(
+                    controller: _searchController,
+                    hint: loc.search,
+                    onChanged: (value) {
+                      setState(() {
+                        _query = value;
+                      });
+                    },
                   ),
-              ],
-            ),
-          );
-        },
+
+                  const SizedBox(height: 14),
+
+                  _SummaryStrip(
+                    total: announcements.length,
+                    shown: filtered.length,
+                  ),
+
+                  const SizedBox(height: 14),
+
+                  if (filtered.isEmpty)
+                    _EmptyState(
+                      title: loc.noAnnouncements,
+                      subtitle: loc.noAnnouncementsHint,
+                    )
+                  else
+                    ...filtered.map(
+                      (announcement) => _AnnouncementCard(
+                        announcement: announcement,
+                        createdAt: _formatDate(context, announcement.createdAt),
+                        onEdit: () => _openEditScreen(announcement),
+                        onDelete: () => _confirmDelete(announcement),
+                      ),
+                    ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }

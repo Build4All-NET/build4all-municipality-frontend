@@ -19,6 +19,7 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class UserRegisterScreen extends StatefulWidget {
   const UserRegisterScreen({super.key});
@@ -143,139 +144,141 @@ class _UserRegisterScreenState extends State<UserRegisterScreen> {
 
     return Scaffold(
       backgroundColor: colors.background,
-      body: SafeArea(
-        child: Column(
-          children: [
-            const RegistrationStepIndicator(),
-            Expanded(
-              child: SingleChildScrollView(
-                padding: EdgeInsets.all(card.padding),
-                child: Form(
-                  key: _formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.end,
-                    children: [
-                      const SizedBox(height: 20),
+      body: ResponsiveCenter.auth(
+        child: SafeArea(
+          child: Column(
+            children: [
+              const RegistrationStepIndicator(),
+              Expanded(
+                child: SingleChildScrollView(
+                  padding: EdgeInsets.all(card.padding),
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        const SizedBox(height: 20),
 
-                      Center(
-                        child: Text(
-                          l10n.registerTitle,
-                          style: theme.textTheme.titleLarge?.copyWith(
-                            fontWeight: FontWeight.bold,
-                            color: cs.onSurface,
-                          ),
-                        ),
-                      ),
-
-                      const SizedBox(height: 20),
-
-                      AppTextField(
-                        controller: _emailCtrl,
-                        label: l10n.emailLabel,
-                        hint: l10n.emailHint,
-                        icon: Icons.email_outlined,
-                        keyboardType: TextInputType.emailAddress,
-                        textAlign: TextAlign.left,
-                        validator: (v) {
-                          final value = v?.trim() ?? '';
-
-                          if (value.isEmpty) {
-                            return l10n.fieldRequired;
-                          }
-
-                          final emailRegex = RegExp(
-                            r'^[^\s@]+@[^\s@]+\.[^\s@]+$',
-                          );
-
-                          if (!emailRegex.hasMatch(value)) {
-                            return l10n.invalidEmail;
-                          }
-
-                          return null;
-                        },
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      AppTextField(
-                        controller: _passwordCtrl,
-                        label: l10n.passwordLabel,
-                        hint: l10n.passwordHint,
-                        icon: Icons.lock_outline,
-                        obscureText: _obscurePassword,
-                        textAlign: TextAlign.left,
-                        suffixIcon: IconButton(
-                          onPressed: () {
-                            setState(() {
-                              _obscurePassword = !_obscurePassword;
-                            });
-                          },
-                          icon: Icon(
-                            _obscurePassword
-                                ? Icons.visibility_off_outlined
-                                : Icons.visibility_outlined,
-                            color: cs.primary,
-                          ),
-                        ),
-                        validator: (v) {
-                          final value = v?.trim() ?? '';
-
-                          if (value.isEmpty) {
-                            return l10n.fieldRequired;
-                          }
-
-                          if (value.length < 6) {
-                            return l10n.passwordTooShort;
-                          }
-
-                          return null;
-                        },
-                      ),
-
-                      const SizedBox(height: 24),
-
-                      PrimaryButton(
-                        label: l10n.registerButton,
-                        isLoading: _isLoading,
-                        onPressed: () {
-                          if (_isLoading) return;
-                          _onSubmit(l10n);
-                        },
-                      ),
-
-                      const SizedBox(height: 16),
-
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            l10n.alreadyHaveAccount,
-                            style: theme.textTheme.bodyMedium?.copyWith(
+                        Center(
+                          child: Text(
+                            l10n.registerTitle,
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.bold,
                               color: cs.onSurface,
                             ),
                           ),
-                          const SizedBox(width: 4),
-                          GestureDetector(
-                            onTap: () => Navigator.pop(context),
-                            child: Text(
-                              l10n.loginNow,
-                              style: TextStyle(
-                                color: cs.primary,
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
-                              ),
+                        ),
+
+                        const SizedBox(height: 20),
+
+                        AppTextField(
+                          controller: _emailCtrl,
+                          label: l10n.emailLabel,
+                          hint: l10n.emailHint,
+                          icon: Icons.email_outlined,
+                          keyboardType: TextInputType.emailAddress,
+                          textAlign: TextAlign.left,
+                          validator: (v) {
+                            final value = v?.trim() ?? '';
+
+                            if (value.isEmpty) {
+                              return l10n.fieldRequired;
+                            }
+
+                            final emailRegex = RegExp(
+                              r'^[^\s@]+@[^\s@]+\.[^\s@]+$',
+                            );
+
+                            if (!emailRegex.hasMatch(value)) {
+                              return l10n.invalidEmail;
+                            }
+
+                            return null;
+                          },
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        AppTextField(
+                          controller: _passwordCtrl,
+                          label: l10n.passwordLabel,
+                          hint: l10n.passwordHint,
+                          icon: Icons.lock_outline,
+                          obscureText: _obscurePassword,
+                          textAlign: TextAlign.left,
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                _obscurePassword = !_obscurePassword;
+                              });
+                            },
+                            icon: Icon(
+                              _obscurePassword
+                                  ? Icons.visibility_off_outlined
+                                  : Icons.visibility_outlined,
+                              color: cs.primary,
                             ),
                           ),
-                        ],
-                      ),
+                          validator: (v) {
+                            final value = v?.trim() ?? '';
 
-                      const SizedBox(height: 20),
-                    ],
+                            if (value.isEmpty) {
+                              return l10n.fieldRequired;
+                            }
+
+                            if (value.length < 6) {
+                              return l10n.passwordTooShort;
+                            }
+
+                            return null;
+                          },
+                        ),
+
+                        const SizedBox(height: 24),
+
+                        PrimaryButton(
+                          label: l10n.registerButton,
+                          isLoading: _isLoading,
+                          onPressed: () {
+                            if (_isLoading) return;
+                            _onSubmit(l10n);
+                          },
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              l10n.alreadyHaveAccount,
+                              style: theme.textTheme.bodyMedium?.copyWith(
+                                color: cs.onSurface,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            GestureDetector(
+                              onTap: () => Navigator.pop(context),
+                              child: Text(
+                                l10n.loginNow,
+                                style: TextStyle(
+                                  color: cs.primary,
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 20),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

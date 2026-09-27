@@ -7,6 +7,7 @@ import 'package:baladiyati/features/admin/Departement/presentation/screens/Add_D
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class DepartmentsScreen extends StatefulWidget {
   const DepartmentsScreen({super.key});
@@ -150,73 +151,75 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
             icon: const Icon(Icons.add),
             label: Text(loc.add),
           ),
-          body: RefreshIndicator(
-            onRefresh: () => _refresh(context),
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
-              children: [
-                _HeaderCard(
-                  title: loc.departments,
-                  subtitle: loc.manageDepartments,
-                  count: state.departments.length,
-                ),
-
-                const SizedBox(height: 16),
-
-                AppSearchField(
-                  controller: _searchController,
-                  hint: loc.search,
-                  onChanged: cubit.searchDepartments,
-                  onClear: _searchController.text.trim().isEmpty
-                      ? null
-                      : () => _clearSearch(context),
-                ),
-
-                const SizedBox(height: 12),
-
-                _FilterCard(
-                  selectedId: state.selectedId,
-                  departments: state.departments,
-                  onChanged: cubit.filterByDepartment,
-                ),
-
-                const SizedBox(height: 12),
-
-                _ResultSummary(
-                  shown: state.filtered.length,
-                  total: state.departments.length,
-                  hasSearch: state.searchQuery.trim().isNotEmpty,
-                  hasFilter: state.selectedId != null,
-                ),
-
-                const SizedBox(height: 16),
-
-                if (state.loading && state.departments.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 120),
-                    child: Center(child: CircularProgressIndicator()),
-                  )
-                else if (state.filtered.isEmpty)
-                  _EmptyState(
-                    title: loc.noData,
-                    subtitle: loc.noDepartmentsHint,
-                  )
-                else
-                  ...state.filtered.map(
-                    (dep) => _DepartmentCard(
-                      department: dep,
-                      isBusy: state.actionLoading,
-                      onEdit: () => _openDepartmentDialog(
-                        context,
-                        department: dep,
-                      ),
-                      onDelete: dep.isFixed
-                          ? null
-                          : () => _confirmDelete(context, dep),
-                    ),
+          body: ResponsiveCenter.detail(
+            child: RefreshIndicator(
+              onRefresh: () => _refresh(context),
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
+                children: [
+                  _HeaderCard(
+                    title: loc.departments,
+                    subtitle: loc.manageDepartments,
+                    count: state.departments.length,
                   ),
-              ],
+
+                  const SizedBox(height: 16),
+
+                  AppSearchField(
+                    controller: _searchController,
+                    hint: loc.search,
+                    onChanged: cubit.searchDepartments,
+                    onClear: _searchController.text.trim().isEmpty
+                        ? null
+                        : () => _clearSearch(context),
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  _FilterCard(
+                    selectedId: state.selectedId,
+                    departments: state.departments,
+                    onChanged: cubit.filterByDepartment,
+                  ),
+
+                  const SizedBox(height: 12),
+
+                  _ResultSummary(
+                    shown: state.filtered.length,
+                    total: state.departments.length,
+                    hasSearch: state.searchQuery.trim().isNotEmpty,
+                    hasFilter: state.selectedId != null,
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  if (state.loading && state.departments.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 120),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  else if (state.filtered.isEmpty)
+                    _EmptyState(
+                      title: loc.noData,
+                      subtitle: loc.noDepartmentsHint,
+                    )
+                  else
+                    ...state.filtered.map(
+                      (dep) => _DepartmentCard(
+                        department: dep,
+                        isBusy: state.actionLoading,
+                        onEdit: () => _openDepartmentDialog(
+                          context,
+                          department: dep,
+                        ),
+                        onDelete: dep.isFixed
+                            ? null
+                            : () => _confirmDelete(context, dep),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         );

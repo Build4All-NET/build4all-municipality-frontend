@@ -1,12 +1,13 @@
-import 'dart:io';
 
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/core/network/globals.dart' as globals;
 import 'package:flutter/material.dart';
+import 'package:baladiyati/core/utils/picked_file.dart';
 
 class PrivateProfileAvatar extends StatefulWidget {
   final String? imageUrl;
-  final File? localImage;
+  /// Image picked on the device but not uploaded yet (works on web too).
+  final PickedFileData? localImage;
   final String fallbackText;
   final double radius;
   final Color backgroundColor;
@@ -37,7 +38,7 @@ class _PrivateProfileAvatarState extends State<PrivateProfileAvatar> {
     super.didUpdateWidget(oldWidget);
 
     if (oldWidget.imageUrl != widget.imageUrl ||
-        oldWidget.localImage?.path != widget.localImage?.path) {
+        oldWidget.localImage != widget.localImage) {
       _failed = false;
       _primaryFailed = false;
     }
@@ -121,7 +122,7 @@ class _PrivateProfileAvatarState extends State<PrivateProfileAvatar> {
     ImageProvider? provider;
 
     if (widget.localImage != null) {
-      provider = FileImage(widget.localImage!);
+      provider = MemoryImage(widget.localImage!.bytes);
     } else {
       final resolved = _resolveUrl(widget.imageUrl);
       final fallback = _fallbackResolvedUrl;

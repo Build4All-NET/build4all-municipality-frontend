@@ -1,4 +1,5 @@
 import '../entities/profile_entity.dart';
+import 'package:baladiyati/core/utils/picked_file.dart';
 
 abstract class ProfileRepository {
   Future<ProfileEntity> getProfile();
@@ -8,7 +9,7 @@ abstract class ProfileRepository {
     required String lastName,
     required String username,
     required String email,
-    String? profileImagePath,
+    PickedFileData? profileImage,
     bool imageRemoved = false,
     required String phone,
     required String address,

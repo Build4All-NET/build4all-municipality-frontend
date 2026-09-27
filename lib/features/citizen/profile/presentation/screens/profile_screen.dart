@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:baladiyati/app/app_router.dart';
 import 'package:baladiyati/common/widgets/app_text_field.dart';
@@ -22,6 +21,8 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/core/utils/picked_file.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -40,7 +41,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   final _imagePicker = ImagePicker();
 
-  File? _selectedImage;
+  PickedFileData? _selectedImage;
   bool _imageRemoved = false;
   bool _isLoggingOut = false;
 
@@ -160,8 +161,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
       return;
     }
 
+    final image = await PickedFileData.fromXFile(picked);
+
     dialogSetState(() {
-      _selectedImage = File(picked.path);
+      _selectedImage = image;
       _imageRemoved = false;
     });
 
@@ -405,7 +408,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                   email: _emailCtrl.text.trim(),
                                   phone: _phoneCtrl.text.trim(),
                                   address: _addressCtrl.text.trim(),
-                                  profileImagePath: _selectedImage?.path,
+                                  profileImage: _selectedImage,
                                   imageRemoved: _imageRemoved,
                                 ),
                               );
@@ -465,57 +468,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         return Scaffold(
           backgroundColor: colors.background,
-          body: state.isLoading
-              ? Center(
-                  child: CircularProgressIndicator(color: colors.primary),
-                )
-              : RefreshIndicator(
-                  color: colors.primary,
-                  onRefresh: () async {
-                    context.read<ProfileBloc>().add(ProfileLoadRequested());
-                  },
-                  child: SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: Column(
-                      children: [
-                        _buildHeader(
-                          context: context,
-                          l10n: l10n,
-                          profile: profile,
-                        ),
-                        Padding(
-                          padding: EdgeInsets.all(card.padding),
-                          child: Column(
-                            children: [
-                              SizedBox(height: card.padding * 0.7),
-                              _buildProfileTabs(
-                                context: context,
-                                l10n: l10n,
-                                profile: profile,
-                              ),
-                              SizedBox(height: card.padding),
-                              _buildEditButton(
-                                context: context,
-                                l10n: l10n,
-                                state: state,
-                              ),
-                              SizedBox(height: card.padding),
-                              _buildLanguageCard(
-                                context: context,
-                                l10n: l10n,
-                                localeCubit: localeCubit,
-                                currentLang: currentLang,
-                              ),
-                              SizedBox(height: card.padding * 1.5),
-                              _buildLogoutButton(context, l10n),
-                              SizedBox(height: card.padding * 1.5),
-                            ],
+          body: ResponsiveCenter.detail(
+            child: state.isLoading
+                ? Center(
+                    child: CircularProgressIndicator(color: colors.primary),
+                  )
+                : RefreshIndicator(
+                    color: colors.primary,
+                    onRefresh: () async {
+                      context.read<ProfileBloc>().add(ProfileLoadRequested());
+                    },
+                    child: SingleChildScrollView(
+                      physics: const AlwaysScrollableScrollPhysics(),
+                      child: Column(
+                        children: [
+                          _buildHeader(
+                            context: context,
+                            l10n: l10n,
+                            profile: profile,
                           ),
-                        ),
-                      ],
+                          Padding(
+                            padding: EdgeInsets.all(card.padding),
+                            child: Column(
+                              children: [
+                                SizedBox(height: card.padding * 0.7),
+                                _buildProfileTabs(
+                                  context: context,
+                                  l10n: l10n,
+                                  profile: profile,
+                                ),
+                                SizedBox(height: card.padding),
+                                _buildEditButton(
+                                  context: context,
+                                  l10n: l10n,
+                                  state: state,
+                                ),
+                                SizedBox(height: card.padding),
+                                _buildLanguageCard(
+                                  context: context,
+                                  l10n: l10n,
+                                  localeCubit: localeCubit,
+                                  currentLang: currentLang,
+                                ),
+                                SizedBox(height: card.padding * 1.5),
+                                _buildLogoutButton(context, l10n),
+                                SizedBox(height: card.padding * 1.5),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ),
-                ),
+          ),
         );
       },
     );

@@ -8,6 +8,7 @@ import 'package:baladiyati/features/admin/manage_service/presentation/screens/Ad
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class ServicesScreen extends StatefulWidget {
   const ServicesScreen({super.key});
@@ -171,54 +172,56 @@ class _ServicesScreenState extends State<ServicesScreen> {
             icon: const Icon(Icons.add),
             label: Text(loc.add),
           ),
-          body: RefreshIndicator(
-            onRefresh: _refresh,
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
-              children: [
-                _HeaderCard(
-                  title: loc.services,
-                  subtitle: loc.manageServices,
-                  count: state.allServices.length,
-                ),
-
-                const SizedBox(height: 16),
-
-                AppSearchField(
-                  controller: _searchController,
-                  hint: loc.search,
-                  onChanged: (value) {
-                    context.read<ServiceBloc>().add(SearchServices(value));
-                    setState(() {});
-                  },
-                  onClear: _searchController.text.trim().isEmpty
-                      ? null
-                      : _clearSearch,
-                ),
-
-                const SizedBox(height: 16),
-
-                if (state.loading && state.allServices.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 120),
-                    child: Center(child: CircularProgressIndicator()),
-                  )
-                else if (state.visibleServices.isEmpty)
-                  _EmptyState(
-                    title: loc.noData,
-                    subtitle: loc.noServicesHint,
-                  )
-                else
-                  ...state.visibleServices.map(
-                    (service) => _ServiceCard(
-                      service: service,
-                      isBusy: state.actionLoading,
-                      onEdit: () => _openForm(service: service),
-                      onDelete: () => _confirmDelete(service),
-                    ),
+          body: ResponsiveCenter.detail(
+            child: RefreshIndicator(
+              onRefresh: _refresh,
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 96),
+                children: [
+                  _HeaderCard(
+                    title: loc.services,
+                    subtitle: loc.manageServices,
+                    count: state.allServices.length,
                   ),
-              ],
+
+                  const SizedBox(height: 16),
+
+                  AppSearchField(
+                    controller: _searchController,
+                    hint: loc.search,
+                    onChanged: (value) {
+                      context.read<ServiceBloc>().add(SearchServices(value));
+                      setState(() {});
+                    },
+                    onClear: _searchController.text.trim().isEmpty
+                        ? null
+                        : _clearSearch,
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  if (state.loading && state.allServices.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 120),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  else if (state.visibleServices.isEmpty)
+                    _EmptyState(
+                      title: loc.noData,
+                      subtitle: loc.noServicesHint,
+                    )
+                  else
+                    ...state.visibleServices.map(
+                      (service) => _ServiceCard(
+                        service: service,
+                        isBusy: state.actionLoading,
+                        onEdit: () => _openForm(service: service),
+                        onDelete: () => _confirmDelete(service),
+                      ),
+                    ),
+                ],
+              ),
             ),
           ),
         );

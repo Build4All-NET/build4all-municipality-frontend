@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:baladiyati/features/citizen/requests/domain/entities/request_entity.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'requests_screen.dart' show StatusBadgeWidget;
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class RequestDetailsScreen extends StatelessWidget {
   final RequestEntity request;
@@ -68,217 +69,219 @@ class RequestDetailsScreen extends StatelessWidget {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          children: [
-            // Status banners
-            if (request.status == 'DOCUMENTS_MISSING')
-              _Banner(
-                icon: Icons.folder_off_outlined,
-                title: loc.statusDocumentsMissing,
-                message: loc.errorGeneric,
-                color: colors.error,
-              ),
-            if (request.status == 'REJECTED')
-              _Banner(
-                icon: Icons.cancel_outlined,
-                title: loc.rejected,
-                message: loc.errorGeneric,
-                color: colors.error,
-              ),
-            if (request.status == 'CANCELLED')
-              _Banner(
-                icon: Icons.block_outlined,
-                title: loc.statusCancelled,
-                message: loc.errorGeneric,
-                color: colors.outline,
-              ),
-            if (request.status == 'COMPLETED')
-              _Banner(
-                icon: Icons.check_circle_outline,
-                title: loc.completed,
-                message: loc.requestSubmittedTitle,
-                color: colors.primary,
-              ),
+      body: ResponsiveCenter.detail(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            children: [
+              // Status banners
+              if (request.status == 'DOCUMENTS_MISSING')
+                _Banner(
+                  icon: Icons.folder_off_outlined,
+                  title: loc.statusDocumentsMissing,
+                  message: loc.errorGeneric,
+                  color: colors.error,
+                ),
+              if (request.status == 'REJECTED')
+                _Banner(
+                  icon: Icons.cancel_outlined,
+                  title: loc.rejected,
+                  message: loc.errorGeneric,
+                  color: colors.error,
+                ),
+              if (request.status == 'CANCELLED')
+                _Banner(
+                  icon: Icons.block_outlined,
+                  title: loc.statusCancelled,
+                  message: loc.errorGeneric,
+                  color: colors.outline,
+                ),
+              if (request.status == 'COMPLETED')
+                _Banner(
+                  icon: Icons.check_circle_outline,
+                  title: loc.completed,
+                  message: loc.requestSubmittedTitle,
+                  color: colors.primary,
+                ),
 
-            // Progress card
-            _Card(
-              theme: theme,
-              colors: colors,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        '${(progress * 100).round()}%',
-                        style: theme.textTheme.bodyMedium?.copyWith(color: colors.outline),
-                      ),
-                      Text(
-                        loc.progress,
-                        style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 10),
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
-                    child: LinearProgressIndicator(
-                      value: progress,
-                      minHeight: 8,
-                      backgroundColor: colors.outline.withOpacity(0.15),
-                      valueColor: AlwaysStoppedAnimation<Color>(
-                        _isNegativeEnd ? colors.error : colors.primary,
+              // Progress card
+              _Card(
+                theme: theme,
+                colors: colors,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          '${(progress * 100).round()}%',
+                          style: theme.textTheme.bodyMedium?.copyWith(color: colors.outline),
+                        ),
+                        Text(
+                          loc.progress,
+                          style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(10),
+                      child: LinearProgressIndicator(
+                        value: progress,
+                        minHeight: 8,
+                        backgroundColor: colors.outline.withOpacity(0.15),
+                        valueColor: AlwaysStoppedAnimation<Color>(
+                          _isNegativeEnd ? colors.error : colors.primary,
+                        ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
-            const SizedBox(height: 12),
+              const SizedBox(height: 12),
 
-            // Timeline card
-            _Card(
-              theme: theme,
-              colors: colors,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    loc.timeline,
-                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
-                  ),
-                  const SizedBox(height: 16),
-                  ...List.generate(_steps.length, (i) {
-                    final step = _steps[i];
-                    final stepOrder = _statusOrder(step.status);
-                    final isDone = stepOrder <= currentOrder && !_isNegativeEnd;
-                    final isCurrent = step.status == request.status;
-                    final isLast = i == _steps.length - 1;
-                    final dotColor = _isNegativeEnd && isCurrent
-                        ? colors.error
-                        : isDone
-                            ? colors.primary
-                            : colors.outline.withOpacity(0.3);
+              // Timeline card
+              _Card(
+                theme: theme,
+                colors: colors,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      loc.timeline,
+                      style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+                    ),
+                    const SizedBox(height: 16),
+                    ...List.generate(_steps.length, (i) {
+                      final step = _steps[i];
+                      final stepOrder = _statusOrder(step.status);
+                      final isDone = stepOrder <= currentOrder && !_isNegativeEnd;
+                      final isCurrent = step.status == request.status;
+                      final isLast = i == _steps.length - 1;
+                      final dotColor = _isNegativeEnd && isCurrent
+                          ? colors.error
+                          : isDone
+                              ? colors.primary
+                              : colors.outline.withOpacity(0.3);
 
-                    return Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Column(
-                          children: [
-                            Container(
-                              width: 14,
-                              height: 14,
-                              decoration: BoxDecoration(shape: BoxShape.circle, color: dotColor),
-                              child: isDone && !isCurrent
-                                  ? Icon(Icons.check, size: 8, color: colors.onPrimary)
-                                  : null,
-                            ),
-                            if (!isLast)
+                      return Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Column(
+                            children: [
                               Container(
-                                width: 2,
-                                height: 44,
-                                color: isDone ? colors.primary.withOpacity(0.4) : colors.outline.withOpacity(0.15),
+                                width: 14,
+                                height: 14,
+                                decoration: BoxDecoration(shape: BoxShape.circle, color: dotColor),
+                                child: isDone && !isCurrent
+                                    ? Icon(Icons.check, size: 8, color: colors.onPrimary)
+                                    : null,
                               ),
-                          ],
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Padding(
-                            padding: const EdgeInsets.only(bottom: 8),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  StatusBadgeWidget.label(AppLocalizations.of(context)!, step.status),
-                                  style: theme.textTheme.bodyMedium?.copyWith(
-                                    fontWeight: isCurrent ? FontWeight.w700 : FontWeight.normal,
-                                    color: isDone ? colors.onSurface : colors.outline,
-                                  ),
+                              if (!isLast)
+                                Container(
+                                  width: 2,
+                                  height: 44,
+                                  color: isDone ? colors.primary.withOpacity(0.4) : colors.outline.withOpacity(0.15),
                                 ),
-                                if (isCurrent)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 4),
-                                    child: StatusBadgeWidget(status: request.status),
+                            ],
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 8),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    StatusBadgeWidget.label(AppLocalizations.of(context)!, step.status),
+                                    style: theme.textTheme.bodyMedium?.copyWith(
+                                      fontWeight: isCurrent ? FontWeight.w700 : FontWeight.normal,
+                                      color: isDone ? colors.onSurface : colors.outline,
+                                    ),
                                   ),
-                              ],
+                                  if (isCurrent)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 4),
+                                      child: StatusBadgeWidget(status: request.status),
+                                    ),
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    );
-                  }),
-                  if (_isNegativeEnd) ...[
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 14,
-                          height: 14,
-                          decoration: BoxDecoration(shape: BoxShape.circle, color: colors.error),
-                          child: Icon(Icons.close, size: 8, color: colors.onError),
-                        ),
-                        const SizedBox(width: 12),
-                        StatusBadgeWidget(status: request.status),
-                      ],
-                    ),
+                        ],
+                      );
+                    }),
+                    if (_isNegativeEnd) ...[
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Container(
+                            width: 14,
+                            height: 14,
+                            decoration: BoxDecoration(shape: BoxShape.circle, color: colors.error),
+                            child: Icon(Icons.close, size: 8, color: colors.onError),
+                          ),
+                          const SizedBox(width: 12),
+                          StatusBadgeWidget(status: request.status),
+                        ],
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
 
-            const SizedBox(height: 12),
+              const SizedBox(height: 12),
 
-            // Details card
-            _Card(
-              theme: theme,
-              colors: colors,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(loc.details, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
-                  const SizedBox(height: 12),
-                  if (request.title.isNotEmpty)
-                    _DetailRow(icon: Icons.title_outlined, label: loc.titleLabel, value: request.title, theme: theme, colors: colors),
-                  if (request.description.isNotEmpty) ...[
-                    const Divider(height: 20),
-                    _DetailRow(icon: Icons.description_outlined, label: loc.descriptionLabel, value: request.description, theme: theme, colors: colors),
-                  ],
-                  if (request.serviceName != null && request.serviceName!.isNotEmpty) ...[
-                    const Divider(height: 20),
-                    _DetailRow(icon: Icons.description_outlined, label: loc.services, value: request.serviceName!, theme: theme, colors: colors),
-                  ],
-                  if (request.addressText != null && request.addressText!.isNotEmpty) ...[
-                    const Divider(height: 20),
-                    _DetailRow(icon: Icons.location_on_outlined, label: loc.address, value: request.addressText!, theme: theme, colors: colors),
-                  ],
-                  const Divider(height: 20),
-                  _DetailRow(
-                    icon: Icons.calendar_today_outlined,
-                    label: loc.submissionDate,
-                    value: _formatDate(request.createdAt),
-                    theme: theme,
-                    colors: colors,
-                  ),
-                  if (request.updatedAt != null) ...[
+              // Details card
+              _Card(
+                theme: theme,
+                colors: colors,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(loc.details, style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800)),
+                    const SizedBox(height: 12),
+                    if (request.title.isNotEmpty)
+                      _DetailRow(icon: Icons.title_outlined, label: loc.titleLabel, value: request.title, theme: theme, colors: colors),
+                    if (request.description.isNotEmpty) ...[
+                      const Divider(height: 20),
+                      _DetailRow(icon: Icons.description_outlined, label: loc.descriptionLabel, value: request.description, theme: theme, colors: colors),
+                    ],
+                    if (request.serviceName != null && request.serviceName!.isNotEmpty) ...[
+                      const Divider(height: 20),
+                      _DetailRow(icon: Icons.description_outlined, label: loc.services, value: request.serviceName!, theme: theme, colors: colors),
+                    ],
+                    if (request.addressText != null && request.addressText!.isNotEmpty) ...[
+                      const Divider(height: 20),
+                      _DetailRow(icon: Icons.location_on_outlined, label: loc.address, value: request.addressText!, theme: theme, colors: colors),
+                    ],
                     const Divider(height: 20),
                     _DetailRow(
-                      icon: Icons.update_outlined,
-                      label: loc.updatedAt,
-                      value: _formatDate(request.updatedAt),
+                      icon: Icons.calendar_today_outlined,
+                      label: loc.submissionDate,
+                      value: _formatDate(request.createdAt),
                       theme: theme,
                       colors: colors,
                     ),
+                    if (request.updatedAt != null) ...[
+                      const Divider(height: 20),
+                      _DetailRow(
+                        icon: Icons.update_outlined,
+                        label: loc.updatedAt,
+                        value: _formatDate(request.updatedAt),
+                        theme: theme,
+                        colors: colors,
+                      ),
+                    ],
                   ],
-                ],
+                ),
               ),
-            ),
 
-            const SizedBox(height: 24),
-          ],
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );

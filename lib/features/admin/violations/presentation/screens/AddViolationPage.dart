@@ -12,6 +12,7 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 // Backend enum values — must be sent exactly as listed.
 const _kViolationTypes = [
@@ -291,153 +292,155 @@ class _CreateViolationScreenState extends State<CreateViolationScreen> {
         appBar: AppBar(
           title: Text(widget.isEdit ? loc.editViolation : loc.createViolation),
         ),
-        body: BlocBuilder<ViolationBloc, ViolationState>(
-          builder: (context, state) {
-            final isLoading = _submitted && state is ViolationLoading;
+        body: ResponsiveCenter.form(
+          child: BlocBuilder<ViolationBloc, ViolationState>(
+            builder: (context, state) {
+              final isLoading = _submitted && state is ViolationLoading;
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    // ── Page header ──────────────────────────────────────────
-                    _PageHeader(isEdit: widget.isEdit),
+              return SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 32),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      // ── Page header ──────────────────────────────────────────
+                      _PageHeader(isEdit: widget.isEdit),
 
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-                    // ── Section 1: Violation Type ────────────────────────────
-                    _SectionCard(
-                      icon: Icons.category_outlined,
-                      title: loc.violationType,
-                      child: _TypeDropdown(
-                        value: _selectedType,
-                        enabled: !isLoading,
-                        onChanged: (v) =>
-                            setState(() => _selectedType = v),
-                        validator: (v) =>
-                            (v == null || v.isEmpty) ? loc.fieldRequired : null,
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // ── Section 2: Violation Details ─────────────────────────
-                    _SectionCard(
-                      icon: Icons.gavel_outlined,
-                      title: loc.violationDetails,
-                      child: Column(
-                        children: [
-                          _InputField(
-                            label: loc.violationTitle,
-                            hint: loc.enterViolationTitle,
-                            controller: _titleController,
-                            icon: Icons.title_outlined,
-                            validator: _required3to100,
-                            enabled: !isLoading,
-                          ),
-                          _InputField(
-                            label: loc.description,
-                            hint: loc.enterDescription,
-                            controller: _descriptionController,
-                            icon: Icons.description_outlined,
-                            minLines: 3,
-                            maxLines: 6,
-                            validator: _required,
-                            enabled: !isLoading,
-                          ),
-                          _InputField(
-                            label: loc.location,
-                            hint: loc.enterLocation,
-                            controller: _locationController,
-                            icon: Icons.location_on_outlined,
-                            validator: _required3to100,
-                            enabled: !isLoading,
-                          ),
-                          _DateField(
-                            label: loc.date,
-                            value: _selectedDate == null
-                                ? loc.selectDate
-                                : _formatDateForUi(_selectedDate!),
-                            hasValue: _selectedDate != null,
-                            onTap: isLoading ? null : _pickDate,
-                          ),
-                        ],
-                      ),
-                    ),
-
-                    const SizedBox(height: 12),
-
-                    // ── Section 3: Citizen / Vehicle Information ─────────────
-                    // Fields shown depend on the selected violation type
-                    if (_selectedType != null)
-                      _CitizenSection(
-                        type: _selectedType!,
-                        isLoading: isLoading,
-                        nameController: _citizenNameController,
-                        identityController: _identityNumberController,
-                        plateController: _carPlateController,
-                        requiredValidator: _required,
-                      ),
-
-                    if (_selectedType == null) ...[
+                      // ── Section 1: Violation Type ────────────────────────────
                       _SectionCard(
-                        icon: Icons.person_outline,
-                        title: loc.citizenInfo,
-                        child: _HintRow(
-                          message: loc.selectTypeFirst,
+                        icon: Icons.category_outlined,
+                        title: loc.violationType,
+                        child: _TypeDropdown(
+                          value: _selectedType,
+                          enabled: !isLoading,
+                          onChanged: (v) =>
+                              setState(() => _selectedType = v),
+                          validator: (v) =>
+                              (v == null || v.isEmpty) ? loc.fieldRequired : null,
                         ),
                       ),
-                    ],
 
-                    const SizedBox(height: 12),
+                      const SizedBox(height: 12),
 
-                    // ── Section 4: Payment & Assignment ─────────────────────
-                    _SectionCard(
-                      icon: Icons.payments_outlined,
-                      title: loc.paymentAndAssignment,
-                      child: Column(
-                        children: [
-                          _InputField(
-                            label: loc.amount,
-                            hint: loc.enterAmount,
-                            controller: _amountController,
-                            icon: Icons.attach_money_outlined,
-                            keyboardType: const TextInputType.numberWithOptions(
-                                decimal: true),
-                            inputFormatters: [
-                              FilteringTextInputFormatter.allow(
-                                  RegExp(r'^\d*\.?\d{0,2}')),
-                            ],
-                            validator: _positiveNumber,
-                            enabled: !isLoading,
-                          ),
-                          _DepartmentDropdown(
-                            loading: _loadingDepartments,
-                            value: _selectedDepartmentId,
-                            departments: _departments,
-                            enabled: !isLoading,
-                            onChanged: (v) =>
-                                setState(() => _selectedDepartmentId = v),
-                            onRefresh: _loadDepartments,
-                          ),
-                        ],
+                      // ── Section 2: Violation Details ─────────────────────────
+                      _SectionCard(
+                        icon: Icons.gavel_outlined,
+                        title: loc.violationDetails,
+                        child: Column(
+                          children: [
+                            _InputField(
+                              label: loc.violationTitle,
+                              hint: loc.enterViolationTitle,
+                              controller: _titleController,
+                              icon: Icons.title_outlined,
+                              validator: _required3to100,
+                              enabled: !isLoading,
+                            ),
+                            _InputField(
+                              label: loc.description,
+                              hint: loc.enterDescription,
+                              controller: _descriptionController,
+                              icon: Icons.description_outlined,
+                              minLines: 3,
+                              maxLines: 6,
+                              validator: _required,
+                              enabled: !isLoading,
+                            ),
+                            _InputField(
+                              label: loc.location,
+                              hint: loc.enterLocation,
+                              controller: _locationController,
+                              icon: Icons.location_on_outlined,
+                              validator: _required3to100,
+                              enabled: !isLoading,
+                            ),
+                            _DateField(
+                              label: loc.date,
+                              value: _selectedDate == null
+                                  ? loc.selectDate
+                                  : _formatDateForUi(_selectedDate!),
+                              hasValue: _selectedDate != null,
+                              onTap: isLoading ? null : _pickDate,
+                            ),
+                          ],
+                        ),
                       ),
-                    ),
 
-                    const SizedBox(height: 24),
+                      const SizedBox(height: 12),
 
-                    PrimaryButton(
-                      label: widget.isEdit ? loc.saveChanges : loc.create,
-                      isLoading: isLoading,
-                      onPressed: _submit,
-                    ),
-                  ],
+                      // ── Section 3: Citizen / Vehicle Information ─────────────
+                      // Fields shown depend on the selected violation type
+                      if (_selectedType != null)
+                        _CitizenSection(
+                          type: _selectedType!,
+                          isLoading: isLoading,
+                          nameController: _citizenNameController,
+                          identityController: _identityNumberController,
+                          plateController: _carPlateController,
+                          requiredValidator: _required,
+                        ),
+
+                      if (_selectedType == null) ...[
+                        _SectionCard(
+                          icon: Icons.person_outline,
+                          title: loc.citizenInfo,
+                          child: _HintRow(
+                            message: loc.selectTypeFirst,
+                          ),
+                        ),
+                      ],
+
+                      const SizedBox(height: 12),
+
+                      // ── Section 4: Payment & Assignment ─────────────────────
+                      _SectionCard(
+                        icon: Icons.payments_outlined,
+                        title: loc.paymentAndAssignment,
+                        child: Column(
+                          children: [
+                            _InputField(
+                              label: loc.amount,
+                              hint: loc.enterAmount,
+                              controller: _amountController,
+                              icon: Icons.attach_money_outlined,
+                              keyboardType: const TextInputType.numberWithOptions(
+                                  decimal: true),
+                              inputFormatters: [
+                                FilteringTextInputFormatter.allow(
+                                    RegExp(r'^\d*\.?\d{0,2}')),
+                              ],
+                              validator: _positiveNumber,
+                              enabled: !isLoading,
+                            ),
+                            _DepartmentDropdown(
+                              loading: _loadingDepartments,
+                              value: _selectedDepartmentId,
+                              departments: _departments,
+                              enabled: !isLoading,
+                              onChanged: (v) =>
+                                  setState(() => _selectedDepartmentId = v),
+                              onRefresh: _loadDepartments,
+                            ),
+                          ],
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      PrimaryButton(
+                        label: widget.isEdit ? loc.saveChanges : loc.create,
+                        isLoading: isLoading,
+                        onPressed: _submit,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );

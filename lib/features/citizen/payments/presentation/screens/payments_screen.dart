@@ -9,6 +9,7 @@ import 'package:baladiyati/features/citizen/payments/data/services/payment_api_s
 import 'package:baladiyati/features/citizen/payments/data/repositories/payment_repository_impl.dart';
 import 'package:baladiyati/features/citizen/payments/domain/usecases/get_my_payments.dart';
 import 'package:baladiyati/features/citizen/payments/domain/usecases/download_receipt.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class PaymentsScreen extends StatefulWidget {
   const PaymentsScreen({super.key});
@@ -50,28 +51,30 @@ class _PaymentsScreenState extends State<PaymentsScreen>
         builder: (context, state) {
           return Scaffold(
             backgroundColor: const Color(0xFFF3F4F6),
-            body: SafeArea(
-              child: Column(
-                children: [
-                  _buildHeader(context, l10n, state),
-                  if (state.isLoading && state.payments.isEmpty)
-                    const Expanded(
-                      child: Center(child: CircularProgressIndicator()),
-                    )
-                  else if (state.errorMessage != null &&
-                      state.payments.isEmpty)
-                    _buildError(context, l10n, state)
-                  else
-                    Expanded(
-                      child: TabBarView(
-                        controller: _tabController,
-                        children: [
-                          _buildPaidList(context, l10n, state),
-                          _buildPendingList(context, l10n, state),
-                        ],
+            body: ResponsiveCenter.detail(
+              child: SafeArea(
+                child: Column(
+                  children: [
+                    _buildHeader(context, l10n, state),
+                    if (state.isLoading && state.payments.isEmpty)
+                      const Expanded(
+                        child: Center(child: CircularProgressIndicator()),
+                      )
+                    else if (state.errorMessage != null &&
+                        state.payments.isEmpty)
+                      _buildError(context, l10n, state)
+                    else
+                      Expanded(
+                        child: TabBarView(
+                          controller: _tabController,
+                          children: [
+                            _buildPaidList(context, l10n, state),
+                            _buildPendingList(context, l10n, state),
+                          ],
+                        ),
                       ),
-                    ),
-                ],
+                  ],
+                ),
               ),
             ),
           );

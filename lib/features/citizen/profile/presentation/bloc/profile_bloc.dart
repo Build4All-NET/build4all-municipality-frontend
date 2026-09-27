@@ -96,7 +96,7 @@ class ProfileBloc extends Bloc<ProfileEvent, ProfileState> {
         email: event.email,
         phone: event.phone,
         address: event.address,
-        profileImagePath: event.profileImagePath,
+        profileImage: event.profileImage,
         imageRemoved: event.imageRemoved,
       );
 

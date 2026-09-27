@@ -1,14 +1,13 @@
 import 'dart:async';
-import 'dart:io';
 
 import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/core/utils/error_message.dart';
+import 'package:baladiyati/core/utils/file_store/file_store.dart';
 import 'package:baladiyati/features/staff/tasks/data/services/staff_task_api_service.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
-import 'package:open_filex/open_filex.dart';
-import 'package:path_provider/path_provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class StaffCertificateScreen extends StatefulWidget {
   final int processInstanceKey;
@@ -30,6 +29,7 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
   static const int _maxAttempts = 20;
   static const Duration _pollInterval = Duration(seconds: 2);
   static const String _prefKeyPrefix = 'cert_file_';
+  static const FileStore _store = FileStore();
 
   final StaffTaskApiService _api = StaffTaskApiService();
 
@@ -58,7 +58,7 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
   Future<void> _init() async {
     final prefs = await SharedPreferences.getInstance();
     final savedPath = prefs.getString(_prefKey);
-    if (savedPath != null && File(savedPath).existsSync()) {
+    if (savedPath != null && await _store.exists(savedPath)) {
       try {
         final cert = await _api.getCertificateByProcessInstanceKey(
           widget.processInstanceKey,
@@ -118,20 +118,8 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
     }
   }
 
-  Future<Directory> _getSaveDir() async {
-    if (Platform.isAndroid) {
-      final ext = await getExternalStorageDirectory();
-      if (ext != null) return ext;
-    }
-    return getApplicationDocumentsDirectory();
-  }
-
-  Future<String> _resolveFilePath(int certId) async {
-    final dir = await _getSaveDir();
-    final fileName =
-        _certificate?['fileName']?.toString() ?? 'certificate_$certId.pdf';
-    return '${dir.path}/$fileName';
-  }
+  String _certificateFileName(int certId) =>
+      _certificate?['fileName']?.toString() ?? 'certificate_$certId.pdf';
 
   Future<void> _persistFilePath(String path) async {
     final prefs = await SharedPreferences.getInstance();
@@ -146,15 +134,14 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
     try {
       final id = certId is int ? certId : int.parse(certId.toString());
       final bytes = await _api.downloadCertificateBytes(id);
-      final filePath = await _resolveFilePath(id);
-      final file = File(filePath);
-      await file.writeAsBytes(bytes);
+      // Disk on mobile, browser session on web.
+      final filePath = await _store.save(_certificateFileName(id), bytes);
       await _persistFilePath(filePath);
 
       if (!mounted) return;
       setState(() => _savedFilePath = filePath);
 
-      await OpenFilex.open(filePath);
+      await _store.open(filePath);
     } catch (e) {
       if (!mounted) return;
       AppToast.show(
@@ -170,8 +157,8 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
   Future<void> _openSaved() async {
     final path = _savedFilePath;
     if (path == null) return;
-    final result = await OpenFilex.open(path);
-    if (result.type != ResultType.done && mounted) {
+    final result = await _store.open(path);
+    if (!result.success && mounted) {
       final l10n = AppLocalizations.of(context)!;
       AppToast.show(
         context,
@@ -195,14 +182,16 @@ class _StaffCertificateScreenState extends State<StaffCertificateScreen> {
           onPressed: () => Navigator.pop(context, true),
         ),
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: _polling
-              ? _buildPolling(theme, colors, l10n)
-              : _error != null
-                  ? _buildError(theme, colors, l10n)
-                  : _buildCertificate(theme, colors, l10n),
+      body: ResponsiveCenter.detail(
+        child: SafeArea(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.all(20),
+            child: _polling
+                ? _buildPolling(theme, colors, l10n)
+                : _error != null
+                    ? _buildError(theme, colors, l10n)
+                    : _buildCertificate(theme, colors, l10n),
+          ),
         ),
       ),
     );

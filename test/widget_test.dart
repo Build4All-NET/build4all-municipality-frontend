@@ -1,30 +1,30 @@
-// This is a basic Flutter widget test.
-//
-// To perform an interaction with a widget in your test, use the WidgetTester
-// utility in the flutter_test package. For example, you can send tap and scroll
-// gestures. You can also use WidgetTester to find child widgets in the widget
-// tree, read text, and verify that the values of widget properties are correct.
+// Smoke test: the welcome screen renders on phone, tablet and desktop widths
+// without layout errors, and its content is capped on wide screens.
 
+import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/core/config/app_breakpoints.dart';
+import 'package:baladiyati/features/welcome/presentation/screens/welcome_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-import '../lib/app/app.dart';
+import 'helpers/test_app.dart';
 
 void main() {
-  testWidgets('Counter increments smoke test', (WidgetTester tester) async {
-    // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+  setUp(() => SharedPreferences.setMockInitialValues({}));
 
-    // Verify that our counter starts at 0.
-    expect(find.text('0'), findsOneWidget);
-    expect(find.text('1'), findsNothing);
+  for (final size in [phoneSize, tabletSize, desktopSize]) {
+    testWidgets('WelcomeScreen renders at ${size.width.toInt()}px', (tester) async {
+      setScreenSize(tester, size);
+      await tester.pumpWidget(testApp(const WelcomeScreen()));
+      await tester.pumpAndSettle();
 
-    // Tap the '+' icon and trigger a frame.
-    await tester.tap(find.byIcon(Icons.add));
-    await tester.pump();
-
-    // Verify that our counter has incremented.
-    expect(find.text('0'), findsNothing);
-    expect(find.text('1'), findsOneWidget);
-  });
+      expect(tester.takeException(), isNull);
+      // The capped column is the first SizedBox inside ResponsiveCenter.
+      final content = tester.getSize(find
+          .descendant(of: find.byType(ResponsiveCenter), matching: find.byType(SizedBox))
+          .first);
+      expect(content.width, lessThanOrEqualTo(AppLayout.maxWidthAuth));
+    });
+  }
 }

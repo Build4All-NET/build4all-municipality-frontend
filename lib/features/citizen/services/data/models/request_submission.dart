@@ -1,3 +1,5 @@
+import 'package:baladiyati/core/config/app_file_types.dart';
+
 // lib/features/citizen/services/data/models/request_submission.dart
 
 class RequestSubmission {
@@ -24,8 +26,8 @@ class RequestSubmission {
     if (attachmentUrls != null && attachmentUrls!.isNotEmpty) {
       attachments = attachmentUrls!.map((url) {
         final fileName = url.split('/').last; // extract filename from URL
-        final ext = fileName.split('.').last.toLowerCase();
-        final fileType = ['jpg', 'jpeg', 'png', 'gif', 'webp'].contains(ext)
+        final ext = AppFileTypes.extensionOf(fileName);
+        final fileType = AppFileTypes.imageExtensions.contains(ext)
             ? 'image'
             : ext == 'pdf'
                 ? 'pdf'

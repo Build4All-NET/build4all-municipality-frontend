@@ -6,6 +6,7 @@ import 'package:baladiyati/features/admin/announcements/presentation/bloc/Announ
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class CreateAnnouncementPage extends StatefulWidget {
   final Announcement? announcement;
@@ -148,79 +149,81 @@ class _CreateAnnouncementPageState extends State<CreateAnnouncementPage> {
             widget.isEdit ? loc.editAnnouncement : loc.createAnnouncement,
           ),
         ),
-        body: BlocBuilder<AnnouncementBloc, AnnouncementState>(
-          builder: (context, state) {
-            final isLoading = _submitted && state is AnnouncementLoading;
+        body: ResponsiveCenter.form(
+          child: BlocBuilder<AnnouncementBloc, AnnouncementState>(
+            builder: (context, state) {
+              final isLoading = _submitted && state is AnnouncementLoading;
 
-            return SingleChildScrollView(
-              padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  children: [
-                    _FormHeader(
-                      title: widget.isEdit
-                          ? loc.editAnnouncement
-                          : loc.createAnnouncement,
-                      subtitle: widget.isEdit
-                          ? loc.announcementEditHint
-                          : loc.announcementCreateHint,
-                    ),
+              return SingleChildScrollView(
+                padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      _FormHeader(
+                        title: widget.isEdit
+                            ? loc.editAnnouncement
+                            : loc.createAnnouncement,
+                        subtitle: widget.isEdit
+                            ? loc.announcementEditHint
+                            : loc.announcementCreateHint,
+                      ),
 
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-                    _InputField(
-                      label: loc.announcementTitle,
-                      hint: loc.enterAnnouncementTitle,
-                      controller: _titleController,
-                      icon: Icons.title_outlined,
-                      validator: _validateTitle,
-                      enabled: !isLoading,
-                    ),
+                      _InputField(
+                        label: loc.announcementTitle,
+                        hint: loc.enterAnnouncementTitle,
+                        controller: _titleController,
+                        icon: Icons.title_outlined,
+                        validator: _validateTitle,
+                        enabled: !isLoading,
+                      ),
 
-                    _InputField(
-                      label: loc.announcementContent,
-                      hint: loc.enterAnnouncementContent,
-                      controller: _contentController,
-                      icon: Icons.article_outlined,
-                      minLines: 5,
-                      maxLines: 9,
-                      validator: _validateContent,
-                      enabled: !isLoading,
-                    ),
+                      _InputField(
+                        label: loc.announcementContent,
+                        hint: loc.enterAnnouncementContent,
+                        controller: _contentController,
+                        icon: Icons.article_outlined,
+                        minLines: 5,
+                        maxLines: 9,
+                        validator: _validateContent,
+                        enabled: !isLoading,
+                      ),
 
-                    const SizedBox(height: 20),
+                      const SizedBox(height: 20),
 
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: isLoading ? null : _submit,
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 15),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: isLoading ? null : _submit,
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(vertical: 15),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                          ),
+                          icon: isLoading
+                              ? SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: colors.onPrimary,
+                                  ),
+                                )
+                              : const Icon(Icons.campaign_outlined),
+                          label: Text(
+                            widget.isEdit ? loc.save : loc.publishAnnouncement,
                           ),
                         ),
-                        icon: isLoading
-                            ? SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: colors.onPrimary,
-                                ),
-                              )
-                            : const Icon(Icons.campaign_outlined),
-                        label: Text(
-                          widget.isEdit ? loc.save : loc.publishAnnouncement,
-                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );

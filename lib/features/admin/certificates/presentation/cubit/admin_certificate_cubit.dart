@@ -1,10 +1,8 @@
-import 'dart:io';
 
 import 'package:baladiyati/features/admin/certificates/data/services/certificate_api_service.dart';
 import 'package:baladiyati/features/admin/certificates/presentation/cubit/admin_certificate_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:open_filex/open_filex.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:baladiyati/core/utils/file_store/file_store.dart';
 
 class AdminCertificateCubit extends Cubit<AdminCertificateState> {
   AdminCertificateCubit(this._api) : super(const AdminCertificateState());
@@ -59,19 +57,12 @@ class AdminCertificateCubit extends Cubit<AdminCertificateState> {
     try {
       final bytes = await _api.downloadCertificate(certificateId);
 
-      Directory dir;
-      try {
-        dir = (await getExternalStorageDirectory())!;
-      } catch (_) {
-        dir = await getApplicationDocumentsDirectory();
-      }
-
       final safeName = fileName.endsWith('.pdf') ? fileName : '$fileName.pdf';
-      final file = File('${dir.path}/$safeName');
-      await file.writeAsBytes(bytes);
+      final store = const FileStore();
+      final handle = await store.save(safeName, bytes);
 
       emit(state.copyWith(actionLoading: false));
-      await OpenFilex.open(file.path);
+      await store.open(handle);
     } catch (e) {
       emit(state.copyWith(actionLoading: false, error: _friendlyError(e)));
     }

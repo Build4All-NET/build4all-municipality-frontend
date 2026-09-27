@@ -3,6 +3,28 @@
 import 'package:flutter/material.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 
+/// One citizen navigation destination, shared by [BottomNav] (phones)
+/// and [SideNav] (web / desktop) so both always show the same items.
+class AppNavItem {
+  final IconData icon;
+  final IconData activeIcon;
+  final String label;
+
+  const AppNavItem({
+    required this.icon,
+    required this.activeIcon,
+    required this.label,
+  });
+}
+
+List<AppNavItem> citizenNavItems(AppLocalizations l10n) => [
+      AppNavItem(icon: Icons.home_outlined, activeIcon: Icons.home, label: l10n.navHome),
+      AppNavItem(icon: Icons.grid_view_outlined, activeIcon: Icons.grid_view, label: l10n.navServices),
+      AppNavItem(icon: Icons.description_outlined, activeIcon: Icons.description, label: l10n.navRequests),
+      AppNavItem(icon: Icons.credit_card_outlined, activeIcon: Icons.credit_card, label: l10n.navPayments),
+      AppNavItem(icon: Icons.person_outline, activeIcon: Icons.person, label: l10n.navAccount),
+    ];
+
 class BottomNav extends StatelessWidget {
   final int currentIndex;
   final Function(int) onTap;
@@ -32,31 +54,12 @@ class BottomNav extends StatelessWidget {
       unselectedFontSize: 11,
 
       items: [
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.home_outlined),
-          activeIcon: const Icon(Icons.home),
-          label: l10n.navHome,
-        ),
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.grid_view_outlined),
-          activeIcon: const Icon(Icons.grid_view),
-          label: l10n.navServices,
-        ),
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.description_outlined),
-          activeIcon: const Icon(Icons.description),
-          label: l10n.navRequests,
-        ),
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.credit_card_outlined),
-          activeIcon: const Icon(Icons.credit_card),
-          label: l10n.navPayments,
-        ),
-        BottomNavigationBarItem(
-          icon: const Icon(Icons.person_outline),
-          activeIcon: const Icon(Icons.person),
-          label: l10n.navAccount,
-        ),
+        for (final item in citizenNavItems(l10n))
+          BottomNavigationBarItem(
+            icon: Icon(item.icon),
+            activeIcon: Icon(item.activeIcon),
+            label: item.label,
+          ),
       ],
     );
   }

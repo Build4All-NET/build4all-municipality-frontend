@@ -6,6 +6,7 @@ import 'package:baladiyati/core/config/env.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:baladiyati/app/app_router.dart';
 import 'package:baladiyati/features/forgotpassword/data/services/forgot_password_api_service.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
@@ -92,204 +93,206 @@ class _ResetPasswordPageState
           color: Colors.black,
         ),
       ),
-      body: Center(
-        child: Container(
-          width: 350,
-          padding:
-              const EdgeInsets.all(24),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius:
-                BorderRadius.circular(
-              20,
-            ),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black
-                    .withOpacity(
-                  0.06,
-                ),
-                blurRadius: 16,
-                offset:
-                    const Offset(0, 4),
+      body: ResponsiveCenter.auth(
+        child: Center(
+          child: Container(
+            width: 350,
+            padding:
+                const EdgeInsets.all(24),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius:
+                  BorderRadius.circular(
+                20,
               ),
-            ],
-          ),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisSize:
-                  MainAxisSize.min,
-              crossAxisAlignment:
-                  CrossAxisAlignment
-                      .end,
-              children: [
-                const Center(
-                  child: CircleAvatar(
-                    radius: 30,
-                    backgroundColor:
-                        Color(
-                      0xFFE3EAF2,
-                    ),
-                    child: Icon(
-                      Icons.lock_reset,
-                      size: 30,
-                      color: Color(
-                        0xFF0D1B2A,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black
+                      .withOpacity(
+                    0.06,
+                  ),
+                  blurRadius: 16,
+                  offset:
+                      const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisSize:
+                    MainAxisSize.min,
+                crossAxisAlignment:
+                    CrossAxisAlignment
+                        .end,
+                children: [
+                  const Center(
+                    child: CircleAvatar(
+                      radius: 30,
+                      backgroundColor:
+                          Color(
+                        0xFFE3EAF2,
+                      ),
+                      child: Icon(
+                        Icons.lock_reset,
+                        size: 30,
+                        color: Color(
+                          0xFF0D1B2A,
+                        ),
                       ),
                     ),
                   ),
-                ),
 
-                const SizedBox(
-                    height: 16),
+                  const SizedBox(
+                      height: 16),
 
-                Center(
-                  child: Text(
-                    l10n
-                        .resetPasswordTitle,
+                  Center(
+                    child: Text(
+                      l10n
+                          .resetPasswordTitle,
+                      style:
+                          const TextStyle(
+                        fontSize: 20,
+                        fontWeight:
+                            FontWeight
+                                .bold,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(
+                      height: 8),
+
+                  Center(
+                    child: Text(
+                      l10n
+                          .resetPasswordSubtitle,
+                      textAlign:
+                          TextAlign
+                              .center,
+                      style:
+                          const TextStyle(
+                        color:
+                            Colors.grey,
+                        fontSize: 13,
+                      ),
+                    ),
+                  ),
+
+                  const SizedBox(
+                      height: 20),
+
+                  Text(
+                    l10n.emailLabel,
                     style:
                         const TextStyle(
-                      fontSize: 20,
                       fontWeight:
                           FontWeight
                               .bold,
                     ),
                   ),
-                ),
 
-                const SizedBox(
-                    height: 8),
+                  const SizedBox(
+                      height: 8),
 
-                Center(
-                  child: Text(
-                    l10n
-                        .resetPasswordSubtitle,
-                    textAlign:
-                        TextAlign
-                            .center,
-                    style:
-                        const TextStyle(
-                      color:
-                          Colors.grey,
-                      fontSize: 13,
-                    ),
-                  ),
-                ),
-
-                const SizedBox(
-                    height: 20),
-
-                Text(
-                  l10n.emailLabel,
-                  style:
-                      const TextStyle(
-                    fontWeight:
-                        FontWeight
-                            .bold,
-                  ),
-                ),
-
-                const SizedBox(
-                    height: 8),
-
-                TextFormField(
-                  controller:
-                      _emailCtrl,
-                  keyboardType:
-                      TextInputType
-                          .emailAddress,
-                  decoration:
-                      InputDecoration(
-                    hintText:
-                        l10n.emailHint,
-                    suffixIcon:
-                        const Icon(
-                      Icons
-                          .email_outlined,
-                    ),
-                    border:
-                        OutlineInputBorder(
-                      borderRadius:
-                          BorderRadius.circular(
-                        12,
+                  TextFormField(
+                    controller:
+                        _emailCtrl,
+                    keyboardType:
+                        TextInputType
+                            .emailAddress,
+                    decoration:
+                        InputDecoration(
+                      hintText:
+                          l10n.emailHint,
+                      suffixIcon:
+                          const Icon(
+                        Icons
+                            .email_outlined,
                       ),
-                    ),
-                  ),
-                  validator: (v) {
-                    if (v == null ||
-                        v
-                            .trim()
-                            .isEmpty) {
-                      return l10n
-                          .fieldRequired;
-                    }
-
-                    if (!v.contains(
-                            '@') ||
-                        !v.contains(
-                            '.')) {
-                      return l10n
-                          .invalidEmail;
-                    }
-
-                    return null;
-                  },
-                ),
-
-                const SizedBox(
-                    height: 20),
-
-                SizedBox(
-                  width: double.infinity,
-                  height: 50,
-                  child:
-                      ElevatedButton(
-                    style:
-                        ElevatedButton.styleFrom(
-                      backgroundColor:
-                          const Color(
-                        0xFF0D1B2A,
-                      ),
-                      shape:
-                          RoundedRectangleBorder(
+                      border:
+                          OutlineInputBorder(
                         borderRadius:
                             BorderRadius.circular(
                           12,
                         ),
                       ),
                     ),
-                    onPressed:
-                        _isLoading
-                            ? null
-                            : _onSend,
-                    child:
-                        _isLoading
-                            ? const SizedBox(
-                                height: 22,
-                                width: 22,
-                                child:
-                                    CircularProgressIndicator(
-                                  strokeWidth:
-                                      2,
-                                  color: Colors
-                                      .white,
-                                ),
-                              )
-                            : Text(
-                                l10n
-                                    .sendCode,
-                                style:
-                                    const TextStyle(
-                                  fontSize:
-                                      16,
-                                  color: Colors
-                                      .white,
-                                ),
-                              ),
+                    validator: (v) {
+                      if (v == null ||
+                          v
+                              .trim()
+                              .isEmpty) {
+                        return l10n
+                            .fieldRequired;
+                      }
+
+                      if (!v.contains(
+                              '@') ||
+                          !v.contains(
+                              '.')) {
+                        return l10n
+                            .invalidEmail;
+                      }
+
+                      return null;
+                    },
                   ),
-                ),
-              ],
+
+                  const SizedBox(
+                      height: 20),
+
+                  SizedBox(
+                    width: double.infinity,
+                    height: 50,
+                    child:
+                        ElevatedButton(
+                      style:
+                          ElevatedButton.styleFrom(
+                        backgroundColor:
+                            const Color(
+                          0xFF0D1B2A,
+                        ),
+                        shape:
+                            RoundedRectangleBorder(
+                          borderRadius:
+                              BorderRadius.circular(
+                            12,
+                          ),
+                        ),
+                      ),
+                      onPressed:
+                          _isLoading
+                              ? null
+                              : _onSend,
+                      child:
+                          _isLoading
+                              ? const SizedBox(
+                                  height: 22,
+                                  width: 22,
+                                  child:
+                                      CircularProgressIndicator(
+                                    strokeWidth:
+                                        2,
+                                    color: Colors
+                                        .white,
+                                  ),
+                                )
+                              : Text(
+                                  l10n
+                                      .sendCode,
+                                  style:
+                                      const TextStyle(
+                                    fontSize:
+                                        16,
+                                    color: Colors
+                                        .white,
+                                  ),
+                                ),
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
         ),

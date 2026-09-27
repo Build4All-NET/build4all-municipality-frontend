@@ -9,6 +9,9 @@ import 'package:baladiyati/features/auth/data/services/session_role_store.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/core/config/app_breakpoints.dart';
+import 'package:baladiyati/core/utils/responsive.dart';
 
 class StaffDashboardScreen extends StatefulWidget {
   const StaffDashboardScreen({super.key});
@@ -215,106 +218,111 @@ class _StaffDashboardScreenState extends State<StaffDashboardScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        physics: const AlwaysScrollableScrollPhysics(),
-        padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            _WelcomeHeader(),
+      body: ResponsiveCenter(
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _WelcomeHeader(),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            Text(
-              loc.quickActions,
-              style: theme.textTheme.titleLarge?.copyWith(
-                fontWeight: FontWeight.w900,
+              Text(
+                loc.quickActions,
+                style: theme.textTheme.titleLarge?.copyWith(
+                  fontWeight: FontWeight.w900,
+                ),
               ),
-            ),
 
-            const SizedBox(height: 12),
+              const SizedBox(height: 12),
 
-            GridView.count(
-              crossAxisCount: 2,
-              shrinkWrap: true,
-              crossAxisSpacing: 12,
-              mainAxisSpacing: 12,
-              physics: const NeverScrollableScrollPhysics(),
-              childAspectRatio: 1.12,
-              children: [
-                _ActionCard(
-                  title: loc.workflowTasks,
-                  icon: Icons.assignment_outlined,
-                  iconColor: colors.tertiary,
-                  onTap: _openTasks,
+              GridView.count(
+                crossAxisCount: context.gridColumns,
+                shrinkWrap: true,
+                crossAxisSpacing: 12,
+                mainAxisSpacing: 12,
+                physics: const NeverScrollableScrollPhysics(),
+                childAspectRatio: context.responsive(
+                  compact: AppLayout.actionTileAspectRatioCompact,
+                  medium: AppLayout.actionTileAspectRatioWide,
                 ),
-                _ActionCard(
-                  title: loc.inbox,
-                  icon: Icons.inbox_outlined,
-                  iconColor: colors.primary,
-                  onTap: _openInbox,
-                ),
-                _ActionCard(
-                  title: loc.services,
-                  icon: Icons.description_outlined,
-                  iconColor: colors.secondary,
-                  onTap: _openServices,
-                ),
-                _ActionCard(
-                  title: loc.violations,
-                  icon: Icons.gavel_outlined,
-                  iconColor: colors.error,
-                  onTap: _openViolations,
-                ),
-                _ActionCard(
-                  title: loc.announcements,
-                  icon: Icons.campaign_outlined,
-                  iconColor: colors.primary,
-                  onTap: _openAnnouncements,
-                ),
-              ],
-            ),
+                children: [
+                  _ActionCard(
+                    title: loc.workflowTasks,
+                    icon: Icons.assignment_outlined,
+                    iconColor: colors.tertiary,
+                    onTap: _openTasks,
+                  ),
+                  _ActionCard(
+                    title: loc.inbox,
+                    icon: Icons.inbox_outlined,
+                    iconColor: colors.primary,
+                    onTap: _openInbox,
+                  ),
+                  _ActionCard(
+                    title: loc.services,
+                    icon: Icons.description_outlined,
+                    iconColor: colors.secondary,
+                    onTap: _openServices,
+                  ),
+                  _ActionCard(
+                    title: loc.violations,
+                    icon: Icons.gavel_outlined,
+                    iconColor: colors.error,
+                    onTap: _openViolations,
+                  ),
+                  _ActionCard(
+                    title: loc.announcements,
+                    icon: Icons.campaign_outlined,
+                    iconColor: colors.primary,
+                    onTap: _openAnnouncements,
+                  ),
+                ],
+              ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            _SectionCard(
-              title: loc.recentActivity,
-              children: [
-                _ActivityItem(
-                  text: loc.newRequest,
-                  color: colors.primary,
-                ),
-                _ActivityItem(
-                  text: loc.missingDocs,
-                  color: Colors.orange,
-                ),
-                _ActivityItem(
-                  text: loc.approvedRequest,
-                  color: Colors.green,
-                ),
-              ],
-            ),
+              _SectionCard(
+                title: loc.recentActivity,
+                children: [
+                  _ActivityItem(
+                    text: loc.newRequest,
+                    color: colors.primary,
+                  ),
+                  _ActivityItem(
+                    text: loc.missingDocs,
+                    color: Colors.orange,
+                  ),
+                  _ActivityItem(
+                    text: loc.approvedRequest,
+                    color: Colors.green,
+                  ),
+                ],
+              ),
 
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            _SectionCard(
-              title: loc.monthPerformance,
-              children: [
-                _PerformanceItem(
-                  title: loc.completedRequests,
-                  value: '-',
-                ),
-                _PerformanceItem(
-                  title: loc.avgTime,
-                  value: '-',
-                ),
-                _PerformanceItem(
-                  title: loc.satisfaction,
-                  value: '-',
-                ),
-              ],
-            ),
-          ],
+              _SectionCard(
+                title: loc.monthPerformance,
+                children: [
+                  _PerformanceItem(
+                    title: loc.completedRequests,
+                    value: '-',
+                  ),
+                  _PerformanceItem(
+                    title: loc.avgTime,
+                    value: '-',
+                  ),
+                  _PerformanceItem(
+                    title: loc.satisfaction,
+                    value: '-',
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

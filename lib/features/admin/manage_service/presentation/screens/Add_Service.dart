@@ -12,6 +12,7 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class AddServicePage extends StatefulWidget {
   final ServiceModel? service;
@@ -279,135 +280,137 @@ class _AddServicePageState extends State<AddServicePage> {
         appBar: AppBar(
           title: Text(isEdit ? loc.editService : loc.addService),
         ),
-        body: SingleChildScrollView(
-          padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                _HeaderCard(
-                  title: isEdit ? loc.editService : loc.addService,
-                  subtitle: loc.manageServices,
-                ),
-
-                const SizedBox(height: 16),
-
-                _DepartmentDropdown(
-                  loading: loadingDepartments,
-                  value: selectedDepartmentId,
-                  departments: departments,
-                  onChanged: (value) {
-                    setState(() {
-                      selectedDepartmentId = value;
-                    });
-                  },
-                  onRefresh: _loadDepartments,
-                ),
-
-                const SizedBox(height: 12),
-
-                _InputField(
-                  controller: nameArController,
-                  label: loc.nameAr,
-                  icon: Icons.language,
-                  validator: _required,
-                ),
-
-                _InputField(
-                  controller: nameEnController,
-                  label: loc.nameEn,
-                  icon: Icons.title_outlined,
-                  validator: _required,
-                ),
-
-                _InputField(
-                  controller: descriptionArController,
-                  label: loc.descriptionAr,
-                  icon: Icons.description_outlined,
-                  minLines: 3,
-                  maxLines: 5,
-                  validator: _required,
-                ),
-
-                _InputField(
-                  controller: descriptionEnController,
-                  label: loc.descriptionEn,
-                  icon: Icons.description_outlined,
-                  minLines: 3,
-                  maxLines: 5,
-                  validator: _required,
-                ),
-
-                _InputField(
-                  controller: slaDaysController,
-                  label: loc.slaDays,
-                  icon: Icons.timer_outlined,
-                  keyboardType: TextInputType.number,
-                  validator: _positiveInt,
-                ),
-
-                SwitchListTile(
-                  value: requiresInspection,
-                  title: Text(loc.requiresInspection),
-                  contentPadding: EdgeInsets.zero,
-                  onChanged: submitting
-                      ? null
-                      : (value) {
-                          setState(() {
-                            requiresInspection = value;
-                          });
-                        },
-                ),
-
-                SwitchListTile(
-                  value: hasFees,
-                  title: Text(loc.hasFees),
-                  contentPadding: EdgeInsets.zero,
-                  onChanged: submitting
-                      ? null
-                      : (value) {
-                          setState(() {
-                            hasFees = value;
-
-                            if (!value) {
-                              feeAmountController.clear();
-                            }
-                          });
-                        },
-                ),
-
-                if (hasFees)
-                  _InputField(
-                    controller: feeAmountController,
-                    label: loc.price,
-                    icon: Icons.payments_outlined,
-                    keyboardType: const TextInputType.numberWithOptions(
-                      decimal: true,
-                    ),
-                    validator: _nonNegativeDouble,
+        body: ResponsiveCenter.form(
+          child: SingleChildScrollView(
+            padding: const EdgeInsets.fromLTRB(16, 12, 16, 24),
+            child: Form(
+              key: _formKey,
+              child: Column(
+                children: [
+                  _HeaderCard(
+                    title: isEdit ? loc.editService : loc.addService,
+                    subtitle: loc.manageServices,
                   ),
 
-                SwitchListTile(
-                  value: isActive,
-                  title: Text(loc.active),
-                  contentPadding: EdgeInsets.zero,
-                  onChanged: submitting
-                      ? null
-                      : (value) {
-                          setState(() {
-                            isActive = value;
-                          });
-                        },
-                ),
+                  const SizedBox(height: 16),
 
-                const SizedBox(height: 16),
+                  _DepartmentDropdown(
+                    loading: loadingDepartments,
+                    value: selectedDepartmentId,
+                    departments: departments,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedDepartmentId = value;
+                      });
+                    },
+                    onRefresh: _loadDepartments,
+                  ),
 
-                PrimaryButton(
-                  label: isEdit ? loc.save : loc.add,
-                  isLoading: submitting,
-                  onPressed: _submit,
-                ),
-              ],
+                  const SizedBox(height: 12),
+
+                  _InputField(
+                    controller: nameArController,
+                    label: loc.nameAr,
+                    icon: Icons.language,
+                    validator: _required,
+                  ),
+
+                  _InputField(
+                    controller: nameEnController,
+                    label: loc.nameEn,
+                    icon: Icons.title_outlined,
+                    validator: _required,
+                  ),
+
+                  _InputField(
+                    controller: descriptionArController,
+                    label: loc.descriptionAr,
+                    icon: Icons.description_outlined,
+                    minLines: 3,
+                    maxLines: 5,
+                    validator: _required,
+                  ),
+
+                  _InputField(
+                    controller: descriptionEnController,
+                    label: loc.descriptionEn,
+                    icon: Icons.description_outlined,
+                    minLines: 3,
+                    maxLines: 5,
+                    validator: _required,
+                  ),
+
+                  _InputField(
+                    controller: slaDaysController,
+                    label: loc.slaDays,
+                    icon: Icons.timer_outlined,
+                    keyboardType: TextInputType.number,
+                    validator: _positiveInt,
+                  ),
+
+                  SwitchListTile(
+                    value: requiresInspection,
+                    title: Text(loc.requiresInspection),
+                    contentPadding: EdgeInsets.zero,
+                    onChanged: submitting
+                        ? null
+                        : (value) {
+                            setState(() {
+                              requiresInspection = value;
+                            });
+                          },
+                  ),
+
+                  SwitchListTile(
+                    value: hasFees,
+                    title: Text(loc.hasFees),
+                    contentPadding: EdgeInsets.zero,
+                    onChanged: submitting
+                        ? null
+                        : (value) {
+                            setState(() {
+                              hasFees = value;
+
+                              if (!value) {
+                                feeAmountController.clear();
+                              }
+                            });
+                          },
+                  ),
+
+                  if (hasFees)
+                    _InputField(
+                      controller: feeAmountController,
+                      label: loc.price,
+                      icon: Icons.payments_outlined,
+                      keyboardType: const TextInputType.numberWithOptions(
+                        decimal: true,
+                      ),
+                      validator: _nonNegativeDouble,
+                    ),
+
+                  SwitchListTile(
+                    value: isActive,
+                    title: Text(loc.active),
+                    contentPadding: EdgeInsets.zero,
+                    onChanged: submitting
+                        ? null
+                        : (value) {
+                            setState(() {
+                              isActive = value;
+                            });
+                          },
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  PrimaryButton(
+                    label: isEdit ? loc.save : loc.add,
+                    isLoading: submitting,
+                    onPressed: _submit,
+                  ),
+                ],
+              ),
             ),
           ),
         ),

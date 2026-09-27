@@ -5,6 +5,8 @@ import 'package:baladiyati/core/config/env.dart';
 import 'package:baladiyati/features/citizen/ai_chat/presentation/screens/ai_chat_screen.dart';
 
 import 'package:baladiyati/common/widgets/bottom_nav.dart';
+import 'package:baladiyati/common/widgets/side_nav.dart';
+import 'package:baladiyati/core/utils/responsive.dart';
 import 'package:baladiyati/features/citizen/payments/presentation/screens/payments_screen.dart';
 import 'package:baladiyati/features/citizen/profile/presentation/bloc/profile_bloc.dart';
 import 'package:baladiyati/features/citizen/profile/presentation/bloc/profile_event.dart';
@@ -26,6 +28,7 @@ import '../widgets/quick_actions.dart';
 import '../widgets/service_categories.dart';
 import '../widgets/recent_requests.dart';
 import '../widgets/announcements.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -86,8 +89,38 @@ class _HomeScreenState extends State<HomeScreen> {
   int _countCompleted(List<RequestEntity> r) =>
       r.where((x) => x.status.toUpperCase() == 'COMPLETED').length;
 
+  void _onTabSelected(int i) {
+    if (i == 2) {
+      _requestsBloc.add(RequestsRefreshRequested());
+    }
+    setState(() => _currentIndex = i);
+  }
+
   @override
   Widget build(BuildContext context) {
+    // Phones keep the bottom bar; web / desktop get a side navigation rail.
+    final useSideNav = !context.isCompact;
+
+    final pages = IndexedStack(
+      index: _currentIndex,
+      children: [
+        _buildHomePage(),
+        BlocProvider.value(
+          value: _servicesBloc,
+          child: const ServicesScreen(),
+        ),
+        BlocProvider.value(
+          value: _requestsBloc,
+          child: const RequestsScreen(),
+        ),
+        const PaymentsScreen(),
+        BlocProvider.value(
+          value: _profileBloc,
+          child: const ProfileScreen(),
+        ),
+      ],
+    );
+
     return MultiBlocProvider(
       providers: [
         BlocProvider.value(value: _profileBloc),
@@ -96,25 +129,21 @@ class _HomeScreenState extends State<HomeScreen> {
       ],
       child: Scaffold(
         backgroundColor: Theme.of(context).colorScheme.surface,
-        body: IndexedStack(
-          index: _currentIndex,
-          children: [
-            _buildHomePage(),
-            BlocProvider.value(
-              value: _servicesBloc,
-              child: const ServicesScreen(),
-            ),
-            BlocProvider.value(
-              value: _requestsBloc,
-              child: const RequestsScreen(),
-            ),
-            const PaymentsScreen(),
-            BlocProvider.value(
-              value: _profileBloc,
-              child: const ProfileScreen(),
-            ),
-          ],
-        ),
+        body: useSideNav
+            ? Row(
+                children: [
+                  SafeArea(
+                    child: SideNav(
+                      currentIndex: _currentIndex,
+                      onTap: _onTabSelected,
+                      extended: context.isExpanded,
+                    ),
+                  ),
+                  const VerticalDivider(width: 1),
+                  Expanded(child: pages),
+                ],
+              )
+            : pages,
         floatingActionButton: _currentIndex == 0
             ? FloatingActionButton(
                 onPressed: () => Navigator.push(
@@ -127,15 +156,12 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: const Icon(Icons.auto_awesome_outlined),
               )
             : null,
-        bottomNavigationBar: BottomNav(
-          currentIndex: _currentIndex,
-          onTap: (i) {
-            if (i == 2) {
-              _requestsBloc.add(RequestsRefreshRequested());
-            }
-            setState(() => _currentIndex = i);
-          },
-        ),
+        bottomNavigationBar: useSideNav
+            ? null
+            : BottomNav(
+                currentIndex: _currentIndex,
+                onTap: _onTabSelected,
+              ),
       ),
     );
   }
@@ -155,70 +181,72 @@ class _HomeScreenState extends State<HomeScreen> {
 
             final requests = requestsState.requests;
 
-            return SingleChildScrollView(
-              child: Column(
-                children: [
-                  HomeHeader(
-                    userName: userName,
-                    municipality: municipality,
-                    notificationCount: _notificationCount,
-                    activeRequests: _countActive(requests),
-                    awaitingPayment: _countAwaiting(requests),
-                    completed: _countCompleted(requests),
-                    isLoading: requestsState.isLoading,
-                    onNotificationTap: () async {
-                      await Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (_) => const NotificationsScreen(),
-                        ),
-                      );
-                      _loadNotificationCount();
-                    },
-                  ),
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      children: [
-                        const SizedBox(height: 8),
-                        QuickActions(
-                          onNewRequest: () =>
-                              setState(() => _currentIndex = 1),
-                          onPayments: () =>
-                              setState(() => _currentIndex = 3),
-                        ),
-                        const SizedBox(height: 20),
-                        ServiceCategoriesSection(
-                          onViewAll: () =>
-                              setState(() => _currentIndex = 1),
-                          onCategoryTap: () =>
-                              setState(() => _currentIndex = 1),
-                        ),
-                        const SizedBox(height: 20),
-                        RecentRequestsSection(
-                          isLoading: requestsState.isLoading,
-                          requests: requests.take(2).map((r) =>
-                            RecentRequestItem(
-                              id: r.id,
-                              nameAr: r.title.isNotEmpty
-                                  ? r.title
-                                  : (r.serviceName ?? r.trackingNumber),
-                              status: r.status.toLowerCase(),
-                              date: _formatDate(r.createdAt),
-                            ),
-                          ).toList(),
-                          onViewAll: () =>
-                              setState(() => _currentIndex = 2),
-                          onRequestTap: (_) =>
-                              setState(() => _currentIndex = 2),
-                        ),
-                        const SizedBox(height: 20),
-                        const AnnouncementsCard(),
-                        const SizedBox(height: 20),
-                      ],
+            return ResponsiveCenter(
+              child: SingleChildScrollView(
+                child: Column(
+                  children: [
+                    HomeHeader(
+                      userName: userName,
+                      municipality: municipality,
+                      notificationCount: _notificationCount,
+                      activeRequests: _countActive(requests),
+                      awaitingPayment: _countAwaiting(requests),
+                      completed: _countCompleted(requests),
+                      isLoading: requestsState.isLoading,
+                      onNotificationTap: () async {
+                        await Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const NotificationsScreen(),
+                          ),
+                        );
+                        _loadNotificationCount();
+                      },
                     ),
-                  ),
-                ],
+                    Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: Column(
+                        children: [
+                          const SizedBox(height: 8),
+                          QuickActions(
+                            onNewRequest: () =>
+                                setState(() => _currentIndex = 1),
+                            onPayments: () =>
+                                setState(() => _currentIndex = 3),
+                          ),
+                          const SizedBox(height: 20),
+                          ServiceCategoriesSection(
+                            onViewAll: () =>
+                                setState(() => _currentIndex = 1),
+                            onCategoryTap: () =>
+                                setState(() => _currentIndex = 1),
+                          ),
+                          const SizedBox(height: 20),
+                          RecentRequestsSection(
+                            isLoading: requestsState.isLoading,
+                            requests: requests.take(2).map((r) =>
+                              RecentRequestItem(
+                                id: r.id,
+                                nameAr: r.title.isNotEmpty
+                                    ? r.title
+                                    : (r.serviceName ?? r.trackingNumber),
+                                status: r.status.toLowerCase(),
+                                date: _formatDate(r.createdAt),
+                              ),
+                            ).toList(),
+                            onViewAll: () =>
+                                setState(() => _currentIndex = 2),
+                            onRequestTap: (_) =>
+                                setState(() => _currentIndex = 2),
+                          ),
+                          const SizedBox(height: 20),
+                          const AnnouncementsCard(),
+                          const SizedBox(height: 20),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
               ),
             );
           },

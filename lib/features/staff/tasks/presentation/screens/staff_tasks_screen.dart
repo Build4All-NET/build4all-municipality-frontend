@@ -7,6 +7,7 @@ import 'package:baladiyati/features/staff/tasks/presentation/widgets/staff_task_
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 enum _TaskFilter { all, active, done }
 
@@ -114,130 +115,20 @@ class _StaffTasksBodyState extends State<_StaffTasksBody> {
           ),
         ],
       ),
-      body: BlocBuilder<StaffTasksCubit, StaffTasksState>(
-        builder: (context, state) {
-          if (state is StaffTasksInitial || state is StaffTasksLoading) {
-            return Center(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const CircularProgressIndicator(),
-                  const SizedBox(height: 14),
-                  Text(
-                    'Loading your tasks...',
-                    style: theme.textTheme.bodyMedium?.copyWith(
-                      color: colors.onSurfaceVariant,
-                    ),
-                  ),
-                ],
-              ),
-            );
-          }
-
-          if (state is StaffTasksError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(28),
+      body: ResponsiveCenter.detail(
+        child: BlocBuilder<StaffTasksCubit, StaffTasksState>(
+          builder: (context, state) {
+            if (state is StaffTasksInitial || state is StaffTasksLoading) {
+              return Center(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    Container(
-                      padding: const EdgeInsets.all(18),
-                      decoration: BoxDecoration(
-                        color: colors.errorContainer,
-                        shape: BoxShape.circle,
-                      ),
-                      child: Icon(
-                        Icons.error_outline,
-                        size: 40,
-                        color: colors.onErrorContainer,
-                      ),
-                    ),
-                    const SizedBox(height: 18),
+                    const CircularProgressIndicator(),
+                    const SizedBox(height: 14),
                     Text(
-                      'Failed to load tasks',
-                      style: theme.textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.w800,
-                        color: colors.onSurface,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      state.message,
-                      textAlign: TextAlign.center,
+                      'Loading your tasks...',
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: colors.onSurfaceVariant,
-                      ),
-                    ),
-                    const SizedBox(height: 22),
-                    FilledButton.icon(
-                      onPressed: () =>
-                          context.read<StaffTasksCubit>().loadTasks(),
-                      icon: const Icon(Icons.refresh),
-                      label: const Text('Retry'),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          }
-
-          if (state is StaffTasksLoaded) {
-            final filtered = _applyFilter(state.tasks);
-            final activeCount =
-                state.tasks.where((t) => !t.isCompleted).length;
-            final doneCount = state.tasks.where((t) => t.isCompleted).length;
-
-            if (state.tasks.isEmpty) {
-              return RefreshIndicator(
-                onRefresh: () =>
-                    context.read<StaffTasksCubit>().loadTasks(),
-                child: ListView(
-                  physics: const AlwaysScrollableScrollPhysics(),
-                  padding: const EdgeInsets.all(28),
-                  children: [
-                    const SizedBox(height: 60),
-                    Center(
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(22),
-                            decoration: BoxDecoration(
-                              color: colors.primaryContainer.withOpacity(0.35),
-                              shape: BoxShape.circle,
-                            ),
-                            child: Icon(
-                              Icons.inbox_outlined,
-                              size: 52,
-                              color: colors.primary.withOpacity(0.65),
-                            ),
-                          ),
-                          const SizedBox(height: 22),
-                          Text(
-                            'No tasks available',
-                            style: theme.textTheme.titleMedium?.copyWith(
-                              fontWeight: FontWeight.w800,
-                              color: colors.onSurface,
-                            ),
-                          ),
-                          const SizedBox(height: 10),
-                          Text(
-                            'There are no pending tasks for your assigned departments.\n\nIf you believe you should have access to tasks, contact your administrator to verify your department assignments.',
-                            textAlign: TextAlign.center,
-                            style: theme.textTheme.bodyMedium?.copyWith(
-                              color: colors.onSurfaceVariant,
-                              height: 1.55,
-                            ),
-                          ),
-                          const SizedBox(height: 22),
-                          OutlinedButton.icon(
-                            onPressed: () =>
-                                context.read<StaffTasksCubit>().loadTasks(),
-                            icon: const Icon(Icons.refresh),
-                            label: const Text('Check again'),
-                          ),
-                        ],
                       ),
                     ),
                   ],
@@ -245,129 +136,241 @@ class _StaffTasksBodyState extends State<_StaffTasksBody> {
               );
             }
 
-            return RefreshIndicator(
-              onRefresh: () => context.read<StaffTasksCubit>().loadTasks(),
-              child: CustomScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                slivers: [
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                      child: _TasksHeader(
-                        total: state.tasks.length,
-                        activeCount: activeCount,
-                        doneCount: doneCount,
+            if (state is StaffTasksError) {
+              return Center(
+                child: Padding(
+                  padding: const EdgeInsets.all(28),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(18),
+                        decoration: BoxDecoration(
+                          color: colors.errorContainer,
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          Icons.error_outline,
+                          size: 40,
+                          color: colors.onErrorContainer,
+                        ),
                       ),
-                    ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
-                      child: _SearchField(
-                        controller: _searchController,
-                        hintText: l10n.searchTasksHint,
-                        onChanged: (v) => setState(() => _searchQuery = v),
-                        onClear: () =>
-                            setState(() => _searchQuery = ''),
-                        colors: colors,
-                        theme: theme,
+                      const SizedBox(height: 18),
+                      Text(
+                        'Failed to load tasks',
+                        style: theme.textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.w800,
+                          color: colors.onSurface,
+                        ),
                       ),
-                    ),
-                  ),
-                  SliverToBoxAdapter(
-                    child: Padding(
-                      padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: _FilterChips(
-                              selected: _filter,
-                              activeCount: activeCount,
-                              doneCount: doneCount,
-                              totalCount: state.tasks.length,
-                              onChanged: (f) => setState(() => _filter = f),
-                              l10n: l10n,
-                              colors: colors,
-                              theme: theme,
-                            ),
-                          ),
-                          if (_hasActiveFilters) ...[
-                            const SizedBox(width: 8),
-                            TextButton.icon(
-                              onPressed: _resetFilters,
-                              icon: const Icon(Icons.filter_alt_off_outlined,
-                                  size: 16),
-                              label: Text(l10n.clearFilters),
-                              style: TextButton.styleFrom(
-                                foregroundColor: colors.error,
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8),
-                              ),
-                            ),
-                          ],
-                        ],
+                      const SizedBox(height: 8),
+                      Text(
+                        state.message,
+                        textAlign: TextAlign.center,
+                        style: theme.textTheme.bodyMedium?.copyWith(
+                          color: colors.onSurfaceVariant,
+                        ),
                       ),
-                    ),
+                      const SizedBox(height: 22),
+                      FilledButton.icon(
+                        onPressed: () =>
+                            context.read<StaffTasksCubit>().loadTasks(),
+                        icon: const Icon(Icons.refresh),
+                        label: const Text('Retry'),
+                      ),
+                    ],
                   ),
-                  if (filtered.isEmpty)
-                    SliverFillRemaining(
-                      child: Center(
+                ),
+              );
+            }
+
+            if (state is StaffTasksLoaded) {
+              final filtered = _applyFilter(state.tasks);
+              final activeCount =
+                  state.tasks.where((t) => !t.isCompleted).length;
+              final doneCount = state.tasks.where((t) => t.isCompleted).length;
+
+              if (state.tasks.isEmpty) {
+                return RefreshIndicator(
+                  onRefresh: () =>
+                      context.read<StaffTasksCubit>().loadTasks(),
+                  child: ListView(
+                    physics: const AlwaysScrollableScrollPhysics(),
+                    padding: const EdgeInsets.all(28),
+                    children: [
+                      const SizedBox(height: 60),
+                      Center(
                         child: Column(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Icon(
-                                _searchQuery.isNotEmpty
-                                    ? Icons.search_off
-                                    : Icons.check_circle_outline,
-                                size: 48,
-                                color: colors.primary.withOpacity(0.4)),
-                            const SizedBox(height: 14),
+                            Container(
+                              padding: const EdgeInsets.all(22),
+                              decoration: BoxDecoration(
+                                color: colors.primaryContainer.withOpacity(0.35),
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.inbox_outlined,
+                                size: 52,
+                                color: colors.primary.withOpacity(0.65),
+                              ),
+                            ),
+                            const SizedBox(height: 22),
                             Text(
-                              _searchQuery.isNotEmpty
-                                  ? l10n.noMatchingTasks
-                                  : _filter == _TaskFilter.active
-                                      ? 'No active tasks'
-                                      : 'No completed tasks',
+                              'No tasks available',
+                              style: theme.textTheme.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w800,
+                                color: colors.onSurface,
+                              ),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              'There are no pending tasks for your assigned departments.\n\nIf you believe you should have access to tasks, contact your administrator to verify your department assignments.',
+                              textAlign: TextAlign.center,
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: colors.onSurfaceVariant,
+                                height: 1.55,
+                              ),
+                            ),
+                            const SizedBox(height: 22),
+                            OutlinedButton.icon(
+                              onPressed: () =>
+                                  context.read<StaffTasksCubit>().loadTasks(),
+                              icon: const Icon(Icons.refresh),
+                              label: const Text('Check again'),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              }
+
+              return RefreshIndicator(
+                onRefresh: () => context.read<StaffTasksCubit>().loadTasks(),
+                child: CustomScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  slivers: [
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                        child: _TasksHeader(
+                          total: state.tasks.length,
+                          activeCount: activeCount,
+                          doneCount: doneCount,
+                        ),
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 0),
+                        child: _SearchField(
+                          controller: _searchController,
+                          hintText: l10n.searchTasksHint,
+                          onChanged: (v) => setState(() => _searchQuery = v),
+                          onClear: () =>
+                              setState(() => _searchQuery = ''),
+                          colors: colors,
+                          theme: theme,
+                        ),
+                      ),
+                    ),
+                    SliverToBoxAdapter(
+                      child: Padding(
+                        padding: const EdgeInsets.fromLTRB(16, 12, 16, 4),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: _FilterChips(
+                                selected: _filter,
+                                activeCount: activeCount,
+                                doneCount: doneCount,
+                                totalCount: state.tasks.length,
+                                onChanged: (f) => setState(() => _filter = f),
+                                l10n: l10n,
+                                colors: colors,
+                                theme: theme,
                               ),
                             ),
                             if (_hasActiveFilters) ...[
-                              const SizedBox(height: 14),
-                              OutlinedButton.icon(
+                              const SizedBox(width: 8),
+                              TextButton.icon(
                                 onPressed: _resetFilters,
                                 icon: const Icon(Icons.filter_alt_off_outlined,
                                     size: 16),
                                 label: Text(l10n.clearFilters),
+                                style: TextButton.styleFrom(
+                                  foregroundColor: colors.error,
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8),
+                                ),
                               ),
                             ],
                           ],
                         ),
                       ),
-                    )
-                  else
-                    SliverPadding(
-                      padding: const EdgeInsets.fromLTRB(16, 4, 16, 96),
-                      sliver: SliverList(
-                        delegate: SliverChildBuilderDelegate(
-                          (context, index) {
-                            final task = filtered[index];
-                            return StaffTaskCard(
-                              task: task,
-                              onOpenForm: () => _openTask(context, task),
-                            );
-                          },
-                          childCount: filtered.length,
+                    ),
+                    if (filtered.isEmpty)
+                      SliverFillRemaining(
+                        child: Center(
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(
+                                  _searchQuery.isNotEmpty
+                                      ? Icons.search_off
+                                      : Icons.check_circle_outline,
+                                  size: 48,
+                                  color: colors.primary.withOpacity(0.4)),
+                              const SizedBox(height: 14),
+                              Text(
+                                _searchQuery.isNotEmpty
+                                    ? l10n.noMatchingTasks
+                                    : _filter == _TaskFilter.active
+                                        ? 'No active tasks'
+                                        : 'No completed tasks',
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: colors.onSurfaceVariant,
+                                ),
+                              ),
+                              if (_hasActiveFilters) ...[
+                                const SizedBox(height: 14),
+                                OutlinedButton.icon(
+                                  onPressed: _resetFilters,
+                                  icon: const Icon(Icons.filter_alt_off_outlined,
+                                      size: 16),
+                                  label: Text(l10n.clearFilters),
+                                ),
+                              ],
+                            ],
+                          ),
+                        ),
+                      )
+                    else
+                      SliverPadding(
+                        padding: const EdgeInsets.fromLTRB(16, 4, 16, 96),
+                        sliver: SliverList(
+                          delegate: SliverChildBuilderDelegate(
+                            (context, index) {
+                              final task = filtered[index];
+                              return StaffTaskCard(
+                                task: task,
+                                onOpenForm: () => _openTask(context, task),
+                              );
+                            },
+                            childCount: filtered.length,
+                          ),
                         ),
                       ),
-                    ),
-                ],
-              ),
-            );
-          }
+                  ],
+                ),
+              );
+            }
 
-          return const SizedBox.shrink();
-        },
+            return const SizedBox.shrink();
+          },
+        ),
       ),
     );
   }

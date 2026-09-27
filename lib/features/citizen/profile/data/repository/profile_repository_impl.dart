@@ -6,6 +6,7 @@ import '../models/build4all_profile_model.dart';
 import '../models/municipality_profile_model.dart';
 import '../models/profile_model.dart';
 import '../services/profile_api_service.dart';
+import 'package:baladiyati/core/utils/picked_file.dart';
 
 class ProfileRepositoryImpl implements ProfileRepository {
   final ProfileApiService api;
@@ -55,7 +56,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
     required String lastName,
     required String username,
     required String email,
-    String? profileImagePath,
+    PickedFileData? profileImage,
     bool imageRemoved = false,
     required String phone,
     required String address,
@@ -65,7 +66,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
       lastName: lastName,
       username: username,
       email: email,
-      profileImagePath: profileImagePath,
+      profileImage: profileImage,
       imageRemoved: imageRemoved,
     );
 

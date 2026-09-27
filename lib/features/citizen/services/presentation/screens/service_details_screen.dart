@@ -7,6 +7,7 @@ import 'package:baladiyati/features/citizen/services/presentation/cubit/ai_servi
 import 'package:baladiyati/features/citizen/services/presentation/cubit/ai_service_state.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'new_request_screen.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class ServiceDetailsScreen extends StatelessWidget {
   final ServiceEntity service;
@@ -42,130 +43,132 @@ class ServiceDetailsScreen extends StatelessWidget {
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
       appBar: AppBar(title: Text(loc.serviceDetails)),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Icon + name card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: colors.surface,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: colors.outline.withOpacity(0.12)),
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    width: 64,
-                    height: 64,
-                    decoration: BoxDecoration(
-                      color: colors.primary.withOpacity(0.10),
-                      borderRadius: BorderRadius.circular(16),
+      body: ResponsiveCenter.detail(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Icon + name card
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: colors.outline.withOpacity(0.12)),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      width: 64,
+                      height: 64,
+                      decoration: BoxDecoration(
+                        color: colors.primary.withOpacity(0.10),
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Icon(Icons.description_outlined,
+                          color: colors.primary, size: 32),
                     ),
-                    child: Icon(Icons.description_outlined,
-                        color: colors.primary, size: 32),
-                  ),
-                  const SizedBox(height: 14),
-                  Text(
-                    service.localizedName(langCode),
-                    style: theme.textTheme.titleLarge
-                        ?.copyWith(fontWeight: FontWeight.w800),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    service.localizedDescription(langCode),
-                    style: theme.textTheme.bodyMedium
-                        ?.copyWith(color: colors.outline),
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 16),
-
-            // Details card
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: colors.surface,
-                borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: colors.outline.withOpacity(0.12)),
-              ),
-              child: Column(
-                children: [
-                  if (service.slaDays != null)
-                    _InfoRow(
-                      icon: Icons.schedule_outlined,
-                      label: loc.slaDays,
-                      value: '${service.slaDays} ${loc.days}',
-                      theme: theme,
-                      colors: colors,
+                    const SizedBox(height: 14),
+                    Text(
+                      service.localizedName(langCode),
+                      style: theme.textTheme.titleLarge
+                          ?.copyWith(fontWeight: FontWeight.w800),
+                      textAlign: TextAlign.center,
                     ),
-                  if (service.hasFees && service.feeAmount != null) ...[
-                    if (service.slaDays != null) const Divider(height: 20),
-                    _InfoRow(
-                      icon: Icons.attach_money,
-                      label: loc.feeLabel,
-                      value: service.feeAmount!.toStringAsFixed(0),
-                      theme: theme,
-                      colors: colors,
+                    const SizedBox(height: 8),
+                    Text(
+                      service.localizedDescription(langCode),
+                      style: theme.textTheme.bodyMedium
+                          ?.copyWith(color: colors.outline),
+                      textAlign: TextAlign.center,
                     ),
                   ],
-                  if (service.requiresInspection) ...[
-                    const Divider(height: 20),
-                    _InfoRow(
-                      icon: Icons.search_outlined,
-                      label: loc.requiresInspection,
-                      value: loc.active,
-                      theme: theme,
-                      colors: colors,
-                    ),
-                  ],
-                ],
-              ),
-            ),
-
-            const SizedBox(height: 28),
-
-            PrimaryButton(
-              label: loc.startRequest,
-              onPressed: () async {
-                final submitted = await Navigator.push<bool>(
-                  context,
-                  MaterialPageRoute(
-                    builder: (_) => NewRequestScreen(service: service),
-                  ),
-                );
-                if (submitted == true && context.mounted) {
-                  Navigator.pop(context, true);
-                }
-              },
-            ),
-
-            const SizedBox(height: 12),
-
-            OutlinedButton.icon(
-              onPressed: () => _showAiHelp(context, service, loc, colors),
-              icon: const Icon(Icons.auto_awesome_outlined),
-              label: Text(loc.aiHelp),
-              style: OutlinedButton.styleFrom(
-                minimumSize: const Size(double.infinity, 48),
-                foregroundColor: colors.primary,
-                side: BorderSide(color: colors.primary.withOpacity(0.5)),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
-            ),
 
-            const SizedBox(height: 24),
-          ],
+              const SizedBox(height: 16),
+
+              // Details card
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(16),
+                decoration: BoxDecoration(
+                  color: colors.surface,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: colors.outline.withOpacity(0.12)),
+                ),
+                child: Column(
+                  children: [
+                    if (service.slaDays != null)
+                      _InfoRow(
+                        icon: Icons.schedule_outlined,
+                        label: loc.slaDays,
+                        value: '${service.slaDays} ${loc.days}',
+                        theme: theme,
+                        colors: colors,
+                      ),
+                    if (service.hasFees && service.feeAmount != null) ...[
+                      if (service.slaDays != null) const Divider(height: 20),
+                      _InfoRow(
+                        icon: Icons.attach_money,
+                        label: loc.feeLabel,
+                        value: service.feeAmount!.toStringAsFixed(0),
+                        theme: theme,
+                        colors: colors,
+                      ),
+                    ],
+                    if (service.requiresInspection) ...[
+                      const Divider(height: 20),
+                      _InfoRow(
+                        icon: Icons.search_outlined,
+                        label: loc.requiresInspection,
+                        value: loc.active,
+                        theme: theme,
+                        colors: colors,
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 28),
+
+              PrimaryButton(
+                label: loc.startRequest,
+                onPressed: () async {
+                  final submitted = await Navigator.push<bool>(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => NewRequestScreen(service: service),
+                    ),
+                  );
+                  if (submitted == true && context.mounted) {
+                    Navigator.pop(context, true);
+                  }
+                },
+              ),
+
+              const SizedBox(height: 12),
+
+              OutlinedButton.icon(
+                onPressed: () => _showAiHelp(context, service, loc, colors),
+                icon: const Icon(Icons.auto_awesome_outlined),
+                label: Text(loc.aiHelp),
+                style: OutlinedButton.styleFrom(
+                  minimumSize: const Size(double.infinity, 48),
+                  foregroundColor: colors.primary,
+                  side: BorderSide(color: colors.primary.withOpacity(0.5)),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+              ),
+
+              const SizedBox(height: 24),
+            ],
+          ),
         ),
       ),
     );

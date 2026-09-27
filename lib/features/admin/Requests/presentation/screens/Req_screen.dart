@@ -9,6 +9,7 @@ import 'package:baladiyati/features/admin/Requests/presentation/screens/Request_
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/common/widgets/responsive_center.dart';
 
 class RequestsScreen extends StatefulWidget {
   const RequestsScreen({super.key});
@@ -124,192 +125,194 @@ class _RequestsScreenState extends State<RequestsScreen> {
         ),
         centerTitle: true,
       ),
-      body: BlocConsumer<RequestBloc, RequestState>(
-        listener: (context, state) {
-          final error = state.error.trim();
-          if (error.isNotEmpty) {
-            AppToast.show(
-              context,
-              message: error,
-              type: AppToastType.error,
-            );
-          }
+      body: ResponsiveCenter.detail(
+        child: BlocConsumer<RequestBloc, RequestState>(
+          listener: (context, state) {
+            final error = state.error.trim();
+            if (error.isNotEmpty) {
+              AppToast.show(
+                context,
+                message: error,
+                type: AppToastType.error,
+              );
+            }
 
-          final success = state.success.trim();
-          if (success.isNotEmpty) {
-            AppToast.show(
-              context,
-              message: _statusUpdateSuccessMessage(l10n, success),
-              type: AppToastType.success,
-            );
-          }
-        },
-        builder: (context, state) {
-          return RefreshIndicator(
-            onRefresh: () async {
-              context.read<RequestBloc>().add(
-                    LoadRequests(
-                      departmentId: state.selectedDepartmentId,
-                      status: state.selectedStatus,
-                    ),
-                  );
-            },
-            child: ListView(
-              physics: const AlwaysScrollableScrollPhysics(),
-              padding: const EdgeInsets.fromLTRB(14, 12, 14, 24),
-              children: [
-                TextField(
-                  onChanged: (value) {
-                    context.read<RequestBloc>().add(SearchRequests(value));
-                  },
-                  decoration: InputDecoration(
-                    hintText: l10n.search,
-                    prefixIcon: const Icon(Icons.search),
-                    filled: true,
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(18),
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  children: [
-                    Expanded(
-                      child: BlocBuilder<DepartmentCubit, DepartmentState>(
-                        builder: (context, depState) {
-                          return DropdownButtonFormField<int?>(
-                            value: state.selectedDepartmentId,
-                            isExpanded: true,
-                            decoration: InputDecoration(
-                              labelText: l10n.department,
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(14),
-                              ),
-                            ),
-                            items: [
-                              DropdownMenuItem<int?>(
-                                value: null,
-                                child: _ResponsiveText(
-                                  text: l10n.all,
-                                  maxFontSize: 13,
-                                  minFontSize: 8,
-                                  color: colors.onSurface,
-                                ),
-                              ),
-                              ...depState.departments.map(
-                                (department) {
-                                  return DropdownMenuItem<int?>(
-                                    value: department.id,
-                                    child: _ResponsiveText(
-                                      text: switch (department.name) {
-                                        'Engineering' => l10n.deptEngineering,
-                                        'Finance' => l10n.deptFinance,
-                                        'Police' => l10n.deptPolice,
-                                        'Civil Status' => l10n.deptCivilStatus,
-                                        'Public Works' => l10n.deptPublicWorks,
-                                        _ => department.name,
-                                      },
-                                      maxFontSize: 13,
-                                      minFontSize: 8,
-                                      color: colors.onSurface,
-                                    ),
-                                  );
-                                },
-                              ),
-                            ],
-                            onChanged: (value) {
-                              context.read<RequestBloc>().add(
-                                    FilterRequests(
-                                      departmentId: value,
-                                      status: state.selectedStatus,
-                                    ),
-                                  );
-                            },
-                          );
-                        },
+            final success = state.success.trim();
+            if (success.isNotEmpty) {
+              AppToast.show(
+                context,
+                message: _statusUpdateSuccessMessage(l10n, success),
+                type: AppToastType.success,
+              );
+            }
+          },
+          builder: (context, state) {
+            return RefreshIndicator(
+              onRefresh: () async {
+                context.read<RequestBloc>().add(
+                      LoadRequests(
+                        departmentId: state.selectedDepartmentId,
+                        status: state.selectedStatus,
                       ),
-                    ),
-                    const SizedBox(width: 10),
-                    Expanded(
-                      child: DropdownButtonFormField<String?>(
-                        value: state.selectedStatus,
-                        isExpanded: true,
-                        decoration: InputDecoration(
-                          labelText: l10n.status,
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(14),
-                          ),
-                        ),
-                        items: [
-                          DropdownMenuItem<String?>(
-                            value: null,
-                            child: _ResponsiveText(
-                              text: l10n.all,
-                              maxFontSize: 13,
-                              minFontSize: 8,
-                              color: colors.onSurface,
-                            ),
-                          ),
-                          ..._statuses.map(
-                            (status) {
-                              return DropdownMenuItem<String?>(
-                                value: status,
-                                child: _ResponsiveText(
-                                  text: _formatStatus(l10n, status),
-                                  maxFontSize: 13,
-                                  minFontSize: 8,
-                                  color: colors.onSurface,
-                                ),
-                              );
-                            },
-                          ),
-                        ],
-                        onChanged: (value) {
-                          context.read<RequestBloc>().add(
-                                FilterRequests(
-                                  departmentId: state.selectedDepartmentId,
-                                  status: value,
-                                ),
-                              );
-                        },
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                if (state.loading && state.visibleRequests.isEmpty)
-                  const Padding(
-                    padding: EdgeInsets.only(top: 120),
-                    child: Center(child: CircularProgressIndicator()),
-                  )
-                else if (state.visibleRequests.isEmpty)
-                  Padding(
-                    padding: const EdgeInsets.only(top: 120),
-                    child: Center(
-                      child: _ResponsiveText(
-                        text: l10n.noData,
-                        maxFontSize: 15,
-                        minFontSize: 10,
-                        color: colors.onSurfaceVariant,
-                      ),
-                    ),
-                  )
-                else
-                  ...state.visibleRequests.map(
-                    (request) {
-                      return _RequestCard(
-                        request: request,
-                        statusText: _formatStatus(l10n, request.status),
-                        statusColor: _statusColor(context, request.status),
-                        createdAt: _formatDate(request.createdAt),
-                        onTap: () => _openDetails(request),
-                      );
+                    );
+              },
+              child: ListView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                padding: const EdgeInsets.fromLTRB(14, 12, 14, 24),
+                children: [
+                  TextField(
+                    onChanged: (value) {
+                      context.read<RequestBloc>().add(SearchRequests(value));
                     },
+                    decoration: InputDecoration(
+                      hintText: l10n.search,
+                      prefixIcon: const Icon(Icons.search),
+                      filled: true,
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(18),
+                      ),
+                    ),
                   ),
-              ],
-            ),
-          );
-        },
+                  const SizedBox(height: 12),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: BlocBuilder<DepartmentCubit, DepartmentState>(
+                          builder: (context, depState) {
+                            return DropdownButtonFormField<int?>(
+                              value: state.selectedDepartmentId,
+                              isExpanded: true,
+                              decoration: InputDecoration(
+                                labelText: l10n.department,
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(14),
+                                ),
+                              ),
+                              items: [
+                                DropdownMenuItem<int?>(
+                                  value: null,
+                                  child: _ResponsiveText(
+                                    text: l10n.all,
+                                    maxFontSize: 13,
+                                    minFontSize: 8,
+                                    color: colors.onSurface,
+                                  ),
+                                ),
+                                ...depState.departments.map(
+                                  (department) {
+                                    return DropdownMenuItem<int?>(
+                                      value: department.id,
+                                      child: _ResponsiveText(
+                                        text: switch (department.name) {
+                                          'Engineering' => l10n.deptEngineering,
+                                          'Finance' => l10n.deptFinance,
+                                          'Police' => l10n.deptPolice,
+                                          'Civil Status' => l10n.deptCivilStatus,
+                                          'Public Works' => l10n.deptPublicWorks,
+                                          _ => department.name,
+                                        },
+                                        maxFontSize: 13,
+                                        minFontSize: 8,
+                                        color: colors.onSurface,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ],
+                              onChanged: (value) {
+                                context.read<RequestBloc>().add(
+                                      FilterRequests(
+                                        departmentId: value,
+                                        status: state.selectedStatus,
+                                      ),
+                                    );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: DropdownButtonFormField<String?>(
+                          value: state.selectedStatus,
+                          isExpanded: true,
+                          decoration: InputDecoration(
+                            labelText: l10n.status,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                            ),
+                          ),
+                          items: [
+                            DropdownMenuItem<String?>(
+                              value: null,
+                              child: _ResponsiveText(
+                                text: l10n.all,
+                                maxFontSize: 13,
+                                minFontSize: 8,
+                                color: colors.onSurface,
+                              ),
+                            ),
+                            ..._statuses.map(
+                              (status) {
+                                return DropdownMenuItem<String?>(
+                                  value: status,
+                                  child: _ResponsiveText(
+                                    text: _formatStatus(l10n, status),
+                                    maxFontSize: 13,
+                                    minFontSize: 8,
+                                    color: colors.onSurface,
+                                  ),
+                                );
+                              },
+                            ),
+                          ],
+                          onChanged: (value) {
+                            context.read<RequestBloc>().add(
+                                  FilterRequests(
+                                    departmentId: state.selectedDepartmentId,
+                                    status: value,
+                                  ),
+                                );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  if (state.loading && state.visibleRequests.isEmpty)
+                    const Padding(
+                      padding: EdgeInsets.only(top: 120),
+                      child: Center(child: CircularProgressIndicator()),
+                    )
+                  else if (state.visibleRequests.isEmpty)
+                    Padding(
+                      padding: const EdgeInsets.only(top: 120),
+                      child: Center(
+                        child: _ResponsiveText(
+                          text: l10n.noData,
+                          maxFontSize: 15,
+                          minFontSize: 10,
+                          color: colors.onSurfaceVariant,
+                        ),
+                      ),
+                    )
+                  else
+                    ...state.visibleRequests.map(
+                      (request) {
+                        return _RequestCard(
+                          request: request,
+                          statusText: _formatStatus(l10n, request.status),
+                          statusColor: _statusColor(context, request.status),
+                          createdAt: _formatDate(request.createdAt),
+                          onTap: () => _openDetails(request),
+                        );
+                      },
+                    ),
+                ],
+              ),
+            );
+          },
+        ),
       ),
     );
   }
