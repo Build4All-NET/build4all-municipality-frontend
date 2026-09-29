@@ -2,6 +2,7 @@ import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:dio/dio.dart';
 import 'package:baladiyati/core/utils/picked_file.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class CitizenProfileService {
   final Dio _buildDio;
@@ -25,8 +26,9 @@ class CitizenProfileService {
 
   Exception _handleError(
     DioException e, {
-    String fallback = 'Request failed',
+    String? fallback,
   }) {
+    fallback ??= AppStrings.current.errRequestFailed;
     final data = e.response?.data;
 
     if (data is Map) {
@@ -75,11 +77,11 @@ class CitizenProfileService {
     } on DioException catch (e) {
       throw _handleError(
         e,
-        fallback: 'Failed to load citizen profile',
+        fallback: AppStrings.current.errLoadProfile,
       );
     } catch (e) {
       throw AppException(
-        'Failed to load citizen profile',
+        AppStrings.current.errLoadProfile,
         original: e,
       );
     }
@@ -133,11 +135,11 @@ class CitizenProfileService {
     } on DioException catch (e) {
       throw _handleError(
         e,
-        fallback: 'Failed to update Build4All profile',
+        fallback: AppStrings.current.errUpdateProfile,
       );
     } catch (e) {
       throw AppException(
-        'Failed to update Build4All profile',
+        AppStrings.current.errUpdateProfile,
         original: e,
       );
     }
@@ -179,11 +181,11 @@ class CitizenProfileService {
     } on DioException catch (e) {
       throw _handleError(
         e,
-        fallback: 'Failed to update municipality profile',
+        fallback: AppStrings.current.errUpdateProfile,
       );
     } catch (e) {
       throw AppException(
-        'Failed to update municipality profile',
+        AppStrings.current.errUpdateProfile,
         original: e,
       );
     }

@@ -2,6 +2,7 @@ import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:dio/dio.dart';
 import '../models/service_model.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class CitizenServiceApi {
   final Dio _dio;
@@ -25,7 +26,7 @@ class CitizenServiceApi {
           .map(ServiceModel.fromJson)
           .toList();
     } on DioException catch (e) {
-      final msg = _extractMessage(e) ?? 'Failed to load services';
+      final msg = _extractMessage(e) ?? AppStrings.current.errLoadServices;
       throw AppException(msg);
     }
   }
@@ -36,7 +37,7 @@ class CitizenServiceApi {
       return ServiceModel.fromJson(
           Map<String, dynamic>.from(response.data as Map));
     } on DioException catch (e) {
-      final msg = _extractMessage(e) ?? 'Failed to load service';
+      final msg = _extractMessage(e) ?? AppStrings.current.errLoadService;
       throw AppException(msg);
     }
   }

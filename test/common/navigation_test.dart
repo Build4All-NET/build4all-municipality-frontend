@@ -1,3 +1,4 @@
+import 'package:baladiyati/common/widgets/app_sidebar.dart';
 import 'package:baladiyati/common/widgets/bottom_nav.dart';
 import 'package:baladiyati/common/widgets/side_nav.dart';
 import 'package:flutter/material.dart';
@@ -31,32 +32,49 @@ void main() {
     int? tapped;
     await tester.pumpWidget(testApp(Scaffold(
       body: Row(children: [
-        SideNav(currentIndex: 1, onTap: (i) => tapped = i, extended: true),
+        SideNav(currentIndex: 1, onTap: (i) => tapped = i, extended: true, userName: 'Hadi Khalil'),
       ]),
     )));
     await tester.pumpAndSettle();
 
-    final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
-    expect(rail.destinations.length, _labels.length);
-    expect(rail.selectedIndex, 1);
-    expect(rail.extended, isTrue);
+    final sidebar = tester.widget<AppSidebar>(find.byType(AppSidebar));
+    expect(sidebar.items.map((i) => i.label).toList(), _labels);
+    expect(sidebar.selectedIndex, 1);
+    expect(sidebar.collapsed, isFalse);
     for (final label in _labels) {
       expect(find.text(label), findsOneWidget, reason: label);
     }
+    // Signed-in user is shown in the footer.
+    expect(find.text('Hadi Khalil'), findsOneWidget);
+
     await tester.tap(find.text('Account'));
     expect(tapped, 4);
   });
 
-  testWidgets('citizenNavItems keeps both navs in sync', (tester) async {
+  testWidgets('SideNav shows icons only when collapsed (tablet)', (tester) async {
+    setScreenSize(tester, tabletSize);
     await tester.pumpWidget(testApp(Scaffold(
       body: Row(children: [SideNav(currentIndex: 0, onTap: (_) {})]),
+    )));
+    await tester.pumpAndSettle();
+
+    expect(tester.widget<AppSidebar>(find.byType(AppSidebar)).collapsed, isTrue);
+    expect(find.text('Services'), findsNothing);
+    expect(find.byTooltip('Services'), findsOneWidget);
+    expect(tester.takeException(), isNull);
+  });
+
+  testWidgets('citizenNavItems keeps both navs in sync', (tester) async {
+    setScreenSize(tester, desktopSize);
+    await tester.pumpWidget(testApp(Scaffold(
+      body: Row(children: [SideNav(currentIndex: 0, onTap: (_) {}, extended: true)]),
       bottomNavigationBar: BottomNav(currentIndex: 0, onTap: (_) {}),
     )));
     await tester.pumpAndSettle();
 
     final bar = tester.widget<BottomNavigationBar>(find.byType(BottomNavigationBar));
-    final rail = tester.widget<NavigationRail>(find.byType(NavigationRail));
+    final sidebar = tester.widget<AppSidebar>(find.byType(AppSidebar));
     expect(bar.items.map((i) => i.label).toList(), _labels);
-    expect(rail.destinations.map((d) => (d.label as Text).data).toList(), _labels);
+    expect(sidebar.items.map((i) => i.label).toList(), _labels);
   });
 }

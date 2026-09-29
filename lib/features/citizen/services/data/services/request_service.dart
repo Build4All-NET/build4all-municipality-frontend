@@ -6,6 +6,7 @@ import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
 import 'package:baladiyati/features/citizen/requests/data/models/request_model.dart';
 import 'package:baladiyati/features/citizen/services/data/models/request_submission.dart';
 import 'package:dio/dio.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class RequestService {
   final Dio _muniDio;
@@ -60,11 +61,11 @@ class RequestService {
       final data = e.response?.data;
       if (data is Map) {
         throw AppException(
-          (data['message'] ?? data['error'] ?? 'Failed to load requests')
+          (data['message'] ?? data['error'] ?? AppStrings.current.errLoadRequests)
               .toString(),
         );
       }
-      throw AppException('Failed to load requests');
+      throw AppException(AppStrings.current.errLoadRequests);
     }
   }
 
@@ -83,11 +84,11 @@ class RequestService {
       final data = e.response?.data;
       if (data is Map) {
         throw AppException(
-          (data['message'] ?? data['error'] ?? 'Failed to submit request')
+          (data['message'] ?? data['error'] ?? AppStrings.current.errCreateRequest)
               .toString(),
         );
       }
-      throw AppException('Failed to submit request');
+      throw AppException(AppStrings.current.errCreateRequest);
     }
   }
 }

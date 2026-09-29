@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
+import '../core/l10n/app_strings.dart';
 import '../core/l10n/locale_cubit.dart';
 import '../core/network/navigation/app_navigator.dart';
 import '../core/theme/theme_cubit.dart';
@@ -28,14 +29,16 @@ class MyApp extends StatelessWidget {
       child: Builder(
         builder: (context) {
           final themeState = context.watch<ThemeCubit>().state;
-          final locale = context.watch<LocaleCubit>().state;
+          final locale = context.watch<LocaleCubit>().state ?? AppStrings.defaultLocale;
+          // Keep strings used outside widgets (services, errors) in the same language.
+          AppStrings.setLocale(locale);
 
           return MaterialApp(
-            title: 'بلديتي',
+            onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
             debugShowCheckedModeBanner: false,
             navigatorKey: AppNavigator.key,
             theme: themeState.themeData,
-            locale: locale ?? const Locale('ar'),
+            locale: locale,
             supportedLocales: const [
               Locale('ar'),
               Locale('en'),

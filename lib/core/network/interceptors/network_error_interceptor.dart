@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:baladiyati/core/network/network_error_dialog_service.dart';
 import 'package:dio/dio.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class NetworkErrorInterceptor extends Interceptor {
   bool _isConnectionProblem(DioException err) {
@@ -35,14 +36,14 @@ class NetworkErrorInterceptor extends Interceptor {
   ) async {
     if (_isConnectionProblem(err)) {
       await NetworkErrorDialogService.showBlocking(
-        title: 'No internet connection',
-        message: 'Please reconnect to Wi-Fi or mobile data, then press Retry.',
+        title: AppStrings.current.networkNoInternet,
+        message: AppStrings.current.errReconnectHint,
         onRetryCheck: _hasInternet,
       );
     } else if (_isServerUnavailable(err)) {
       await NetworkErrorDialogService.showBlocking(
-        title: 'Server unavailable',
-        message: 'The server is not reachable right now. Press Retry later.',
+        title: AppStrings.current.errServerUnavailable,
+        message: AppStrings.current.errServerUnreachableHint,
         onRetryCheck: _hasInternet,
       );
     }

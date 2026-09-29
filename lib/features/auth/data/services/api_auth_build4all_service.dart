@@ -3,13 +3,15 @@ import 'package:baladiyati/core/exceptions/auth_exception.dart';
 import 'package:baladiyati/features/auth/data/models/admin_login_response.dart';
 import 'package:dio/dio.dart';
 import 'package:baladiyati/core/utils/picked_file.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class AuthApi {
   final Dio _dio;
 
   AuthApi(this._dio);
 
-  Exception _handleError(DioException e, {String fallback = 'Request failed'}) {
+  Exception _handleError(DioException e, {String? fallback}) {
+    fallback ??= AppStrings.current.errRequestFailed;
     final data = e.response?.data;
 
     String? message;
@@ -44,9 +46,9 @@ class AuthApi {
         },
       );
     } on DioException catch (e) {
-      throw _handleError(e, fallback: 'Login failed');
+      throw _handleError(e, fallback: AppStrings.current.loginFailed);
     } catch (e) {
-      throw AppException('Login failed', original: e);
+      throw AppException(AppStrings.current.loginFailed, original: e);
     }
   }
 
@@ -65,9 +67,9 @@ class AuthApi {
         },
       );
     } on DioException catch (e) {
-      throw _handleError(e, fallback: 'Failed to send verification code');
+      throw _handleError(e, fallback: AppStrings.current.errSendCode);
     } catch (e) {
-      throw AppException('Failed to send verification code', original: e);
+      throw AppException(AppStrings.current.errSendCode, original: e);
     }
   }
 
@@ -84,9 +86,9 @@ class AuthApi {
         },
       );
     } on DioException catch (e) {
-      throw _handleError(e, fallback: 'Failed to verify code');
+      throw _handleError(e, fallback: AppStrings.current.errVerifyCode);
     } catch (e) {
-      throw AppException('Failed to verify code', original: e);
+      throw AppException(AppStrings.current.errVerifyCode, original: e);
     }
   }
 
@@ -117,9 +119,9 @@ class AuthApi {
         data: formData,
       );
     } on DioException catch (e) {
-      throw _handleError(e, fallback: 'Failed to complete profile');
+      throw _handleError(e, fallback: AppStrings.current.errCompleteProfile);
     } catch (e) {
-      throw AppException('Failed to complete profile', original: e);
+      throw AppException(AppStrings.current.errCompleteProfile, original: e);
     }
   }
 
@@ -133,12 +135,12 @@ class AuthApi {
       );
     } on DioException catch (e) {
       throw AuthException(
-        'Session expired',
+        AppStrings.current.errSessionExpired,
         code: 'SESSION_EXPIRED',
         original: e,
       );
     } catch (e) {
-      throw AppException('Refresh failed', original: e);
+      throw AppException(AppStrings.current.errSessionExpired, original: e);
     }
   }
 
@@ -153,9 +155,9 @@ class AuthApi {
         },
       );
     } on DioException catch (e) {
-      throw _handleError(e, fallback: 'Logout failed');
+      throw _handleError(e, fallback: AppStrings.current.errLogout);
     } catch (e) {
-      throw AppException('Logout failed', original: e);
+      throw AppException(AppStrings.current.errLogout, original: e);
     }
   }
 
@@ -178,9 +180,9 @@ class AuthApi {
         Map<String, dynamic>.from(response.data as Map),
       );
     } on DioException catch (e) {
-      throw _handleError(e, fallback: 'Admin login failed');
+      throw _handleError(e, fallback: AppStrings.current.loginFailed);
     } catch (e) {
-      throw AppException('Admin login failed', original: e);
+      throw AppException(AppStrings.current.loginFailed, original: e);
     }
   }
 }

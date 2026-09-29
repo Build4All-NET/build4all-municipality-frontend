@@ -26,6 +26,7 @@ import '../../../../../common/widgets/primary_button.dart';
 import '../../../../../core/config/app_sizes.dart';
 import '../../../../../core/theme/theme_cubit.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -199,11 +200,11 @@ class _LoginScreenState extends State<LoginScreen> {
     final refreshToken = dual.userRefreshToken;
 
     if (token == null || token.trim().isEmpty) {
-      throw Exception('Missing user token.');
+      throw Exception(AppStrings.current.errMissingLoginData);
     }
 
     if (refreshToken == null || refreshToken.trim().isEmpty) {
-      throw Exception('Missing refresh token from Build4All login response.');
+      throw Exception(AppStrings.current.errMissingLoginData);
     }
 
     await AdminTokenStore().clear();
@@ -248,7 +249,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
         AppToast.show(
           context,
-          message: 'This account is not registered as a staff member.',
+          message: AppStrings.current.errNotStaffAccount,
           type: AppToastType.error,
         );
         return;
@@ -333,7 +334,7 @@ class _LoginScreenState extends State<LoginScreen> {
   Future<void> _goAfterAdminLogin(DualLoginResult dual) async {
     try {
       if (dual.admin == null) {
-        throw Exception('Missing admin login data.');
+        throw Exception(AppStrings.current.errMissingLoginData);
       }
 
       await AuthTokenStore().clear();

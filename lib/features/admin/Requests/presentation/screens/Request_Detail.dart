@@ -17,6 +17,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/core/l10n/known_names.dart';
 
 class RequestDetailPage extends StatefulWidget {
   final RequestModel request;
@@ -79,32 +80,7 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
   }
 
   String _localizedStatus(AppLocalizations l10n, String? status) {
-    final clean = status?.trim().toUpperCase() ?? '';
-
-    switch (clean) {
-      case 'SUBMITTED':
-        return l10n.statusSubmitted;
-      case 'PENDING':
-        return l10n.statusPending;
-      case 'UNDER_REVIEW':
-        return l10n.statusUnderReview;
-      case 'DOCUMENTS_MISSING':
-        return l10n.statusDocumentsMissing;
-      case 'IN_PROGRESS':
-        return l10n.statusInProgress;
-      case 'APPROVED':
-        return l10n.statusApproved;
-      case 'REJECTED':
-        return l10n.statusRejected;
-      case 'COMPLETED':
-        return l10n.statusCompleted;
-      case 'CANCELLED':
-        return l10n.statusCancelled;
-      case 'TAX_PAID':
-        return l10n.statusTaxPaid;
-      default:
-        return _safe(status).replaceAll('_', ' ');
-    }
+    return localizedRequestStatus(l10n, status);
   }
 
   Color _statusColor(BuildContext context, String? status) {
@@ -413,22 +389,7 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                                 _DetailRow(
                                   icon: Icons.miscellaneous_services_outlined,
                                   label: l10n.service,
-                                  value: switch (widget.request.serviceName) {
-                                    'Building Permit' => l10n.serviceBuildingPermit,
-                                    'Larger Building Permit' => l10n.serviceLargerBuildingPermit,
-                                    'Housing Permit' => l10n.serviceHousingPermit,
-                                    'External Works' => l10n.serviceExternalWorks,
-                                    'Illegal Construction' => l10n.serviceIllegalConstruction,
-                                    'Valuation Certificate' => l10n.serviceValuationCertificate,
-                                    'Clearance Certificate' => l10n.serviceClearanceCertificate,
-                                    'Tent Permit' => l10n.serviceTentPermit,
-                                    'Property Access' => l10n.servicePropertyAccess,
-                                    'Residence Certificate' => l10n.serviceResidenceCertificate,
-                                    'Contents Certificate' => l10n.serviceContentsCertificate,
-                                    'Work Certificate' => l10n.serviceWorkCertificate,
-                                    'Lease Registration' => l10n.serviceLeaseRegistration,
-                                    _ => _safe(widget.request.serviceName),
-                                  },
+                                  value: localizedServiceName(l10n, _safe(widget.request.serviceName)),
                                 ),
                                 _DetailRow(
                                   icon: Icons.person_outline,
@@ -442,7 +403,7 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                                 ),
                                 _DetailRow(
                                   icon: Icons.account_tree_outlined,
-                                  label: 'Process Key',
+                                  label: l10n.processKey,
                                   value: widget.request.processInstanceKey == null
                                       ? '—'
                                       : widget.request.processInstanceKey.toString(),

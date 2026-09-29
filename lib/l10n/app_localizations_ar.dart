@@ -681,13 +681,13 @@ class AppLocalizationsAr extends AppLocalizations {
   String get enterTitleAr => 'أدخل العنوان';
 
   @override
-  String get enterTitleEn => 'Enter title';
+  String get enterTitleEn => 'أدخل العنوان بالإنجليزية';
 
   @override
   String get enterContentAr => 'أدخل المحتوى';
 
   @override
-  String get enterContentEn => 'Enter content';
+  String get enterContentEn => 'أدخل المحتوى بالإنجليزية';
 
   @override
   String get published => 'منشور';
@@ -1808,4 +1808,327 @@ class AppLocalizationsAr extends AppLocalizations {
 
   @override
   String get serviceLeaseRegistration => 'تسجيل عقد إيجار';
+
+  @override
+  String get errSomethingWrong => 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errNoInternet => 'لا يوجد اتصال بالإنترنت. يرجى التحقق من شبكة الواي فاي أو بيانات الهاتف.';
+
+  @override
+  String get errReconnectHint => 'يرجى الاتصال بالواي فاي أو بيانات الهاتف ثم الضغط على إعادة المحاولة.';
+
+  @override
+  String get errServerUnavailable => 'الخادم غير متاح';
+
+  @override
+  String get errServerUnreachableHint => 'لا يمكن الوصول إلى الخادم حالياً. اضغط على إعادة المحاولة لاحقاً.';
+
+  @override
+  String get errServerNotResponding => 'الخادم لا يستجيب';
+
+  @override
+  String get errServer => 'خطأ في الخادم. يرجى المحاولة لاحقاً.';
+
+  @override
+  String get errTimeout => 'انتهت مهلة الاتصال. يرجى المحاولة مرة أخرى.';
+
+  @override
+  String get errRequestCancelled => 'تم إلغاء الطلب.';
+
+  @override
+  String get errSecureConnection => 'فشل الاتصال الآمن.';
+
+  @override
+  String get errInvalidRequest => 'طلب غير صالح. يرجى التحقق من البيانات المدخلة.';
+
+  @override
+  String get errSessionExpired => 'انتهت صلاحية الجلسة. يرجى تسجيل الدخول مجدداً.';
+
+  @override
+  String get errNoPermission => 'ليس لديك صلاحية للقيام بهذا الإجراء.';
+
+  @override
+  String get errNotFound => 'غير موجود.';
+
+  @override
+  String get errConflict => 'هذا العنصر موجود مسبقاً أو لا يمكن تنفيذ العملية الآن.';
+
+  @override
+  String get errRequestFailed => 'فشل الطلب.';
+
+  @override
+  String get errInvalidResponse => 'استجابة غير صالحة من الخادم.';
+
+  @override
+  String get errInvalidInput => 'بيانات غير صالحة.';
+
+  @override
+  String get errInvalidEmailFormat => 'صيغة البريد الإلكتروني غير صحيحة';
+
+  @override
+  String get errAccountInactive => 'حسابك غير مفعّل. أعد تفعيله للمتابعة.';
+
+  @override
+  String get errNotStaffAccount => 'هذا الحساب غير مسجّل كموظف في البلدية.';
+
+  @override
+  String get errMissingLoginData => 'بيانات تسجيل الدخول ناقصة. يرجى تسجيل الدخول مجدداً.';
+
+  @override
+  String get errMissingOwnerProject => 'رابط البلدية غير موجود. يرجى تسجيل الدخول مجدداً.';
+
+  @override
+  String get errFileNotFound => 'الملف غير موجود';
+
+  @override
+  String get errUploadFailed => 'فشل رفع الملفات';
+
+  @override
+  String get errInvalidAiResponse => 'استجابة غير صالحة من المساعد';
+
+  @override
+  String get errEmailRequired => 'البريد الإلكتروني مطلوب';
+
+  @override
+  String get errFullNameRequired => 'الاسم الكامل مطلوب';
+
+  @override
+  String get errRoleRequired => 'الدور مطلوب';
+
+  @override
+  String get errInvalidUserId => 'معرّف المستخدم غير صالح';
+
+  @override
+  String get errCarPlateRequired => 'رقم اللوحة مطلوب';
+
+  @override
+  String get errIdentityRequired => 'رقم الهوية مطلوب';
+
+  @override
+  String get errNameMinLength => 'يجب أن يحتوي الاسم على حرفين على الأقل';
+
+  @override
+  String get errInvalidResetCode => 'رمز إعادة التعيين غير صحيح';
+
+  @override
+  String get errLoadRequests => 'تعذّر تحميل الطلبات';
+
+  @override
+  String get errLoadRequest => 'تعذّر تحميل الطلب';
+
+  @override
+  String get errCreateRequest => 'تعذّر إرسال الطلب';
+
+  @override
+  String get errLoadServices => 'تعذّر تحميل الخدمات';
+
+  @override
+  String get errLoadService => 'تعذّر تحميل الخدمة';
+
+  @override
+  String get errCreateService => 'تعذّر إنشاء الخدمة';
+
+  @override
+  String get errUpdateService => 'تعذّر تحديث الخدمة';
+
+  @override
+  String get errDeleteService => 'تعذّر حذف الخدمة';
+
+  @override
+  String get errLoadDepartments => 'تعذّر تحميل الأقسام';
+
+  @override
+  String get errDeleteDepartment => 'تعذّر حذف القسم';
+
+  @override
+  String get errLoadEmployees => 'تعذّر تحميل الموظفين';
+
+  @override
+  String get errCreateEmployee => 'تعذّر إضافة الموظف';
+
+  @override
+  String get errUpdateEmployee => 'تعذّر تحديث بيانات الموظف';
+
+  @override
+  String get errDeleteEmployee => 'تعذّر حذف الموظف';
+
+  @override
+  String get errLoadUsers => 'تعذّر تحميل المستخدمين';
+
+  @override
+  String get errLoadRoles => 'تعذّر تحميل الأدوار';
+
+  @override
+  String get errAssignRole => 'تعذّر تعيين الدور';
+
+  @override
+  String get errRemoveRole => 'تعذّر إزالة الدور';
+
+  @override
+  String get errLoadAnnouncements => 'تعذّر تحميل الإعلانات';
+
+  @override
+  String get errLoadViolations => 'تعذّر تحميل المخالفات';
+
+  @override
+  String get errLoadNotifications => 'تعذّر تحميل الإشعارات';
+
+  @override
+  String get errMarkNotificationRead => 'تعذّر تعليم الإشعار كمقروء';
+
+  @override
+  String get errMarkAllRead => 'تعذّر تعليم كل الإشعارات كمقروءة';
+
+  @override
+  String get errLoadPayments => 'تعذّر تحميل المدفوعات';
+
+  @override
+  String get errDownloadReceipt => 'تعذّر تنزيل الإيصال';
+
+  @override
+  String get errLoadProfile => 'تعذّر تحميل الملف الشخصي';
+
+  @override
+  String get errUpdateProfile => 'تعذّر تحديث الملف الشخصي';
+
+  @override
+  String get errSendCode => 'تعذّر إرسال رمز التحقق';
+
+  @override
+  String get errVerifyCode => 'تعذّر التحقق من الرمز';
+
+  @override
+  String get errCompleteProfile => 'تعذّر إكمال الملف الشخصي';
+
+  @override
+  String get errRegister => 'تعذّر إنشاء الحساب';
+
+  @override
+  String get errResetPassword => 'تعذّر إعادة تعيين كلمة المرور';
+
+  @override
+  String get errLogout => 'تعذّر تسجيل الخروج';
+
+  @override
+  String get errSyncMunicipalityUser => 'تعذّر ربط حسابك بالبلدية';
+
+  @override
+  String get passwordResetSuccess => 'تمت إعادة تعيين كلمة المرور بنجاح';
+
+  @override
+  String get operationSuccess => 'تمت العملية بنجاح';
+
+  @override
+  String get refresh => 'تحديث';
+
+  @override
+  String get stepRegister => 'التسجيل';
+
+  @override
+  String get stepVerify => 'التحقق';
+
+  @override
+  String get stepComplete => 'الإكمال';
+
+  @override
+  String get languageArabic => 'العربية';
+
+  @override
+  String get languageEnglish => 'الإنجليزية';
+
+  @override
+  String get languageFrench => 'الفرنسية';
+
+  @override
+  String get myTasks => 'مهامي';
+
+  @override
+  String tasksSummary(Object active, Object done) {
+    return '$active نشطة · $done منجزة';
+  }
+
+  @override
+  String get loadingTasks => 'جارٍ تحميل مهامك...';
+
+  @override
+  String get noTasksAvailable => 'لا توجد مهام';
+
+  @override
+  String get noTasksHint => 'لا توجد مهام معلّقة للأقسام المعيّنة لك.\n\nإذا كنت تعتقد أنه يجب أن تكون لديك مهام، تواصل مع المسؤول للتحقق من الأقسام المعيّنة لك.';
+
+  @override
+  String get checkAgain => 'تحقق مجدداً';
+
+  @override
+  String get noActiveTasks => 'لا توجد مهام نشطة';
+
+  @override
+  String get noCompletedTasks => 'لا توجد مهام منجزة';
+
+  @override
+  String get taskStatusAssigned => 'مُسندة';
+
+  @override
+  String get defaultTaskName => 'مهمة';
+
+  @override
+  String get municipalityCertificate => 'إفادة بلدية';
+
+  @override
+  String get officiallySigned => 'موقّعة رسمياً';
+
+  @override
+  String get certificateGeneratedNote => 'تم إصدار هذا المستند إلكترونياً عبر النظام البلدي.';
+
+  @override
+  String fieldMinValue(Object min) {
+    return 'أقل قيمة مسموحة هي $min';
+  }
+
+  @override
+  String fieldMaxValue(Object max) {
+    return 'أعلى قيمة مسموحة هي $max';
+  }
+
+  @override
+  String get noCertificatesInCategory => 'لا توجد إفادات في هذه الفئة.';
+
+  @override
+  String certificatesSummary(Object signed, Object pending) {
+    return '$signed موقّعة · $pending قيد الانتظار';
+  }
+
+  @override
+  String get processKey => 'رقم العملية';
+
+  @override
+  String get visibility => 'الظهور';
+
+  @override
+  String get profilePublic => 'عام';
+
+  @override
+  String get profilePrivate => 'خاص';
+
+  @override
+  String get timeJustNow => 'الآن';
+
+  @override
+  String timeMinutesAgo(Object count) {
+    return 'منذ $count د';
+  }
+
+  @override
+  String timeHoursAgo(Object count) {
+    return 'منذ $count س';
+  }
+
+  @override
+  String get timeYesterday => 'أمس';
+
+  @override
+  String timeDaysAgo(Object count) {
+    return 'منذ $count أيام';
+  }
 }

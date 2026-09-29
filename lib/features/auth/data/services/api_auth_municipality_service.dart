@@ -3,6 +3,7 @@
 import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/features/auth/data/models/auth_response_model.dart';
 import 'package:dio/dio.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class ApiAuthMunicipalityService {
   final Dio _dio;
@@ -11,8 +12,9 @@ class ApiAuthMunicipalityService {
 
   AppException _handleDioError(
     DioException e, {
-    String fallback = 'Municipality request failed',
+    String? fallback,
   }) {
+    fallback ??= AppStrings.current.errRequestFailed;
     final data = e.response?.data;
 
     if (data is Map) {
@@ -84,9 +86,9 @@ class ApiAuthMunicipalityService {
         return null;
       }
 
-      throw _handleDioError(e, fallback: 'Failed to sync municipality user');
+      throw _handleDioError(e, fallback: AppStrings.current.errSyncMunicipalityUser);
     } catch (e) {
-      throw AppException('Failed to sync municipality user', original: e);
+      throw AppException(AppStrings.current.errSyncMunicipalityUser, original: e);
     }
   }
 }

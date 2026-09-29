@@ -1,6 +1,7 @@
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/admin/violations/data/model/ViolationModel.dart';
 import 'package:dio/dio.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class ViolationApiService {
   final Dio dio;
@@ -35,7 +36,7 @@ class ViolationApiService {
     final cleanedCarPlate = carPlate.trim();
 
     if (cleanedCarPlate.isEmpty) {
-      throw Exception('Car plate is required');
+      throw Exception(AppStrings.current.errCarPlateRequired);
     }
 
     final response = await dio.get(
@@ -54,7 +55,7 @@ class ViolationApiService {
     final cleanedIdentityNumber = identityNumber.trim();
 
     if (cleanedIdentityNumber.isEmpty) {
-      throw Exception('Identity number is required');
+      throw Exception(AppStrings.current.errIdentityRequired);
     }
 
     final response = await dio.get(
@@ -71,7 +72,7 @@ class ViolationApiService {
     final cleanedName = name.trim();
 
     if (cleanedName.length < 2) {
-      throw Exception('Name must contain at least 2 characters');
+      throw Exception(AppStrings.current.errNameMinLength);
     }
 
     final response = await dio.get(
@@ -86,7 +87,7 @@ class ViolationApiService {
 
   List<ViolationModel> _parseViolationList(dynamic data) {
     if (data is! List) {
-      throw Exception('Invalid violations response');
+      throw Exception(AppStrings.current.errInvalidResponse);
     }
 
     return data

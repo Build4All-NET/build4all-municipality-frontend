@@ -1,6 +1,7 @@
 import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/features/admin/Requests/data/model/RequestModel.dart';
 import 'package:dio/dio.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class RequestApiService {
   final Dio dio;
@@ -101,7 +102,7 @@ class RequestApiService {
       }
     }
 
-    throw AppException('Invalid server response.');
+    throw AppException(AppStrings.current.errInvalidResponse);
   }
 
   RequestModel _parseOne(dynamic data) {
@@ -113,6 +114,6 @@ class RequestApiService {
       return RequestModel.fromJson(Map<String, dynamic>.from(data));
     }
 
-    throw AppException('Invalid server response.');
+    throw AppException(AppStrings.current.errInvalidResponse);
   }
 }

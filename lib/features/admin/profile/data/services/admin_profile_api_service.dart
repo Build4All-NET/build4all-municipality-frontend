@@ -1,6 +1,7 @@
 import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:dio/dio.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class AdminProfileApiService {
   final Dio dio;
@@ -20,6 +21,6 @@ class AdminProfileApiService {
       return Map<String, dynamic>.from(data);
     }
 
-    throw AppException('Invalid server response.');
+    throw AppException(AppStrings.current.errInvalidResponse);
   }
 }

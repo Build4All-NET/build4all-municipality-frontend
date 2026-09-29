@@ -3,6 +3,7 @@ import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:dio/dio.dart';
 import '../models/request_model.dart';
 import 'package:baladiyati/core/config/app_file_types.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class RequestApiService {
   final Dio _dio;
@@ -29,7 +30,7 @@ class RequestApiService {
       }
       return list.whereType<Map<String, dynamic>>().map(RequestModel.fromJson).toList();
     } on DioException catch (e) {
-      throw AppException(_extractMessage(e) ?? 'Failed to load requests');
+      throw AppException(_extractMessage(e) ?? AppStrings.current.errLoadRequests);
     }
   }
 
@@ -38,7 +39,7 @@ class RequestApiService {
       final response = await _dio.get('/api/requests/$id');
       return RequestModel.fromJson(Map<String, dynamic>.from(response.data as Map));
     } on DioException catch (e) {
-      throw AppException(_extractMessage(e) ?? 'Failed to load request');
+      throw AppException(_extractMessage(e) ?? AppStrings.current.errLoadRequest);
     }
   }
 
@@ -78,7 +79,7 @@ class RequestApiService {
       final response = await _dio.post('/api/requests/$serviceId', data: body);
       return RequestModel.fromJson(Map<String, dynamic>.from(response.data as Map));
     } on DioException catch (e) {
-      throw AppException(_extractMessage(e) ?? 'Failed to create request');
+      throw AppException(_extractMessage(e) ?? AppStrings.current.errCreateRequest);
     }
   }
 

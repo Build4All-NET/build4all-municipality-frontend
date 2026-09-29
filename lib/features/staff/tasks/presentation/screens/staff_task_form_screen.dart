@@ -1329,10 +1329,10 @@ class _DynamicField extends StatelessWidget {
       final num? n = num.tryParse(v);
       if (n == null) return l10n.invalidNumber;
       if (field.min != null && n < field.min!) {
-        return 'Minimum value is ${field.min}';
+        return l10n.fieldMinValue(field.min!);
       }
       if (field.max != null && n > field.max!) {
-        return 'Maximum value is ${field.max}';
+        return l10n.fieldMaxValue(field.max!);
       }
     }
     return null;
@@ -1597,7 +1597,7 @@ class _DynamicField extends StatelessWidget {
         borderRadius: BorderRadius.circular(10),
       ),
       child: Text(
-        '${field.label} (unsupported type: $type)',
+        '${field.label} (${AppLocalizations.of(context)!.unsupportedFieldType}: $type)',
         style: theme.textTheme.bodySmall?.copyWith(
           color: colors.onErrorContainer,
         ),

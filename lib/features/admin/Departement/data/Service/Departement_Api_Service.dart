@@ -1,6 +1,7 @@
 import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/features/admin/Departement/data/Model/Departement_model.dart';
 import 'package:dio/dio.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class DepartmentApiService {
   final Dio dio;
@@ -17,12 +18,12 @@ class DepartmentApiService {
       return data.map((e) => DepartmentModel.fromJson(e)).toList();
     }
 
-    throw const AppException('Invalid departments response format');
+    throw AppException(AppStrings.current.errInvalidResponse);
   } on DioException {
     rethrow;
   } catch (e) {
     if (e is AppException) rethrow;
-    throw AppException('Failed to load departments: $e');
+    throw AppException(AppStrings.current.errLoadDepartments);
   }
 }
 
@@ -47,7 +48,7 @@ Future<void> delete(int id) async {
     rethrow;
   } catch (e) {
     if (e is AppException) rethrow;
-    throw AppException('Failed to delete department: $e');
+    throw AppException(AppStrings.current.errDeleteDepartment);
   }
 }
 

@@ -2,6 +2,7 @@ import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/admin/staff/data/Model/AdminUserModel.dart';
 import 'package:baladiyati/features/admin/staff/data/Model/UserAssignmentSearchResult.dart';
 import 'package:dio/dio.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class AdminUserApiService {
   final Dio dio;
@@ -21,7 +22,7 @@ class AdminUserApiService {
     final data = response.data;
 
     if (data is! List) {
-      throw Exception('Invalid users response');
+      throw Exception(AppStrings.current.errInvalidResponse);
     }
 
     return data
@@ -37,7 +38,7 @@ class AdminUserApiService {
     final cleanEmail = email.trim();
 
     if (cleanEmail.isEmpty) {
-      throw Exception('Email is required');
+      throw Exception(AppStrings.current.errEmailRequired);
     }
 
     final response = await dio.get(
@@ -51,7 +52,7 @@ class AdminUserApiService {
     final data = response.data;
 
     if (data is! Map) {
-      throw Exception('Invalid search response');
+      throw Exception(AppStrings.current.errInvalidResponse);
     }
 
     return UserAssignmentSearchResult.fromJson(
@@ -65,7 +66,7 @@ class AdminUserApiService {
     final data = response.data;
 
     if (data is! List) {
-      throw Exception('Invalid roles response');
+      throw Exception(AppStrings.current.errInvalidResponse);
     }
 
     return data
@@ -80,13 +81,13 @@ class AdminUserApiService {
     List<int> departmentIds = const [],
   }) async {
     if (userId <= 0) {
-      throw Exception('Invalid user ID');
+      throw Exception(AppStrings.current.errInvalidUserId);
     }
 
     final cleanRole = roleName.trim();
 
     if (cleanRole.isEmpty) {
-      throw Exception('Role is required');
+      throw Exception(AppStrings.current.errRoleRequired);
     }
 
     final Map<String, dynamic> body = {
@@ -106,7 +107,7 @@ class AdminUserApiService {
     final data = response.data;
 
     if (data is! Map) {
-      throw Exception('Invalid assign role response');
+      throw Exception(AppStrings.current.errInvalidResponse);
     }
 
     return AdminUserModel.fromJson(
@@ -122,11 +123,11 @@ class AdminUserApiService {
     final cleanName = fullName.trim();
 
     if (cleanEmail.isEmpty) {
-      throw Exception('Email is required');
+      throw Exception(AppStrings.current.errEmailRequired);
     }
 
     if (cleanName.isEmpty) {
-      throw Exception('Full name is required');
+      throw Exception(AppStrings.current.errFullNameRequired);
     }
 
     await dio.post(
@@ -143,13 +144,13 @@ class AdminUserApiService {
     required String roleName,
   }) async {
     if (userId <= 0) {
-      throw Exception('Invalid user ID');
+      throw Exception(AppStrings.current.errInvalidUserId);
     }
 
     final cleanRole = roleName.trim();
 
     if (cleanRole.isEmpty) {
-      throw Exception('Role is required');
+      throw Exception(AppStrings.current.errRoleRequired);
     }
 
     final response = await dio.delete(
@@ -159,7 +160,7 @@ class AdminUserApiService {
     final data = response.data;
 
     if (data is! Map) {
-      throw Exception('Invalid remove role response');
+      throw Exception(AppStrings.current.errInvalidResponse);
     }
 
     return AdminUserModel.fromJson(

@@ -10,6 +10,8 @@ import 'package:baladiyati/features/citizen/requests/presentation/bloc/requests_
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'request_details_screen.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/common/widgets/adaptive_card_grid.dart';
+import 'package:baladiyati/core/l10n/known_names.dart';
 
 class RequestsScreen extends StatefulWidget {
   const RequestsScreen({super.key});
@@ -56,20 +58,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
   }).toList();
 
   String _statusLabel(AppLocalizations loc, String status) {
-    switch (status) {
-      case 'DRAFT': return loc.statusDraft;
-      case 'SUBMITTED': return loc.statusSubmitted;
-      case 'UNDER_REVIEW': return loc.statusUnderReview;
-      case 'DOCUMENTS_MISSING': return loc.statusDocumentsMissing;
-      case 'IN_PROGRESS': return loc.inProgress;
-      case 'APPROVED': return loc.approved;
-      case 'REJECTED': return loc.rejected;
-      case 'COMPLETED': return loc.completed;
-      case 'CANCELLED': return loc.statusCancelled;
-      case 'TAX_PAID': return loc.statusTaxPaid;
-      case 'TAX_REJECTED': return loc.statusTaxRejected;
-      default: return status;
-    }
+    return localizedRequestStatus(loc, status);
   }
 
   @override
@@ -90,7 +79,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
 
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          body: ResponsiveCenter.detail(
+          body: ResponsiveCenter(
             child: SafeArea(
               child: Column(
                 children: [
@@ -164,7 +153,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
                             : RefreshIndicator(
                                 onRefresh: () async =>
                                     context.read<RequestsBloc>().add(RequestsRefreshRequested()),
-                                child: ListView.builder(
+                                child: AdaptiveCardList.builder(
                                   padding: const EdgeInsets.all(16),
                                   itemCount: items.length,
                                   itemBuilder: (_, i) => _RequestCard(
@@ -198,7 +187,7 @@ class _RequestsSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    return AdaptiveCardList.builder(
       padding: const EdgeInsets.all(16),
       physics: const NeverScrollableScrollPhysics(),
       itemCount: 6,
@@ -271,20 +260,7 @@ class StatusBadgeWidget extends StatelessWidget {
   const StatusBadgeWidget({super.key, required this.status});
 
   static String label(AppLocalizations loc, String status) {
-    switch (status) {
-      case 'DRAFT': return loc.statusDraft;
-      case 'SUBMITTED': return loc.statusSubmitted;
-      case 'UNDER_REVIEW': return loc.statusUnderReview;
-      case 'DOCUMENTS_MISSING': return loc.statusDocumentsMissing;
-      case 'IN_PROGRESS': return loc.inProgress;
-      case 'APPROVED': return loc.approved;
-      case 'REJECTED': return loc.rejected;
-      case 'COMPLETED': return loc.completed;
-      case 'CANCELLED': return loc.statusCancelled;
-      case 'TAX_PAID': return loc.statusTaxPaid;
-      case 'TAX_REJECTED': return loc.statusTaxRejected;
-      default: return status;
-    }
+    return localizedRequestStatus(loc, status);
   }
 
   @override

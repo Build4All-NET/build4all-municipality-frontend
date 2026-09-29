@@ -2,6 +2,7 @@ import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:dio/dio.dart';
 import '../../domain/entities/notification_entity.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class NotificationApiService {
   final Dio _dio;
@@ -28,7 +29,7 @@ class NotificationApiService {
           .map(NotificationEntity.fromJson)
           .toList();
     } on DioException catch (e) {
-      throw AppException(_extractMessage(e) ?? 'Failed to load notifications');
+      throw AppException(_extractMessage(e) ?? AppStrings.current.errLoadNotifications);
     }
   }
 
@@ -37,7 +38,7 @@ class NotificationApiService {
       final response = await _dio.put('/api/notifications/$id/read');
       return NotificationEntity.fromJson(response.data as Map<String, dynamic>);
     } on DioException catch (e) {
-      throw AppException(_extractMessage(e) ?? 'Failed to mark notification as read');
+      throw AppException(_extractMessage(e) ?? AppStrings.current.errMarkNotificationRead);
     }
   }
 
@@ -45,7 +46,7 @@ class NotificationApiService {
     try {
       await _dio.put('/api/notifications/read-all');
     } on DioException catch (e) {
-      throw AppException(_extractMessage(e) ?? 'Failed to mark all as read');
+      throw AppException(_extractMessage(e) ?? AppStrings.current.errMarkAllRead);
     }
   }
 

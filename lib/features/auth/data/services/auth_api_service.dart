@@ -8,6 +8,7 @@ import 'package:dio/dio.dart';
 import '../models/auth_response_model.dart';
 import 'auth_token_store.dart';
 import 'session_role_store.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class AuthApiService {
   final AuthTokenStore _tokenStore;
@@ -21,8 +22,9 @@ class AuthApiService {
 
   Exception _handleDioError(
     DioException e, {
-    String fallback = 'Request failed',
+    String? fallback,
   }) {
+    fallback ??= AppStrings.current.errRequestFailed;
     final data = e.response?.data;
 
     String message = fallback;
@@ -84,13 +86,13 @@ class AuthApiService {
 
       return authResponse;
     } on DioException catch (e) {
-      throw _handleDioError(e, fallback: 'Failed to register user');
+      throw _handleDioError(e, fallback: AppStrings.current.errRegister);
     } on AuthException {
       rethrow;
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to register user', original: e);
+      throw AppException(AppStrings.current.errRegister, original: e);
     }
   }
 
@@ -122,13 +124,13 @@ class AuthApiService {
 
       return authResponse;
     } on DioException catch (e) {
-      throw _handleDioError(e, fallback: 'Failed to login user');
+      throw _handleDioError(e, fallback: AppStrings.current.loginFailed);
     } on AuthException {
       rethrow;
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to login user', original: e);
+      throw AppException(AppStrings.current.loginFailed, original: e);
     }
   }
 
@@ -170,13 +172,13 @@ class AuthApiService {
         return data['message'].toString();
       }
 
-      return 'Password reset successfully';
+      return AppStrings.current.passwordResetSuccess;
     } on DioException catch (e) {
-      throw _handleDioError(e, fallback: 'Failed to reset password');
+      throw _handleDioError(e, fallback: AppStrings.current.errResetPassword);
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to reset password', original: e);
+      throw AppException(AppStrings.current.errResetPassword, original: e);
     }
   }
 
@@ -209,13 +211,13 @@ class AuthApiService {
         return data['message'].toString();
       }
 
-      return 'Success';
+      return AppStrings.current.operationSuccess;
     } on DioException catch (e) {
-      throw _handleDioError(e, fallback: 'Failed to complete profile');
+      throw _handleDioError(e, fallback: AppStrings.current.errCompleteProfile);
     } on AppException {
       rethrow;
     } catch (e) {
-      throw AppException('Failed to complete profile', original: e);
+      throw AppException(AppStrings.current.errCompleteProfile, original: e);
     }
   }
 

@@ -10,6 +10,8 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/core/l10n/known_names.dart';
+import 'package:baladiyati/common/widgets/adaptive_card_grid.dart';
 
 class RequestsScreen extends StatefulWidget {
   const RequestsScreen({super.key});
@@ -38,25 +40,8 @@ class _RequestsScreenState extends State<RequestsScreen> {
     context.read<DepartmentCubit>().fetchDepartments();
   }
 
-  String _safe(String? value) {
-    final clean = value?.trim() ?? '';
-    return clean.isEmpty || clean == 'null' ? '---' : clean;
-  }
-
   String _formatStatus(AppLocalizations l10n, String? status) {
-    final clean = status?.trim().toUpperCase() ?? '';
-    return switch (clean) {
-      'SUBMITTED' => l10n.statusSubmitted,
-      'PENDING' => l10n.statusPending,
-      'UNDER_REVIEW' => l10n.statusUnderReview,
-      'DOCUMENTS_MISSING' => l10n.statusDocumentsMissing,
-      'IN_PROGRESS' => l10n.statusInProgress,
-      'APPROVED' => l10n.statusApproved,
-      'REJECTED' => l10n.statusRejected,
-      'COMPLETED' => l10n.statusCompleted,
-      'CANCELLED' => l10n.statusCancelled,
-      _ => _safe(status).replaceAll('_', ' '),
-    };
+    return localizedRequestStatus(l10n, status);
   }
 
   String _statusUpdateSuccessMessage(AppLocalizations l10n, String status) {
@@ -125,7 +110,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
         ),
         centerTitle: true,
       ),
-      body: ResponsiveCenter.detail(
+      body: ResponsiveCenter(
         child: BlocConsumer<RequestBloc, RequestState>(
           listener: (context, state) {
             final error = state.error.trim();
@@ -203,14 +188,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
                                     return DropdownMenuItem<int?>(
                                       value: department.id,
                                       child: _ResponsiveText(
-                                        text: switch (department.name) {
-                                          'Engineering' => l10n.deptEngineering,
-                                          'Finance' => l10n.deptFinance,
-                                          'Police' => l10n.deptPolice,
-                                          'Civil Status' => l10n.deptCivilStatus,
-                                          'Public Works' => l10n.deptPublicWorks,
-                                          _ => department.name,
-                                        },
+                                        text: localizedDepartmentName(l10n, department.name),
                                         maxFontSize: 13,
                                         minFontSize: 8,
                                         color: colors.onSurface,
@@ -297,16 +275,18 @@ class _RequestsScreenState extends State<RequestsScreen> {
                       ),
                     )
                   else
-                    ...state.visibleRequests.map(
-                      (request) {
-                        return _RequestCard(
-                          request: request,
-                          statusText: _formatStatus(l10n, request.status),
-                          statusColor: _statusColor(context, request.status),
-                          createdAt: _formatDate(request.createdAt),
-                          onTap: () => _openDetails(request),
-                        );
-                      },
+                    AdaptiveCardGrid(
+                      children: state.visibleRequests.map(
+                        (request) {
+                          return _RequestCard(
+                            request: request,
+                            statusText: _formatStatus(l10n, request.status),
+                            statusColor: _statusColor(context, request.status),
+                            createdAt: _formatDate(request.createdAt),
+                            onTap: () => _openDetails(request),
+                          );
+                        },
+                      ).toList(),
                     ),
                 ],
               ),
@@ -397,22 +377,7 @@ class _RequestCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   _MiniInfoLine(
                     icon: Icons.miscellaneous_services_outlined,
-                    text: switch (request.serviceName) {
-                      'Building Permit' => l10n.serviceBuildingPermit,
-                      'Larger Building Permit' => l10n.serviceLargerBuildingPermit,
-                      'Housing Permit' => l10n.serviceHousingPermit,
-                      'External Works' => l10n.serviceExternalWorks,
-                      'Illegal Construction' => l10n.serviceIllegalConstruction,
-                      'Valuation Certificate' => l10n.serviceValuationCertificate,
-                      'Clearance Certificate' => l10n.serviceClearanceCertificate,
-                      'Tent Permit' => l10n.serviceTentPermit,
-                      'Property Access' => l10n.servicePropertyAccess,
-                      'Residence Certificate' => l10n.serviceResidenceCertificate,
-                      'Contents Certificate' => l10n.serviceContentsCertificate,
-                      'Work Certificate' => l10n.serviceWorkCertificate,
-                      'Lease Registration' => l10n.serviceLeaseRegistration,
-                      _ => _safe(request.serviceName),
-                    },
+                    text: localizedServiceName(l10n, _safe(request.serviceName)),
                   ),
                   const SizedBox(height: 4),
                   _MiniInfoLine(

@@ -1,5 +1,6 @@
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:dio/dio.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class AiChatService {
   AiChatService({Dio? dio}) : _dio = dio ?? DioClient.muni;
@@ -19,7 +20,7 @@ class AiChatService {
     if (response.data is Map) {
       return Map<String, dynamic>.from(response.data as Map);
     }
-    throw Exception('Invalid response from AI');
+    throw Exception(AppStrings.current.errInvalidAiResponse);
   }
 
   Future<void> clearConversation(int conversationId) async {

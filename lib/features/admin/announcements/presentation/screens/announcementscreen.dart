@@ -15,6 +15,7 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/common/widgets/adaptive_card_grid.dart';
 
 class AnnouncementsPage extends StatelessWidget {
   const AnnouncementsPage({super.key});
@@ -180,7 +181,7 @@ class _AnnouncementsBodyState extends State<AnnouncementsBody> {
         icon: const Icon(Icons.add),
         label: Text(loc.newAnnouncement),
       ),
-      body: ResponsiveCenter.detail(
+      body: ResponsiveCenter(
         child: BlocConsumer<AnnouncementBloc, AnnouncementState>(
           listener: (context, state) {
             if (state is AnnouncementError) {
@@ -242,13 +243,15 @@ class _AnnouncementsBodyState extends State<AnnouncementsBody> {
                       subtitle: loc.noAnnouncementsHint,
                     )
                   else
-                    ...filtered.map(
-                      (announcement) => _AnnouncementCard(
-                        announcement: announcement,
-                        createdAt: _formatDate(context, announcement.createdAt),
-                        onEdit: () => _openEditScreen(announcement),
-                        onDelete: () => _confirmDelete(announcement),
-                      ),
+                    AdaptiveCardGrid(
+                      children: filtered.map(
+                        (announcement) => _AnnouncementCard(
+                          announcement: announcement,
+                          createdAt: _formatDate(context, announcement.createdAt),
+                          onEdit: () => _openEditScreen(announcement),
+                          onDelete: () => _confirmDelete(announcement),
+                        ),
+                      ).toList(),
                     ),
                 ],
               ),

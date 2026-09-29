@@ -7,6 +7,7 @@ import '../models/municipality_profile_model.dart';
 import '../models/profile_model.dart';
 import '../services/profile_api_service.dart';
 import 'package:baladiyati/core/utils/picked_file.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class ProfileRepositoryImpl implements ProfileRepository {
   final ProfileApiService api;
@@ -32,7 +33,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
     }
 
     if (core == null && municipality == null) {
-      throw Exception('Failed to load profile data');
+      throw Exception(AppStrings.current.errLoadProfile);
     }
 
     // If Build4All is down, synthesise a minimal core from municipality data

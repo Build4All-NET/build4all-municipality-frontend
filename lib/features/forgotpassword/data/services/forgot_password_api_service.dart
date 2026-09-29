@@ -9,6 +9,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 import '../models/forgot_password_models.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class ForgotPasswordApiService {
   final http.Client _client;
@@ -62,7 +63,7 @@ class ForgotPasswordApiService {
         resp,
         decoded,
         fallback:
-            'Failed to send reset code',
+            AppStrings.current.errSendCode,
       );
     }
 
@@ -109,7 +110,7 @@ class ForgotPasswordApiService {
         resp,
         decoded,
         fallback:
-            'Invalid reset code',
+            AppStrings.current.errInvalidResetCode,
       );
     }
 
@@ -159,7 +160,7 @@ class ForgotPasswordApiService {
         resp,
         decoded,
         fallback:
-            'Failed to update password',
+            AppStrings.current.errResetPassword,
       );
     }
 
@@ -189,17 +190,17 @@ class ForgotPasswordApiService {
           );
     } on SocketException catch (e) {
       throw NetworkException(
-        'No internet connection',
+        AppStrings.current.errNoInternet,
         original: e,
       );
     } on TimeoutException catch (e) {
       throw NetworkException(
-        'Request timed out',
+        AppStrings.current.errTimeout,
         original: e,
       );
     } on http.ClientException catch (e) {
       throw NetworkException(
-        'Network error',
+        AppStrings.current.errNoInternet,
         original: e,
       );
     }
@@ -259,19 +260,19 @@ class ForgotPasswordApiService {
         () {
           switch (status) {
             case 400:
-              return 'Invalid request.';
+              return AppStrings.current.errInvalidRequest;
             case 401:
-              return 'Unauthorized.';
+              return AppStrings.current.errSessionExpired;
             case 403:
-              return 'No permission.';
+              return AppStrings.current.errNoPermission;
             case 404:
-              return 'User not found.';
+              return AppStrings.current.errorUserNotFound;
             case 409:
-              return 'Conflict.';
+              return AppStrings.current.errConflict;
             case 422:
-              return 'Invalid fields.';
+              return AppStrings.current.errInvalidRequest;
             case 500:
-              return 'Server error.';
+              return AppStrings.current.errServer;
             default:
               return fallback;
           }

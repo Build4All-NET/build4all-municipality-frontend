@@ -7,6 +7,7 @@ import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/core/exceptions/network_exception.dart';
 import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
 import 'package:http/http.dart' as http;
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class ApiClient {
   // Municipality API base URL comes from dart-define/env.
@@ -151,7 +152,7 @@ class ApiClient {
       if (e is AppException) rethrow;
 
       throw ServerException(
-        'Server error. Please try later',
+        AppStrings.current.errServer,
         statusCode: response.statusCode,
       );
     }

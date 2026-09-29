@@ -3678,6 +3678,624 @@ abstract class AppLocalizations {
   /// In en, this message translates to:
   /// **'Lease Registration'**
   String get serviceLeaseRegistration;
+
+  /// No description provided for @errSomethingWrong.
+  ///
+  /// In en, this message translates to:
+  /// **'Something went wrong. Please try again.'**
+  String get errSomethingWrong;
+
+  /// No description provided for @errNoInternet.
+  ///
+  /// In en, this message translates to:
+  /// **'No internet connection. Please check your Wi-Fi or mobile data.'**
+  String get errNoInternet;
+
+  /// No description provided for @errReconnectHint.
+  ///
+  /// In en, this message translates to:
+  /// **'Please reconnect to Wi-Fi or mobile data, then press Retry.'**
+  String get errReconnectHint;
+
+  /// No description provided for @errServerUnavailable.
+  ///
+  /// In en, this message translates to:
+  /// **'Server unavailable'**
+  String get errServerUnavailable;
+
+  /// No description provided for @errServerUnreachableHint.
+  ///
+  /// In en, this message translates to:
+  /// **'The server is not reachable right now. Press Retry later.'**
+  String get errServerUnreachableHint;
+
+  /// No description provided for @errServerNotResponding.
+  ///
+  /// In en, this message translates to:
+  /// **'Server is not responding'**
+  String get errServerNotResponding;
+
+  /// No description provided for @errServer.
+  ///
+  /// In en, this message translates to:
+  /// **'Server error. Please try again later.'**
+  String get errServer;
+
+  /// No description provided for @errTimeout.
+  ///
+  /// In en, this message translates to:
+  /// **'Connection timed out. Please try again.'**
+  String get errTimeout;
+
+  /// No description provided for @errRequestCancelled.
+  ///
+  /// In en, this message translates to:
+  /// **'Request cancelled.'**
+  String get errRequestCancelled;
+
+  /// No description provided for @errSecureConnection.
+  ///
+  /// In en, this message translates to:
+  /// **'Secure connection failed.'**
+  String get errSecureConnection;
+
+  /// No description provided for @errInvalidRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid request. Please check your input.'**
+  String get errInvalidRequest;
+
+  /// No description provided for @errSessionExpired.
+  ///
+  /// In en, this message translates to:
+  /// **'Your session has expired. Please log in again.'**
+  String get errSessionExpired;
+
+  /// No description provided for @errNoPermission.
+  ///
+  /// In en, this message translates to:
+  /// **'You don\'t have permission to do this.'**
+  String get errNoPermission;
+
+  /// No description provided for @errNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'Not found.'**
+  String get errNotFound;
+
+  /// No description provided for @errConflict.
+  ///
+  /// In en, this message translates to:
+  /// **'This already exists or can\'t be done now.'**
+  String get errConflict;
+
+  /// No description provided for @errRequestFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Request failed.'**
+  String get errRequestFailed;
+
+  /// No description provided for @errInvalidResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid server response.'**
+  String get errInvalidResponse;
+
+  /// No description provided for @errInvalidInput.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid input.'**
+  String get errInvalidInput;
+
+  /// No description provided for @errInvalidEmailFormat.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid email format'**
+  String get errInvalidEmailFormat;
+
+  /// No description provided for @errAccountInactive.
+  ///
+  /// In en, this message translates to:
+  /// **'Your account is inactive. Reactivate it to continue.'**
+  String get errAccountInactive;
+
+  /// No description provided for @errNotStaffAccount.
+  ///
+  /// In en, this message translates to:
+  /// **'This account is not registered as a staff member.'**
+  String get errNotStaffAccount;
+
+  /// No description provided for @errMissingLoginData.
+  ///
+  /// In en, this message translates to:
+  /// **'Login data is missing. Please log in again.'**
+  String get errMissingLoginData;
+
+  /// No description provided for @errMissingOwnerProject.
+  ///
+  /// In en, this message translates to:
+  /// **'Municipality link is missing. Please log in again.'**
+  String get errMissingOwnerProject;
+
+  /// No description provided for @errFileNotFound.
+  ///
+  /// In en, this message translates to:
+  /// **'File not found'**
+  String get errFileNotFound;
+
+  /// No description provided for @errUploadFailed.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to upload files'**
+  String get errUploadFailed;
+
+  /// No description provided for @errInvalidAiResponse.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid response from the assistant'**
+  String get errInvalidAiResponse;
+
+  /// No description provided for @errEmailRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Email is required'**
+  String get errEmailRequired;
+
+  /// No description provided for @errFullNameRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Full name is required'**
+  String get errFullNameRequired;
+
+  /// No description provided for @errRoleRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Role is required'**
+  String get errRoleRequired;
+
+  /// No description provided for @errInvalidUserId.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid user ID'**
+  String get errInvalidUserId;
+
+  /// No description provided for @errCarPlateRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Car plate is required'**
+  String get errCarPlateRequired;
+
+  /// No description provided for @errIdentityRequired.
+  ///
+  /// In en, this message translates to:
+  /// **'Identity number is required'**
+  String get errIdentityRequired;
+
+  /// No description provided for @errNameMinLength.
+  ///
+  /// In en, this message translates to:
+  /// **'Name must contain at least 2 characters'**
+  String get errNameMinLength;
+
+  /// No description provided for @errInvalidResetCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Invalid reset code'**
+  String get errInvalidResetCode;
+
+  /// No description provided for @errLoadRequests.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load requests'**
+  String get errLoadRequests;
+
+  /// No description provided for @errLoadRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load the request'**
+  String get errLoadRequest;
+
+  /// No description provided for @errCreateRequest.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to submit the request'**
+  String get errCreateRequest;
+
+  /// No description provided for @errLoadServices.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load services'**
+  String get errLoadServices;
+
+  /// No description provided for @errLoadService.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load the service'**
+  String get errLoadService;
+
+  /// No description provided for @errCreateService.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create the service'**
+  String get errCreateService;
+
+  /// No description provided for @errUpdateService.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update the service'**
+  String get errUpdateService;
+
+  /// No description provided for @errDeleteService.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete the service'**
+  String get errDeleteService;
+
+  /// No description provided for @errLoadDepartments.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load departments'**
+  String get errLoadDepartments;
+
+  /// No description provided for @errDeleteDepartment.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete the department'**
+  String get errDeleteDepartment;
+
+  /// No description provided for @errLoadEmployees.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load employees'**
+  String get errLoadEmployees;
+
+  /// No description provided for @errCreateEmployee.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to add the employee'**
+  String get errCreateEmployee;
+
+  /// No description provided for @errUpdateEmployee.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update the employee'**
+  String get errUpdateEmployee;
+
+  /// No description provided for @errDeleteEmployee.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to delete the employee'**
+  String get errDeleteEmployee;
+
+  /// No description provided for @errLoadUsers.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load users'**
+  String get errLoadUsers;
+
+  /// No description provided for @errLoadRoles.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load roles'**
+  String get errLoadRoles;
+
+  /// No description provided for @errAssignRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to assign the role'**
+  String get errAssignRole;
+
+  /// No description provided for @errRemoveRole.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to remove the role'**
+  String get errRemoveRole;
+
+  /// No description provided for @errLoadAnnouncements.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load announcements'**
+  String get errLoadAnnouncements;
+
+  /// No description provided for @errLoadViolations.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load violations'**
+  String get errLoadViolations;
+
+  /// No description provided for @errLoadNotifications.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load notifications'**
+  String get errLoadNotifications;
+
+  /// No description provided for @errMarkNotificationRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to mark the notification as read'**
+  String get errMarkNotificationRead;
+
+  /// No description provided for @errMarkAllRead.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to mark all notifications as read'**
+  String get errMarkAllRead;
+
+  /// No description provided for @errLoadPayments.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load payments'**
+  String get errLoadPayments;
+
+  /// No description provided for @errDownloadReceipt.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to download the receipt'**
+  String get errDownloadReceipt;
+
+  /// No description provided for @errLoadProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to load the profile'**
+  String get errLoadProfile;
+
+  /// No description provided for @errUpdateProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to update the profile'**
+  String get errUpdateProfile;
+
+  /// No description provided for @errSendCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to send the verification code'**
+  String get errSendCode;
+
+  /// No description provided for @errVerifyCode.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to verify the code'**
+  String get errVerifyCode;
+
+  /// No description provided for @errCompleteProfile.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to complete the profile'**
+  String get errCompleteProfile;
+
+  /// No description provided for @errRegister.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to create the account'**
+  String get errRegister;
+
+  /// No description provided for @errResetPassword.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to reset the password'**
+  String get errResetPassword;
+
+  /// No description provided for @errLogout.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to log out'**
+  String get errLogout;
+
+  /// No description provided for @errSyncMunicipalityUser.
+  ///
+  /// In en, this message translates to:
+  /// **'Failed to link your account to the municipality'**
+  String get errSyncMunicipalityUser;
+
+  /// No description provided for @passwordResetSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Password reset successfully'**
+  String get passwordResetSuccess;
+
+  /// No description provided for @operationSuccess.
+  ///
+  /// In en, this message translates to:
+  /// **'Done successfully'**
+  String get operationSuccess;
+
+  /// No description provided for @refresh.
+  ///
+  /// In en, this message translates to:
+  /// **'Refresh'**
+  String get refresh;
+
+  /// No description provided for @stepRegister.
+  ///
+  /// In en, this message translates to:
+  /// **'Register'**
+  String get stepRegister;
+
+  /// No description provided for @stepVerify.
+  ///
+  /// In en, this message translates to:
+  /// **'Verify'**
+  String get stepVerify;
+
+  /// No description provided for @stepComplete.
+  ///
+  /// In en, this message translates to:
+  /// **'Complete'**
+  String get stepComplete;
+
+  /// No description provided for @languageArabic.
+  ///
+  /// In en, this message translates to:
+  /// **'Arabic'**
+  String get languageArabic;
+
+  /// No description provided for @languageEnglish.
+  ///
+  /// In en, this message translates to:
+  /// **'English'**
+  String get languageEnglish;
+
+  /// No description provided for @languageFrench.
+  ///
+  /// In en, this message translates to:
+  /// **'French'**
+  String get languageFrench;
+
+  /// No description provided for @myTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'My Tasks'**
+  String get myTasks;
+
+  /// No description provided for @tasksSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{active} active · {done} done'**
+  String tasksSummary(Object active, Object done);
+
+  /// No description provided for @loadingTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'Loading your tasks...'**
+  String get loadingTasks;
+
+  /// No description provided for @noTasksAvailable.
+  ///
+  /// In en, this message translates to:
+  /// **'No tasks available'**
+  String get noTasksAvailable;
+
+  /// No description provided for @noTasksHint.
+  ///
+  /// In en, this message translates to:
+  /// **'There are no pending tasks for your assigned departments.\n\nIf you believe you should have access to tasks, contact your administrator to verify your department assignments.'**
+  String get noTasksHint;
+
+  /// No description provided for @checkAgain.
+  ///
+  /// In en, this message translates to:
+  /// **'Check again'**
+  String get checkAgain;
+
+  /// No description provided for @noActiveTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'No active tasks'**
+  String get noActiveTasks;
+
+  /// No description provided for @noCompletedTasks.
+  ///
+  /// In en, this message translates to:
+  /// **'No completed tasks'**
+  String get noCompletedTasks;
+
+  /// No description provided for @taskStatusAssigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Assigned'**
+  String get taskStatusAssigned;
+
+  /// No description provided for @defaultTaskName.
+  ///
+  /// In en, this message translates to:
+  /// **'Task'**
+  String get defaultTaskName;
+
+  /// No description provided for @municipalityCertificate.
+  ///
+  /// In en, this message translates to:
+  /// **'Municipality Certificate'**
+  String get municipalityCertificate;
+
+  /// No description provided for @officiallySigned.
+  ///
+  /// In en, this message translates to:
+  /// **'Officially Signed'**
+  String get officiallySigned;
+
+  /// No description provided for @certificateGeneratedNote.
+  ///
+  /// In en, this message translates to:
+  /// **'This document is digitally generated by the municipal system.'**
+  String get certificateGeneratedNote;
+
+  /// No description provided for @fieldMinValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Minimum value is {min}'**
+  String fieldMinValue(Object min);
+
+  /// No description provided for @fieldMaxValue.
+  ///
+  /// In en, this message translates to:
+  /// **'Maximum value is {max}'**
+  String fieldMaxValue(Object max);
+
+  /// No description provided for @noCertificatesInCategory.
+  ///
+  /// In en, this message translates to:
+  /// **'No certificates in this category.'**
+  String get noCertificatesInCategory;
+
+  /// No description provided for @certificatesSummary.
+  ///
+  /// In en, this message translates to:
+  /// **'{signed} signed · {pending} pending'**
+  String certificatesSummary(Object signed, Object pending);
+
+  /// No description provided for @processKey.
+  ///
+  /// In en, this message translates to:
+  /// **'Process Key'**
+  String get processKey;
+
+  /// No description provided for @visibility.
+  ///
+  /// In en, this message translates to:
+  /// **'Visibility'**
+  String get visibility;
+
+  /// No description provided for @profilePublic.
+  ///
+  /// In en, this message translates to:
+  /// **'Public'**
+  String get profilePublic;
+
+  /// No description provided for @profilePrivate.
+  ///
+  /// In en, this message translates to:
+  /// **'Private'**
+  String get profilePrivate;
+
+  /// No description provided for @timeJustNow.
+  ///
+  /// In en, this message translates to:
+  /// **'Just now'**
+  String get timeJustNow;
+
+  /// No description provided for @timeMinutesAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} min ago'**
+  String timeMinutesAgo(Object count);
+
+  /// No description provided for @timeHoursAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} h ago'**
+  String timeHoursAgo(Object count);
+
+  /// No description provided for @timeYesterday.
+  ///
+  /// In en, this message translates to:
+  /// **'Yesterday'**
+  String get timeYesterday;
+
+  /// No description provided for @timeDaysAgo.
+  ///
+  /// In en, this message translates to:
+  /// **'{count} days ago'**
+  String timeDaysAgo(Object count);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

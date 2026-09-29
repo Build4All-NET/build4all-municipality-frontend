@@ -10,6 +10,7 @@ import 'package:baladiyati/features/citizen/payments/data/repositories/payment_r
 import 'package:baladiyati/features/citizen/payments/domain/usecases/get_my_payments.dart';
 import 'package:baladiyati/features/citizen/payments/domain/usecases/download_receipt.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/common/widgets/adaptive_card_grid.dart';
 
 class PaymentsScreen extends StatefulWidget {
   const PaymentsScreen({super.key});
@@ -51,7 +52,7 @@ class _PaymentsScreenState extends State<PaymentsScreen>
         builder: (context, state) {
           return Scaffold(
             backgroundColor: const Color(0xFFF3F4F6),
-            body: ResponsiveCenter.detail(
+            body: ResponsiveCenter(
               child: SafeArea(
                 child: Column(
                   children: [
@@ -198,7 +199,7 @@ class _PaymentsScreenState extends State<PaymentsScreen>
       onRefresh: () async => context
           .read<PaymentsBloc>()
           .add(PaymentsRefreshRequested()),
-      child: ListView.builder(
+      child: AdaptiveCardList.builder(
         padding: const EdgeInsets.all(16),
         itemCount: pending.length,
         itemBuilder: (_, i) => _buildPendingCard(context, l10n, pending[i]),
@@ -227,7 +228,7 @@ class _PaymentsScreenState extends State<PaymentsScreen>
       onRefresh: () async => context
           .read<PaymentsBloc>()
           .add(PaymentsRefreshRequested()),
-      child: ListView.builder(
+      child: AdaptiveCardList.builder(
         padding: const EdgeInsets.all(16),
         itemCount: paid.length,
         itemBuilder: (_, i) =>

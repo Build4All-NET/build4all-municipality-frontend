@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:dio/dio.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class AppErrorInterceptor extends Interceptor {
   bool _isNetworkError(DioException err) {
@@ -19,7 +20,7 @@ class AppErrorInterceptor extends Interceptor {
       return (data['message'] ??
               data['error'] ??
               data['details'] ??
-              'Something went wrong.')
+              AppStrings.current.errSomethingWrong)
           .toString();
     }
 
@@ -27,7 +28,7 @@ class AppErrorInterceptor extends Interceptor {
       return data.trim();
     }
 
-    return 'Something went wrong.';
+    return AppStrings.current.errSomethingWrong;
   }
 
   String _codeFromResponse(DioException err) {
@@ -54,7 +55,7 @@ class AppErrorInterceptor extends Interceptor {
 
     if (_isNetworkError(err)) {
       appException = AppException(
-        'No internet connection. Please check your Wi-Fi or mobile data.',
+        AppStrings.current.errNoInternet,
         code: 'NETWORK_ERROR',
         original: err,
       );
@@ -63,7 +64,7 @@ class AppErrorInterceptor extends Interceptor {
 
       if (status == 500) {
         appException = AppException(
-          'Server error. Please try again later.',
+          AppStrings.current.errServer,
           code: 'SERVER_ERROR',
           original: err,
         );
@@ -84,8 +85,8 @@ class AppErrorInterceptor extends Interceptor {
         final code = _codeFromResponse(err);
 
         appException = AppException(
-          message == 'Something went wrong.'
-              ? 'Authentication failed. Please login again.'
+          message == AppStrings.current.errSomethingWrong
+              ? AppStrings.current.errSessionExpired
               : message,
           code: code,
           original: err,

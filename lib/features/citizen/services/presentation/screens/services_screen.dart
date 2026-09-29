@@ -12,6 +12,7 @@ import 'package:baladiyati/features/citizen/services/presentation/bloc/services_
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'service_details_screen.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/common/widgets/adaptive_card_grid.dart';
 
 class ServicesScreen extends StatefulWidget {
   const ServicesScreen({super.key});
@@ -69,7 +70,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
 
         return Scaffold(
           backgroundColor: theme.scaffoldBackgroundColor,
-          body: ResponsiveCenter.detail(
+          body: ResponsiveCenter(
             child: SafeArea(
               child: Column(
                 children: [
@@ -133,7 +134,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
                                 onRefresh: () async => context
                                     .read<CitizenServicesBloc>()
                                     .add(CitizenServicesRefreshRequested()),
-                                child: ListView.builder(
+                                child: AdaptiveCardList.builder(
                                   padding: const EdgeInsets.all(16),
                                   itemCount: items.length,
                                   itemBuilder: (_, i) => _ServiceCard(
@@ -177,7 +178,7 @@ class _ServicesSkeleton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView.builder(
+    return AdaptiveCardList.builder(
       padding: const EdgeInsets.all(16),
       physics: const NeverScrollableScrollPhysics(),
       itemCount: 7,

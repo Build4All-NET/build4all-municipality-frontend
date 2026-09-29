@@ -13,6 +13,7 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/common/widgets/adaptive_card_grid.dart';
 
 class EmployeesScreen extends StatefulWidget {
   const EmployeesScreen({super.key});
@@ -188,7 +189,7 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
             icon: const Icon(Icons.person_add_alt_1_outlined),
             label: Text(l10n.assignStaff),
           ),
-          body: ResponsiveCenter.detail(
+          body: ResponsiveCenter(
             child: SafeArea(
               child: RefreshIndicator(
                 onRefresh: _refresh,
@@ -232,11 +233,13 @@ class _EmployeesScreenState extends State<EmployeesScreen> {
                         subtitle: l10n.noStaffHint,
                       )
                     else
-                      ...state.visibleStaffUsers.map(
-                        (user) => _StaffCard(
-                          user: user,
-                          onRemove: () => _confirmRemoveRole(user),
-                        ),
+                      AdaptiveCardGrid(
+                        children: state.visibleStaffUsers.map(
+                          (user) => _StaffCard(
+                            user: user,
+                            onRemove: () => _confirmRemoveRole(user),
+                          ),
+                        ).toList(),
                       ),
                   ],
                 ),

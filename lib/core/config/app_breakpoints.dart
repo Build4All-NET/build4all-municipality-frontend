@@ -21,10 +21,18 @@ class AppLayout {
   static const int gridColumnsMedium   = 3;
   static const int gridColumnsExpanded = 4;
 
+  // List cards: columns are added while each card can stay at least this wide.
+  static const double cardMinWidth   = 420;
+  static const int    cardMaxColumns = 3;
+  static const double cardGridSpacing = 12;
+
   // Dashboard quick-action tiles (width / height): wider on tablet / web.
   static const double actionTileAspectRatioCompact = 1.12;
   static const double actionTileAspectRatioWide    = 1.6;
 
-  // Side navigation (NavigationRail) shown instead of the bottom bar on wide screens.
-  static const double railExtendedWidth = 220;
+  // Side navigation shown instead of the bottom bar / dashboard tiles on wide screens.
+  static const double sidebarWidth          = 272;  // desktop: icons + labels
+  static const double sidebarCollapsedWidth = 84;   // tablet: icons only
+  static const double sidebarItemHeight     = 48;
+  static const double sidebarLogoSize       = 44;
 }

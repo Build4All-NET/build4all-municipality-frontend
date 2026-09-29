@@ -11,6 +11,8 @@ class AppException implements Exception {
 
   const AppException(this.message, {this.code, this.original});
 
+  /// Many screens show `error.toString()` directly, so this returns only the
+  /// user-facing (localized) message, without a technical prefix.
   @override
-  String toString() => 'AppException($code): $message';
+  String toString() => message;
 }
