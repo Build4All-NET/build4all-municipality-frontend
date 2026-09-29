@@ -9,6 +9,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
 import 'package:baladiyati/core/l10n/known_names.dart';
+import 'package:baladiyati/common/widgets/adaptive_card_grid.dart';
 
 class DepartmentsScreen extends StatefulWidget {
   const DepartmentsScreen({super.key});
@@ -145,7 +146,7 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
             icon: const Icon(Icons.add),
             label: Text(loc.add),
           ),
-          body: ResponsiveCenter.detail(
+          body: ResponsiveCenter(
             child: RefreshIndicator(
               onRefresh: () => _refresh(context),
               child: ListView(
@@ -199,18 +200,20 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
                       subtitle: loc.noDepartmentsHint,
                     )
                   else
-                    ...state.filtered.map(
-                      (dep) => _DepartmentCard(
-                        department: dep,
-                        isBusy: state.actionLoading,
-                        onEdit: () => _openDepartmentDialog(
-                          context,
+                    AdaptiveCardGrid(
+                      children: state.filtered.map(
+                        (dep) => _DepartmentCard(
                           department: dep,
+                          isBusy: state.actionLoading,
+                          onEdit: () => _openDepartmentDialog(
+                            context,
+                            department: dep,
+                          ),
+                          onDelete: dep.isFixed
+                              ? null
+                              : () => _confirmDelete(context, dep),
                         ),
-                        onDelete: dep.isFixed
-                            ? null
-                            : () => _confirmDelete(context, dep),
-                      ),
+                      ).toList(),
                     ),
                 ],
               ),

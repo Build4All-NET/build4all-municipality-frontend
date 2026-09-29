@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:baladiyati/common/widgets/shimmer_loading.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
+import 'package:baladiyati/core/l10n/known_names.dart';
 
 class RecentRequestItem {
   final String id;
@@ -132,20 +133,7 @@ class _RequestCard extends StatelessWidget {
   const _RequestCard({required this.request, required this.onTap});
 
   static String _statusLabel(AppLocalizations l10n, String status) {
-    switch (status.toUpperCase()) {
-      case 'DRAFT': return l10n.statusDraft;
-      case 'SUBMITTED': return l10n.statusSubmitted;
-      case 'UNDER_REVIEW': return l10n.statusUnderReview;
-      case 'DOCUMENTS_MISSING': return l10n.statusDocumentsMissing;
-      case 'IN_PROGRESS': return l10n.inProgress;
-      case 'APPROVED': return l10n.approved;
-      case 'REJECTED': return l10n.rejected;
-      case 'COMPLETED': return l10n.completed;
-      case 'CANCELLED': return l10n.statusCancelled;
-      case 'TAX_PAID': return l10n.statusTaxPaid;
-      case 'TAX_REJECTED': return l10n.statusTaxRejected;
-      default: return status;
-    }
+    return localizedRequestStatus(l10n, status);
   }
 
   @override

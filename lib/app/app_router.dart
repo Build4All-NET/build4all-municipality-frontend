@@ -176,144 +176,163 @@ class AppRouter {
     );
   }
 
+  static Widget profilePage() => BlocProvider(
+        create: (_) => ProfileBloc(),
+        child: const ProfileScreen(),
+      );
+
   static void goToProfile(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => BlocProvider(
-          create: (_) => ProfileBloc(),
-          child: const ProfileScreen(),
-        ),
-      ),
-    );
+    Navigator.push(context, MaterialPageRoute(builder: (_) => profilePage()));
   }
 
-  // ================= ADMIN: ANNOUNCEMENTS =================
-
-  static void goToAnnouncements(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const AnnouncementsPage()),
-    );
+  static void _push(BuildContext context, Widget page) {
+    Navigator.push(context, MaterialPageRoute(builder: (_) => page));
   }
 
-  // ================= ADMIN: VIOLATIONS =================
+  // Page builders: each returns a screen with the blocs it needs, so the same
+  // page can be pushed (phones) or shown inside the web sidebar layout.
 
-  static void goToViolations(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const ViolationsPage()),
-    );
-  }
+  static Widget announcementsPage() => const AnnouncementsPage();
 
-  // ================= ADMIN: DEPARTMENTS =================
+  static Widget violationsPage() => const ViolationsPage();
 
-  static void goToDepartments(BuildContext context) {
+  static Widget departmentsPage() {
     final repository = DepartmentRepositoryImpl(
       DepartmentApiService(DioClient.muni),
     );
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => BlocProvider(
-          create: (_) => DepartmentCubit(
-            GetDepartments(repository),
-            AddDepartment(repository),
-            DeleteDepartment(repository),
-            UpdateDepartment(repository),
-          )..fetchDepartments(),
-          child: const DepartmentsScreen(),
-        ),
-      ),
+    return BlocProvider(
+      create: (_) => DepartmentCubit(
+        GetDepartments(repository),
+        AddDepartment(repository),
+        DeleteDepartment(repository),
+        UpdateDepartment(repository),
+      )..fetchDepartments(),
+      child: const DepartmentsScreen(),
     );
   }
 
-  // ================= ADMIN: SERVICES =================
-
-  static void goToServices(BuildContext context) {
+  static Widget servicesPage() {
     final repository = ServiceRepositoryImpl(
       ServiceApiService(DioClient.muni),
     );
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => BlocProvider(
-          create: (_) => ServiceBloc(
-            getServices: GetServices(repository),
-            createService: CreateService(repository),
-            updateService: UpdateService(repository),
-            deleteService: DeleteService(repository),
-          )..add(LoadServices()),
-          child: const ServicesScreen(),
-        ),
-      ),
+    return BlocProvider(
+      create: (_) => ServiceBloc(
+        getServices: GetServices(repository),
+        createService: CreateService(repository),
+        updateService: UpdateService(repository),
+        deleteService: DeleteService(repository),
+      )..add(LoadServices()),
+      child: const ServicesScreen(),
     );
   }
+
+  static Widget adminProfilePage() {
+    final repository = AdminProfileRepositoryImpl(
+      api: AdminProfileApiService(dio: DioClient.build),
+    );
+    return BlocProvider(
+      create: (_) => AdminProfileCubit(
+        getAdminProfile: GetAdminProfileUseCase(repository),
+      )..loadProfile(),
+      child: const AdminProfileScreen(),
+    );
+  }
+
+  static Widget employeesPage() {
+    final departmentRepository = DepartmentRepositoryImpl(
+      DepartmentApiService(DioClient.muni),
+    );
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => AdminStaffBloc(apiService: AdminUserApiService()),
+        ),
+        BlocProvider(
+          create: (_) => DepartmentCubit(
+            GetDepartments(departmentRepository),
+            AddDepartment(departmentRepository),
+            DeleteDepartment(departmentRepository),
+            UpdateDepartment(departmentRepository),
+          ),
+        ),
+      ],
+      child: const EmployeesScreen(),
+    );
+  }
+
+  static Widget certificatesPage() => BlocProvider(
+        create: (_) =>
+            AdminCertificateCubit(CertificateApiService())..loadCertificates(),
+        child: const AdminCertificatesScreen(),
+      );
+
+  static Widget staffServicesPage() => const StaffServicesScreen();
+
+  static Widget staffTasksPage() => BlocProvider(
+        create: (_) => StaffTasksCubit(StaffTaskApiService()),
+        child: const StaffTasksScreen(),
+      );
+
+  static Widget requestsPage() {
+    final departmentRepository = DepartmentRepositoryImpl(
+      DepartmentApiService(DioClient.muni),
+    );
+    final requestRepository = RequestRepositoryImpl(
+      RequestApiService(DioClient.muni),
+    );
+    return MultiBlocProvider(
+      providers: [
+        BlocProvider(
+          create: (_) => RequestBloc(
+            getAllRequestsAdmin: GetAllRequestsAdmin(requestRepository),
+            updateRequestStatus: UpdateRequestStatus(requestRepository),
+            markRequestPaid: MarkRequestPaid(requestRepository),
+          )..add(LoadRequests()),
+        ),
+        BlocProvider(
+          create: (_) => DepartmentCubit(
+            GetDepartments(departmentRepository),
+            AddDepartment(departmentRepository),
+            DeleteDepartment(departmentRepository),
+            UpdateDepartment(departmentRepository),
+          )..fetchDepartments(),
+        ),
+      ],
+      child: const RequestsScreen(),
+    );
+  }
+
+  // ================= ADMIN =================
+
+  static void goToAnnouncements(BuildContext context) =>
+      _push(context, announcementsPage());
+
+  static void goToViolations(BuildContext context) =>
+      _push(context, violationsPage());
+
+  static void goToDepartments(BuildContext context) =>
+      _push(context, departmentsPage());
+
+  static void goToServices(BuildContext context) =>
+      _push(context, servicesPage());
 
   static void goToManageServices(BuildContext context) {
     goToServices(context);
   }
 
-  static void goToAdminProfile(BuildContext context) {
-    final repository = AdminProfileRepositoryImpl(
-      api: AdminProfileApiService(dio: DioClient.build),
-    );
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => BlocProvider(
-          create: (_) => AdminProfileCubit(
-            getAdminProfile: GetAdminProfileUseCase(repository),
-          )..loadProfile(),
-          child: const AdminProfileScreen(),
-        ),
-      ),
-    );
-  }
+  static void goToAdminProfile(BuildContext context) =>
+      _push(context, adminProfilePage());
 
-  // ================= ADMIN: EMPLOYEES / STAFF =================
+  static void goToEmployees(BuildContext context) =>
+      _push(context, employeesPage());
 
-  static void goToEmployees(BuildContext context) {
-    final departmentRepository = DepartmentRepositoryImpl(
-      DepartmentApiService(DioClient.muni),
-    );
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => MultiBlocProvider(
-          providers: [
-            BlocProvider(
-              create: (_) => AdminStaffBloc(apiService: AdminUserApiService()),
-            ),
-            BlocProvider(
-              create: (_) => DepartmentCubit(
-                GetDepartments(departmentRepository),
-                AddDepartment(departmentRepository),
-                DeleteDepartment(departmentRepository),
-                UpdateDepartment(departmentRepository),
-              ),
-            ),
-          ],
-          child: const EmployeesScreen(),
-        ),
-      ),
-    );
-  }
+  static void goToCertificates(BuildContext context) =>
+      _push(context, certificatesPage());
 
-  // ================= ADMIN: CERTIFICATES =================
+  static void goToRequests(BuildContext context) =>
+      _push(context, requestsPage());
 
-  static void goToCertificates(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => BlocProvider(
-          create: (_) => AdminCertificateCubit(CertificateApiService())
-            ..loadCertificates(),
-          child: const AdminCertificatesScreen(),
-        ),
-      ),
-    );
-  }
+  // ================= STAFF =================
 
   static void goToStaffDashboard(BuildContext context) {
     Navigator.pushAndRemoveUntil(
@@ -323,58 +342,9 @@ class AppRouter {
     );
   }
 
-  static void goToStaffServices(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (_) => const StaffServicesScreen()),
-    );
-  }
+  static void goToStaffServices(BuildContext context) =>
+      _push(context, staffServicesPage());
 
-  static void goToStaffTasks(BuildContext context) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => BlocProvider(
-          create: (_) => StaffTasksCubit(StaffTaskApiService()),
-          child: const StaffTasksScreen(),
-        ),
-      ),
-    );
-  }
-
-  // ================= ADMIN: REQUESTS =================
-
-  static void goToRequests(BuildContext context) {
-    final departmentRepository = DepartmentRepositoryImpl(
-      DepartmentApiService(DioClient.muni),
-    );
-    final requestRepository = RequestRepositoryImpl(
-      RequestApiService(DioClient.muni),
-    );
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (_) => MultiBlocProvider(
-          providers: [
-            BlocProvider(
-              create: (_) => RequestBloc(
-                getAllRequestsAdmin: GetAllRequestsAdmin(requestRepository),
-                updateRequestStatus: UpdateRequestStatus(requestRepository),
-                markRequestPaid: MarkRequestPaid(requestRepository),
-              )..add(LoadRequests()),
-            ),
-            BlocProvider(
-              create: (_) => DepartmentCubit(
-                GetDepartments(departmentRepository),
-                AddDepartment(departmentRepository),
-                DeleteDepartment(departmentRepository),
-                UpdateDepartment(departmentRepository),
-              )..fetchDepartments(),
-            ),
-          ],
-          child: const RequestsScreen(),
-        ),
-      ),
-    );
-  }
+  static void goToStaffTasks(BuildContext context) =>
+      _push(context, staffTasksPage());
 }

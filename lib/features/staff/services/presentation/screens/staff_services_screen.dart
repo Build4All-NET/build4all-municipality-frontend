@@ -7,6 +7,7 @@ import 'package:baladiyati/features/staff/services/data/staff_service_api.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/common/widgets/adaptive_card_grid.dart';
 
 class StaffServicesScreen extends StatefulWidget {
   const StaffServicesScreen({super.key});
@@ -125,7 +126,7 @@ class _StaffServicesScreenState extends State<StaffServicesScreen> {
           ),
         ],
       ),
-      body: ResponsiveCenter.detail(
+      body: ResponsiveCenter(
         child: RefreshIndicator(
           onRefresh: _refresh,
           child: ListView(
@@ -163,8 +164,10 @@ class _StaffServicesScreenState extends State<StaffServicesScreen> {
                   subtitle: loc.noServicesHint,
                 )
               else
-                ..._visibleServices.map(
-                  (service) => _ServiceReadOnlyCard(service: service),
+                AdaptiveCardGrid(
+                  children: _visibleServices.map(
+                    (service) => _ServiceReadOnlyCard(service: service),
+                  ).toList(),
                 ),
             ],
           ),

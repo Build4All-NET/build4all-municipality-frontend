@@ -80,32 +80,7 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
   }
 
   String _localizedStatus(AppLocalizations l10n, String? status) {
-    final clean = status?.trim().toUpperCase() ?? '';
-
-    switch (clean) {
-      case 'SUBMITTED':
-        return l10n.statusSubmitted;
-      case 'PENDING':
-        return l10n.statusPending;
-      case 'UNDER_REVIEW':
-        return l10n.statusUnderReview;
-      case 'DOCUMENTS_MISSING':
-        return l10n.statusDocumentsMissing;
-      case 'IN_PROGRESS':
-        return l10n.statusInProgress;
-      case 'APPROVED':
-        return l10n.statusApproved;
-      case 'REJECTED':
-        return l10n.statusRejected;
-      case 'COMPLETED':
-        return l10n.statusCompleted;
-      case 'CANCELLED':
-        return l10n.statusCancelled;
-      case 'TAX_PAID':
-        return l10n.statusTaxPaid;
-      default:
-        return _safe(status).replaceAll('_', ' ');
-    }
+    return localizedRequestStatus(l10n, status);
   }
 
   Color _statusColor(BuildContext context, String? status) {

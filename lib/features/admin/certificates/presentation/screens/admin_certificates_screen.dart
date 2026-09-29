@@ -6,6 +6,8 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/common/widgets/adaptive_card_grid.dart';
+import 'package:baladiyati/core/l10n/known_names.dart';
 
 enum _CertFilter { all, signed, unsigned }
 
@@ -110,7 +112,7 @@ class _AdminCertificatesScreenState extends State<AdminCertificatesScreen> {
               ),
             ],
           ),
-          body: ResponsiveCenter.detail(
+          body: ResponsiveCenter(
             child: RefreshIndicator(
               onRefresh: cubit.loadCertificates,
               child: state.loading
@@ -184,17 +186,19 @@ class _AdminCertificatesScreenState extends State<AdminCertificatesScreen> {
                               SliverPadding(
                                 padding:
                                     const EdgeInsets.fromLTRB(16, 4, 16, 96),
-                                sliver: SliverList(
-                                  delegate: SliverChildBuilderDelegate(
-                                    (context, index) => _CertificateCard(
-                                      certificate: filtered[index],
-                                      loc: loc,
-                                      theme: theme,
-                                      colors: colors,
-                                      actionLoading: state.actionLoading,
-                                      cubit: cubit,
-                                    ),
-                                    childCount: filtered.length,
+                                sliver: SliverToBoxAdapter(
+                                  child: AdaptiveCardGrid(
+                                    children: [
+                                      for (final certificate in filtered)
+                                        _CertificateCard(
+                                          certificate: certificate,
+                                          loc: loc,
+                                          theme: theme,
+                                          colors: colors,
+                                          actionLoading: state.actionLoading,
+                                          cubit: cubit,
+                                        ),
+                                    ],
                                   ),
                                 ),
                               ),
@@ -650,19 +654,7 @@ class _CertificateCard extends StatelessWidget {
   }
 
   String _humaniseStatus(AppLocalizations loc, String status) {
-    final clean = status.trim().toUpperCase();
-    return switch (clean) {
-      'SUBMITTED' => loc.statusSubmitted,
-      'PENDING' => loc.statusPending,
-      'UNDER_REVIEW' => loc.statusUnderReview,
-      'DOCUMENTS_MISSING' => loc.statusDocumentsMissing,
-      'IN_PROGRESS' => loc.statusInProgress,
-      'APPROVED' => loc.statusApproved,
-      'REJECTED' => loc.statusRejected,
-      'COMPLETED' => loc.statusCompleted,
-      'CANCELLED' => loc.statusCancelled,
-      _ => status.replaceAll('_', ' '),
-    };
+    return localizedRequestStatus(loc, status);
   }
 
   Color _statusColor(String status, ColorScheme colors) {

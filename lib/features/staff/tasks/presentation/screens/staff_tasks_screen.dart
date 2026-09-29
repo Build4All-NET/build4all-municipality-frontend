@@ -8,6 +8,7 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/common/widgets/adaptive_card_grid.dart';
 
 enum _TaskFilter { all, active, done }
 
@@ -115,7 +116,7 @@ class _StaffTasksBodyState extends State<_StaffTasksBody> {
           ),
         ],
       ),
-      body: ResponsiveCenter.detail(
+      body: ResponsiveCenter(
         child: BlocBuilder<StaffTasksCubit, StaffTasksState>(
           builder: (context, state) {
             if (state is StaffTasksInitial || state is StaffTasksLoading) {
@@ -350,16 +351,15 @@ class _StaffTasksBodyState extends State<_StaffTasksBody> {
                     else
                       SliverPadding(
                         padding: const EdgeInsets.fromLTRB(16, 4, 16, 96),
-                        sliver: SliverList(
-                          delegate: SliverChildBuilderDelegate(
-                            (context, index) {
-                              final task = filtered[index];
-                              return StaffTaskCard(
-                                task: task,
-                                onOpenForm: () => _openTask(context, task),
-                              );
-                            },
-                            childCount: filtered.length,
+                        sliver: SliverToBoxAdapter(
+                          child: AdaptiveCardGrid(
+                            children: [
+                              for (final task in filtered)
+                                StaffTaskCard(
+                                  task: task,
+                                  onOpenForm: () => _openTask(context, task),
+                                ),
+                            ],
                           ),
                         ),
                       ),

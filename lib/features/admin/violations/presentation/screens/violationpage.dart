@@ -15,6 +15,7 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/common/widgets/adaptive_card_grid.dart';
 
 class ViolationsPage extends StatelessWidget {
   const ViolationsPage({super.key});
@@ -112,7 +113,7 @@ class _ViolationsBodyState extends State<ViolationsBody> {
           ),
         ],
       ),
-      body: ResponsiveCenter.detail(
+      body: ResponsiveCenter(
         child: BlocConsumer<ViolationBloc, ViolationState>(
           listener: (context, state) {
             if (state is ViolationError) {
@@ -161,11 +162,13 @@ class _ViolationsBodyState extends State<ViolationsBody> {
                   if (filtered.isEmpty)
                     _EmptyState(title: loc.noData, subtitle: loc.violations)
                   else
-                    ...filtered.map(
-                      (violation) => _ViolationCard(
-                        violation: violation,
-                        onUpdated: _reload,
-                      ),
+                    AdaptiveCardGrid(
+                      children: filtered.map(
+                        (violation) => _ViolationCard(
+                          violation: violation,
+                          onUpdated: _reload,
+                        ),
+                      ).toList(),
                     ),
                 ],
               ),

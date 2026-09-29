@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
 import 'package:baladiyati/core/l10n/known_names.dart';
+import 'package:baladiyati/common/widgets/adaptive_card_grid.dart';
 
 class RequestsScreen extends StatefulWidget {
   const RequestsScreen({super.key});
@@ -39,25 +40,8 @@ class _RequestsScreenState extends State<RequestsScreen> {
     context.read<DepartmentCubit>().fetchDepartments();
   }
 
-  String _safe(String? value) {
-    final clean = value?.trim() ?? '';
-    return clean.isEmpty || clean == 'null' ? '---' : clean;
-  }
-
   String _formatStatus(AppLocalizations l10n, String? status) {
-    final clean = status?.trim().toUpperCase() ?? '';
-    return switch (clean) {
-      'SUBMITTED' => l10n.statusSubmitted,
-      'PENDING' => l10n.statusPending,
-      'UNDER_REVIEW' => l10n.statusUnderReview,
-      'DOCUMENTS_MISSING' => l10n.statusDocumentsMissing,
-      'IN_PROGRESS' => l10n.statusInProgress,
-      'APPROVED' => l10n.statusApproved,
-      'REJECTED' => l10n.statusRejected,
-      'COMPLETED' => l10n.statusCompleted,
-      'CANCELLED' => l10n.statusCancelled,
-      _ => _safe(status).replaceAll('_', ' '),
-    };
+    return localizedRequestStatus(l10n, status);
   }
 
   String _statusUpdateSuccessMessage(AppLocalizations l10n, String status) {
@@ -126,7 +110,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
         ),
         centerTitle: true,
       ),
-      body: ResponsiveCenter.detail(
+      body: ResponsiveCenter(
         child: BlocConsumer<RequestBloc, RequestState>(
           listener: (context, state) {
             final error = state.error.trim();
@@ -291,16 +275,18 @@ class _RequestsScreenState extends State<RequestsScreen> {
                       ),
                     )
                   else
-                    ...state.visibleRequests.map(
-                      (request) {
-                        return _RequestCard(
-                          request: request,
-                          statusText: _formatStatus(l10n, request.status),
-                          statusColor: _statusColor(context, request.status),
-                          createdAt: _formatDate(request.createdAt),
-                          onTap: () => _openDetails(request),
-                        );
-                      },
+                    AdaptiveCardGrid(
+                      children: state.visibleRequests.map(
+                        (request) {
+                          return _RequestCard(
+                            request: request,
+                            statusText: _formatStatus(l10n, request.status),
+                            statusColor: _statusColor(context, request.status),
+                            createdAt: _formatDate(request.createdAt),
+                            onTap: () => _openDetails(request),
+                          );
+                        },
+                      ).toList(),
                     ),
                 ],
               ),

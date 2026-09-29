@@ -10,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
 import 'package:baladiyati/core/l10n/known_names.dart';
+import 'package:baladiyati/common/widgets/adaptive_card_grid.dart';
 
 class ServicesScreen extends StatefulWidget {
   const ServicesScreen({super.key});
@@ -158,7 +159,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
             icon: const Icon(Icons.add),
             label: Text(loc.add),
           ),
-          body: ResponsiveCenter.detail(
+          body: ResponsiveCenter(
             child: RefreshIndicator(
               onRefresh: _refresh,
               child: ListView(
@@ -198,13 +199,15 @@ class _ServicesScreenState extends State<ServicesScreen> {
                       subtitle: loc.noServicesHint,
                     )
                   else
-                    ...state.visibleServices.map(
-                      (service) => _ServiceCard(
-                        service: service,
-                        isBusy: state.actionLoading,
-                        onEdit: () => _openForm(service: service),
-                        onDelete: () => _confirmDelete(service),
-                      ),
+                    AdaptiveCardGrid(
+                      children: state.visibleServices.map(
+                        (service) => _ServiceCard(
+                          service: service,
+                          isBusy: state.actionLoading,
+                          onEdit: () => _openForm(service: service),
+                          onDelete: () => _confirmDelete(service),
+                        ),
+                      ).toList(),
                     ),
                 ],
               ),

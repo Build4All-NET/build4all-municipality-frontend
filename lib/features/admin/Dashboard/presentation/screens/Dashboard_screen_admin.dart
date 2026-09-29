@@ -16,6 +16,7 @@ import 'package:baladiyati/features/auth/data/services/auth_api_service.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/common/widgets/app_sidebar.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
 import 'package:baladiyati/core/config/app_breakpoints.dart';
 import 'package:baladiyati/core/utils/responsive.dart';
@@ -251,7 +252,32 @@ class _DashboardPageState extends State<DashboardPage> {
     );
   }
 
+  // Web / tablet: sections open inside the sidebar layout instead of new routes.
+  static const int _sectionOverview = 0;
+  static const int _sectionRequests = 1;
+  static const int _sectionServices = 2;
+  static const int _sectionDepartments = 3;
+  static const int _sectionEmployees = 4;
+  static const int _sectionAnnouncements = 5;
+  static const int _sectionViolations = 6;
+  static const int _sectionCertificates = 7;
+  static const int _sectionProfile = 8;
+
+  int _section = _sectionOverview;
+
+  bool get _useSidebar => !context.isCompact;
+
+  /// Shows [section] in the sidebar layout on wide screens, otherwise pushes it.
+  Future<void> _open(int section, void Function(BuildContext) push) async {
+    if (_useSidebar) {
+      setState(() => _section = section);
+      return;
+    }
+    push(context);
+  }
+
   Future<void> _openAnnouncements() async {
+    if (_useSidebar) return _open(_sectionAnnouncements, AppRouter.goToAnnouncements);
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -263,6 +289,7 @@ class _DashboardPageState extends State<DashboardPage> {
   }
 
   Future<void> _openViolations() async {
+    if (_useSidebar) return _open(_sectionViolations, AppRouter.goToViolations);
     await Navigator.push(
       context,
       MaterialPageRoute(
@@ -273,19 +300,91 @@ class _DashboardPageState extends State<DashboardPage> {
     await _refreshStats();
   }
 
-  void _openServices() => AppRouter.goToServices(context);
-  void _openDepartments() => AppRouter.goToDepartments(context);
+  void _openServices() => _open(_sectionServices, AppRouter.goToServices);
+  void _openDepartments() => _open(_sectionDepartments, AppRouter.goToDepartments);
   Future<void> _openEmployees() async {
-    AppRouter.goToEmployees(context);
+    await _open(_sectionEmployees, AppRouter.goToEmployees);
     await _refreshStats();
   }
-  void _openInbox() => AppRouter.goToRequests(context);
-  void _openCertificates() => AppRouter.goToCertificates(context);
+  void _openInbox() => _open(_sectionRequests, AppRouter.goToRequests);
+  void _openCertificates() => _open(_sectionCertificates, AppRouter.goToCertificates);
+  void _openProfile() => _open(_sectionProfile, AppRouter.goToAdminProfile);
 
-  String _formatCount(int count) => count < 0 ? '-' : '$count';
+  Widget _sectionPage(int section) {
+    switch (section) {
+      case _sectionRequests:
+        return AppRouter.requestsPage();
+      case _sectionServices:
+        return AppRouter.servicesPage();
+      case _sectionDepartments:
+        return AppRouter.departmentsPage();
+      case _sectionEmployees:
+        return AppRouter.employeesPage();
+      case _sectionAnnouncements:
+        return AppRouter.announcementsPage();
+      case _sectionViolations:
+        return AppRouter.violationsPage();
+      case _sectionCertificates:
+        return AppRouter.certificatesPage();
+      case _sectionProfile:
+        return AppRouter.adminProfilePage();
+      default:
+        return _buildOverview(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
+    if (!_useSidebar) return _buildOverview(context);
+
+    final loc = AppLocalizations.of(context)!;
+    final items = [
+      SidebarItem(icon: Icons.dashboard_outlined, selectedIcon: Icons.dashboard, label: loc.dashboard),
+      SidebarItem(icon: Icons.inbox_outlined, selectedIcon: Icons.inbox, label: loc.inbox),
+      SidebarItem(icon: Icons.description_outlined, selectedIcon: Icons.description, label: loc.services),
+      SidebarItem(icon: Icons.account_tree_outlined, selectedIcon: Icons.account_tree, label: loc.departments),
+      SidebarItem(icon: Icons.badge_outlined, selectedIcon: Icons.badge, label: loc.employees),
+      SidebarItem(icon: Icons.campaign_outlined, selectedIcon: Icons.campaign, label: loc.announcements),
+      SidebarItem(icon: Icons.gavel_outlined, selectedIcon: Icons.gavel, label: loc.violations),
+      SidebarItem(icon: Icons.verified_outlined, selectedIcon: Icons.verified, label: loc.certificate),
+    ];
+
+    return Scaffold(
+      body: Row(
+        children: [
+          AppSidebar(
+            title: loc.appTitle,
+            subtitle: loc.roleOwner,
+            brandIcon: Icons.admin_panel_settings_outlined,
+            collapsed: !context.isExpanded,
+            items: items,
+            // The profile page has no sidebar item, so nothing is highlighted there.
+            selectedIndex: _section < items.length ? _section : -1,
+            onSelected: (i) {
+              setState(() => _section = i);
+              if (i == _sectionOverview) _refreshStats();
+            },
+            actions: [
+              SidebarAction(icon: Icons.person_outline, label: loc.profile, onTap: _openProfile),
+              SidebarAction(icon: Icons.language, label: loc.selectLanguage, onTap: _showLanguageSheet),
+              SidebarAction(icon: Icons.logout, label: loc.logout, onTap: _logout, destructive: true),
+            ],
+          ),
+          Expanded(
+            child: KeyedSubtree(
+              key: ValueKey(_section),
+              child: _sectionPage(_section),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  String _formatCount(int count) => count < 0 ? '-' : '$count';
+
+  /// Stats and quick actions; the whole screen on phones, the first section on web.
+  Widget _buildOverview(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
@@ -295,7 +394,7 @@ class _DashboardPageState extends State<DashboardPage> {
       appBar: AppBar(
         title: Text(loc.dashboard),
         centerTitle: false,
-        actions: [
+        actions: _useSidebar ? null : [
           IconButton(
             tooltip: loc.selectLanguage,
             icon: const Icon(Icons.language),
@@ -432,72 +531,75 @@ class _DashboardPageState extends State<DashboardPage> {
                       ],
                     ),
 
-                    const SizedBox(height: 22),
+                    // Phones only: on web the sidebar already lists every section.
+                    if (!_useSidebar) ...[
+                      const SizedBox(height: 22),
 
-                    Text(
-                      loc.quickActions,
-                      style: theme.textTheme.titleLarge?.copyWith(
-                        fontWeight: FontWeight.w900,
+                      Text(
+                        loc.quickActions,
+                        style: theme.textTheme.titleLarge?.copyWith(
+                          fontWeight: FontWeight.w900,
+                        ),
                       ),
-                    ),
 
-                    const SizedBox(height: 12),
+                      const SizedBox(height: 12),
 
-                    GridView.count(
-                      crossAxisCount: context.gridColumns,
-                      shrinkWrap: true,
-                      crossAxisSpacing: 12,
-                      mainAxisSpacing: 12,
-                      physics: const NeverScrollableScrollPhysics(),
-                      childAspectRatio: context.responsive(
-                        compact: AppLayout.actionTileAspectRatioCompact,
-                        medium: AppLayout.actionTileAspectRatioWide,
+                      GridView.count(
+                        crossAxisCount: context.gridColumns,
+                        shrinkWrap: true,
+                        crossAxisSpacing: 12,
+                        mainAxisSpacing: 12,
+                        physics: const NeverScrollableScrollPhysics(),
+                        childAspectRatio: context.responsive(
+                          compact: AppLayout.actionTileAspectRatioCompact,
+                          medium: AppLayout.actionTileAspectRatioWide,
+                        ),
+                        children: [
+                          _ActionCard(
+                            title: loc.announcements,
+                            icon: Icons.campaign_outlined,
+                            iconColor: colors.primary,
+                            onTap: _openAnnouncements,
+                          ),
+                          _ActionCard(
+                            title: loc.violations,
+                            icon: Icons.gavel_outlined,
+                            iconColor: colors.error,
+                            onTap: _openViolations,
+                          ),
+                          _ActionCard(
+                            title: loc.services,
+                            icon: Icons.description_outlined,
+                            iconColor: colors.secondary,
+                            onTap: _openServices,
+                          ),
+                          _ActionCard(
+                            title: loc.inbox,
+                            icon: Icons.inbox_outlined,
+                            iconColor: colors.primary,
+                            onTap: _openInbox,
+                          ),
+                          _ActionCard(
+                            title: loc.departments,
+                            icon: Icons.account_tree_outlined,
+                            iconColor: colors.tertiary,
+                            onTap: _openDepartments,
+                          ),
+                          _ActionCard(
+                            title: loc.employees,
+                            icon: Icons.badge_outlined,
+                            iconColor: colors.primary,
+                            onTap: _openEmployees,
+                          ),
+                          _ActionCard(
+                            title: loc.certificate,
+                            icon: Icons.verified_outlined,
+                            iconColor: colors.primary,
+                            onTap: _openCertificates,
+                          ),
+                        ],
                       ),
-                      children: [
-                        _ActionCard(
-                          title: loc.announcements,
-                          icon: Icons.campaign_outlined,
-                          iconColor: colors.primary,
-                          onTap: _openAnnouncements,
-                        ),
-                        _ActionCard(
-                          title: loc.violations,
-                          icon: Icons.gavel_outlined,
-                          iconColor: colors.error,
-                          onTap: _openViolations,
-                        ),
-                        _ActionCard(
-                          title: loc.services,
-                          icon: Icons.description_outlined,
-                          iconColor: colors.secondary,
-                          onTap: _openServices,
-                        ),
-                        _ActionCard(
-                          title: loc.inbox,
-                          icon: Icons.inbox_outlined,
-                          iconColor: colors.primary,
-                          onTap: _openInbox,
-                        ),
-                        _ActionCard(
-                          title: loc.departments,
-                          icon: Icons.account_tree_outlined,
-                          iconColor: colors.tertiary,
-                          onTap: _openDepartments,
-                        ),
-                        _ActionCard(
-                          title: loc.employees,
-                          icon: Icons.badge_outlined,
-                          iconColor: colors.primary,
-                          onTap: _openEmployees,
-                        ),
-                        _ActionCard(
-                          title: loc.certificate,
-                          icon: Icons.verified_outlined,
-                          iconColor: colors.primary,
-                          onTap: _openCertificates,
-                        ),
-                      ],
-                    ),
+                    ],
                   ],
                 ),
               ),

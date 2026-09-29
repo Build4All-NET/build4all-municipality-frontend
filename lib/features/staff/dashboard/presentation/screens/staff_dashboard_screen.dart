@@ -9,6 +9,7 @@ import 'package:baladiyati/features/auth/data/services/session_role_store.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/common/widgets/app_sidebar.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
 import 'package:baladiyati/core/config/app_breakpoints.dart';
 import 'package:baladiyati/core/utils/responsive.dart';
@@ -159,32 +160,109 @@ class _StaffDashboardScreenState extends State<StaffDashboardScreen> {
     );
   }
 
-  void _openInbox() {
-    AppRouter.goToRequests(context);
+  // Web / tablet: sections open inside the sidebar layout instead of new routes.
+  static const int _sectionOverview = 0;
+  static const int _sectionTasks = 1;
+  static const int _sectionInbox = 2;
+  static const int _sectionServices = 3;
+  static const int _sectionViolations = 4;
+  static const int _sectionAnnouncements = 5;
+  static const int _sectionProfile = 6;
+
+  int _section = _sectionOverview;
+
+  bool get _useSidebar => !context.isCompact;
+
+  /// Shows [section] in the sidebar layout on wide screens, otherwise pushes it.
+  void _open(int section, void Function(BuildContext) push) {
+    if (_useSidebar) {
+      setState(() => _section = section);
+    } else {
+      push(context);
+    }
   }
 
-  void _openAnnouncements() {
-    AppRouter.goToAnnouncements(context);
-  }
+  void _openInbox() => _open(_sectionInbox, AppRouter.goToRequests);
 
-  void _openViolations() {
-    AppRouter.goToViolations(context);
-  }
+  void _openAnnouncements() => _open(_sectionAnnouncements, AppRouter.goToAnnouncements);
 
-  void _openServices() {
-    AppRouter.goToStaffServices(context);
-  }
+  void _openViolations() => _open(_sectionViolations, AppRouter.goToViolations);
 
-  void _openTasks() {
-    AppRouter.goToStaffTasks(context);
-  }
+  void _openServices() => _open(_sectionServices, AppRouter.goToStaffServices);
 
-  void _openProfile() {
-    AppRouter.goToProfile(context);
+  void _openTasks() => _open(_sectionTasks, AppRouter.goToStaffTasks);
+
+  void _openProfile() => _open(_sectionProfile, AppRouter.goToProfile);
+
+  Widget _sectionPage(int section) {
+    switch (section) {
+      case _sectionTasks:
+        return AppRouter.staffTasksPage();
+      case _sectionInbox:
+        return AppRouter.requestsPage();
+      case _sectionServices:
+        return AppRouter.staffServicesPage();
+      case _sectionViolations:
+        return AppRouter.violationsPage();
+      case _sectionAnnouncements:
+        return AppRouter.announcementsPage();
+      case _sectionProfile:
+        return AppRouter.profilePage();
+      default:
+        return _buildOverview(context);
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (!_useSidebar) return _buildOverview(context);
+
+    final loc = AppLocalizations.of(context)!;
+    final items = [
+      SidebarItem(icon: Icons.dashboard_outlined, selectedIcon: Icons.dashboard, label: loc.dashboard),
+      SidebarItem(icon: Icons.assignment_outlined, selectedIcon: Icons.assignment, label: loc.workflowTasks),
+      SidebarItem(icon: Icons.inbox_outlined, selectedIcon: Icons.inbox, label: loc.inbox),
+      SidebarItem(icon: Icons.description_outlined, selectedIcon: Icons.description, label: loc.services),
+      SidebarItem(icon: Icons.gavel_outlined, selectedIcon: Icons.gavel, label: loc.violations),
+      SidebarItem(icon: Icons.campaign_outlined, selectedIcon: Icons.campaign, label: loc.announcements),
+    ];
+
+    return Scaffold(
+      body: Row(
+        children: [
+          AppSidebar(
+            title: loc.appTitle,
+            subtitle: loc.roleStaff,
+            brandIcon: Icons.badge_outlined,
+            collapsed: !context.isExpanded,
+            items: items,
+            // The profile page has no sidebar item, so nothing is highlighted there.
+            selectedIndex: _section < items.length ? _section : -1,
+            onSelected: (i) => setState(() => _section = i),
+            actions: [
+              SidebarAction(icon: Icons.person_outline, label: loc.profile, onTap: _openProfile),
+              SidebarAction(icon: Icons.language, label: loc.selectLanguage, onTap: _showLanguageSheet),
+              SidebarAction(
+                icon: Icons.logout,
+                label: loc.logout,
+                onTap: _isLoggingOut ? () {} : _logout,
+                destructive: true,
+              ),
+            ],
+          ),
+          Expanded(
+            child: KeyedSubtree(
+              key: ValueKey(_section),
+              child: _sectionPage(_section),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /// Quick actions and activity; the whole screen on phones, the first section on web.
+  Widget _buildOverview(BuildContext context) {
     final loc = AppLocalizations.of(context)!;
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
@@ -194,7 +272,7 @@ class _StaffDashboardScreenState extends State<StaffDashboardScreen> {
       appBar: AppBar(
         title: Text(loc.dashboard),
         centerTitle: false,
-        actions: [
+        actions: _useSidebar ? null : [
           IconButton(
             tooltip: loc.selectLanguage,
             icon: const Icon(Icons.language),
@@ -227,60 +305,63 @@ class _StaffDashboardScreenState extends State<StaffDashboardScreen> {
             children: [
               _WelcomeHeader(),
 
-              const SizedBox(height: 24),
+              // Phones only: on web the sidebar already lists every section.
+              if (!_useSidebar) ...[
+                const SizedBox(height: 24),
 
-              Text(
-                loc.quickActions,
-                style: theme.textTheme.titleLarge?.copyWith(
-                  fontWeight: FontWeight.w900,
+                Text(
+                  loc.quickActions,
+                  style: theme.textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.w900,
+                  ),
                 ),
-              ),
 
-              const SizedBox(height: 12),
+                const SizedBox(height: 12),
 
-              GridView.count(
-                crossAxisCount: context.gridColumns,
-                shrinkWrap: true,
-                crossAxisSpacing: 12,
-                mainAxisSpacing: 12,
-                physics: const NeverScrollableScrollPhysics(),
-                childAspectRatio: context.responsive(
-                  compact: AppLayout.actionTileAspectRatioCompact,
-                  medium: AppLayout.actionTileAspectRatioWide,
+                GridView.count(
+                  crossAxisCount: context.gridColumns,
+                  shrinkWrap: true,
+                  crossAxisSpacing: 12,
+                  mainAxisSpacing: 12,
+                  physics: const NeverScrollableScrollPhysics(),
+                  childAspectRatio: context.responsive(
+                    compact: AppLayout.actionTileAspectRatioCompact,
+                    medium: AppLayout.actionTileAspectRatioWide,
+                  ),
+                  children: [
+                    _ActionCard(
+                      title: loc.workflowTasks,
+                      icon: Icons.assignment_outlined,
+                      iconColor: colors.tertiary,
+                      onTap: _openTasks,
+                    ),
+                    _ActionCard(
+                      title: loc.inbox,
+                      icon: Icons.inbox_outlined,
+                      iconColor: colors.primary,
+                      onTap: _openInbox,
+                    ),
+                    _ActionCard(
+                      title: loc.services,
+                      icon: Icons.description_outlined,
+                      iconColor: colors.secondary,
+                      onTap: _openServices,
+                    ),
+                    _ActionCard(
+                      title: loc.violations,
+                      icon: Icons.gavel_outlined,
+                      iconColor: colors.error,
+                      onTap: _openViolations,
+                    ),
+                    _ActionCard(
+                      title: loc.announcements,
+                      icon: Icons.campaign_outlined,
+                      iconColor: colors.primary,
+                      onTap: _openAnnouncements,
+                    ),
+                  ],
                 ),
-                children: [
-                  _ActionCard(
-                    title: loc.workflowTasks,
-                    icon: Icons.assignment_outlined,
-                    iconColor: colors.tertiary,
-                    onTap: _openTasks,
-                  ),
-                  _ActionCard(
-                    title: loc.inbox,
-                    icon: Icons.inbox_outlined,
-                    iconColor: colors.primary,
-                    onTap: _openInbox,
-                  ),
-                  _ActionCard(
-                    title: loc.services,
-                    icon: Icons.description_outlined,
-                    iconColor: colors.secondary,
-                    onTap: _openServices,
-                  ),
-                  _ActionCard(
-                    title: loc.violations,
-                    icon: Icons.gavel_outlined,
-                    iconColor: colors.error,
-                    onTap: _openViolations,
-                  ),
-                  _ActionCard(
-                    title: loc.announcements,
-                    icon: Icons.campaign_outlined,
-                    iconColor: colors.primary,
-                    onTap: _openAnnouncements,
-                  ),
-                ],
-              ),
+              ],
 
               const SizedBox(height: 24),
 

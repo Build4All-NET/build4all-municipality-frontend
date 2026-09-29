@@ -132,14 +132,18 @@ class _HomeScreenState extends State<HomeScreen> {
         body: useSideNav
             ? Row(
                 children: [
-                  SafeArea(
-                    child: SideNav(
-                      currentIndex: _currentIndex,
-                      onTap: _onTabSelected,
-                      extended: context.isExpanded,
-                    ),
+                  BlocBuilder<ProfileBloc, ProfileState>(
+                    builder: (context, profileState) {
+                      final profile = profileState.profile;
+                      return SideNav(
+                        currentIndex: _currentIndex,
+                        onTap: _onTabSelected,
+                        extended: context.isExpanded,
+                        municipalityName: profile?.municipalityName,
+                        userName: profile?.fullName,
+                      );
+                    },
                   ),
-                  const VerticalDivider(width: 1),
                   Expanded(child: pages),
                 ],
               )
