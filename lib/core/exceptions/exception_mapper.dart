@@ -4,6 +4,7 @@
 import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'app_exception.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class ExceptionMapper {
   static String toMessage(Object error) {
@@ -19,22 +20,22 @@ class ExceptionMapper {
 
         switch (error.code) {
           case 'INVALID_CREDENTIALS':
-            return 'Invalid email or password';
+            return AppStrings.current.errorInvalidCredentials;
           case 'WRONG_PASSWORD':
-            return 'Invalid email or password';
+            return AppStrings.current.errorInvalidCredentials;
           case 'USER_NOT_FOUND':
-            return 'User not found';
+            return AppStrings.current.errorUserNotFound;
           case 'INVALID_EMAIL_FORMAT':
-            return 'Invalid email format';
+            return AppStrings.current.errInvalidEmailFormat;
           case 'LOGIN_LOCKED':
           // Message already contains context (e.g. lock duration) → use as-is
             return _sanitize(error.message);
           case 'INACTIVE':
-            return 'Your account is inactive. Reactivate to continue.';
+            return AppStrings.current.errAccountInactive;
           case 'NETWORK_ERROR':
-            return 'No internet connection';
+            return AppStrings.current.errNoInternet;
           case 'SERVER_ERROR':
-            return 'Server error. Please try later.';
+            return AppStrings.current.errServer;
         }
 
         return _sanitize(error.message);
@@ -42,15 +43,15 @@ class ExceptionMapper {
       if (error is DioException) return _dioToMessage(error);
 
       // Standard Dart errors
-      if (error is FormatException) return 'Invalid server response.';
-      if (error is ArgumentError) return 'Invalid input.';
-      if (error is TypeError) return 'Something went wrong. Please try again.';
+      if (error is FormatException) return AppStrings.current.errInvalidResponse;
+      if (error is ArgumentError) return AppStrings.current.errInvalidInput;
+      if (error is TypeError) return AppStrings.current.errSomethingWrong;
 
       //  fallback
       return _sanitize(error.toString());
     } catch (_) {
       // Safety net — mapper must never crash the UI
-      return 'Something went wrong. Please try again.';
+      return AppStrings.current.errSomethingWrong;
     }
   }
 
@@ -60,15 +61,15 @@ class ExceptionMapper {
       case DioExceptionType.connectionTimeout:
       case DioExceptionType.sendTimeout:
       case DioExceptionType.receiveTimeout:
-        return 'Connection timed out. Try again.';
+        return AppStrings.current.errTimeout;
       case DioExceptionType.connectionError:
-        return 'No internet connection.';
+        return AppStrings.current.errNoInternet;
       case DioExceptionType.cancel:
-        return 'Request cancelled.';
+        return AppStrings.current.errRequestCancelled;
       case DioExceptionType.badCertificate:
-        return 'Secure connection failed.';
+        return AppStrings.current.errSecureConnection;
       case DioExceptionType.unknown:
-        return 'Network error. Check your connection.';
+        return AppStrings.current.errNoInternet;
       case DioExceptionType.badResponse:
         break; // handled below
     }
@@ -84,22 +85,22 @@ class ExceptionMapper {
 
   /// Returns a generic message based on HTTP status code.
   static String _statusFallback(int? status) {
-    if (status == null) return 'Request failed.';
+    if (status == null) return AppStrings.current.errRequestFailed;
     switch (status) {
       case 400:
       case 422:
-        return 'Invalid request. Please check your input.';
+        return AppStrings.current.errInvalidRequest;
       case 401:
-        return 'Session expired. Please log in again.';
+        return AppStrings.current.errSessionExpired;
       case 403:
-        return 'You don\'t have permission to do this.';
+        return AppStrings.current.errNoPermission;
       case 404:
-        return 'Not found.';
+        return AppStrings.current.errNotFound;
       case 409:
-        return 'Conflict. This already exists or can\'t be done now.';
+        return AppStrings.current.errConflict;
       default:
-        if (status >= 500) return 'Server error. Please try later.';
-        return 'Request failed.';
+        if (status >= 500) return AppStrings.current.errServer;
+        return AppStrings.current.errRequestFailed;
     }
   }
 
@@ -166,6 +167,6 @@ class ExceptionMapper {
     const maxLen = 160;
     if (msg.length > maxLen) msg = '${msg.substring(0, maxLen)}…';
 
-    return msg.isEmpty ? 'Something went wrong.' : msg;
+    return msg.isEmpty ? AppStrings.current.errSomethingWrong : msg;
   }
 }

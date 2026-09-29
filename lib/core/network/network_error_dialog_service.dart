@@ -2,6 +2,7 @@
 import 'package:flutter/material.dart';
 
 import 'navigation/app_navigator.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class NetworkErrorDialogService {
   static bool _isShowing = false;
@@ -69,7 +70,7 @@ class NetworkErrorDialogService {
                               height: 18,
                               child: CircularProgressIndicator(strokeWidth: 2),
                             )
-                          : const Text('Retry'),
+                          : Text(AppStrings.current.retry),
                     ),
                   ],
                 );

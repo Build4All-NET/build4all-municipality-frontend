@@ -106,7 +106,7 @@ class _StaffTasksBodyState extends State<_StaffTasksBody> {
             builder: (context, state) {
               return IconButton(
                 icon: const Icon(Icons.refresh),
-                tooltip: 'Refresh',
+                tooltip: AppLocalizations.of(context)!.refresh,
                 onPressed: state is StaffTasksLoading
                     ? null
                     : () => context.read<StaffTasksCubit>().loadTasks(),
@@ -126,7 +126,7 @@ class _StaffTasksBodyState extends State<_StaffTasksBody> {
                     const CircularProgressIndicator(),
                     const SizedBox(height: 14),
                     Text(
-                      'Loading your tasks...',
+                      AppLocalizations.of(context)!.loadingTasks,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: colors.onSurfaceVariant,
                       ),
@@ -157,7 +157,7 @@ class _StaffTasksBodyState extends State<_StaffTasksBody> {
                       ),
                       const SizedBox(height: 18),
                       Text(
-                        'Failed to load tasks',
+                        AppLocalizations.of(context)!.failedToLoadTasks,
                         style: theme.textTheme.titleMedium?.copyWith(
                           fontWeight: FontWeight.w800,
                           color: colors.onSurface,
@@ -176,7 +176,7 @@ class _StaffTasksBodyState extends State<_StaffTasksBody> {
                         onPressed: () =>
                             context.read<StaffTasksCubit>().loadTasks(),
                         icon: const Icon(Icons.refresh),
-                        label: const Text('Retry'),
+                        label: Text(AppLocalizations.of(context)!.retry),
                       ),
                     ],
                   ),
@@ -217,7 +217,7 @@ class _StaffTasksBodyState extends State<_StaffTasksBody> {
                             ),
                             const SizedBox(height: 22),
                             Text(
-                              'No tasks available',
+                              AppLocalizations.of(context)!.noTasksAvailable,
                               style: theme.textTheme.titleMedium?.copyWith(
                                 fontWeight: FontWeight.w800,
                                 color: colors.onSurface,
@@ -225,7 +225,7 @@ class _StaffTasksBodyState extends State<_StaffTasksBody> {
                             ),
                             const SizedBox(height: 10),
                             Text(
-                              'There are no pending tasks for your assigned departments.\n\nIf you believe you should have access to tasks, contact your administrator to verify your department assignments.',
+                              AppLocalizations.of(context)!.noTasksHint,
                               textAlign: TextAlign.center,
                               style: theme.textTheme.bodyMedium?.copyWith(
                                 color: colors.onSurfaceVariant,
@@ -237,7 +237,7 @@ class _StaffTasksBodyState extends State<_StaffTasksBody> {
                               onPressed: () =>
                                   context.read<StaffTasksCubit>().loadTasks(),
                               icon: const Icon(Icons.refresh),
-                              label: const Text('Check again'),
+                              label: Text(AppLocalizations.of(context)!.checkAgain),
                             ),
                           ],
                         ),
@@ -328,8 +328,8 @@ class _StaffTasksBodyState extends State<_StaffTasksBody> {
                                 _searchQuery.isNotEmpty
                                     ? l10n.noMatchingTasks
                                     : _filter == _TaskFilter.active
-                                        ? 'No active tasks'
-                                        : 'No completed tasks',
+                                        ? AppLocalizations.of(context)!.noActiveTasks
+                                        : AppLocalizations.of(context)!.noCompletedTasks,
                                 style: theme.textTheme.bodyMedium?.copyWith(
                                   color: colors.onSurfaceVariant,
                                 ),
@@ -613,14 +613,14 @@ class _TasksHeader extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'My Tasks',
+                  AppLocalizations.of(context)!.myTasks,
                   style: theme.textTheme.titleMedium?.copyWith(
                     color: colors.onPrimary,
                     fontWeight: FontWeight.w900,
                   ),
                 ),
                 Text(
-                  '$activeCount active · $doneCount done',
+                  AppLocalizations.of(context)!.tasksSummary(activeCount, doneCount),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colors.onPrimary.withOpacity(0.78),
                   ),

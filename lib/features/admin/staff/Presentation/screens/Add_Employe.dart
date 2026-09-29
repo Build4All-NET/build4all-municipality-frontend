@@ -9,6 +9,7 @@ import 'package:baladiyati/features/admin/staff/Presentation/bloc/Empl_event.dar
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/core/l10n/known_names.dart';
 
 class AddEmployeeDialog extends StatefulWidget {
   final Employee? employee;
@@ -148,14 +149,7 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
                   if (_isEditing && (widget.employee!.departmentName?.isNotEmpty == true))
                     _InfoRow(
                       label: loc.department,
-                      value: switch (widget.employee!.departmentName) {
-                        'Engineering' => loc.deptEngineering,
-                        'Finance' => loc.deptFinance,
-                        'Police' => loc.deptPolice,
-                        'Civil Status' => loc.deptCivilStatus,
-                        'Public Works' => loc.deptPublicWorks,
-                        _ => widget.employee!.departmentName!,
-                      },
+                      value: localizedDepartmentName(loc, widget.employee!.departmentName!),
                     ),
                   if (_isEditing && (widget.employee!.roleName?.isNotEmpty == true))
                     _InfoRow(
@@ -214,14 +208,7 @@ class _AddEmployeeDialogState extends State<AddEmployeeDialog> {
                         items: state.departments.map((department) {
                           return DropdownMenuItem<int>(
                             value: department.id,
-                            child: Text(switch (department.name) {
-                              'Engineering' => loc.deptEngineering,
-                              'Finance' => loc.deptFinance,
-                              'Police' => loc.deptPolice,
-                              'Civil Status' => loc.deptCivilStatus,
-                              'Public Works' => loc.deptPublicWorks,
-                              _ => department.name,
-                            }),
+                            child: Text(localizedDepartmentName(loc, department.name)),
                           );
                         }).toList(),
                         onChanged: submitting

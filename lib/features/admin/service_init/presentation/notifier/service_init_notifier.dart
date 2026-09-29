@@ -2,6 +2,7 @@ import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/admin/service_init/presentation/notifier/service_init_state.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 /// Globally accessible Riverpod 2.x provider for the service-init lifecycle.
 final serviceInitNotifierProvider =
@@ -54,7 +55,7 @@ class ServiceInitNotifier extends Notifier<ServiceInitState> {
       } catch (_) {
         state = state.copyWith(
           status: ServiceInitStatus.error,
-          errorMessage: 'An unexpected error occurred. Please try again.',
+          errorMessage: AppStrings.current.errSomethingWrong,
         );
       }
     });
@@ -65,22 +66,22 @@ class ServiceInitNotifier extends Notifier<ServiceInitState> {
   String _resolveDioError(DioException e) {
     switch (e.type) {
       case DioExceptionType.connectionTimeout:
-        return 'Connection timed out. Verify your network and retry.';
+        return AppStrings.current.errTimeout;
 
       case DioExceptionType.sendTimeout:
-        return 'Request could not be transmitted in time. Please retry.';
+        return AppStrings.current.errTimeout;
 
       case DioExceptionType.receiveTimeout:
-        return 'Server response exceeded the timeout threshold. Please retry.';
+        return AppStrings.current.errTimeout;
 
       case DioExceptionType.connectionError:
-        return 'Unable to reach the server. Check your network connection.';
+        return AppStrings.current.errNoInternet;
 
       case DioExceptionType.cancel:
-        return 'Request was cancelled before it could complete.';
+        return AppStrings.current.errRequestCancelled;
 
       case DioExceptionType.badCertificate:
-        return 'SSL certificate verification failed. Contact support.';
+        return AppStrings.current.errSecureConnection;
 
       case DioExceptionType.badResponse:
         final body = e.response?.data;
@@ -88,14 +89,14 @@ class ServiceInitNotifier extends Notifier<ServiceInitState> {
           final msg = body['message'];
           if (msg is String && msg.isNotEmpty) return msg;
         }
-        return 'Server error (HTTP ${e.response?.statusCode ?? 'unknown'}).';
+        return AppStrings.current.errServer;
 
       case DioExceptionType.unknown:
       default:
         final raw = e.message;
         return (raw != null && raw.isNotEmpty)
             ? raw
-            : 'An unknown network error occurred.';
+            : AppStrings.current.errSomethingWrong;
     }
   }
 }

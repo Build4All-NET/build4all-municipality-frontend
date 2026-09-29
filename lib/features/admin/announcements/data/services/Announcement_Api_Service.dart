@@ -1,5 +1,6 @@
 import 'package:baladiyati/features/admin/announcements/data/model/announcementModel.dart';
 import 'package:dio/dio.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class AnnouncementApiService {
   final Dio dio;
@@ -11,7 +12,7 @@ class AnnouncementApiService {
 
     final data = res.data;
     if (data is! List) {
-      throw Exception('Invalid announcements response');
+      throw Exception(AppStrings.current.errInvalidResponse);
     }
 
     return data

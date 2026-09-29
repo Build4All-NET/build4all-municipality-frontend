@@ -1,6 +1,7 @@
 import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/features/admin/staff/data/Model/EmployeModel.dart';
 import 'package:dio/dio.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class EmployeeApiService {
   final Dio dio;
@@ -14,12 +15,12 @@ class EmployeeApiService {
       if (data is List) {
         return data.map((e) => EmployeeModel.fromJson(e)).toList();
       }
-      throw const AppException('Invalid employees response format');
+      throw AppException(AppStrings.current.errInvalidResponse);
     } on DioException {
       rethrow;
     } catch (e) {
       if (e is AppException) rethrow;
-      throw AppException('Failed to load employees: $e');
+      throw AppException(AppStrings.current.errLoadEmployees);
     }
   }
 
@@ -30,7 +31,7 @@ class EmployeeApiService {
       rethrow;
     } catch (e) {
       if (e is AppException) rethrow;
-      throw AppException('Failed to create employee: $e');
+      throw AppException(AppStrings.current.errCreateEmployee);
     }
   }
 
@@ -41,7 +42,7 @@ class EmployeeApiService {
       rethrow;
     } catch (e) {
       if (e is AppException) rethrow;
-      throw AppException('Failed to update employee: $e');
+      throw AppException(AppStrings.current.errUpdateEmployee);
     }
   }
 
@@ -52,7 +53,7 @@ class EmployeeApiService {
       rethrow;
     } catch (e) {
       if (e is AppException) rethrow;
-      throw AppException('Failed to delete employee: $e');
+      throw AppException(AppStrings.current.errDeleteEmployee);
     }
   }
 }

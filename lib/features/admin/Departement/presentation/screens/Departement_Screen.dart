@@ -8,6 +8,7 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/core/l10n/known_names.dart';
 
 class DepartmentsScreen extends StatefulWidget {
   const DepartmentsScreen({super.key});
@@ -51,14 +52,7 @@ class _DepartmentsScreenState extends State<DepartmentsScreen> {
         return AlertDialog(
           title: Text(loc.confirmDelete),
           content: Text(
-            loc.deleteDepartmentConfirm(switch (department.name) {
-              'Engineering' => loc.deptEngineering,
-              'Finance' => loc.deptFinance,
-              'Police' => loc.deptPolice,
-              'Civil Status' => loc.deptCivilStatus,
-              'Public Works' => loc.deptPublicWorks,
-              _ => department.name,
-            }),
+            loc.deleteDepartmentConfirm(localizedDepartmentName(loc, department.name)),
           ),
           actions: [
             TextButton(
@@ -339,14 +333,7 @@ class _FilterCard extends StatelessWidget {
             ...departments.map(
               (d) => DropdownMenuItem<int?>(
                 value: d.id,
-                child: Text(switch (d.name) {
-                  'Engineering' => loc.deptEngineering,
-                  'Finance' => loc.deptFinance,
-                  'Police' => loc.deptPolice,
-                  'Civil Status' => loc.deptCivilStatus,
-                  'Public Works' => loc.deptPublicWorks,
-                  _ => d.name,
-                }),
+                child: Text(localizedDepartmentName(loc, d.name)),
               ),
             ),
           ],
@@ -466,14 +453,7 @@ class _DepartmentCard extends StatelessWidget {
           children: [
             Expanded(
               child: Text(
-                switch (department.name) {
-                  'Engineering' => loc.deptEngineering,
-                  'Finance' => loc.deptFinance,
-                  'Police' => loc.deptPolice,
-                  'Civil Status' => loc.deptCivilStatus,
-                  'Public Works' => loc.deptPublicWorks,
-                  _ => department.name,
-                },
+                localizedDepartmentName(loc, department.name),
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),

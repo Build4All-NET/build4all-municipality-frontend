@@ -12,6 +12,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import '../models/build4all_profile_model.dart';
 import '../models/municipality_profile_model.dart';
 import 'package:baladiyati/core/utils/picked_file.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class ProfileApiService {
   final Dio _buildDio;
@@ -78,7 +79,7 @@ class ProfileApiService {
       }
     }
 
-    throw AppException('Missing user auth token. Please login again.');
+    throw AppException(AppStrings.current.errSessionExpired);
   }
 
   Future<int> _userId() async {
@@ -107,7 +108,7 @@ class ProfileApiService {
       if (parsed != null && parsed > 0) return parsed;
     }
 
-    throw AppException('Missing user id. Please login again.');
+    throw AppException(AppStrings.current.errSessionExpired);
   }
 
   int _extractUserIdFromJwt(String token) {
@@ -140,8 +141,9 @@ class ProfileApiService {
 
   Exception _handleError(
     DioException e, {
-    String fallback = 'Request failed',
+    String? fallback,
   }) {
+    fallback ??= AppStrings.current.errRequestFailed;
     final data = e.response?.data;
 
     if (data is Map) {
@@ -186,10 +188,10 @@ class ProfileApiService {
         Map<String, dynamic>.from(response.data as Map),
       );
     } on DioException catch (e) {
-      throw _handleError(e, fallback: 'Failed to load Build4All profile');
+      throw _handleError(e, fallback: AppStrings.current.errLoadProfile);
     } catch (e) {
       if (e is AppException) rethrow;
-      throw AppException('Failed to load Build4All profile', original: e);
+      throw AppException(AppStrings.current.errLoadProfile, original: e);
     }
   }
 
@@ -216,10 +218,10 @@ class ProfileApiService {
         Map<String, dynamic>.from(response.data as Map),
       );
     } on DioException catch (e) {
-      throw _handleError(e, fallback: 'Failed to load municipality profile');
+      throw _handleError(e, fallback: AppStrings.current.errLoadProfile);
     } catch (e) {
       if (e is AppException) rethrow;
-      throw AppException('Failed to load municipality profile', original: e);
+      throw AppException(AppStrings.current.errLoadProfile, original: e);
     }
   }
 
@@ -262,10 +264,10 @@ class ProfileApiService {
 
       return Build4AllProfileModel.fromJson(userJson);
     } on DioException catch (e) {
-      throw _handleError(e, fallback: 'Failed to update Build4All profile');
+      throw _handleError(e, fallback: AppStrings.current.errUpdateProfile);
     } catch (e) {
       if (e is AppException) rethrow;
-      throw AppException('Failed to update Build4All profile', original: e);
+      throw AppException(AppStrings.current.errUpdateProfile, original: e);
     }
   }
 
@@ -278,7 +280,7 @@ class ProfileApiService {
       final ownerProjectLinkId = int.tryParse(Env.ownerProjectLinkId) ?? 0;
 
       if (ownerProjectLinkId <= 0) {
-        throw AppException('Missing owner project link id.');
+        throw AppException(AppStrings.current.errMissingOwnerProject);
       }
 
       final response = await _muniDio.patch(
@@ -301,10 +303,10 @@ class ProfileApiService {
         Map<String, dynamic>.from(response.data as Map),
       );
     } on DioException catch (e) {
-      throw _handleError(e, fallback: 'Failed to update municipality profile');
+      throw _handleError(e, fallback: AppStrings.current.errUpdateProfile);
     } catch (e) {
       if (e is AppException) rethrow;
-      throw AppException('Failed to update municipality profile', original: e);
+      throw AppException(AppStrings.current.errUpdateProfile, original: e);
     }
   }
 }

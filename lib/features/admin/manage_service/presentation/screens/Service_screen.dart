@@ -9,6 +9,7 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/core/l10n/known_names.dart';
 
 class ServicesScreen extends StatefulWidget {
   const ServicesScreen({super.key});
@@ -51,22 +52,7 @@ class _ServicesScreenState extends State<ServicesScreen> {
     final serviceName = langCode == 'ar'
         ? (service.nameAr.trim().isNotEmpty ? service.nameAr.trim() : service.nameEn.trim())
         : langCode == 'fr'
-            ? switch (service.nameEn.trim()) {
-                'Building Permit' => "Permis de construire",
-                'Larger Building Permit' => "Permis de construire (grande superficie)",
-                'Housing Permit' => "Permis d'habitation",
-                'External Works' => 'Travaux extérieurs',
-                'Illegal Construction' => 'Régularisation de construction illégale',
-                'Valuation Certificate' => "Certificat d'évaluation",
-                'Clearance Certificate' => 'Certificat de non-redevance',
-                'Tent Permit' => 'Permis de tente',
-                'Property Access' => "Autorisation d'accès à la propriété",
-                'Residence Certificate' => 'Certificat de résidence',
-                'Contents Certificate' => 'Attestation de contenu',
-                'Work Certificate' => 'Attestation de travaux',
-                'Lease Registration' => 'Enregistrement de bail',
-                _ => service.nameEn.trim(),
-              }
+            ? localizedServiceName(loc, service.nameEn.trim())
             : service.nameEn.trim();
 
     final confirmed = await showDialog<bool>(
@@ -325,22 +311,7 @@ class _ServiceCard extends StatelessWidget {
     final title = langCode == 'ar'
         ? (service.nameAr.trim().isNotEmpty ? service.nameAr : service.nameEn)
         : langCode == 'fr'
-            ? switch (service.nameEn.trim()) {
-                'Building Permit' => "Permis de construire",
-                'Larger Building Permit' => "Permis de construire (grande superficie)",
-                'Housing Permit' => "Permis d'habitation",
-                'External Works' => 'Travaux extérieurs',
-                'Illegal Construction' => 'Régularisation de construction illégale',
-                'Valuation Certificate' => "Certificat d'évaluation",
-                'Clearance Certificate' => 'Certificat de non-redevance',
-                'Tent Permit' => 'Permis de tente',
-                'Property Access' => "Autorisation d'accès à la propriété",
-                'Residence Certificate' => 'Certificat de résidence',
-                'Contents Certificate' => 'Attestation de contenu',
-                'Work Certificate' => 'Attestation de travaux',
-                'Lease Registration' => 'Enregistrement de bail',
-                _ => service.nameEn,
-              }
+            ? localizedServiceName(loc, service.nameEn)
             : service.nameEn;
 
     final subtitle = service.descriptionEn.trim().isNotEmpty

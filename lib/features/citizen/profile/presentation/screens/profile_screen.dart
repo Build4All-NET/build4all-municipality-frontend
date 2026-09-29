@@ -737,15 +737,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _infoRow(
           context: context,
           icon: Icons.verified_user_outlined,
-          label: 'Status',
+          label: AppLocalizations.of(context)!.status,
           value: _safeValue(profile?.coreStatus),
         ),
         _divider(context),
         _infoRow(
           context: context,
           icon: Icons.visibility_outlined,
-          label: 'Visibility',
-          value: profile?.isPublicProfile == true ? 'Public' : 'Private',
+          label: AppLocalizations.of(context)!.visibility,
+          value: profile?.isPublicProfile == true
+              ? AppLocalizations.of(context)!.profilePublic
+              : AppLocalizations.of(context)!.profilePrivate,
         ),
       ],
     );

@@ -7,6 +7,7 @@ import 'package:web/web.dart' as web;
 
 import '../../config/app_file_types.dart';
 import 'file_open_result.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 /// Web implementation: browsers have no app file system, so files are kept in
 /// memory for the session and handed to the browser as blob URLs.
@@ -36,7 +37,7 @@ class FileStore {
 
   Future<FileOpenResult> open(String handle) async {
     final bytes = _session[handle];
-    if (bytes == null) return const FileOpenResult.failed('File not found');
+    if (bytes == null) return FileOpenResult.failed(AppStrings.current.errFileNotFound);
 
     final mimeType = AppFileTypes.mimeTypeOf(handle, headerBytes: bytes);
     final blob = web.Blob([bytes.toJS].toJS, web.BlobPropertyBag(type: mimeType));

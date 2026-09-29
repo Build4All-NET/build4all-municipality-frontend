@@ -1808,4 +1808,327 @@ class AppLocalizationsFr extends AppLocalizations {
 
   @override
   String get serviceLeaseRegistration => 'Enregistrement de bail';
+
+  @override
+  String get errSomethingWrong => 'Une erreur s\'est produite. Veuillez réessayer.';
+
+  @override
+  String get errNoInternet => 'Pas de connexion Internet. Vérifiez votre Wi-Fi ou vos données mobiles.';
+
+  @override
+  String get errReconnectHint => 'Reconnectez-vous au Wi-Fi ou aux données mobiles, puis appuyez sur Réessayer.';
+
+  @override
+  String get errServerUnavailable => 'Serveur indisponible';
+
+  @override
+  String get errServerUnreachableHint => 'Le serveur est injoignable pour le moment. Réessayez plus tard.';
+
+  @override
+  String get errServerNotResponding => 'Le serveur ne répond pas';
+
+  @override
+  String get errServer => 'Erreur du serveur. Veuillez réessayer plus tard.';
+
+  @override
+  String get errTimeout => 'Délai de connexion dépassé. Veuillez réessayer.';
+
+  @override
+  String get errRequestCancelled => 'Requête annulée.';
+
+  @override
+  String get errSecureConnection => 'Échec de la connexion sécurisée.';
+
+  @override
+  String get errInvalidRequest => 'Requête invalide. Vérifiez les données saisies.';
+
+  @override
+  String get errSessionExpired => 'Votre session a expiré. Veuillez vous reconnecter.';
+
+  @override
+  String get errNoPermission => 'Vous n\'avez pas la permission d\'effectuer cette action.';
+
+  @override
+  String get errNotFound => 'Introuvable.';
+
+  @override
+  String get errConflict => 'Cet élément existe déjà ou l\'action est impossible pour le moment.';
+
+  @override
+  String get errRequestFailed => 'La requête a échoué.';
+
+  @override
+  String get errInvalidResponse => 'Réponse du serveur invalide.';
+
+  @override
+  String get errInvalidInput => 'Données invalides.';
+
+  @override
+  String get errInvalidEmailFormat => 'Format d\'e-mail invalide';
+
+  @override
+  String get errAccountInactive => 'Votre compte est inactif. Réactivez-le pour continuer.';
+
+  @override
+  String get errNotStaffAccount => 'Ce compte n\'est pas enregistré comme membre du personnel.';
+
+  @override
+  String get errMissingLoginData => 'Données de connexion manquantes. Veuillez vous reconnecter.';
+
+  @override
+  String get errMissingOwnerProject => 'Lien de la municipalité manquant. Veuillez vous reconnecter.';
+
+  @override
+  String get errFileNotFound => 'Fichier introuvable';
+
+  @override
+  String get errUploadFailed => 'Échec du téléversement des fichiers';
+
+  @override
+  String get errInvalidAiResponse => 'Réponse invalide de l\'assistant';
+
+  @override
+  String get errEmailRequired => 'L\'e-mail est obligatoire';
+
+  @override
+  String get errFullNameRequired => 'Le nom complet est obligatoire';
+
+  @override
+  String get errRoleRequired => 'Le rôle est obligatoire';
+
+  @override
+  String get errInvalidUserId => 'Identifiant d\'utilisateur invalide';
+
+  @override
+  String get errCarPlateRequired => 'La plaque d\'immatriculation est obligatoire';
+
+  @override
+  String get errIdentityRequired => 'Le numéro d\'identité est obligatoire';
+
+  @override
+  String get errNameMinLength => 'Le nom doit contenir au moins 2 caractères';
+
+  @override
+  String get errInvalidResetCode => 'Code de réinitialisation invalide';
+
+  @override
+  String get errLoadRequests => 'Impossible de charger les demandes';
+
+  @override
+  String get errLoadRequest => 'Impossible de charger la demande';
+
+  @override
+  String get errCreateRequest => 'Impossible d\'envoyer la demande';
+
+  @override
+  String get errLoadServices => 'Impossible de charger les services';
+
+  @override
+  String get errLoadService => 'Impossible de charger le service';
+
+  @override
+  String get errCreateService => 'Impossible de créer le service';
+
+  @override
+  String get errUpdateService => 'Impossible de mettre à jour le service';
+
+  @override
+  String get errDeleteService => 'Impossible de supprimer le service';
+
+  @override
+  String get errLoadDepartments => 'Impossible de charger les départements';
+
+  @override
+  String get errDeleteDepartment => 'Impossible de supprimer le département';
+
+  @override
+  String get errLoadEmployees => 'Impossible de charger les employés';
+
+  @override
+  String get errCreateEmployee => 'Impossible d\'ajouter l\'employé';
+
+  @override
+  String get errUpdateEmployee => 'Impossible de mettre à jour l\'employé';
+
+  @override
+  String get errDeleteEmployee => 'Impossible de supprimer l\'employé';
+
+  @override
+  String get errLoadUsers => 'Impossible de charger les utilisateurs';
+
+  @override
+  String get errLoadRoles => 'Impossible de charger les rôles';
+
+  @override
+  String get errAssignRole => 'Impossible d\'attribuer le rôle';
+
+  @override
+  String get errRemoveRole => 'Impossible de retirer le rôle';
+
+  @override
+  String get errLoadAnnouncements => 'Impossible de charger les annonces';
+
+  @override
+  String get errLoadViolations => 'Impossible de charger les infractions';
+
+  @override
+  String get errLoadNotifications => 'Impossible de charger les notifications';
+
+  @override
+  String get errMarkNotificationRead => 'Impossible de marquer la notification comme lue';
+
+  @override
+  String get errMarkAllRead => 'Impossible de tout marquer comme lu';
+
+  @override
+  String get errLoadPayments => 'Impossible de charger les paiements';
+
+  @override
+  String get errDownloadReceipt => 'Impossible de télécharger le reçu';
+
+  @override
+  String get errLoadProfile => 'Impossible de charger le profil';
+
+  @override
+  String get errUpdateProfile => 'Impossible de mettre à jour le profil';
+
+  @override
+  String get errSendCode => 'Impossible d\'envoyer le code de vérification';
+
+  @override
+  String get errVerifyCode => 'Impossible de vérifier le code';
+
+  @override
+  String get errCompleteProfile => 'Impossible de compléter le profil';
+
+  @override
+  String get errRegister => 'Impossible de créer le compte';
+
+  @override
+  String get errResetPassword => 'Impossible de réinitialiser le mot de passe';
+
+  @override
+  String get errLogout => 'Impossible de se déconnecter';
+
+  @override
+  String get errSyncMunicipalityUser => 'Impossible de lier votre compte à la municipalité';
+
+  @override
+  String get passwordResetSuccess => 'Mot de passe réinitialisé avec succès';
+
+  @override
+  String get operationSuccess => 'Opération réussie';
+
+  @override
+  String get refresh => 'Actualiser';
+
+  @override
+  String get stepRegister => 'Inscription';
+
+  @override
+  String get stepVerify => 'Vérification';
+
+  @override
+  String get stepComplete => 'Finalisation';
+
+  @override
+  String get languageArabic => 'Arabe';
+
+  @override
+  String get languageEnglish => 'Anglais';
+
+  @override
+  String get languageFrench => 'Français';
+
+  @override
+  String get myTasks => 'Mes tâches';
+
+  @override
+  String tasksSummary(Object active, Object done) {
+    return '$active actives · $done terminées';
+  }
+
+  @override
+  String get loadingTasks => 'Chargement de vos tâches...';
+
+  @override
+  String get noTasksAvailable => 'Aucune tâche disponible';
+
+  @override
+  String get noTasksHint => 'Aucune tâche en attente pour vos départements.\n\nSi vous pensez devoir avoir accès à des tâches, contactez votre administrateur pour vérifier vos affectations.';
+
+  @override
+  String get checkAgain => 'Vérifier à nouveau';
+
+  @override
+  String get noActiveTasks => 'Aucune tâche active';
+
+  @override
+  String get noCompletedTasks => 'Aucune tâche terminée';
+
+  @override
+  String get taskStatusAssigned => 'Assignée';
+
+  @override
+  String get defaultTaskName => 'Tâche';
+
+  @override
+  String get municipalityCertificate => 'Certificat municipal';
+
+  @override
+  String get officiallySigned => 'Signé officiellement';
+
+  @override
+  String get certificateGeneratedNote => 'Ce document est généré électroniquement par le système municipal.';
+
+  @override
+  String fieldMinValue(Object min) {
+    return 'La valeur minimale est $min';
+  }
+
+  @override
+  String fieldMaxValue(Object max) {
+    return 'La valeur maximale est $max';
+  }
+
+  @override
+  String get noCertificatesInCategory => 'Aucun certificat dans cette catégorie.';
+
+  @override
+  String certificatesSummary(Object signed, Object pending) {
+    return '$signed signés · $pending en attente';
+  }
+
+  @override
+  String get processKey => 'Clé du processus';
+
+  @override
+  String get visibility => 'Visibilité';
+
+  @override
+  String get profilePublic => 'Public';
+
+  @override
+  String get profilePrivate => 'Privé';
+
+  @override
+  String get timeJustNow => 'À l\'instant';
+
+  @override
+  String timeMinutesAgo(Object count) {
+    return 'Il y a $count min';
+  }
+
+  @override
+  String timeHoursAgo(Object count) {
+    return 'Il y a $count h';
+  }
+
+  @override
+  String get timeYesterday => 'Hier';
+
+  @override
+  String timeDaysAgo(Object count) {
+    return 'Il y a $count jours';
+  }
 }

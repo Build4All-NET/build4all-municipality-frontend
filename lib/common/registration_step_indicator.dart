@@ -3,6 +3,7 @@
 import 'package:baladiyati/common/registration_step_cubit.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:baladiyati/l10n/app_localizations.dart';
 
 enum RegistrationStep {
   register(0),
@@ -69,15 +70,14 @@ class RegistrationStepIndicator extends StatelessWidget {
   }
 
   String _getStepTitle(BuildContext context, int step) {
-    // Keep these simple for now.
-    // Later you can move them to app localization keys.
+    final l10n = AppLocalizations.of(context)!;
     switch (step) {
       case 0:
-        return 'Register';
+        return l10n.stepRegister;
       case 1:
-        return 'Verify';
+        return l10n.stepVerify;
       case 2:
-        return 'Complete';
+        return l10n.stepComplete;
       default:
         return '';
     }

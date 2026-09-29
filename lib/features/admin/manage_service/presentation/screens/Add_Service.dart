@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/core/l10n/known_names.dart';
 
 class AddServicePage extends StatefulWidget {
   final ServiceModel? service;
@@ -511,14 +512,7 @@ class _DepartmentDropdown extends StatelessWidget {
       items: departments.map((department) {
         return DropdownMenuItem<int>(
           value: department.id,
-          child: Text(switch (department.name) {
-            'Engineering' => loc.deptEngineering,
-            'Finance' => loc.deptFinance,
-            'Police' => loc.deptPolice,
-            'Civil Status' => loc.deptCivilStatus,
-            'Public Works' => loc.deptPublicWorks,
-            _ => department.name,
-          }),
+          child: Text(localizedDepartmentName(loc, department.name)),
         );
       }).toList(),
       onChanged: onChanged,

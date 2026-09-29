@@ -7,6 +7,7 @@ import 'package:baladiyati/core/utils/jwt_utils.dart';
 import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
 import 'package:dio/dio.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class AuthRefreshCoordinator {
   AuthRefreshCoordinator._();
@@ -65,14 +66,14 @@ class AuthRefreshCoordinator {
 
     if (status == 401 || status == 403) {
       return AuthException(
-        message.isEmpty ? 'Session expired. Please login again.' : message,
+        message.isEmpty ? AppStrings.current.errSessionExpired : message,
         code: code.isEmpty ? 'BAD_REFRESH' : code,
         original: e,
       );
     }
 
     return AuthException(
-      message.isEmpty ? 'Refresh failed.' : message,
+      message.isEmpty ? AppStrings.current.errSessionExpired : message,
       code: code.isEmpty ? 'BAD_REFRESH' : code,
       original: e,
     );
@@ -126,7 +127,7 @@ class AuthRefreshCoordinator {
 
       if (refresh.isEmpty) {
         throw AuthException(
-          'No refresh token available.',
+          AppStrings.current.errSessionExpired,
           code: 'NO_USER_REFRESH',
         );
       }
@@ -162,7 +163,7 @@ class AuthRefreshCoordinator {
       // we keep the existing one rather than treating it as an error.
       if (newAccess.isEmpty) {
         throw AuthException(
-          'Invalid refresh response.',
+          AppStrings.current.errSessionExpired,
           code: 'BAD_REFRESH_RESPONSE',
         );
       }
@@ -197,7 +198,7 @@ class AuthRefreshCoordinator {
       }
 
       final wrapped = AppException(
-        'Refresh failed.',
+        AppStrings.current.errSessionExpired,
         original: e,
       );
 
@@ -221,7 +222,7 @@ class AuthRefreshCoordinator {
 
       if (refresh.isEmpty) {
         throw AuthException(
-          'No refresh token available.',
+          AppStrings.current.errSessionExpired,
           code: 'NO_ADMIN_REFRESH',
         );
       }
@@ -254,7 +255,7 @@ class AuthRefreshCoordinator {
       // Many backends don't rotate the refresh token — keep existing if omitted.
       if (newAccess.isEmpty) {
         throw AuthException(
-          'Invalid refresh response.',
+          AppStrings.current.errSessionExpired,
           code: 'BAD_REFRESH_RESPONSE',
         );
       }
@@ -290,7 +291,7 @@ class AuthRefreshCoordinator {
       }
 
       final wrapped = AppException(
-        'Refresh failed.',
+        AppStrings.current.errSessionExpired,
         original: e,
       );
 

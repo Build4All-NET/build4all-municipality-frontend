@@ -1,6 +1,7 @@
 import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/features/admin/manage_service/Data/model/service_Model.dart';
 import 'package:dio/dio.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class ServiceApiService {
   final Dio dio;
@@ -30,12 +31,12 @@ class ServiceApiService {
         return data.map((e) => ServiceModel.fromJson(e)).toList();
       }
 
-      throw const AppException('Invalid services response format');
+      throw AppException(AppStrings.current.errInvalidResponse);
     } on DioException {
       rethrow;
     } catch (e) {
       if (e is AppException) rethrow;
-      throw AppException('Failed to load services: $e');
+      throw AppException(AppStrings.current.errLoadServices);
     }
   }
 
@@ -49,7 +50,7 @@ class ServiceApiService {
       rethrow;
     } catch (e) {
       if (e is AppException) rethrow;
-      throw AppException('Failed to create service: $e');
+      throw AppException(AppStrings.current.errCreateService);
     }
   }
 
@@ -60,7 +61,7 @@ class ServiceApiService {
       rethrow;
     } catch (e) {
       if (e is AppException) rethrow;
-      throw AppException('Failed to delete service: $e');
+      throw AppException(AppStrings.current.errDeleteService);
     }
   }
 
@@ -74,7 +75,7 @@ class ServiceApiService {
       rethrow;
     } catch (e) {
       if (e is AppException) rethrow;
-      throw AppException('Failed to update service: $e');
+      throw AppException(AppStrings.current.errUpdateService);
     }
   }
 }

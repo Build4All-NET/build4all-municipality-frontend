@@ -136,19 +136,19 @@ class _StaffDashboardScreenState extends State<StaffDashboardScreen> {
                 languageTile(
                   code: 'ar',
                   title: 'العربية',
-                  subtitle: 'Arabic',
+                  subtitle: AppLocalizations.of(context)!.languageArabic,
                   onTap: localeCubit.setArabic,
                 ),
                 languageTile(
                   code: 'en',
                   title: 'English',
-                  subtitle: 'English',
+                  subtitle: AppLocalizations.of(context)!.languageEnglish,
                   onTap: localeCubit.setEnglish,
                 ),
                 languageTile(
                   code: 'fr',
                   title: 'Français',
-                  subtitle: 'French',
+                  subtitle: AppLocalizations.of(context)!.languageFrench,
                   onTap: localeCubit.setFrench,
                 ),
               ],

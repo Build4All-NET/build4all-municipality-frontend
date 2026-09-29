@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:dio/dio.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 String errorMessage(Object error) {
   if (error is AppException) {
@@ -20,7 +21,7 @@ String errorMessage(Object error) {
         error.type == DioExceptionType.connectionTimeout ||
         error.type == DioExceptionType.receiveTimeout ||
         error.type == DioExceptionType.sendTimeout) {
-      return 'No internet connection. Please check your Wi-Fi or mobile data.';
+      return AppStrings.current.errNoInternet;
     }
 
     final data = error.response?.data;
@@ -28,11 +29,11 @@ String errorMessage(Object error) {
     if (data is Map) {
       return (data['message'] ??
               data['error'] ??
-              'Something went wrong. Please try again.')
+              AppStrings.current.errSomethingWrong)
           .toString();
     }
 
-    return 'Something went wrong. Please try again.';
+    return AppStrings.current.errSomethingWrong;
   }
 
   final text = error.toString();
@@ -42,7 +43,7 @@ String errorMessage(Object error) {
       text.contains('Connection failed') ||
       text.contains('Network is unreachable') ||
       text.contains('Failed host lookup')) {
-    return 'No internet connection. Please check your Wi-Fi or mobile data.';
+    return AppStrings.current.errNoInternet;
   }
 
   return text.replaceAll('Exception:', '').trim();

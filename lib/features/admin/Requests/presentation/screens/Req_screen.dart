@@ -10,6 +10,7 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
+import 'package:baladiyati/core/l10n/known_names.dart';
 
 class RequestsScreen extends StatefulWidget {
   const RequestsScreen({super.key});
@@ -203,14 +204,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
                                     return DropdownMenuItem<int?>(
                                       value: department.id,
                                       child: _ResponsiveText(
-                                        text: switch (department.name) {
-                                          'Engineering' => l10n.deptEngineering,
-                                          'Finance' => l10n.deptFinance,
-                                          'Police' => l10n.deptPolice,
-                                          'Civil Status' => l10n.deptCivilStatus,
-                                          'Public Works' => l10n.deptPublicWorks,
-                                          _ => department.name,
-                                        },
+                                        text: localizedDepartmentName(l10n, department.name),
                                         maxFontSize: 13,
                                         minFontSize: 8,
                                         color: colors.onSurface,
@@ -397,22 +391,7 @@ class _RequestCard extends StatelessWidget {
                   const SizedBox(height: 6),
                   _MiniInfoLine(
                     icon: Icons.miscellaneous_services_outlined,
-                    text: switch (request.serviceName) {
-                      'Building Permit' => l10n.serviceBuildingPermit,
-                      'Larger Building Permit' => l10n.serviceLargerBuildingPermit,
-                      'Housing Permit' => l10n.serviceHousingPermit,
-                      'External Works' => l10n.serviceExternalWorks,
-                      'Illegal Construction' => l10n.serviceIllegalConstruction,
-                      'Valuation Certificate' => l10n.serviceValuationCertificate,
-                      'Clearance Certificate' => l10n.serviceClearanceCertificate,
-                      'Tent Permit' => l10n.serviceTentPermit,
-                      'Property Access' => l10n.servicePropertyAccess,
-                      'Residence Certificate' => l10n.serviceResidenceCertificate,
-                      'Contents Certificate' => l10n.serviceContentsCertificate,
-                      'Work Certificate' => l10n.serviceWorkCertificate,
-                      'Lease Registration' => l10n.serviceLeaseRegistration,
-                      _ => _safe(request.serviceName),
-                    },
+                    text: localizedServiceName(l10n, _safe(request.serviceName)),
                   ),
                   const SizedBox(height: 4),
                   _MiniInfoLine(

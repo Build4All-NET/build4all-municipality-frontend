@@ -3,6 +3,7 @@ import 'package:baladiyati/features/admin/certificates/data/services/certificate
 import 'package:baladiyati/features/admin/certificates/presentation/cubit/admin_certificate_state.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/core/utils/file_store/file_store.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class AdminCertificateCubit extends Cubit<AdminCertificateState> {
   AdminCertificateCubit(this._api) : super(const AdminCertificateState());
@@ -71,13 +72,13 @@ class AdminCertificateCubit extends Cubit<AdminCertificateState> {
   String _friendlyError(Object e) {
     final msg = e.toString();
     if (msg.contains('DioException') || msg.contains('SocketException')) {
-      return 'Network error. Please check your connection.';
+      return AppStrings.current.errNoInternet;
     }
     if (msg.contains('404')) return 'Certificate not found.';
     if (msg.contains('403') || msg.contains('401')) {
-      return 'You are not authorised to perform this action.';
+      return AppStrings.current.errNoPermission;
     }
-    if (msg.contains('500')) return 'Server error. Please try again later.';
+    if (msg.contains('500')) return AppStrings.current.errServer;
     return msg.replaceAll('Exception: ', '');
   }
 }

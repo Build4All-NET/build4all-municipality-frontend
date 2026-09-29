@@ -103,7 +103,7 @@ class _AdminCertificatesScreenState extends State<AdminCertificatesScreen> {
                       setState(() => _newestFirst = !_newestFirst),
                 ),
               IconButton(
-                tooltip: 'Refresh',
+                tooltip: loc.refresh,
                 icon: const Icon(Icons.refresh),
                 onPressed:
                     state.loading ? null : cubit.loadCertificates,
@@ -172,7 +172,7 @@ class _AdminCertificatesScreenState extends State<AdminCertificatesScreen> {
                                       ),
                                       const SizedBox(height: 4),
                                       Text(
-                                        'No certificates in this category.',
+                                        AppLocalizations.of(context)!.noCertificatesInCategory,
                                         style: theme.textTheme.bodySmall
                                             ?.copyWith(color: colors.outline),
                                       ),
@@ -257,7 +257,7 @@ class _Header extends StatelessWidget {
                 ),
                 const SizedBox(height: 4),
                 Text(
-                  '$signedCount signed · $unsignedCount pending',
+                  AppLocalizations.of(context)!.certificatesSummary(signedCount, unsignedCount),
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: colors.onPrimary.withOpacity(0.78),
                   ),

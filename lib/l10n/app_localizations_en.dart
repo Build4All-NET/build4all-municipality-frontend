@@ -1808,4 +1808,327 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get serviceLeaseRegistration => 'Lease Registration';
+
+  @override
+  String get errSomethingWrong => 'Something went wrong. Please try again.';
+
+  @override
+  String get errNoInternet => 'No internet connection. Please check your Wi-Fi or mobile data.';
+
+  @override
+  String get errReconnectHint => 'Please reconnect to Wi-Fi or mobile data, then press Retry.';
+
+  @override
+  String get errServerUnavailable => 'Server unavailable';
+
+  @override
+  String get errServerUnreachableHint => 'The server is not reachable right now. Press Retry later.';
+
+  @override
+  String get errServerNotResponding => 'Server is not responding';
+
+  @override
+  String get errServer => 'Server error. Please try again later.';
+
+  @override
+  String get errTimeout => 'Connection timed out. Please try again.';
+
+  @override
+  String get errRequestCancelled => 'Request cancelled.';
+
+  @override
+  String get errSecureConnection => 'Secure connection failed.';
+
+  @override
+  String get errInvalidRequest => 'Invalid request. Please check your input.';
+
+  @override
+  String get errSessionExpired => 'Your session has expired. Please log in again.';
+
+  @override
+  String get errNoPermission => 'You don\'t have permission to do this.';
+
+  @override
+  String get errNotFound => 'Not found.';
+
+  @override
+  String get errConflict => 'This already exists or can\'t be done now.';
+
+  @override
+  String get errRequestFailed => 'Request failed.';
+
+  @override
+  String get errInvalidResponse => 'Invalid server response.';
+
+  @override
+  String get errInvalidInput => 'Invalid input.';
+
+  @override
+  String get errInvalidEmailFormat => 'Invalid email format';
+
+  @override
+  String get errAccountInactive => 'Your account is inactive. Reactivate it to continue.';
+
+  @override
+  String get errNotStaffAccount => 'This account is not registered as a staff member.';
+
+  @override
+  String get errMissingLoginData => 'Login data is missing. Please log in again.';
+
+  @override
+  String get errMissingOwnerProject => 'Municipality link is missing. Please log in again.';
+
+  @override
+  String get errFileNotFound => 'File not found';
+
+  @override
+  String get errUploadFailed => 'Failed to upload files';
+
+  @override
+  String get errInvalidAiResponse => 'Invalid response from the assistant';
+
+  @override
+  String get errEmailRequired => 'Email is required';
+
+  @override
+  String get errFullNameRequired => 'Full name is required';
+
+  @override
+  String get errRoleRequired => 'Role is required';
+
+  @override
+  String get errInvalidUserId => 'Invalid user ID';
+
+  @override
+  String get errCarPlateRequired => 'Car plate is required';
+
+  @override
+  String get errIdentityRequired => 'Identity number is required';
+
+  @override
+  String get errNameMinLength => 'Name must contain at least 2 characters';
+
+  @override
+  String get errInvalidResetCode => 'Invalid reset code';
+
+  @override
+  String get errLoadRequests => 'Failed to load requests';
+
+  @override
+  String get errLoadRequest => 'Failed to load the request';
+
+  @override
+  String get errCreateRequest => 'Failed to submit the request';
+
+  @override
+  String get errLoadServices => 'Failed to load services';
+
+  @override
+  String get errLoadService => 'Failed to load the service';
+
+  @override
+  String get errCreateService => 'Failed to create the service';
+
+  @override
+  String get errUpdateService => 'Failed to update the service';
+
+  @override
+  String get errDeleteService => 'Failed to delete the service';
+
+  @override
+  String get errLoadDepartments => 'Failed to load departments';
+
+  @override
+  String get errDeleteDepartment => 'Failed to delete the department';
+
+  @override
+  String get errLoadEmployees => 'Failed to load employees';
+
+  @override
+  String get errCreateEmployee => 'Failed to add the employee';
+
+  @override
+  String get errUpdateEmployee => 'Failed to update the employee';
+
+  @override
+  String get errDeleteEmployee => 'Failed to delete the employee';
+
+  @override
+  String get errLoadUsers => 'Failed to load users';
+
+  @override
+  String get errLoadRoles => 'Failed to load roles';
+
+  @override
+  String get errAssignRole => 'Failed to assign the role';
+
+  @override
+  String get errRemoveRole => 'Failed to remove the role';
+
+  @override
+  String get errLoadAnnouncements => 'Failed to load announcements';
+
+  @override
+  String get errLoadViolations => 'Failed to load violations';
+
+  @override
+  String get errLoadNotifications => 'Failed to load notifications';
+
+  @override
+  String get errMarkNotificationRead => 'Failed to mark the notification as read';
+
+  @override
+  String get errMarkAllRead => 'Failed to mark all notifications as read';
+
+  @override
+  String get errLoadPayments => 'Failed to load payments';
+
+  @override
+  String get errDownloadReceipt => 'Failed to download the receipt';
+
+  @override
+  String get errLoadProfile => 'Failed to load the profile';
+
+  @override
+  String get errUpdateProfile => 'Failed to update the profile';
+
+  @override
+  String get errSendCode => 'Failed to send the verification code';
+
+  @override
+  String get errVerifyCode => 'Failed to verify the code';
+
+  @override
+  String get errCompleteProfile => 'Failed to complete the profile';
+
+  @override
+  String get errRegister => 'Failed to create the account';
+
+  @override
+  String get errResetPassword => 'Failed to reset the password';
+
+  @override
+  String get errLogout => 'Failed to log out';
+
+  @override
+  String get errSyncMunicipalityUser => 'Failed to link your account to the municipality';
+
+  @override
+  String get passwordResetSuccess => 'Password reset successfully';
+
+  @override
+  String get operationSuccess => 'Done successfully';
+
+  @override
+  String get refresh => 'Refresh';
+
+  @override
+  String get stepRegister => 'Register';
+
+  @override
+  String get stepVerify => 'Verify';
+
+  @override
+  String get stepComplete => 'Complete';
+
+  @override
+  String get languageArabic => 'Arabic';
+
+  @override
+  String get languageEnglish => 'English';
+
+  @override
+  String get languageFrench => 'French';
+
+  @override
+  String get myTasks => 'My Tasks';
+
+  @override
+  String tasksSummary(Object active, Object done) {
+    return '$active active · $done done';
+  }
+
+  @override
+  String get loadingTasks => 'Loading your tasks...';
+
+  @override
+  String get noTasksAvailable => 'No tasks available';
+
+  @override
+  String get noTasksHint => 'There are no pending tasks for your assigned departments.\n\nIf you believe you should have access to tasks, contact your administrator to verify your department assignments.';
+
+  @override
+  String get checkAgain => 'Check again';
+
+  @override
+  String get noActiveTasks => 'No active tasks';
+
+  @override
+  String get noCompletedTasks => 'No completed tasks';
+
+  @override
+  String get taskStatusAssigned => 'Assigned';
+
+  @override
+  String get defaultTaskName => 'Task';
+
+  @override
+  String get municipalityCertificate => 'Municipality Certificate';
+
+  @override
+  String get officiallySigned => 'Officially Signed';
+
+  @override
+  String get certificateGeneratedNote => 'This document is digitally generated by the municipal system.';
+
+  @override
+  String fieldMinValue(Object min) {
+    return 'Minimum value is $min';
+  }
+
+  @override
+  String fieldMaxValue(Object max) {
+    return 'Maximum value is $max';
+  }
+
+  @override
+  String get noCertificatesInCategory => 'No certificates in this category.';
+
+  @override
+  String certificatesSummary(Object signed, Object pending) {
+    return '$signed signed · $pending pending';
+  }
+
+  @override
+  String get processKey => 'Process Key';
+
+  @override
+  String get visibility => 'Visibility';
+
+  @override
+  String get profilePublic => 'Public';
+
+  @override
+  String get profilePrivate => 'Private';
+
+  @override
+  String get timeJustNow => 'Just now';
+
+  @override
+  String timeMinutesAgo(Object count) {
+    return '$count min ago';
+  }
+
+  @override
+  String timeHoursAgo(Object count) {
+    return '$count h ago';
+  }
+
+  @override
+  String get timeYesterday => 'Yesterday';
+
+  @override
+  String timeDaysAgo(Object count) {
+    return '$count days ago';
+  }
 }

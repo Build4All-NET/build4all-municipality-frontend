@@ -3,6 +3,7 @@ import 'package:baladiyati/core/exceptions/app_exception.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:dio/dio.dart';
 import '../models/payment_model.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class PaymentApiService {
   final Dio _dio;
@@ -32,7 +33,7 @@ class PaymentApiService {
           .map(PaymentModel.fromJson)
           .toList();
     } on DioException catch (e) {
-      throw AppException(_extractMessage(e) ?? 'Failed to load payments');
+      throw AppException(_extractMessage(e) ?? AppStrings.current.errLoadPayments);
     }
   }
 
@@ -44,7 +45,7 @@ class PaymentApiService {
       );
       return response.data as Uint8List;
     } on DioException catch (e) {
-      throw AppException(_extractMessage(e) ?? 'Failed to download receipt');
+      throw AppException(_extractMessage(e) ?? AppStrings.current.errDownloadReceipt);
     }
   }
 

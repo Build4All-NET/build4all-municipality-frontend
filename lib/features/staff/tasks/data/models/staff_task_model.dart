@@ -1,3 +1,5 @@
+import 'package:baladiyati/core/l10n/app_strings.dart';
+
 class StaffTaskModel {
   final int? id;
   final String taskId;
@@ -154,7 +156,7 @@ class StaffTaskModel {
   /// Human-readable name derived from the Camunda element ID or task name.
   String get displayName {
     final source = name.isNotEmpty ? name : taskId;
-    if (source.isEmpty) return 'Task';
+    if (source.isEmpty) return AppStrings.current.defaultTaskName;
     final stripped = source
         .replaceFirst(
             RegExp(

@@ -8,6 +8,7 @@ import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:http/http.dart' as http;
 
 import 'connection_status.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class ConnectionStateModel {
   final ConnectionStatus status;
@@ -107,9 +108,9 @@ class ConnectionCubit extends Cubit<ConnectionStateModel> {
     } catch (_) {
       if (state.status != ConnectionStatus.offline) {
         emit(
-          const ConnectionStateModel(
+          ConnectionStateModel(
             status: ConnectionStatus.serverDown,
-            message: 'Server is not responding',
+            message: AppStrings.current.errServerNotResponding,
           ),
         );
       }
@@ -120,7 +121,7 @@ class ConnectionCubit extends Cubit<ConnectionStateModel> {
     emit(
       ConnectionStateModel(
         status: ConnectionStatus.serverDown,
-        message: message ?? 'Server is not responding',
+        message: message ?? AppStrings.current.errServerNotResponding,
       ),
     );
   }

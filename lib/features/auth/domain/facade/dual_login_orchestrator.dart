@@ -3,6 +3,7 @@
 import 'package:baladiyati/features/auth/data/models/admin_login_response.dart';
 import 'package:baladiyati/features/auth/data/services/AdminTokenStore.dart';
 import 'package:baladiyati/features/auth/data/services/api_auth_build4all_service.dart';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 
 class DualLoginResult {
   final bool adminOk;
@@ -122,7 +123,7 @@ class DualLoginOrchestrator {
         userOk: false,
         error: userError?.toString() ??
             adminError?.toString() ??
-            'Login failed',
+            AppStrings.current.loginFailed,
       );
     }
 

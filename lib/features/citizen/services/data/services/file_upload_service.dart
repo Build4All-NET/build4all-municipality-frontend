@@ -4,6 +4,7 @@ import 'package:baladiyati/features/auth/data/services/auth_token_store.dart';
 import 'package:baladiyati/core/network/api_client.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:baladiyati/core/l10n/app_strings.dart';
 import 'package:baladiyati/core/utils/picked_file.dart';
 
 class FileUploadService {
@@ -37,7 +38,7 @@ class FileUploadService {
       final fileUrls = List<String>.from(data['fileUrls'] ?? []);
       return fileUrls;
     } else {
-      throw Exception('Upload failed: ${response.statusCode} ${response.body}');
+      throw Exception(AppStrings.current.errUploadFailed);
     }
   }
 }

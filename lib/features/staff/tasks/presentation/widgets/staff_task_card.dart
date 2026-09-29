@@ -295,15 +295,15 @@ class _StatusChip extends StatelessWidget {
     if (upper == 'COMPLETED' || upper == 'DONE') {
       bg = colors.surfaceVariant;
       fg = colors.onSurfaceVariant;
-      label = 'Done';
+      label = AppLocalizations.of(context)!.done;
     } else if (upper == 'CREATED' || upper == 'PENDING') {
       bg = colors.primaryContainer;
       fg = colors.onPrimaryContainer;
-      label = 'Pending';
+      label = AppLocalizations.of(context)!.statusPending;
     } else if (upper == 'ASSIGNED') {
       bg = colors.tertiaryContainer;
       fg = colors.onTertiaryContainer;
-      label = 'Assigned';
+      label = AppLocalizations.of(context)!.taskStatusAssigned;
     } else {
       bg = colors.surfaceVariant;
       fg = colors.onSurfaceVariant;
