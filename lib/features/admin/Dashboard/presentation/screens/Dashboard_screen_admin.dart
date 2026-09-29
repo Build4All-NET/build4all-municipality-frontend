@@ -4,6 +4,7 @@ import 'package:baladiyati/core/l10n/locale_cubit.dart';
 import 'package:baladiyati/core/network/dio_client.dart';
 import 'package:baladiyati/features/admin/Departement/data/Service/Departement_Api_Service.dart';
 import 'package:baladiyati/features/admin/Requests/data/Service/Req_Api_Service.dart';
+import 'package:baladiyati/features/admin/Requests/data/model/RequestModel.dart';
 import 'package:baladiyati/features/admin/announcements/data/services/Announcement_Api_Service.dart';
 import 'package:baladiyati/features/admin/announcements/presentation/screens/announcementscreen.dart';
 import 'package:baladiyati/features/admin/manage_service/Data/service/Service_Api_service.dart';
@@ -17,6 +18,7 @@ import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:baladiyati/common/widgets/app_sidebar.dart';
+import 'package:baladiyati/core/l10n/known_names.dart';
 import 'package:baladiyati/common/widgets/responsive_center.dart';
 import 'package:baladiyati/core/config/app_breakpoints.dart';
 import 'package:baladiyati/core/utils/responsive.dart';
@@ -26,6 +28,7 @@ const int _statColumnsCompact = 2;
 const int _statColumnsMedium = 3;
 const int _statColumnsExpanded = 6; // all six stats in one row on desktop
 const double _statAspectRatio = 1.72;
+const int _recentRequestsLimit = 5; // web overview list
 
 class DashboardPage extends StatefulWidget {
   const DashboardPage({super.key});
@@ -43,6 +46,9 @@ class _AdminDashboardStats {
   final int employeesCount;
   final int requestsCount;
 
+  /// Newest requests, shown on the web overview.
+  final List<RequestModel> recentRequests;
+
   const _AdminDashboardStats({
     required this.announcementsCount,
     required this.violationsCount,
@@ -50,6 +56,7 @@ class _AdminDashboardStats {
     required this.servicesCount,
     required this.employeesCount,
     required this.requestsCount,
+    this.recentRequests = const [],
   });
 
   factory _AdminDashboardStats.empty() {
@@ -100,6 +107,12 @@ class _DashboardPageState extends State<DashboardPage> {
 
   // Each API is wrapped independently — one failure never breaks the others.
   Future<_AdminDashboardStats> _loadStats() async {
+    // Requests are fetched once: the list feeds both the count and the recent list.
+    final requestsFuture = _requestApiService
+        .getAllRequestsAdmin()
+        .then<List<RequestModel>?>((v) => v)
+        .catchError((_) => null);
+
     final counts = await Future.wait([
       _announcementApiService
           .getAll()
@@ -121,11 +134,11 @@ class _DashboardPageState extends State<DashboardPage> {
           .getUsersByRole(roleName: 'STAFF')
           .then<int>((v) => v.length)
           .catchError((_) => -1),
-      _requestApiService
-          .getAllRequestsAdmin()
-          .then<int>((v) => v.length)
-          .catchError((_) => -1),
+      requestsFuture.then<int>((v) => v?.length ?? -1),
     ]);
+
+    final recent = [...?await requestsFuture]
+      ..sort((a, b) => b.createdAt.compareTo(a.createdAt));
 
     return _AdminDashboardStats(
       announcementsCount: counts[0],
@@ -134,6 +147,7 @@ class _DashboardPageState extends State<DashboardPage> {
       servicesCount: counts[3],
       employeesCount: counts[4],
       requestsCount: counts[5],
+      recentRequests: recent.take(_recentRequestsLimit).toList(),
     );
   }
 
@@ -485,6 +499,7 @@ class _DashboardPageState extends State<DashboardPage> {
                       children: [
                         _StatCard(
                           title: loc.announcements,
+                          onTap: _openAnnouncements,
                           value: isLoading
                               ? '...'
                               : _formatCount(stats.announcementsCount),
@@ -493,6 +508,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                         _StatCard(
                           title: loc.violations,
+                          onTap: _openViolations,
                           value: isLoading
                               ? '...'
                               : _formatCount(stats.violationsCount),
@@ -501,6 +517,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                         _StatCard(
                           title: loc.departments,
+                          onTap: _openDepartments,
                           value: isLoading
                               ? '...'
                               : _formatCount(stats.departmentsCount),
@@ -509,6 +526,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                         _StatCard(
                           title: loc.services,
+                          onTap: _openServices,
                           value:
                               isLoading ? '...' : _formatCount(stats.servicesCount),
                           icon: Icons.description_outlined,
@@ -516,6 +534,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                         _StatCard(
                           title: loc.employees,
+                          onTap: _openEmployees,
                           value:
                               isLoading ? '...' : _formatCount(stats.employeesCount),
                           icon: Icons.groups_outlined,
@@ -523,6 +542,7 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                         _StatCard(
                           title: loc.requestsCount,
+                          onTap: _openInbox,
                           value:
                               isLoading ? '...' : _formatCount(stats.requestsCount),
                           icon: Icons.inbox_outlined,
@@ -530,6 +550,16 @@ class _DashboardPageState extends State<DashboardPage> {
                         ),
                       ],
                     ),
+
+                    // Web: latest requests fill the overview (sections live in the sidebar).
+                    if (_useSidebar) ...[
+                      const SizedBox(height: 22),
+                      _RecentRequestsPanel(
+                        requests: stats.recentRequests,
+                        isLoading: isLoading,
+                        onViewAll: _openInbox,
+                      ),
+                    ],
 
                     // Phones only: on web the sidebar already lists every section.
                     if (!_useSidebar) ...[
@@ -690,12 +720,14 @@ class _StatCard extends StatelessWidget {
   final String value;
   final IconData icon;
   final Color iconColor;
+  final VoidCallback? onTap;
 
   const _StatCard({
     required this.title,
     required this.value,
     required this.icon,
     required this.iconColor,
+    this.onTap,
   });
 
   @override
@@ -703,66 +735,73 @@ class _StatCard extends StatelessWidget {
     final theme = Theme.of(context);
     final colors = theme.colorScheme;
 
-    return Container(
-      padding: const EdgeInsets.all(10),
-      decoration: BoxDecoration(
-        color: colors.surface,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: onTap,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(
-          color: colors.outline.withOpacity(0.14),
+        child: Container(
+          padding: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            color: colors.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
+              color: colors.outline.withOpacity(0.14),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: colors.shadow.withOpacity(0.04),
+                blurRadius: 9,
+                offset: const Offset(0, 5),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                height: 34,
+                width: 34,
+                decoration: BoxDecoration(
+                  color: iconColor.withOpacity(0.12),
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                child: Icon(
+                  icon,
+                  color: iconColor,
+                  size: 18,
+                ),
+              ),
+              const SizedBox(width: 9),
+              Expanded(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      value,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.titleMedium?.copyWith(
+                        fontWeight: FontWeight.w900,
+                        fontSize: 17,
+                      ),
+                    ),
+                    const SizedBox(height: 2),
+                    Text(
+                      title,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: theme.textTheme.bodySmall?.copyWith(
+                        fontSize: 11,
+                        color: colors.onSurface.withOpacity(0.72),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: colors.shadow.withOpacity(0.04),
-            blurRadius: 9,
-            offset: const Offset(0, 5),
-          ),
-        ],
-      ),
-      child: Row(
-        children: [
-          Container(
-            height: 34,
-            width: 34,
-            decoration: BoxDecoration(
-              color: iconColor.withOpacity(0.12),
-              borderRadius: BorderRadius.circular(10),
-            ),
-            child: Icon(
-              icon,
-              color: iconColor,
-              size: 18,
-            ),
-          ),
-          const SizedBox(width: 9),
-          Expanded(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  value,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w900,
-                    fontSize: 17,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  title,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    fontSize: 11,
-                    color: colors.onSurface.withOpacity(0.72),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
       ),
     );
   }
@@ -821,6 +860,127 @@ class _ActionCard extends StatelessWidget {
             ),
           ],
         ),
+      ),
+    );
+  }
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+/// Newest citizen requests on the web overview, with a link to the inbox.
+class _RecentRequestsPanel extends StatelessWidget {
+  final List<RequestModel> requests;
+  final bool isLoading;
+  final VoidCallback onViewAll;
+
+  const _RecentRequestsPanel({
+    required this.requests,
+    required this.isLoading,
+    required this.onViewAll,
+  });
+
+  Color _statusColor(ColorScheme colors, String status) {
+    switch (status.trim().toUpperCase()) {
+      case 'APPROVED':
+      case 'COMPLETED':
+      case 'TAX_PAID':
+        return colors.primary;
+      case 'REJECTED':
+      case 'CANCELLED':
+      case 'TAX_REJECTED':
+        return colors.error;
+      case 'IN_PROGRESS':
+      case 'UNDER_REVIEW':
+        return colors.tertiary;
+      default:
+        return colors.secondary;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final loc = AppLocalizations.of(context)!;
+    final theme = Theme.of(context);
+    final colors = theme.colorScheme;
+
+    return Container(
+      decoration: BoxDecoration(
+        color: colors.surface,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: colors.outline.withOpacity(0.14)),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Padding(
+            padding: const EdgeInsets.fromLTRB(16, 12, 8, 4),
+            child: Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    loc.recentRequests,
+                    style: theme.textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w800),
+                  ),
+                ),
+                TextButton(onPressed: onViewAll, child: Text(loc.viewAll)),
+              ],
+            ),
+          ),
+          if (isLoading)
+            const Padding(
+              padding: EdgeInsets.all(24),
+              child: Center(child: CircularProgressIndicator()),
+            )
+          else if (requests.isEmpty)
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Center(
+                child: Text(
+                  loc.noRequests,
+                  style: theme.textTheme.bodyMedium?.copyWith(color: colors.outline),
+                ),
+              ),
+            )
+          else
+            for (final request in requests) ...[
+              Divider(height: 1, color: colors.outline.withOpacity(0.12)),
+              ListTile(
+                onTap: onViewAll,
+                leading: CircleAvatar(
+                  backgroundColor: colors.primary.withOpacity(0.10),
+                  child: Icon(Icons.description_outlined, color: colors.primary, size: 20),
+                ),
+                title: Text(
+                  request.title,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodyMedium?.copyWith(fontWeight: FontWeight.w700),
+                ),
+                subtitle: Text(
+                  [request.trackingNumber, request.citizenName, request.createdAt.split('T').first]
+                      .where((part) => part.trim().isNotEmpty)
+                      .join('  ·  '),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.bodySmall?.copyWith(color: colors.outline),
+                ),
+                trailing: Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: _statusColor(colors, request.status).withOpacity(0.12),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    localizedRequestStatus(loc, request.status),
+                    style: theme.textTheme.labelSmall?.copyWith(
+                      color: _statusColor(colors, request.status),
+                      fontWeight: FontWeight.w700,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+        ],
       ),
     );
   }

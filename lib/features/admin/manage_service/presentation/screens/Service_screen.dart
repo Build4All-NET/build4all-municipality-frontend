@@ -317,9 +317,10 @@ class _ServiceCard extends StatelessWidget {
             ? localizedServiceName(loc, service.nameEn)
             : service.nameEn;
 
-    final subtitle = service.descriptionEn.trim().isNotEmpty
-        ? service.descriptionEn
-        : service.descriptionAr;
+    // Arabic description in Arabic, English otherwise; fall back to the other one.
+    final preferred = langCode == 'ar' ? service.descriptionAr : service.descriptionEn;
+    final fallback = langCode == 'ar' ? service.descriptionEn : service.descriptionAr;
+    final subtitle = preferred.trim().isNotEmpty ? preferred : fallback;
 
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
