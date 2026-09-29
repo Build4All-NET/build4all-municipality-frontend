@@ -144,6 +144,10 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
   _AllowedActions _allowedActions(String? status) {
     final s = status?.trim().toUpperCase() ?? '';
     if (_isTerminalStatus(status)) return const _AllowedActions();
+    // The workflow rejected the payment and waits for a new one
+    if (s == 'TAX_REJECTED') {
+      return _AllowedActions(showPay: _isStaffOrOwner);
+    }
     if (s == 'APPROVED' || s == 'IN_PROGRESS') {
       return _AllowedActions(
         showComplete: true,
