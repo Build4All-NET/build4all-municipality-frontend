@@ -1,7 +1,12 @@
+import 'package:baladiyati/core/l10n/known_names.dart';
+import 'package:baladiyati/core/utils/date_display.dart';
 import 'package:baladiyati/features/staff/tasks/data/models/staff_task_model.dart';
 import 'package:baladiyati/features/staff/tasks/presentation/widgets/staff_request_details.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 import 'package:flutter/material.dart';
+
+/// Separates the request summary parts shown under the task name.
+const String _summarySeparator = ' · ';
 
 class StaffTaskCard extends StatefulWidget {
   final StaffTaskModel task;
@@ -81,6 +86,20 @@ class _StaffTaskCardState extends State<StaffTaskCard> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
+                        // The service tells staff which request the task belongs to
+                        if (task.serviceType.isNotEmpty) ...
+                          [
+                            Text(
+                              localizedServiceName(l10n, task.serviceType),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.labelMedium?.copyWith(
+                                color: colors.primary,
+                                fontWeight: FontWeight.w800,
+                              ),
+                            ),
+                            const SizedBox(height: 2),
+                          ],
                         Text(
                           task.name.isNotEmpty
                               ? task.name
@@ -92,11 +111,23 @@ class _StaffTaskCardState extends State<StaffTaskCard> {
                             color: colors.onSurface,
                           ),
                         ),
+                        if (_requestSummary(task).isNotEmpty) ...
+                          [
+                            const SizedBox(height: 2),
+                            Text(
+                              _requestSummary(task),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
+                              style: theme.textTheme.bodySmall?.copyWith(
+                                color: colors.onSurface,
+                              ),
+                            ),
+                          ],
                         if (task.creationDate.isNotEmpty) ...
                           [
                             const SizedBox(height: 2),
                             Text(
-                              task.creationDate,
+                              formatIsoDateTime(task.creationDate),
                               style: theme.textTheme.bodySmall?.copyWith(
                                 color: colors.onSurfaceVariant,
                               ),
@@ -276,6 +307,16 @@ class _StaffTaskCardState extends State<StaffTaskCard> {
       ),
     );
   }
+}
+
+/// Request title, citizen and tracking number, so staff can tell tasks of
+/// the same step apart without opening the details.
+String _requestSummary(StaffTaskModel task) {
+  return [
+    task.requestName,
+    task.requesterName,
+    if (task.trackingNumber.isNotEmpty) '#${task.trackingNumber}',
+  ].where((part) => part.isNotEmpty).join(_summarySeparator);
 }
 
 class _StatusChip extends StatelessWidget {
