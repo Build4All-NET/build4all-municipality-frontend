@@ -150,7 +150,8 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
     }
     if (s == 'APPROVED' || s == 'IN_PROGRESS') {
       return _AllowedActions(
-        showComplete: true,
+        // Completing records the payment, so it follows the same rule as Pay
+        showComplete: s == 'APPROVED' && _isStaffOrOwner,
         showReject: true,
         showPay: s == 'APPROVED' && _isStaffOrOwner,
       );
@@ -274,6 +275,54 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
     );
 
     if (confirmed != true || !context.mounted) return;
+
+    context.read<RequestBloc>().add(MarkRequestPaidRequested(id));
+  }
+
+  /// The workflow completes a request once its payment is recorded, so
+  /// "Complete" asks whether the citizen paid and records the payment.
+  Future<void> _completeRequest(BuildContext context, AppLocalizations l10n) async {
+    final id = widget.request.id;
+
+    if (id == null) {
+      AppToast.show(
+        context,
+        message: l10n.invalidRequestId,
+        type: AppToastType.error,
+      );
+      return;
+    }
+
+    final paid = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          title: Text(l10n.complete),
+          content: Text(l10n.confirmCompletePaid),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.pop(dialogContext, false),
+              child: Text(l10n.paidNotYet),
+            ),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(dialogContext, true),
+              child: Text(l10n.paidYes),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (!context.mounted || paid == null) return;
+
+    if (!paid) {
+      AppToast.show(
+        context,
+        message: l10n.completeNeedsPayment,
+        type: AppToastType.warning,
+      );
+      return;
+    }
 
     context.read<RequestBloc>().add(MarkRequestPaidRequested(id));
   }
@@ -513,8 +562,8 @@ class _RequestDetailPageState extends State<RequestDetailPage> {
                                 _changeStatus(context, l10n, 'APPROVED');
                               },
                               onComplete: () {
-                                if (state.updating) return;
-                                _changeStatus(context, l10n, 'COMPLETED');
+                                if (state.payUpdating) return;
+                                _completeRequest(context, l10n);
                               },
                               onPay: () {
                                 if (state.payUpdating) return;

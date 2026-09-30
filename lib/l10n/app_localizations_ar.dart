@@ -1361,6 +1361,18 @@ class AppLocalizationsAr extends AppLocalizations {
   String get confirmPayRequest => 'هل أنت متأكد من تسجيل الدفع؟';
 
   @override
+  String get confirmCompletePaid => 'هل دفع المواطن رسوم هذا الطلب؟ يُستكمل الطلب بعد تسجيل الدفع.';
+
+  @override
+  String get paidYes => 'نعم، تم الدفع';
+
+  @override
+  String get paidNotYet => 'ليس بعد';
+
+  @override
+  String get completeNeedsPayment => 'سيُستكمل الطلب بعد تسجيل الدفع.';
+
+  @override
   String get requestApprovedSuccess => 'تم قبول الطلب بنجاح';
 
   @override
