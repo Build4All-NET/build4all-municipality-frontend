@@ -2785,6 +2785,30 @@ abstract class AppLocalizations {
   /// **'Are you sure you want to mark this request as paid?'**
   String get confirmPayRequest;
 
+  /// No description provided for @confirmCompletePaid.
+  ///
+  /// In en, this message translates to:
+  /// **'Has the citizen paid the fees for this request? The request is completed once the payment is recorded.'**
+  String get confirmCompletePaid;
+
+  /// No description provided for @paidYes.
+  ///
+  /// In en, this message translates to:
+  /// **'Yes, paid'**
+  String get paidYes;
+
+  /// No description provided for @paidNotYet.
+  ///
+  /// In en, this message translates to:
+  /// **'Not yet'**
+  String get paidNotYet;
+
+  /// No description provided for @completeNeedsPayment.
+  ///
+  /// In en, this message translates to:
+  /// **'The request will be completed once the payment is recorded.'**
+  String get completeNeedsPayment;
+
   /// No description provided for @requestApprovedSuccess.
   ///
   /// In en, this message translates to:

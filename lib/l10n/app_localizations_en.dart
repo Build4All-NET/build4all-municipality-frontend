@@ -1361,6 +1361,18 @@ class AppLocalizationsEn extends AppLocalizations {
   String get confirmPayRequest => 'Are you sure you want to mark this request as paid?';
 
   @override
+  String get confirmCompletePaid => 'Has the citizen paid the fees for this request? The request is completed once the payment is recorded.';
+
+  @override
+  String get paidYes => 'Yes, paid';
+
+  @override
+  String get paidNotYet => 'Not yet';
+
+  @override
+  String get completeNeedsPayment => 'The request will be completed once the payment is recorded.';
+
+  @override
   String get requestApprovedSuccess => 'Request approved successfully';
 
   @override
