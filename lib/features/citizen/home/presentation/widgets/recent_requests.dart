@@ -42,6 +42,13 @@ class RecentRequestsSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Text(
+              l10n.recentRequests,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: cs.onSurface,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             GestureDetector(
               onTap: onViewAll,
               child: Text(
@@ -50,13 +57,6 @@ class RecentRequestsSection extends StatelessWidget {
                   color: cs.primary,
                   fontWeight: FontWeight.w500,
                 ),
-              ),
-            ),
-            Text(
-              l10n.recentRequests,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: cs.onSurface,
-                fontWeight: FontWeight.bold,
               ),
             ),
           ],
@@ -168,6 +168,13 @@ class _RequestCard extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Text(
+              request.nameAr,
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: cs.onSurface,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -201,13 +208,6 @@ class _RequestCard extends StatelessWidget {
                   ],
                 ),
               ],
-            ),
-            Text(
-              request.nameAr,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: cs.onSurface,
-                fontWeight: FontWeight.w600,
-              ),
             ),
           ],
         ),

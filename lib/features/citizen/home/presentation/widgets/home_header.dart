@@ -59,6 +59,38 @@ class HomeHeader extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // 👤 User info
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    l10n.welcomeMessage,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: cs.onPrimary.withOpacity(0.7),
+                    ),
+                  ),
+
+                  const SizedBox(height: 4),
+
+                  Text(
+                    userName,
+                    style: theme.textTheme.headlineSmall?.copyWith(
+                      color: cs.onPrimary,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+
+                  const SizedBox(height: 2),
+
+                  Text(
+                    municipality,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: cs.onPrimary.withOpacity(0.7),
+                    ),
+                  ),
+                ],
+              ),
+
               // 🔔 Notification icon
               GestureDetector(
                 onTap: onNotificationTap,
@@ -103,38 +135,6 @@ class HomeHeader extends StatelessWidget {
                       ),
                   ],
                 ),
-              ),
-
-              // 👤 User info
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    l10n.welcomeMessage,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: cs.onPrimary.withOpacity(0.7),
-                    ),
-                  ),
-
-                  const SizedBox(height: 4),
-
-                  Text(
-                    userName,
-                    style: theme.textTheme.headlineSmall?.copyWith(
-                      color: cs.onPrimary,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-
-                  const SizedBox(height: 2),
-
-                  Text(
-                    municipality,
-                    style: theme.textTheme.bodySmall?.copyWith(
-                      color: cs.onPrimary.withOpacity(0.7),
-                    ),
-                  ),
-                ],
               ),
             ],
           ),

@@ -554,7 +554,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         card.padding * 2.4,
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
             l10n.myAccount,
@@ -568,9 +568,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Row(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              PrivateProfileAvatar(
+                imageUrl: _profileImage(profile),
+                localImage: null,
+                fallbackText: _fallbackText(profile),
+                radius: 39,
+                backgroundColor: colors.onPrimary.withOpacity(0.20),
+                textColor: colors.onPrimary,
+              ),
+              SizedBox(width: card.padding),
               Expanded(
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     _responsiveText(
                       text: profile?.fullName ?? _dash(),
@@ -593,7 +602,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     if (profile?.username.isNotEmpty == true) ...[
                       SizedBox(height: card.padding * 0.35),
                       _responsiveText(
-                        text: '@${profile!.username}',
+                        text: '‎@${profile!.username}',
                         color: colors.onPrimary.withOpacity(0.78),
                         maxFontSize: 12,
                         minFontSize: 9,
@@ -603,15 +612,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ],
                   ],
                 ),
-              ),
-              SizedBox(width: card.padding),
-              PrivateProfileAvatar(
-                imageUrl: _profileImage(profile),
-                localImage: null,
-                fallbackText: _fallbackText(profile),
-                radius: 39,
-                backgroundColor: colors.onPrimary.withOpacity(0.20),
-                textColor: colors.onPrimary,
               ),
             ],
           ),
@@ -872,7 +872,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               maxFontSize: 13,
               minFontSize: 10,
             ),
-            Icon(Icons.chevron_left, color: colors.muted),
+            Icon(Icons.chevron_right, color: colors.muted),
           ],
         ),
       ),
@@ -935,7 +935,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           SizedBox(width: card.padding * 0.8),
           Expanded(
             child: Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 _responsiveText(
                   text: label,

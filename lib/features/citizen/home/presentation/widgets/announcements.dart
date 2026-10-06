@@ -65,7 +65,7 @@ class _AnnouncementsCardState extends State<AnnouncementsCard> {
         border: Border.all(color: cs.primary.withValues(alpha: 0.20)),
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           // ── Header ──────────────────────────────────────
           Text(
@@ -111,12 +111,12 @@ class _AnnouncementsCardState extends State<AnnouncementsCard> {
             )
           else
             Column(
-              crossAxisAlignment: CrossAxisAlignment.end,
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: _announcements.asMap().entries.map((entry) {
                 final index = entry.key;
                 final a = entry.value;
                 return Column(
-                  crossAxisAlignment: CrossAxisAlignment.end,
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       a.title,

@@ -326,7 +326,7 @@ class _MunicipalityProfileSetupScreenState
                     child: Form(
                       key: _formKey,
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Center(
                             child: Text(
@@ -445,9 +445,8 @@ class _MunicipalityProfileSetupScreenState
         vertical: AppSizes.paddingMedium,
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          const SizedBox(width: 24),
           Text(
             l10n.appTitle,
             style: theme.textTheme.titleMedium?.copyWith(
