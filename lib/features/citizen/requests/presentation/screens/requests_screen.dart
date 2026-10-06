@@ -352,7 +352,7 @@ class _RequestCard extends StatelessWidget {
                       ),
                       if (request.trackingNumber.isNotEmpty)
                         Text(
-                          '#${request.trackingNumber}',
+                          '‎#${request.trackingNumber}',
                           style: theme.textTheme.bodySmall?.copyWith(color: colors.outline),
                         ),
                     ],

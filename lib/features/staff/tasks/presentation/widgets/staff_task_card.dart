@@ -315,7 +315,7 @@ String _requestSummary(StaffTaskModel task) {
   return [
     task.requestName,
     task.requesterName,
-    if (task.trackingNumber.isNotEmpty) '#${task.trackingNumber}',
+    if (task.trackingNumber.isNotEmpty) '‎#${task.trackingNumber}',
   ].where((part) => part.isNotEmpty).join(_summarySeparator);
 }
 

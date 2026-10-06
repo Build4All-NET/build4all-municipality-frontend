@@ -28,7 +28,7 @@ void main() {
     await tester.pumpAndSettle();
 
     expect(find.text('External Works'), findsOneWidget);
-    expect(find.text('Fence repair · Rana · #REQ-0042'), findsOneWidget);
+    expect(find.text('Fence repair · Rana · ‎#REQ-0042'), findsOneWidget);
     expect(find.text('2026-09-29 06:21'), findsOneWidget);
   });
 

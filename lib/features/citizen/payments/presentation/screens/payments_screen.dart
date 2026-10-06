@@ -90,11 +90,19 @@ class _PaymentsScreenState extends State<PaymentsScreen>
       color: Colors.white,
       padding: const EdgeInsets.fromLTRB(20, 16, 20, 0),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.end,
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Text(
+                l10n.navPayments,
+                style: const TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF1E3A5F),
+                ),
+              ),
               if (state.errorMessage != null && state.payments.isNotEmpty)
                 IconButton(
                   icon: const Icon(Icons.refresh, color: Color(0xFF1E3A5F)),
@@ -104,14 +112,6 @@ class _PaymentsScreenState extends State<PaymentsScreen>
                 )
               else
                 const SizedBox.shrink(),
-              Text(
-                l10n.navPayments,
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF1E3A5F),
-                ),
-              ),
             ],
           ),
           const SizedBox(height: 12),
@@ -255,11 +255,22 @@ class _PaymentsScreenState extends State<PaymentsScreen>
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Expanded(
+                  child: Text(
+                    p.title,
+                    textAlign: TextAlign.start,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -274,17 +285,6 @@ class _PaymentsScreenState extends State<PaymentsScreen>
                       fontSize: 12,
                       fontWeight: FontWeight.w500,
                     ),
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    p.title,
-                    textAlign: TextAlign.start,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -346,11 +346,22 @@ class _PaymentsScreenState extends State<PaymentsScreen>
       child: Padding(
         padding: const EdgeInsets.all(16),
         child: Column(
-          crossAxisAlignment: CrossAxisAlignment.end,
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                Expanded(
+                  child: Text(
+                    p.title,
+                    textAlign: TextAlign.start,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 Container(
                   padding:
                       const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -373,17 +384,6 @@ class _PaymentsScreenState extends State<PaymentsScreen>
                         ),
                       ),
                     ],
-                  ),
-                ),
-                const SizedBox(width: 8),
-                Expanded(
-                  child: Text(
-                    p.title,
-                    textAlign: TextAlign.start,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                        fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
               ],
@@ -413,6 +413,12 @@ class _PaymentsScreenState extends State<PaymentsScreen>
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
+                if (p.amount != null)
+                  Text(
+                    '${_formatAmount(p.amount!.toInt())} ${l10n.lbp}',
+                    style: const TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.bold),
+                  ),
                 OutlinedButton.icon(
                   style: OutlinedButton.styleFrom(
                     shape: RoundedRectangleBorder(
@@ -433,12 +439,6 @@ class _PaymentsScreenState extends State<PaymentsScreen>
                       : const Icon(Icons.download, size: 16),
                   label: Text(downloading ? l10n.loading : l10n.downloadReceipt),
                 ),
-                if (p.amount != null)
-                  Text(
-                    '${_formatAmount(p.amount!.toInt())} ${l10n.lbp}',
-                    style: const TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.bold),
-                  ),
               ],
             ),
           ],

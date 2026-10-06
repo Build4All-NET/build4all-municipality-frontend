@@ -46,6 +46,13 @@ class ServiceCategoriesSection extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
+            Text(
+              l10n.serviceCategories,
+              style: theme.textTheme.titleMedium?.copyWith(
+                color: cs.onSurface,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
             GestureDetector(
               onTap: onViewAll,
               child: Text(
@@ -54,13 +61,6 @@ class ServiceCategoriesSection extends StatelessWidget {
                   color: cs.primary,
                   fontWeight: FontWeight.w500,
                 ),
-              ),
-            ),
-            Text(
-              l10n.serviceCategories,
-              style: theme.textTheme.titleMedium?.copyWith(
-                color: cs.onSurface,
-                fontWeight: FontWeight.bold,
               ),
             ),
           ],

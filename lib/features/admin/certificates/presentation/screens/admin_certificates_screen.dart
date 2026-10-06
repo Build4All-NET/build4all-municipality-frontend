@@ -552,7 +552,7 @@ class _CertificateCard extends StatelessWidget {
                   _InfoRow(
                     icon: Icons.numbers_outlined,
                     label: loc.requestIdLabel,
-                    value: '#${certificate.requestId}',
+                    value: '‎#${certificate.requestId}',
                     theme: theme,
                     colors: colors,
                   ),

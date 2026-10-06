@@ -34,7 +34,7 @@ class AppTextField extends StatelessWidget {
     final cs = theme.colorScheme;
 
     return Column(
-      crossAxisAlignment: CrossAxisAlignment.end,
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
           label,

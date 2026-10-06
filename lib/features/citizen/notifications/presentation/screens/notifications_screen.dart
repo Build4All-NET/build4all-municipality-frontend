@@ -85,10 +85,27 @@ class NotificationsScreen extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsetsDirectional.fromSTEB(20, 8, 4, 12),
+          padding: const EdgeInsetsDirectional.fromSTEB(4, 8, 20, 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              Row(
+                children: [
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: const Icon(Icons.arrow_back),
+                  ),
+                  const SizedBox(width: 8),
+                  Text(
+                    l10n.notifications,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF1E3A5F),
+                    ),
+                  ),
+                ],
+              ),
               if (state.unreadCount > 0)
                 TextButton.icon(
                   onPressed: () => context
@@ -102,23 +119,6 @@ class NotificationsScreen extends StatelessWidget {
                 )
               else
                 const SizedBox.shrink(),
-              Row(
-                children: [
-                  Text(
-                    l10n.notifications,
-                    style: const TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Color(0xFF1E3A5F),
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: const Icon(Icons.arrow_forward),
-                  ),
-                ],
-              ),
             ],
           ),
         ),
@@ -249,9 +249,43 @@ class _NotifCard extends StatelessWidget {
             child: Row(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
+                if (isUnread)
+                  Container(
+                    width: 4,
+                    decoration: const BoxDecoration(
+                      color: Color(0xFF2F6FED),
+                      borderRadius: BorderRadiusDirectional.only(
+                        topStart: Radius.circular(12),
+                        bottomStart: Radius.circular(12),
+                      ),
+                    ),
+                  ),
+                Container(
+                  width: 52,
+                  margin: const EdgeInsetsDirectional.only(top: 14, bottom: 14, start: 10),
+                  padding: const EdgeInsetsDirectional.only(end: 4),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    children: [
+                      Container(
+                        width: 46,
+                        height: 46,
+                        decoration: BoxDecoration(
+                          color: iconBg,
+                          shape: BoxShape.circle,
+                          border: Border.all(
+                            color: iconColor.withValues(alpha: 0.2),
+                            width: 1,
+                          ),
+                        ),
+                        child: Icon(iconData, color: iconColor, size: 22),
+                      ),
+                    ],
+                  ),
+                ),
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsetsDirectional.fromSTEB(4, 14, 14, 14),
+                    padding: const EdgeInsetsDirectional.fromSTEB(14, 14, 4, 14),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -277,7 +311,7 @@ class _NotifCard extends StatelessWidget {
                         ],
                         Expanded(
                           child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.end,
+                            crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
                                 item.title,
@@ -333,40 +367,6 @@ class _NotifCard extends StatelessWidget {
                     ),
                   ),
                 ),
-                Container(
-                  width: 52,
-                  margin: const EdgeInsets.symmetric(vertical: 14),
-                  padding: const EdgeInsetsDirectional.only(start: 4),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      Container(
-                        width: 46,
-                        height: 46,
-                        decoration: BoxDecoration(
-                          color: iconBg,
-                          shape: BoxShape.circle,
-                          border: Border.all(
-                            color: iconColor.withValues(alpha: 0.2),
-                            width: 1,
-                          ),
-                        ),
-                        child: Icon(iconData, color: iconColor, size: 22),
-                      ),
-                    ],
-                  ),
-                ),
-                if (isUnread)
-                  Container(
-                    width: 4,
-                    decoration: const BoxDecoration(
-                      color: Color(0xFF2F6FED),
-                      borderRadius: BorderRadius.only(
-                        topRight: Radius.circular(12),
-                        bottomRight: Radius.circular(12),
-                      ),
-                    ),
-                  ),
               ],
             ),
           ),

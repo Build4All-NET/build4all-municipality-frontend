@@ -57,7 +57,7 @@ class RequestDetailsScreen extends StatelessWidget {
             Text(loc.requestDetails),
             if (request.trackingNumber.isNotEmpty)
               Text(
-                '#${request.trackingNumber}',
+                '‎#${request.trackingNumber}',
                 style: theme.textTheme.bodySmall?.copyWith(color: colors.onSurface.withOpacity(0.65)),
               ),
           ],
@@ -115,12 +115,12 @@ class RequestDetailsScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
                       children: [
                         Text(
-                          '${(progress * 100).round()}%',
-                          style: theme.textTheme.bodyMedium?.copyWith(color: colors.outline),
-                        ),
-                        Text(
                           loc.progress,
                           style: theme.textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
+                        ),
+                        Text(
+                          '${(progress * 100).round()}%',
+                          style: theme.textTheme.bodyMedium?.copyWith(color: colors.outline),
                         ),
                       ],
                     ),
