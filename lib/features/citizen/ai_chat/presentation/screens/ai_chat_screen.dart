@@ -352,9 +352,9 @@ class _InputBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      padding: EdgeInsets.only(
-        left: 12,
-        right: 12,
+      padding: EdgeInsetsDirectional.only(
+        end: 12,
+        start: 12,
         top: 10,
         bottom: MediaQuery.of(context).padding.bottom + 10,
       ),

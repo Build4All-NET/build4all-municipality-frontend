@@ -53,7 +53,7 @@ class ConnectionBanner extends StatelessWidget {
             child: Container(
               height: 36,
               padding: const EdgeInsets.symmetric(horizontal: 12),
-              alignment: Alignment.centerLeft,
+              alignment: AlignmentDirectional.centerEnd,
               child:Row(
   children: [
     if (state.status == ConnectionStatus.serverDown)

@@ -64,7 +64,7 @@ class RequestDetailsScreen extends StatelessWidget {
         ),
         actions: [
           Padding(
-            padding: const EdgeInsets.only(right: 12),
+            padding: const EdgeInsetsDirectional.only(start: 12),
             child: StatusBadgeWidget(status: request.status),
           ),
         ],

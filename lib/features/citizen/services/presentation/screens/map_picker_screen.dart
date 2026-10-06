@@ -165,9 +165,9 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
               left: 0,
               right: 0,
               child: Container(
-                padding: EdgeInsets.only(
-                  left: 16,
-                  right: 16,
+                padding: EdgeInsetsDirectional.only(
+                  end: 16,
+                  start: 16,
                   top: 14,
                   bottom: MediaQuery.of(context).padding.bottom + 14,
                 ),

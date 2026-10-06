@@ -137,7 +137,7 @@ class _PrivateProfileAvatarState extends State<PrivateProfileAvatar> {
     }
 
     return Stack(
-      alignment: Alignment.bottomRight,
+      alignment: AlignmentDirectional.bottomStart,
       children: [
         CircleAvatar(
           radius: widget.radius,

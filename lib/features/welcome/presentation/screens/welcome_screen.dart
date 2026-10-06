@@ -102,9 +102,9 @@ class WelcomeScreen extends StatelessWidget {
                 ),
               ),
 
-              const Positioned(
+              const PositionedDirectional(
                 top: 16,
-                right: 16,
+                start: 16,
                 child: _LanguageSelector(),
               ),
 

@@ -265,7 +265,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               ),
               title: Text(
                 l10n.editProfile,
-                textAlign: TextAlign.right,
+                textAlign: TextAlign.start,
                 style: TextStyle(
                   color: colors.label,
                   fontWeight: FontWeight.w700,
@@ -328,7 +328,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       label: l10n.firstNameLabel,
                       hint: l10n.firstNameLabel,
                       icon: Icons.person_outline,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                     ),
                     SizedBox(height: card.padding),
                     AppTextField(
@@ -336,7 +336,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       label: l10n.lastNameLabel,
                       hint: l10n.lastNameLabel,
                       icon: Icons.person_outline,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                     ),
                     SizedBox(height: card.padding),
                     AppTextField(
@@ -370,7 +370,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       label: l10n.addressLabel,
                       hint: l10n.addressLabel,
                       icon: Icons.location_on_outlined,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                     ),
                   ],
                 ),
@@ -579,7 +579,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       minFontSize: 14,
                       fontWeight: FontWeight.bold,
                       maxLines: 2,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                     ),
                     SizedBox(height: card.padding * 0.4),
                     _responsiveText(
@@ -588,7 +588,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       maxFontSize: 13,
                       minFontSize: 10,
                       maxLines: 1,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                     ),
                     if (profile?.username.isNotEmpty == true) ...[
                       SizedBox(height: card.padding * 0.35),
@@ -598,7 +598,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         maxFontSize: 12,
                         minFontSize: 9,
                         maxLines: 1,
-                        textAlign: TextAlign.right,
+                        textAlign: TextAlign.start,
                       ),
                     ],
                   ],
@@ -943,7 +943,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   maxFontSize: 11,
                   minFontSize: 9,
                   maxLines: 1,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                 ),
                 SizedBox(height: card.padding * 0.25),
                 _responsiveText(
@@ -953,7 +953,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   minFontSize: 10,
                   fontWeight: FontWeight.w700,
                   maxLines: 2,
-                  textAlign: TextAlign.right,
+                  textAlign: TextAlign.start,
                 ),
               ],
             ),

@@ -676,7 +676,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             },
                           ),
                           Align(
-                            alignment: Alignment.centerRight,
+                            alignment: AlignmentDirectional.centerStart,
                             child: TextButton(
                               onPressed: _isLoading
                                   ? null

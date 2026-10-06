@@ -325,7 +325,7 @@ class _InfoRow extends StatelessWidget {
           const SizedBox(width: 10),
           Expanded(
             child: Align(
-              alignment: Alignment.centerRight,
+              alignment: AlignmentDirectional.centerStart,
               child: _ResponsiveOneLineText(
                 text: value,
                 textAlign: TextAlign.end,
@@ -400,14 +400,18 @@ class _ResponsiveOneLineText extends StatelessWidget {
       fontSize = minFontSize;
     }
 
-    Alignment alignment;
+    final AlignmentGeometry alignment;
 
-    if (textAlign == TextAlign.end || textAlign == TextAlign.right) {
-      alignment = Alignment.centerRight;
+    if (textAlign == TextAlign.end) {
+      alignment = AlignmentDirectional.centerEnd;
     } else if (textAlign == TextAlign.center) {
       alignment = Alignment.center;
-    } else {
+    } else if (textAlign == TextAlign.right) {
+      alignment = Alignment.centerRight;
+    } else if (textAlign == TextAlign.left) {
       alignment = Alignment.centerLeft;
+    } else {
+      alignment = AlignmentDirectional.centerStart;
     }
 
     return SizedBox(

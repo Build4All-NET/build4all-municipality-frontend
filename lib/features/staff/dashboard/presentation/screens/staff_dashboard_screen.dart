@@ -444,7 +444,7 @@ class _WelcomeHeader extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment:
-                  isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                  CrossAxisAlignment.start,
               children: [
                 _ResponsiveText(
                   text: loc.dashboard,
@@ -452,7 +452,7 @@ class _WelcomeHeader extends StatelessWidget {
                   minFontSize: 12,
                   fontWeight: FontWeight.w900,
                   color: colors.onPrimary,
-                  textAlign: isRtl ? TextAlign.right : TextAlign.left,
+                  textAlign: TextAlign.start,
                 ),
                 const SizedBox(height: 4),
                 _ResponsiveText(
@@ -460,7 +460,7 @@ class _WelcomeHeader extends StatelessWidget {
                   maxFontSize: 13,
                   minFontSize: 9,
                   color: colors.onPrimary.withOpacity(0.78),
-                  textAlign: isRtl ? TextAlign.right : TextAlign.left,
+                  textAlign: TextAlign.start,
                 ),
               ],
             ),
@@ -597,7 +597,7 @@ class _ActivityItem extends StatelessWidget {
           Expanded(
             child: Text(
               text,
-              textAlign: isRtl ? TextAlign.right : TextAlign.left,
+              textAlign: TextAlign.start,
               style: theme.textTheme.bodyMedium,
             ),
           ),
@@ -629,7 +629,7 @@ class _PerformanceItem extends StatelessWidget {
           Expanded(
             child: Text(
               title,
-              textAlign: isRtl ? TextAlign.right : TextAlign.left,
+              textAlign: TextAlign.start,
               style: theme.textTheme.bodyMedium,
             ),
           ),
@@ -687,14 +687,18 @@ class _ResponsiveText extends StatelessWidget {
       fontSize = minFontSize;
     }
 
-    Alignment alignment;
+    final AlignmentGeometry alignment;
 
-    if (textAlign == TextAlign.end || textAlign == TextAlign.right) {
-      alignment = Alignment.centerRight;
+    if (textAlign == TextAlign.end) {
+      alignment = AlignmentDirectional.centerEnd;
     } else if (textAlign == TextAlign.center) {
       alignment = Alignment.center;
-    } else {
+    } else if (textAlign == TextAlign.right) {
+      alignment = Alignment.centerRight;
+    } else if (textAlign == TextAlign.left) {
       alignment = Alignment.centerLeft;
+    } else {
+      alignment = AlignmentDirectional.centerStart;
     }
 
     return SizedBox(

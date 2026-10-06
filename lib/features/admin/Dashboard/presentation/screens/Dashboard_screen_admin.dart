@@ -681,7 +681,7 @@ class _WelcomeHeader extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment:
-                  isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                  CrossAxisAlignment.start,
               children: [
                 Text(
                   loc.dashboard,
@@ -913,7 +913,7 @@ class _RecentRequestsPanel extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
           Padding(
-            padding: const EdgeInsets.fromLTRB(16, 12, 8, 4),
+            padding: const EdgeInsetsDirectional.fromSTEB(8, 12, 16, 4),
             child: Row(
               children: [
                 Expanded(

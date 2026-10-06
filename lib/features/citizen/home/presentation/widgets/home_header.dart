@@ -79,9 +79,9 @@ class HomeHeader extends StatelessWidget {
                     ),
 
                     if (notificationCount > 0)
-                      Positioned(
+                      PositionedDirectional(
                         top: 0,
-                        right: 0,
+                        start: 0,
                         child: Container(
                           width: 18,
                           height: 18,

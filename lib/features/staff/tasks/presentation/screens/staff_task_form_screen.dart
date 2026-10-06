@@ -1451,7 +1451,7 @@ class _DynamicField extends StatelessWidget {
               if (state.hasError)
                 Padding(
                   padding:
-                      const EdgeInsets.only(left: 12, top: 4),
+                      const EdgeInsetsDirectional.only(end: 12, top: 4),
                   child: Text(
                     state.errorText ?? '',
                     style: theme.textTheme.bodySmall
