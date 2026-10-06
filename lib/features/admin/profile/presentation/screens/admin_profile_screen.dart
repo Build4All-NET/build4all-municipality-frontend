@@ -328,7 +328,7 @@ class _InfoRow extends StatelessWidget {
               alignment: AlignmentDirectional.centerStart,
               child: _ResponsiveOneLineText(
                 text: value,
-                textAlign: TextAlign.end,
+                textAlign: TextAlign.start,
                 maxFontSize: 14,
                 minFontSize: 8,
                 fontWeight: FontWeight.w800,
