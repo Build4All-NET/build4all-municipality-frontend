@@ -419,10 +419,12 @@ class _InfoRow extends StatelessWidget {
         Text(label,
             style: theme.textTheme.bodyMedium
                 ?.copyWith(color: colors.outline)),
-        const Spacer(),
-        Text(value,
-            style: theme.textTheme.bodyMedium
-                ?.copyWith(fontWeight: FontWeight.w600)),
+        const SizedBox(width: 8),
+        Flexible(
+          child: Text(value,
+              style: theme.textTheme.bodyMedium
+                  ?.copyWith(fontWeight: FontWeight.w600)),
+        ),
       ],
     );
   }

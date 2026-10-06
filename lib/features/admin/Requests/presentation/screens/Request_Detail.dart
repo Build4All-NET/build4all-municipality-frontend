@@ -817,7 +817,7 @@ class _DetailRow extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    flex: 4,
+                    flex: 3,
                     child: Text(
                       label,
                       maxLines: 2,
@@ -830,10 +830,10 @@ class _DetailRow extends StatelessWidget {
                   ),
                   const SizedBox(width: 10),
                   Expanded(
-                    flex: 5,
+                    flex: 7,
                     child: Text(
                       value,
-                      textAlign: TextAlign.end,
+                      textAlign: TextAlign.start,
                       softWrap: true,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: colors.onSurface,
