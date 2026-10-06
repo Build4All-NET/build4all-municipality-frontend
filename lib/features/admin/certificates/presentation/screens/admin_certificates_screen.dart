@@ -85,7 +85,7 @@ class _AdminCertificatesScreenState extends State<AdminCertificatesScreen> {
             actions: [
               if (state.actionLoading)
                 const Padding(
-                  padding: EdgeInsets.only(right: 8),
+                  padding: EdgeInsetsDirectional.only(start: 8),
                   child: SizedBox(
                     width: 20,
                     height: 20,

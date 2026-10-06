@@ -280,7 +280,7 @@ class _PaymentsScreenState extends State<PaymentsScreen>
                 Expanded(
                   child: Text(
                     p.title,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
@@ -379,7 +379,7 @@ class _PaymentsScreenState extends State<PaymentsScreen>
                 Expanded(
                   child: Text(
                     p.title,
-                    textAlign: TextAlign.right,
+                    textAlign: TextAlign.start,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(

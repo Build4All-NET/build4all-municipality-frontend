@@ -583,14 +583,18 @@ class _ResponsiveText extends StatelessWidget {
       fontSize = minFontSize;
     }
 
-    Alignment alignment;
+    final AlignmentGeometry alignment;
 
-    if (textAlign == TextAlign.end || textAlign == TextAlign.right) {
-      alignment = Alignment.centerRight;
+    if (textAlign == TextAlign.end) {
+      alignment = AlignmentDirectional.centerEnd;
     } else if (textAlign == TextAlign.center) {
       alignment = Alignment.center;
-    } else {
+    } else if (textAlign == TextAlign.right) {
+      alignment = Alignment.centerRight;
+    } else if (textAlign == TextAlign.left) {
       alignment = Alignment.centerLeft;
+    } else {
+      alignment = AlignmentDirectional.centerStart;
     }
 
     return SizedBox(

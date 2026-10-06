@@ -85,7 +85,7 @@ class NotificationsScreen extends StatelessWidget {
       child: SafeArea(
         bottom: false,
         child: Padding(
-          padding: const EdgeInsets.fromLTRB(4, 8, 20, 12),
+          padding: const EdgeInsetsDirectional.fromSTEB(20, 8, 4, 12),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -251,7 +251,7 @@ class _NotifCard extends StatelessWidget {
               children: [
                 Expanded(
                   child: Padding(
-                    padding: const EdgeInsets.fromLTRB(14, 14, 4, 14),
+                    padding: const EdgeInsetsDirectional.fromSTEB(4, 14, 14, 14),
                     child: Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -288,14 +288,14 @@ class _NotifCard extends StatelessWidget {
                                       ? const Color(0xFF1E3A5F)
                                       : Colors.black87,
                                 ),
-                                textAlign: TextAlign.right,
+                                textAlign: TextAlign.start,
                                 maxLines: 2,
                                 overflow: TextOverflow.ellipsis,
                               ),
                               const SizedBox(height: 6),
                               Text(
                                 item.body,
-                                textAlign: TextAlign.right,
+                                textAlign: TextAlign.start,
                                 style: const TextStyle(
                                     fontSize: 13, color: Colors.grey),
                                 maxLines: 3,
@@ -336,7 +336,7 @@ class _NotifCard extends StatelessWidget {
                 Container(
                   width: 52,
                   margin: const EdgeInsets.symmetric(vertical: 14),
-                  padding: const EdgeInsets.only(right: 4),
+                  padding: const EdgeInsetsDirectional.only(start: 4),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.start,
                     children: [

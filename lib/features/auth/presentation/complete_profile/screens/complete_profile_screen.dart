@@ -321,7 +321,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
           GestureDetector(
             onTap: _isLoading ? null : _pickImage,
             child: Stack(
-              alignment: Alignment.bottomRight,
+              alignment: AlignmentDirectional.bottomStart,
               children: [
                 CircleAvatar(
                   radius: 52,

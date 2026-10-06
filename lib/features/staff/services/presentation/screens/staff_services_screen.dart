@@ -220,13 +220,13 @@ class _HeaderCard extends StatelessWidget {
           Expanded(
             child: Column(
               crossAxisAlignment:
-                  isRtl ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                  CrossAxisAlignment.start,
               children: [
                 Text(
                   title,
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  textAlign: isRtl ? TextAlign.right : TextAlign.left,
+                  textAlign: TextAlign.start,
                   style: theme.textTheme.titleLarge?.copyWith(
                     color: colors.onPrimary,
                     fontWeight: FontWeight.w900,
@@ -237,7 +237,7 @@ class _HeaderCard extends StatelessWidget {
                   subtitle,
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
-                  textAlign: isRtl ? TextAlign.right : TextAlign.left,
+                  textAlign: TextAlign.start,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: colors.onPrimary.withOpacity(0.78),
                   ),
@@ -320,7 +320,7 @@ class _ServiceReadOnlyCard extends StatelessWidget {
                 title.trim().isNotEmpty ? title : '---',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                textAlign: isRtl ? TextAlign.right : TextAlign.left,
+                textAlign: TextAlign.start,
                 style: theme.textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.w800,
                 ),
@@ -338,7 +338,7 @@ class _ServiceReadOnlyCard extends StatelessWidget {
                 : '${loc.department}: ${service.departmentId} • ${loc.price}: ${service.feeAmount.toStringAsFixed(2)}',
             maxLines: 2,
             overflow: TextOverflow.ellipsis,
-            textAlign: isRtl ? TextAlign.right : TextAlign.left,
+            textAlign: TextAlign.start,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: colors.onSurface.withOpacity(0.68),
             ),

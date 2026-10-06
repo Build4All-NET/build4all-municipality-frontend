@@ -94,7 +94,7 @@ class _AnnouncementsCardState extends State<AnnouncementsCard> {
           else if (_error != null)
             Text(
               l10n.loadFailed,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: cs.error,
                 fontSize: 13,
@@ -103,7 +103,7 @@ class _AnnouncementsCardState extends State<AnnouncementsCard> {
           else if (_announcements.isEmpty)
             Text(
               l10n.noAnnouncements,
-              textAlign: TextAlign.right,
+              textAlign: TextAlign.start,
               style: theme.textTheme.bodySmall?.copyWith(
                 color: cs.outline,
                 fontSize: 13,
@@ -120,7 +120,7 @@ class _AnnouncementsCardState extends State<AnnouncementsCard> {
                   children: [
                     Text(
                       a.title,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                       style: theme.textTheme.bodyMedium?.copyWith(
                         color: cs.onSurface,
                         fontWeight: FontWeight.w600,
@@ -130,7 +130,7 @@ class _AnnouncementsCardState extends State<AnnouncementsCard> {
                     const SizedBox(height: 4),
                     Text(
                       a.content,
-                      textAlign: TextAlign.right,
+                      textAlign: TextAlign.start,
                       style: theme.textTheme.bodySmall?.copyWith(
                         color: cs.onSurface,
                         fontSize: 12,
