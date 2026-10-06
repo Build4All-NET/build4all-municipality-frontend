@@ -626,13 +626,12 @@ class _PerformanceItem extends StatelessWidget {
       child: Row(
         textDirection: isRtl ? TextDirection.rtl : TextDirection.ltr,
         children: [
-          Expanded(
-            child: Text(
-              title,
-              textAlign: TextAlign.start,
-              style: theme.textTheme.bodyMedium,
-            ),
+          Text(
+            title,
+            textAlign: TextAlign.start,
+            style: theme.textTheme.bodyMedium,
           ),
+          const SizedBox(width: 12),
           Text(
             value,
             style: theme.textTheme.titleSmall?.copyWith(
