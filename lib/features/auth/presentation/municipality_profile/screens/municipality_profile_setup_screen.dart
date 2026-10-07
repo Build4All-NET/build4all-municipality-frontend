@@ -1,3 +1,4 @@
+import 'package:baladiyati/core/config/app_branding.dart';
 import 'package:baladiyati/common/widgets/app_text_field.dart';
 import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/common/widgets/primary_button.dart';
@@ -448,7 +449,7 @@ class _MunicipalityProfileSetupScreenState
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            l10n.appTitle,
+            brandName(context),
             style: theme.textTheme.titleMedium?.copyWith(
               color: cs.onSurface,
               fontWeight: FontWeight.w600,

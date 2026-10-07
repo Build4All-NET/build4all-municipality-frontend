@@ -141,7 +141,9 @@ class AppLocalizationsAr extends AppLocalizations {
   String get eightDigits => 'يجب أن يكون 8 أرقام';
 
   @override
-  String get copyright => '© 2026 بلديتي - جميع الحقوق محفوظة';
+  String copyright(Object name) {
+    return '© 2026 $name - جميع الحقوق محفوظة';
+  }
 
   @override
   String get errorGeneric => 'حدث خطأ ما. يرجى المحاولة مرة أخرى.';

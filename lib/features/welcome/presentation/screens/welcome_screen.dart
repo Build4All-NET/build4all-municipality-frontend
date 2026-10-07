@@ -1,5 +1,6 @@
 // lib/features/welcome/presentation/screens/welcome_screen.dart
 
+import 'package:baladiyati/core/config/app_branding.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 
@@ -43,23 +44,27 @@ class WelcomeScreen extends StatelessWidget {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Container(
-                          width: 150,
-                          height: 150,
-                          decoration: BoxDecoration(
-                            color: cs.onPrimary.withOpacity(0.18),
-                            borderRadius: BorderRadius.circular(32),
-                          ),
-                          child: Icon(
-                            Icons.apartment,
-                            size: 85,
-                            color: cs.onPrimary,
+                        BrandLogo(
+                          size: 150,
+                          radius: 32,
+                          fallback: Container(
+                            width: 150,
+                            height: 150,
+                            decoration: BoxDecoration(
+                              color: cs.onPrimary.withOpacity(0.18),
+                              borderRadius: BorderRadius.circular(32),
+                            ),
+                            child: Icon(
+                              Icons.apartment,
+                              size: 85,
+                              color: cs.onPrimary,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 36),
 
                         Text(
-                          l10n.appTitle,
+                          brandName(context),
                           textAlign: TextAlign.center,
                           style: theme.textTheme.displaySmall?.copyWith(
                             fontWeight: FontWeight.bold,
@@ -113,7 +118,7 @@ class WelcomeScreen extends StatelessWidget {
                 left: 0,
                 right: 0,
                 child: Text(
-                  l10n.copyright,
+                  l10n.copyright(brandName(context)),
                   textAlign: TextAlign.center,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: cs.onPrimary.withOpacity(0.55),

@@ -1,5 +1,6 @@
 // lib/features/auth/presentation/complete_profile/screens/complete_profile_screen.dart
 
+import 'package:baladiyati/core/config/app_branding.dart';
 import 'dart:convert';
 
 import 'package:baladiyati/app/app_router.dart';
@@ -414,7 +415,7 @@ class _CompleteProfileScreenState extends State<CompleteProfileScreen> {
             ),
           ),
           Text(
-            l10n.appTitle,
+            brandName(context),
             style: theme.textTheme.titleMedium?.copyWith(
               color: cs.onSurface,
               fontWeight: FontWeight.w600,

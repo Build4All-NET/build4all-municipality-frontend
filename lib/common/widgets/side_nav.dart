@@ -1,5 +1,6 @@
 // lib/common/widgets/side_nav.dart
 
+import 'package:baladiyati/core/config/app_branding.dart';
 import 'package:flutter/material.dart';
 import 'package:baladiyati/l10n/app_localizations.dart';
 
@@ -33,7 +34,7 @@ class SideNav extends StatelessWidget {
     final l10n = AppLocalizations.of(context)!;
 
     return AppSidebar(
-      title: l10n.appTitle,
+      title: brandName(context),
       subtitle: municipalityName ?? l10n.appSubtitle,
       collapsed: !extended,
       selectedIndex: currentIndex,
