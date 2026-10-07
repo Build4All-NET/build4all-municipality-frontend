@@ -1,3 +1,4 @@
+import 'package:baladiyati/core/config/app_branding.dart';
 import 'package:baladiyati/app/app_router.dart';
 import 'package:baladiyati/common/widgets/app_toast.dart';
 import 'package:baladiyati/core/config/jwt_store.dart';
@@ -231,7 +232,7 @@ class _StaffDashboardScreenState extends State<StaffDashboardScreen> {
       body: Row(
         children: [
           AppSidebar(
-            title: loc.appTitle,
+            title: brandName(context),
             subtitle: loc.roleStaff,
             brandIcon: Icons.badge_outlined,
             collapsed: !context.isExpanded,

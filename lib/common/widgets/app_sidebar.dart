@@ -1,5 +1,6 @@
 // lib/common/widgets/app_sidebar.dart
 
+import 'package:baladiyati/core/config/app_branding.dart';
 import 'package:flutter/material.dart';
 import 'package:baladiyati/core/config/app_breakpoints.dart';
 import 'package:baladiyati/core/config/app_sizes.dart';
@@ -120,14 +121,18 @@ class _Brand extends StatelessWidget {
     final theme = Theme.of(context);
     final cs = theme.colorScheme;
 
-    final logo = Container(
-      width: AppLayout.sidebarLogoSize,
-      height: AppLayout.sidebarLogoSize,
-      decoration: BoxDecoration(
-        color: cs.primary,
-        borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+    final logo = BrandLogo(
+      size: AppLayout.sidebarLogoSize,
+      radius: AppSizes.radiusMedium,
+      fallback: Container(
+        width: AppLayout.sidebarLogoSize,
+        height: AppLayout.sidebarLogoSize,
+        decoration: BoxDecoration(
+          color: cs.primary,
+          borderRadius: BorderRadius.circular(AppSizes.radiusMedium),
+        ),
+        child: Icon(icon, color: cs.onPrimary, size: AppSizes.iconMedium),
       ),
-      child: Icon(icon, color: cs.onPrimary, size: AppSizes.iconMedium),
     );
 
     return Padding(

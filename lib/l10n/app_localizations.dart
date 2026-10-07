@@ -364,8 +364,8 @@ abstract class AppLocalizations {
   /// No description provided for @copyright.
   ///
   /// In en, this message translates to:
-  /// **'© 2026 Baladiyati - All rights reserved'**
-  String get copyright;
+  /// **'© 2026 {name} - All rights reserved'**
+  String copyright(Object name);
 
   /// No description provided for @errorGeneric.
   ///

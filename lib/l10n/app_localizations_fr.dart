@@ -141,7 +141,9 @@ class AppLocalizationsFr extends AppLocalizations {
   String get eightDigits => 'Doit contenir 8 chiffres';
 
   @override
-  String get copyright => '© 2026 Baladiyati - Tous droits réservés';
+  String copyright(Object name) {
+    return '© 2026 $name - Tous droits réservés';
+  }
 
   @override
   String get errorGeneric => 'Une erreur s\'est produite. Veuillez réessayer.';

@@ -1,5 +1,6 @@
 // lib/app/app.dart
 
+import 'package:baladiyati/core/config/app_branding.dart';
 import 'package:baladiyati/common/registration_step_cubit.dart';
 import 'package:baladiyati/features/auth/presentation/gate/auth_gate.dart';
 import 'package:flutter/material.dart';
@@ -34,7 +35,7 @@ class MyApp extends StatelessWidget {
           AppStrings.setLocale(locale);
 
           return MaterialApp(
-            onGenerateTitle: (context) => AppLocalizations.of(context)!.appTitle,
+            onGenerateTitle: (context) => brandName(context),
             debugShowCheckedModeBanner: false,
             navigatorKey: AppNavigator.key,
             theme: themeState.themeData,

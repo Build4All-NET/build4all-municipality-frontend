@@ -1,3 +1,4 @@
+import 'package:baladiyati/core/config/app_branding.dart';
 import 'package:baladiyati/app/app_router.dart';
 import 'package:baladiyati/core/config/jwt_store.dart';
 import 'package:baladiyati/core/l10n/locale_cubit.dart';
@@ -367,7 +368,7 @@ class _DashboardPageState extends State<DashboardPage> {
       body: Row(
         children: [
           AppSidebar(
-            title: loc.appTitle,
+            title: brandName(context),
             subtitle: loc.roleOwner,
             brandIcon: Icons.admin_panel_settings_outlined,
             collapsed: !context.isExpanded,
