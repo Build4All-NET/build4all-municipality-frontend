@@ -586,7 +586,7 @@ abstract class AppLocalizations {
   /// No description provided for @phoneInvalid.
   ///
   /// In en, this message translates to:
-  /// **'Phone number must contain 8 to 15 digits'**
+  /// **'Invalid phone number. Example: 03 123 456 or 70 123 456'**
   String get phoneInvalid;
 
   /// No description provided for @missingBuild4allToken.

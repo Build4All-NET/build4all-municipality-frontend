@@ -254,7 +254,7 @@ class AppLocalizationsAr extends AppLocalizations {
   String get addressTooShort => 'العنوان قصير جدًا';
 
   @override
-  String get phoneInvalid => 'رقم الهاتف يجب أن يحتوي على 8 إلى 15 رقمًا';
+  String get phoneInvalid => 'رقم هاتف غير صالح. مثال: 03 123 456 أو 70 123 456';
 
   @override
   String get missingBuild4allToken => 'رمز تسجيل الدخول غير موجود. يرجى تسجيل الدخول من جديد.';
