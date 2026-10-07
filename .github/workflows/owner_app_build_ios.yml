@@ -883,15 +883,33 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
-          BUNDLE_ID="$(tr -d '\r\n' < ci_ios_bundle_id.txt)"
-          bundle exec fastlane run produce \
-            app_identifier:"$BUNDLE_ID" \
-            team_id:"${IOS_TEAM_ID}" \
-            api_key_path:"$GITHUB_WORKSPACE/.private/api_key.json" \
-            skip_itc:false \
-            language:"${APPLE_PRIMARY_LOCALE:-en-US}" \
-            app_name:"${APPLE_APP_NAME:-Runner}" \
-            sku:"${APPLE_SKU:-$BUNDLE_ID}" || true
+          # fastlane produce cannot authenticate with an App Store Connect API key (it asks for an Apple ID),
+          # so the Bundle ID (App ID) is registered directly through the App Store Connect API.
+          python3 - <<'PY'
+          import json, jwt, time, re, pathlib, requests, sys
+          api_key = json.load(open(".private/api_key.json", encoding="utf-8"))
+          bundle_id = pathlib.Path("ci_ios_bundle_id.txt").read_text(encoding="utf-8").strip()
+          def headers():
+              tok = jwt.encode({"iss": api_key["issuer_id"], "iat": int(time.time()), "exp": int(time.time()) + 1200,
+                                "aud": "appstoreconnect-v1"}, api_key["key"], algorithm="ES256",
+                               headers={"kid": api_key["key_id"], "typ": "JWT"})
+              return {"Authorization": f"Bearer {tok}", "Content-Type": "application/json"}
+          r = requests.get("https://api.appstoreconnect.apple.com/v1/bundleIds",
+                           params={"filter[identifier]": bundle_id, "filter[platform]": "IOS", "limit": 200},
+                           headers=headers(), timeout=30)
+          r.raise_for_status()
+          if any(d["attributes"]["identifier"] == bundle_id for d in r.json().get("data", [])):
+              print(f"App ID already registered: {bundle_id}")
+              sys.exit(0)
+          name = "B4A " + re.sub(r"[^A-Za-z0-9 ]+", " ", bundle_id).strip()
+          body = {"data": {"type": "bundleIds",
+                           "attributes": {"identifier": bundle_id, "name": name, "platform": "IOS"}}}
+          r = requests.post("https://api.appstoreconnect.apple.com/v1/bundleIds", headers=headers(), json=body, timeout=30)
+          print(r.status_code, r.text[:600])
+          if r.status_code not in (200, 201, 409):
+              raise SystemExit(f"Could not register App ID {bundle_id}")
+          print(f"App ID registered: {bundle_id}")
+          PY
 
       - name: Grant existing App Store Connect user access to this app
         shell: bash
