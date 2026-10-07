@@ -254,7 +254,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addressTooShort => 'Address is too short';
 
   @override
-  String get phoneInvalid => 'Phone number must contain 8 to 15 digits';
+  String get phoneInvalid => 'Invalid phone number. Example: 03 123 456 or 70 123 456';
 
   @override
   String get missingBuild4allToken => 'Missing login token. Please login again.';

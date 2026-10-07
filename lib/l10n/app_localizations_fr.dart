@@ -254,7 +254,7 @@ class AppLocalizationsFr extends AppLocalizations {
   String get addressTooShort => 'L’adresse est trop courte';
 
   @override
-  String get phoneInvalid => 'Le numéro doit contenir entre 8 et 15 chiffres';
+  String get phoneInvalid => 'Numéro de téléphone invalide. Exemple : 03 123 456 ou 70 123 456';
 
   @override
   String get missingBuild4allToken => 'Token de connexion manquant. Veuillez vous reconnecter.';

@@ -143,7 +143,8 @@ class _MunicipalityProfileSetupScreenState
   String _phoneForBackend() {
     final phone = _phoneCtrl.value;
     final nsn = phone.nsn.trim().replaceAll(RegExp(r'\s+'), '');
-    if (nsn.isNotEmpty) return nsn;
+    // Lebanese numbers go as typed locally (the backend adds the trunk 0 of 03 / 01); others with their country code.
+    if (nsn.isNotEmpty) return phone.countryCode == '961' ? nsn : '+${phone.countryCode}$nsn';
     return phone.international.trim().replaceAll(RegExp(r'[^0-9]'), '');
   }
 

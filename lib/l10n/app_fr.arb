@@ -82,7 +82,7 @@
   "addressLabel": "Adresse",
   "addressHint": "Entrez votre adresse",
   "addressTooShort": "L’adresse est trop courte",
-  "phoneInvalid": "Le numéro doit contenir entre 8 et 15 chiffres",
+  "phoneInvalid": "Numéro de téléphone invalide. Exemple : 03 123 456 ou 70 123 456",
   "missingBuild4allToken": "Token de connexion manquant. Veuillez vous reconnecter.",
   "missingBuild4allUser": "Données utilisateur manquantes. Veuillez vous reconnecter.",
   "resetPasswordTitle": "Réinitialiser le mot de passe",
